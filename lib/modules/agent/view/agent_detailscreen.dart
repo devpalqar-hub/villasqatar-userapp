@@ -61,11 +61,10 @@ class AgentDetailScreen extends StatelessWidget {
             SizedBox(height: 20.h),
 
             AgentContactButtons(
-  onCall: () => _makeCall("+97455123456"),
-  onWhatsApp: () => _openWhatsApp("+97455123456"),
-  onEmail: () => _sendEmail("agent@villasqatar.com"),
-),
-        
+              onCall: () => _makeCall("+97455123456"),
+              onWhatsApp: () => _openWhatsApp("+97455123456"),
+              onEmail: () => _sendEmail("agent@villasqatar.com"),
+            ),
 
             SizedBox(height: 22.h),
 
@@ -226,43 +225,33 @@ class AgentDetailScreen extends StatelessWidget {
     );
   }
 
-
-
   Future<void> _makeCall(String phone) async {
-  final Uri uri = Uri(
-    scheme: 'tel',
-    path: phone,
-  );
+    final Uri uri = Uri(scheme: 'tel', path: phone);
 
-  if (await canLaunchUrl(uri)) {
-    await launchUrl(uri);
+    if (await canLaunchUrl(uri)) {
+      await launchUrl(uri);
+    }
   }
-}
 
-Future<void> _openWhatsApp(String phone) async {
-  final number = phone.replaceAll(RegExp(r'[^0-9]'), '');
+  Future<void> _openWhatsApp(String phone) async {
+    final number = phone.replaceAll(RegExp(r'[^0-9]'), '');
 
-  final Uri uri = Uri.parse(
-    'https://wa.me/$number',
-  );
+    final Uri uri = Uri.parse('https://wa.me/$number');
 
-  if (await canLaunchUrl(uri)) {
-    await launchUrl(
-      uri,
-      mode: LaunchMode.externalApplication,
+    if (await canLaunchUrl(uri)) {
+      await launchUrl(uri, mode: LaunchMode.externalApplication);
+    }
+  }
+
+  Future<void> _sendEmail(String email) async {
+    final Uri uri = Uri(
+      scheme: 'mailto',
+      path: email,
+      query: 'subject=Property Inquiry',
     );
-  }
-}
 
-Future<void> _sendEmail(String email) async {
-  final Uri uri = Uri(
-    scheme: 'mailto',
-    path: email,
-    query: 'subject=Property Inquiry',
-  );
-
-  if (await canLaunchUrl(uri)) {
-    await launchUrl(uri);
+    if (await canLaunchUrl(uri)) {
+      await launchUrl(uri);
+    }
   }
-}
 }

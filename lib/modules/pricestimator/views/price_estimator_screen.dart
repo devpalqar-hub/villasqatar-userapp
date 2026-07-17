@@ -42,195 +42,197 @@ class _PriceEstimatorScreenState extends State<PriceEstimatorScreen> {
     return Scaffold(
       backgroundColor: AppColors.background,
       appBar: _buildAppBar(context),
-      body: ListView(
-        padding: const EdgeInsets.only(bottom: 24),
-        children: [
-          _buildHero(context),
-          Padding(
-            padding: const EdgeInsets.fromLTRB(16, 10, 16, 0),
-            child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(10.r),
-                border: Border.all(color: const Color(0xFFE8E8ED), width: 1),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.04),
-                    blurRadius: 18,
-                    spreadRadius: 0,
-                    offset: const Offset(0, 6),
-                  ),
-                ],
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Container(
-                    padding: EdgeInsets.symmetric(
-                      horizontal: 10.w,
-                      vertical: 18.h,
+      body: SafeArea(
+        child: ListView(
+          padding: EdgeInsets.symmetric(horizontal: 5.w,vertical: 10.h),
+          children: [
+            _buildHero(context),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16, 10, 16, 0),
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(10.r),
+                  border: Border.all(color: const Color(0xFFE8E8ED), width: 1),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.04),
+                      blurRadius: 18,
+                      spreadRadius: 0,
+                      offset: const Offset(0, 6),
                     ),
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(10.r),
-                      border: Border.all(color: const Color(0xFFE9E9EF)),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withOpacity(.04),
-                          blurRadius: 14,
-                          offset: const Offset(0, 4),
+                  ],
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Container(
+                      padding: EdgeInsets.symmetric(
+                        horizontal: 10.w,
+                        vertical: 18.h,
+                      ),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(10.r),
+                        border: Border.all(color: const Color(0xFFE9E9EF)),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(.04),
+                            blurRadius: 14,
+                            offset: const Offset(0, 4),
+                          ),
+                        ],
+                      ),
+                      child: Row(
+                        children: [
+                          /// Location
+                          Expanded(
+                            child: Row(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Icon(
+                                  Icons.location_on_outlined,
+                                  color: AppColors.primary,
+                                  size: 24.sp,
+                                ),
+                                const SizedBox(width: 14),
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        "Location",
+                                        style: TextStyle(
+                                          fontSize: 13,
+                                          fontWeight: FontWeight.w600,
+                                        ),
+                                      ),
+                                      SizedBox(height: 4.h),
+                                      TextField(
+                                        maxLines: 2,
+                                        minLines: 1,
+                                        decoration: InputDecoration(
+                                          hintText:
+                                              "Enter city, locality or area",
+                                          hintMaxLines: 2,
+                                          border: InputBorder.none,
+                                          isDense: true,
+                                          contentPadding: EdgeInsets.zero,
+                                          hintStyle: TextStyle(
+                                            color: const Color(0xFF8A8A99),
+                                            fontSize: 10.sp,
+                                            height: 1.3,
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+        
+                          Container(
+                            margin: const EdgeInsets.symmetric(horizontal: 18),
+                            height: 58,
+                            width: 1,
+                            color: const Color(0xFFE4E4EA),
+                          ),
+        
+                          /// Area
+                          Expanded(
+                            child: Row(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Icon(
+                                  Icons.square_foot_outlined,
+                                  color: AppColors.primary,
+                                  size: 22.sp,
+                                ),
+                                const SizedBox(width: 14),
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      const Text(
+                                        "Area (sqft)",
+                                        style: TextStyle(
+                                          fontSize: 13,
+                                          fontWeight: FontWeight.w600,
+                                        ),
+                                      ),
+                                      const SizedBox(height: 8),
+                                      TextField(
+                                        keyboardType: TextInputType.number,
+                                        decoration: InputDecoration(
+                                          hintText: "e.g. 1200",
+                                          suffixText: "sqft",
+                                          border: InputBorder.none,
+                                          isDense: true,
+                                          contentPadding: EdgeInsets.zero,
+                                          hintStyle: TextStyle(
+                                            color: Color(0xFF8A8A99),
+                                            fontSize: 12.sp,
+                                          ),
+                                          suffixStyle: TextStyle(
+                                            color: Color.fromARGB(255, 44, 44, 150),
+                                            fontSize: 12.sp,
+                                            fontWeight: FontWeight.w500,
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                SizedBox(height: 12.h),
+                    _sectionLabel('Property Type'),
+                    const SizedBox(height: 8),
+                    _buildTypeGrid(),
+                    const SizedBox(height: 20),
+                    Row(
+                      children: const [
+                        Text(
+                          'Quick Details',
+                          style: TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w700,
+                            color: AppColors.textPrimary,
+                          ),
+                        ),
+                        SizedBox(width: 6),
+                        Text(
+                          '(Optional)',
+                          style: TextStyle(
+                            fontSize: 12.5,
+                            color: AppColors.textSecondary,
+                          ),
                         ),
                       ],
                     ),
-                    child: Row(
-                      children: [
-                        /// Location
-                        Expanded(
-                          child: Row(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Icon(
-                                Icons.location_on_outlined,
-                                color: AppColors.primary,
-                                size: 24.sp,
-                              ),
-                              const SizedBox(width: 14),
-                              Expanded(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      "Location",
-                                      style: TextStyle(
-                                        fontSize: 13,
-                                        fontWeight: FontWeight.w600,
-                                      ),
-                                    ),
-                                    SizedBox(height: 4.h),
-                                    TextField(
-                                      maxLines: 2,
-                                      minLines: 1,
-                                      decoration: InputDecoration(
-                                        hintText:
-                                            "Enter city, locality or area",
-                                        hintMaxLines: 2,
-                                        border: InputBorder.none,
-                                        isDense: true,
-                                        contentPadding: EdgeInsets.zero,
-                                        hintStyle: TextStyle(
-                                          color: const Color(0xFF8A8A99),
-                                          fontSize: 10.sp,
-                                          height: 1.3,
-                                        ),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-
-                        Container(
-                          margin: const EdgeInsets.symmetric(horizontal: 18),
-                          height: 58,
-                          width: 1,
-                          color: const Color(0xFFE4E4EA),
-                        ),
-
-                        /// Area
-                        Expanded(
-                          child: Row(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Icon(
-                                Icons.square_foot_outlined,
-                                color: AppColors.primary,
-                                size: 22.sp,
-                              ),
-                              const SizedBox(width: 14),
-                              Expanded(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    const Text(
-                                      "Area (sqft)",
-                                      style: TextStyle(
-                                        fontSize: 13,
-                                        fontWeight: FontWeight.w600,
-                                      ),
-                                    ),
-                                    const SizedBox(height: 8),
-                                    TextField(
-                                      keyboardType: TextInputType.number,
-                                      decoration: InputDecoration(
-                                        hintText: "e.g. 1200",
-                                        suffixText: "sqft",
-                                        border: InputBorder.none,
-                                        isDense: true,
-                                        contentPadding: EdgeInsets.zero,
-                                        hintStyle: TextStyle(
-                                          color: Color(0xFF8A8A99),
-                                          fontSize: 12.sp,
-                                        ),
-                                        suffixStyle: TextStyle(
-                                          color: Color.fromARGB(255, 44, 44, 150),
-                                          fontSize: 12.sp,
-                                          fontWeight: FontWeight.w500,
-                                        ),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-              SizedBox(height: 12.h),
-                  _sectionLabel('Property Type'),
-                  const SizedBox(height: 8),
-                  _buildTypeGrid(),
-                  const SizedBox(height: 20),
-                  Row(
-                    children: const [
-                      Text(
-                        'Quick Details',
-                        style: TextStyle(
-                          fontSize: 14,
-                          fontWeight: FontWeight.w700,
-                          color: AppColors.textPrimary,
-                        ),
-                      ),
-                      SizedBox(width: 6),
-                      Text(
-                        '(Optional)',
-                        style: TextStyle(
-                          fontSize: 12.5,
-                          color: AppColors.textSecondary,
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 10),
-                  _buildDetailGrid(),
-                  const SizedBox(height: 18),
-                  _sectionLabel('Share some highlights (Optional)'),
-                  _buildHighlightsField(),
-                  const SizedBox(height: 16),
-                  _buildAdvancedOptions(),
-                  const SizedBox(height: 24),
-                  _buildCta(),
-                  const SizedBox(height: 14),
-                  _buildFooterNote(),
-                ],
+                    const SizedBox(height: 10),
+                    _buildDetailGrid(),
+                    const SizedBox(height: 18),
+                    _sectionLabel('Share some highlights (Optional)'),
+                    _buildHighlightsField(),
+                    const SizedBox(height: 16),
+                    _buildAdvancedOptions(),
+                    const SizedBox(height: 24),
+                    _buildCta(),
+                    const SizedBox(height: 14),
+                    _buildFooterNote(),
+                  ],
+                ),
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

@@ -3,7 +3,9 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:villas_qatar/Core/constants/app_colors.dart';
 import 'package:villas_qatar/Core/theme/app_textstyles.dart';
+import 'package:villas_qatar/modules/mainscreen/mainscreen.dart';
 import 'package:villas_qatar/modules/onboard/controller/auth_controller.dart';
+import 'package:villas_qatar/modules/onboard/views/complete_profile_screen.dart';
 import 'package:villas_qatar/modules/onboard/views/login_screen.dart';
 
 class WelcomeScreen extends StatelessWidget {
@@ -13,7 +15,7 @@ WelcomeScreen({super.key});
   @override
   Widget build(BuildContext context) {
     return GetBuilder<AuthController>(
-      init: AuthController(),
+     
       builder: (controller) {
         return Scaffold(
           body: Stack(
@@ -107,19 +109,19 @@ WelcomeScreen({super.key});
                               image: "assets/google.png",
                               text: "Google",
                               onTap: () async {
-                                final success = await controller
-                                    .signInWithGoogle();
+  final success = await controller.signInWithGoogle();
 
-                                if (success) {
-                                  if (controller.isNewUser) {
-                                    // Complete Profile
-                                    // Get.offNamed(AppRoutes.completeProfile);
-                                  } else {
-                                    // Home
-                                    // Get.offNamed(AppRoutes.home);
-                                  }
-                                }
-                              },
+  debugPrint("Google Success: $success");
+  debugPrint("Is New User: ${controller.isNewUser}");
+
+  if (success) {
+    if (controller.isNewUser) {
+      Get.off(() => CompleteProfileScreen());
+    } else {
+      Get.off(() => MainScreen());
+    }
+  }
+}
                             ),
                           ),
                           SizedBox(width: 16.w),

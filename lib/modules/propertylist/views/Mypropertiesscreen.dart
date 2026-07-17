@@ -1,182 +1,178 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get_core/src/get_main.dart';
+import 'package:get/get_instance/src/extension_instance.dart';
 import 'package:get/get_navigation/src/extension_navigation.dart';
 import 'package:get/get_navigation/src/routes/transitions_type.dart';
+import 'package:get/get_state_manager/src/simple/get_state.dart';
 import 'package:villas_qatar/Core/constants/app_colors.dart';
+import 'package:villas_qatar/modules/propertydetailscreen/propertydetailscreen.dart';
+import 'package:villas_qatar/modules/propertylist/model/myproperty_model.dart';
+import 'package:villas_qatar/modules/propertylist/service/myproperties_listcontroller.dart';
+import 'package:villas_qatar/modules/propertylist/widgets/filter_bottomsheet.dart';
+import 'package:villas_qatar/modules/searchscreen/service/searchlist_screen.dart';
 
-import 'listyourproperty_screen..dart';
+import 'add_listproperty.dart';
 
-enum PropertyStatus { active, draft, sold }
+final MyPropertyController controller = Get.put(MyPropertyController());
 
-enum PropertyFor { sale, rent }
-
-class PropertyListing {
-  final String name;
-  final String type;
-  final String location;
-  final int rooms;
-  final int bathrooms;
-  final int areaSqft;
-  final double price;
-  final String currency;
-  final PropertyFor listedFor;
-  final PropertyStatus status;
-  final Color thumbColor;
-  final IconData thumbIcon;
-  final int photoCount;
-
-  const PropertyListing({
-    required this.name,
-    required this.type,
-    required this.location,
-    required this.rooms,
-    required this.bathrooms,
-    required this.areaSqft,
-    required this.price,
-    required this.currency,
-    required this.listedFor,
-    required this.status,
-    required this.thumbColor,
-    required this.thumbIcon,
-    required this.photoCount,
-  });
-}
-
-// Demo data — replace with your real listings (e.g. from the form on submit)
-final List<PropertyListing> demoListings = [
-  PropertyListing(
-    name: 'Marina View Apartment',
-    type: 'Apartment',
-    location: 'West Bay, Doha',
-    rooms: 3,
-    bathrooms: 2,
-    areaSqft: 1450,
-    price: 850000,
-    currency: 'QAR',
-    listedFor: PropertyFor.sale,
-    status: PropertyStatus.active,
-    thumbColor: Color(0xFFEFE3D8),
-    thumbIcon: Icons.apartment,
-    photoCount: 12,
-  ),
-  PropertyListing(
-    name: 'Cozy Studio near Corniche',
-    type: 'Studio',
-    location: 'Al Sadd, Doha',
-    rooms: 1,
-    bathrooms: 1,
-    areaSqft: 520,
-    price: 4500,
-    currency: 'QAR',
-    listedFor: PropertyFor.rent,
-    status: PropertyStatus.active,
-    thumbColor: Color(0xFFE7DED6),
-    thumbIcon: Icons.other_houses_outlined,
-    photoCount: 8,
-  ),
-  const PropertyListing(
-    name: 'Family Villa with Garden',
-    type: 'Villa',
-    location: 'The Pearl, Doha',
-    rooms: 5,
-    bathrooms: 4,
-    areaSqft: 3800,
-    price: 3200000,
-    currency: 'QAR',
-    listedFor: PropertyFor.sale,
-    status: PropertyStatus.draft,
-    thumbColor: Color(0xFFDCE4E8),
-    thumbIcon: Icons.house_outlined,
-    photoCount: 3,
-  ),
-  const PropertyListing(
-    name: 'Downtown Office Space',
-    type: 'Office',
-    location: 'Lusail, Doha',
-    rooms: 0,
-    bathrooms: 2,
-    areaSqft: 2100,
-    price: 12000,
-    currency: 'QAR',
-    listedFor: PropertyFor.rent,
-    status: PropertyStatus.sold,
-    thumbColor: Color(0xFFEDEAE4),
-    thumbIcon: Icons.business_outlined,
-    photoCount: 15,
-  ),
-];
-
-// =================================================================
-// SCREEN
-// =================================================================
 class MyPropertiesScreen extends StatefulWidget {
-  MyPropertiesScreen({super.key, List<PropertyListing>? listings})
-    : listings = listings ?? demoListings;
-
-  final List<PropertyListing> listings;
+  const MyPropertiesScreen({super.key});
 
   @override
   State<MyPropertiesScreen> createState() => _MyPropertiesScreenState();
 }
 
+@override
+State<MyPropertiesScreen> createState() => _MyPropertiesScreenState();
+
 class _MyPropertiesScreenState extends State<MyPropertiesScreen> {
-  String activeFilter = 'All';
+  final ScrollController scrollController = ScrollController();
+
+  String activeFilter = "All";
+
   final searchCtrl = TextEditingController();
 
-  final List<String> filters = const ['All', 'Active', 'Draft', 'Sold'];
+  final List<String> filters = const ["All", "Active", "Draft", "Sold"];
+
+  @override
+  void initState() {
+    super.initState();
+
+    controller.fetchProperties();
+
+    scrollController.addListener(() {
+      if (scrollController.position.pixels >=
+              scrollController.position.maxScrollExtent - 200 &&
+          !controller.isLoadingMore &&
+          controller.hasMore) {
+        controller.fetchProperties(loadMore: true);
+      }
+    });
+
+    searchCtrl.addListener(() {
+      setState(() {});
+    });
+  }
 
   @override
   void dispose() {
     searchCtrl.dispose();
+    scrollController.dispose();
     super.dispose();
-  }
-
-  List<PropertyListing> get _filtered {
-    Iterable<PropertyListing> list = widget.listings;
-    if (activeFilter != 'All') {
-      final status = PropertyStatus.values.firstWhere(
-        (s) => s.name.toLowerCase() == activeFilter.toLowerCase(),
-      );
-      list = list.where((p) => p.status == status);
-    }
-    if (searchCtrl.text.trim().isNotEmpty) {
-      final q = searchCtrl.text.trim().toLowerCase();
-      list = list.where(
-        (p) =>
-            p.name.toLowerCase().contains(q) ||
-            p.location.toLowerCase().contains(q),
-      );
-    }
-    return list.toList();
   }
 
   @override
   Widget build(BuildContext context) {
-    final listings = _filtered;
     return Scaffold(
       backgroundColor: AppColors.background,
-      body: SafeArea(
-        child: Column(
-          children: [
-            _buildTopBar(),
-            _buildSearchBar(),
-            _buildFilterChips(),
-            const SizedBox(height: 4),
-            Expanded(
-              child: listings.isEmpty
-                  ? _buildEmptyState()
-                  : ListView.separated(
-                      padding: const EdgeInsets.fromLTRB(20, 8, 20, 90),
-                      itemCount: listings.length,
-                      separatorBuilder: (_, __) => const SizedBox(height: 14),
-                      itemBuilder: (context, i) =>
-                          _PropertyCard(listing: listings[i]),
-                    ),
+
+      body: GetBuilder<MyPropertyController>(
+        builder: (controller) {
+          if (controller.isLoading) {
+            return const Center(child: CircularProgressIndicator());
+          }
+
+          List<Property> listings = List.from(controller.properties);
+
+          if (searchCtrl.text.trim().isNotEmpty) {
+            final q = searchCtrl.text.trim().toLowerCase();
+
+            listings = listings.where((e) {
+              return e.propertyName.toLowerCase().contains(q) ||
+                  e.areaName.toLowerCase().contains(q);
+            }).toList();
+          }
+
+          /// FILTER
+
+          if (activeFilter != "All") {
+            listings = listings.where((e) {
+              return e.status.toLowerCase() == activeFilter.toLowerCase();
+            }).toList();
+          }
+
+          return SafeArea(
+            child: Column(
+              children: [
+                _buildTopBar(),
+
+                _buildSearchBar(),
+
+                const SizedBox(height: 4),
+
+                Expanded(
+                  child: listings.isEmpty
+                      ? _buildEmptyState()
+                      : RefreshIndicator(
+                          onRefresh: controller.refreshProperties,
+
+                          child: listings.isEmpty
+                              ? ListView(
+                                  physics:
+                                      const AlwaysScrollableScrollPhysics(),
+                                  children: const [
+                                    SizedBox(height: 120),
+                                    _EmptyState(),
+                                  ],
+                                )
+                              : ListView.separated(
+                                  controller: scrollController,
+                                  physics:
+                                      const AlwaysScrollableScrollPhysics(),
+
+                                  padding: const EdgeInsets.fromLTRB(
+                                    20,
+                                    8,
+                                    20,
+                                    90,
+                                  ),
+
+                                  itemCount:
+                                      listings.length +
+                                      (controller.hasMore ? 1 : 0),
+
+                                  separatorBuilder: (_, __) =>
+                                      const SizedBox(height: 14),
+
+                                  itemBuilder: (context, index) {
+                                    if (index == listings.length) {
+                                      return const Padding(
+                                        padding: EdgeInsets.all(20),
+                                        child: Center(
+                                          child: CircularProgressIndicator(),
+                                        ),
+                                      );
+                                    }
+
+                                    return _PropertyCard(
+                                      listing: listings[index],
+                                      onTap: () async {
+                                        final searchController = Get.put(
+                                          PropertySearchController(),
+                                        );
+
+                                        await searchController
+                                            .fetchPropertyDetails(
+                                              listings[index].id,
+                                            );
+
+                                        Get.to(
+                                          () => const PropertyDetailsScreen(),
+                                          transition: Transition.rightToLeft,
+                                        );
+                                      },
+                                    );
+                                  },
+                                ),
+                        ),
+                ),
+              ],
             ),
-          ],
-        ),
+          );
+        },
       ),
+
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () {
           Get.to(
@@ -186,10 +182,13 @@ class _MyPropertiesScreenState extends State<MyPropertiesScreen> {
             curve: Curves.easeOutCubic,
           );
         },
+
         backgroundColor: AppColors.primary,
+
         icon: const Icon(Icons.add, color: Colors.white),
+
         label: const Text(
-          'List Property',
+          "List Property",
           style: TextStyle(fontWeight: FontWeight.w700, color: Colors.white),
         ),
       ),
@@ -222,7 +221,9 @@ class _MyPropertiesScreenState extends State<MyPropertiesScreen> {
           ),
           IconButton(
             icon: const Icon(Icons.tune, color: AppColors.primary),
-            onPressed: () {},
+            onPressed: () {
+              showFilterBottomSheet(context);
+            },
           ),
         ],
       ),
@@ -255,47 +256,6 @@ class _MyPropertiesScreenState extends State<MyPropertiesScreen> {
             contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 10),
           ),
         ),
-      ),
-    );
-  }
-
-  // ---------------------------------------------------------
-  // FILTER CHIPS — same pill/toggle language as Sale/Rent
-  // ---------------------------------------------------------
-  Widget _buildFilterChips() {
-    return SizedBox(
-      height: 25.h,
-      child: ListView.separated(
-        padding: EdgeInsets.symmetric(horizontal: 14.w),
-        scrollDirection: Axis.horizontal,
-        itemCount: filters.length,
-        separatorBuilder: (_, __) => const SizedBox(width: 8),
-        itemBuilder: (context, i) {
-          final label = filters[i];
-          final selected = activeFilter == label;
-          return GestureDetector(
-            onTap: () => setState(() => activeFilter = label),
-            child: Container(
-              padding: EdgeInsets.symmetric(horizontal: 14.w),
-              alignment: Alignment.center,
-              decoration: BoxDecoration(
-                color: selected ? AppColors.pinkBg : AppColors.fieldBg,
-                borderRadius: BorderRadius.circular(20),
-                border: Border.all(
-                  color: selected ? AppColors.primary : AppColors.fieldBorder,
-                ),
-              ),
-              child: Text(
-                label,
-                style: TextStyle(
-                  fontWeight: FontWeight.w600,
-                  fontSize: 12.sp,
-                  color: selected ? AppColors.primary : AppColors.hintGrey,
-                ),
-              ),
-            ),
-          );
-        },
       ),
     );
   }
@@ -341,35 +301,42 @@ class _MyPropertiesScreenState extends State<MyPropertiesScreen> {
 // =================================================================
 // PROPERTY CARD
 // =================================================================
+
 class _PropertyCard extends StatelessWidget {
-  final PropertyListing listing;
-  const _PropertyCard({required this.listing});
+  final Property listing;
+  final VoidCallback onTap;
+
+  const _PropertyCard({required this.listing, required this.onTap});
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        color: AppColors.cardBg,
-        borderRadius: BorderRadius.circular(10.r),
-        border: Border.all(color: AppColors.fieldBorder),
-      ),
-      padding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 8.h),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              _buildThumbnail(),
-              const SizedBox(width: 12),
-              Expanded(child: _buildInfo()),
-            ],
-          ),
-          SizedBox(height: 10.h),
-          Divider(height: 1, color: AppColors.fieldBorder),
-          SizedBox(height: 5.h),
-          _buildFooter(),
-        ],
+    return InkWell(
+      borderRadius: BorderRadius.circular(10.r),
+      onTap: onTap,
+      child: Container(
+        decoration: BoxDecoration(
+          color: AppColors.cardBg,
+          borderRadius: BorderRadius.circular(10.r),
+          border: Border.all(color: AppColors.fieldBorder),
+        ),
+        padding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 8.h),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                _buildThumbnail(),
+                const SizedBox(width: 12),
+                Expanded(child: _buildInfo()),
+              ],
+            ),
+            SizedBox(height: 10.h),
+            Divider(height: 1, color: AppColors.fieldBorder),
+            SizedBox(height: 5.h),
+            _buildFooter(),
+          ],
+        ),
       ),
     );
   }
@@ -377,16 +344,21 @@ class _PropertyCard extends StatelessWidget {
   Widget _buildThumbnail() {
     return Stack(
       children: [
-        Container(
-          width: 80.w,
-          height: 80.h,
-          decoration: BoxDecoration(
-            color: listing.thumbColor,
-            borderRadius: BorderRadius.circular(12),
-          ),
-          alignment: Alignment.center,
-          child: Icon(listing.thumbIcon, color: Colors.white, size: 30),
+        ClipRRect(
+          borderRadius: BorderRadius.circular(12),
+          child: listing.photos.isNotEmpty
+              ? Image.network(
+                  listing.photos.first.url,
+                  width: 80.w,
+                  height: 80.h,
+                  fit: BoxFit.cover,
+                  errorBuilder: (_, __, ___) {
+                    return _placeholder();
+                  },
+                )
+              : _placeholder(),
         ),
+
         Positioned(
           left: 6,
           bottom: 6,
@@ -402,7 +374,7 @@ class _PropertyCard extends StatelessWidget {
                 const Icon(Icons.photo_camera, size: 10, color: Colors.white),
                 const SizedBox(width: 3),
                 Text(
-                  '${listing.photoCount}',
+                  "${listing.photos.length}",
                   style: TextStyle(color: Colors.white, fontSize: 8.sp),
                 ),
               ],
@@ -410,6 +382,18 @@ class _PropertyCard extends StatelessWidget {
           ),
         ),
       ],
+    );
+  }
+
+  Widget _placeholder() {
+    return Container(
+      width: 80.w,
+      height: 80.h,
+      decoration: BoxDecoration(
+        color: Colors.grey.shade300,
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: const Icon(Icons.home, color: Colors.white),
     );
   }
 
@@ -421,7 +405,7 @@ class _PropertyCard extends StatelessWidget {
           children: [
             Expanded(
               child: Text(
-                listing.name,
+                listing.propertyName,
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
                 style: TextStyle(
@@ -434,7 +418,9 @@ class _PropertyCard extends StatelessWidget {
             _StatusBadge(status: listing.status),
           ],
         ),
+
         const SizedBox(height: 4),
+
         Row(
           children: [
             const Icon(
@@ -445,7 +431,7 @@ class _PropertyCard extends StatelessWidget {
             const SizedBox(width: 3),
             Expanded(
               child: Text(
-                listing.location,
+                "${listing.areaName}, ${listing.municipality}",
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
                 style: const TextStyle(color: AppColors.hintGrey, fontSize: 10),
@@ -455,9 +441,10 @@ class _PropertyCard extends StatelessWidget {
         ),
 
         const SizedBox(height: 8),
+
         Text(
-          '${listing.currency} ${_formatPrice(listing.price)}'
-          '${listing.listedFor == PropertyFor.rent ? " / month" : ""}',
+          "QAR ${_formatPrice(listing.price)}"
+          "${listing.purpose == "RENT" ? " / month" : ""}",
           style: const TextStyle(
             fontWeight: FontWeight.w800,
             fontSize: 15,
@@ -471,13 +458,17 @@ class _PropertyCard extends StatelessWidget {
   Widget _buildFooter() {
     return Row(
       children: [
-        if (listing.rooms > 0) ...[
-          _statIcon(Icons.bed_outlined, '${listing.rooms} Beds'),
+        if (listing.bedrooms > 0) ...[
+          _statIcon(Icons.bed_outlined, "${listing.bedrooms} Beds"),
           const SizedBox(width: 16),
         ],
-        _statIcon(Icons.bathtub_outlined, '${listing.bathrooms} Baths'),
+
+        _statIcon(Icons.bathtub_outlined, "${listing.bathrooms} Baths"),
+
         const SizedBox(width: 16),
-        _statIcon(Icons.square_foot_outlined, '${listing.areaSqft} sqft'),
+
+        _statIcon(Icons.square_foot_outlined, "${listing.area.toInt()} sqft"),
+
         const Spacer(),
       ],
     );
@@ -496,27 +487,10 @@ class _PropertyCard extends StatelessWidget {
     );
   }
 
-  Widget _iconButton(IconData icon) {
-    return Container(
-      width: 30,
-      height: 30,
-      decoration: BoxDecoration(
-        color: AppColors.pinkChipBg,
-        borderRadius: BorderRadius.circular(8),
-      ),
-      child: Icon(icon, size: 15, color: AppColors.primary),
-    );
-  }
-
-  String _formatPrice(double price) {
-    final s = price.toStringAsFixed(0);
-    final buffer = StringBuffer();
-    for (int i = 0; i < s.length; i++) {
-      final posFromEnd = s.length - i;
-      buffer.write(s[i]);
-      if (posFromEnd > 1 && posFromEnd % 3 == 1) buffer.write(',');
-    }
-    return buffer.toString();
+  String _formatPrice(num price) {
+    return price
+        .toStringAsFixed(0)
+        .replaceAllMapped(RegExp(r'\B(?=(\d{3})+(?!\d))'), (match) => ",");
   }
 }
 
@@ -525,31 +499,36 @@ class _PropertyCard extends StatelessWidget {
 // the WhatsApp Verified banner (colored bg + colored text)
 // =================================================================
 class _StatusBadge extends StatelessWidget {
-  final PropertyStatus status;
+  final String status;
+
   const _StatusBadge({required this.status});
 
   @override
   Widget build(BuildContext context) {
-    late Color bg;
-    late Color fg;
-    late String label;
-    switch (status) {
-      case PropertyStatus.active:
+    Color bg;
+    Color fg;
+
+    switch (status.toUpperCase()) {
+      case "ACTIVE":
         bg = AppColors.greenBg;
         fg = AppColors.greenText;
-        label = 'Active';
         break;
-      case PropertyStatus.draft:
+
+      case "PENDING":
         bg = Colors.grey.shade100;
         fg = Colors.grey;
-        label = 'Draft';
         break;
-      case PropertyStatus.sold:
+
+      case "INACTIVE":
         bg = AppColors.pinkChipBg;
         fg = AppColors.primary;
-        label = 'Sold';
         break;
+
+      default:
+        bg = Colors.orange.shade100;
+        fg = Colors.orange;
     }
+
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
       decoration: BoxDecoration(
@@ -557,7 +536,7 @@ class _StatusBadge extends StatelessWidget {
         borderRadius: BorderRadius.circular(6),
       ),
       child: Text(
-        label,
+        status,
         style: TextStyle(fontSize: 10, fontWeight: FontWeight.w700, color: fg),
       ),
     );
@@ -568,12 +547,14 @@ class _StatusBadge extends StatelessWidget {
 // FOR SALE / FOR RENT TAG
 // =================================================================
 class _ForTag extends StatelessWidget {
-  final PropertyFor listedFor;
-  const _ForTag({required this.listedFor});
+  final Property property;
+
+  const _ForTag({super.key, required this.property});
 
   @override
   Widget build(BuildContext context) {
-    final isSale = listedFor == PropertyFor.sale;
+    final bool isSale = property.purpose.toUpperCase() == "SALE";
+
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
       decoration: BoxDecoration(
@@ -590,7 +571,7 @@ class _ForTag extends StatelessWidget {
           ),
           const SizedBox(width: 3),
           Text(
-            isSale ? 'For Sale' : 'For Rent',
+            isSale ? "For Sale" : "For Rent",
             style: const TextStyle(
               fontSize: 10.5,
               fontWeight: FontWeight.w700,
@@ -598,6 +579,25 @@ class _ForTag extends StatelessWidget {
             ),
           ),
         ],
+      ),
+    );
+  }
+}
+
+class _EmptyState extends StatelessWidget {
+  const _EmptyState({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(32),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            // your existing empty state UI
+          ],
+        ),
       ),
     );
   }

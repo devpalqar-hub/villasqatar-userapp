@@ -5,6 +5,9 @@ import 'package:sign_in_with_apple/sign_in_with_apple.dart';
 import 'package:villas_qatar/Core/network/api_handler.dart';
 import 'package:villas_qatar/Core/network/api_endpoints.dart';
 import 'package:villas_qatar/Core/services/storage_service.dart';
+import 'package:villas_qatar/modules/mainscreen/mainscreen.dart';
+import 'package:villas_qatar/modules/onboard/views/login_screen.dart';
+import 'package:villas_qatar/modules/onboard/views/welcome_screen.dart';
 
 class AuthController extends GetxController {
   final phoneController = TextEditingController();
@@ -24,45 +27,56 @@ class AuthController extends GetxController {
   @override
   void onInit() {
     super.onInit();
+    accessToken = StorageService.getToken();
+    profile = StorageService.getProfile();
     _initializeGoogle();
-    _navigateNext();
+  
   }
 
   Future<void> _initializeGoogle() async {
     await _googleSignIn.initialize(
-      // If required, provide your Web Client ID here.
-      // clientId: "YOUR_WEB_CLIENT_ID.apps.googleusercontent.com",
+      serverClientId:
+          "1091977941143-5lrna9int1uevplanjgt6kmmq8mq4q75.apps.googleusercontent.com",
     );
+
+    _googleSignIn.authenticationEvents
+        .listen((event) {
+          debugPrint("Google auth event: $event");
+        })
+        .onError((error) {
+          debugPrint("Google auth error: $error");
+        });
+
+    await _googleSignIn.attemptLightweightAuthentication();
   }
 
   @override
- 
+  void reset() {
+    phoneController.clear();
+    otpController.clear();
+    nameController.clear();
+    emailController.clear();
 
- void reset() {
-  phoneController.clear();
-  otpController.clear();
-  nameController.clear();
-  emailController.clear();
+    isLoading = false;
+    isNewUser = false;
+    selectedCountryCode = "+974";
+    phoneNumber = "";
+    accessToken = null;
+    profile = null;
 
-  isLoading = false;
-  isNewUser = false;
-  selectedCountryCode = "+974";
-  phoneNumber = "";
-  accessToken = null;
-  profile = null;
+    update();
+  }
 
-  update();
-}
   /// Splash Navigation
   Future<void> _navigateNext() async {
     await Future.delayed(const Duration(seconds: 3));
 
     final token = StorageService.getToken();
-
+        
     if (token != null && token.isNotEmpty) {
-      // Get.offAllNamed(AppRoutes.home);
+     Get.to(MainScreen());
     } else {
-      // Get.offAllNamed(AppRoutes.login);
+    Get.to(WelcomeScreen());
     }
   }
 
@@ -109,16 +123,17 @@ class AuthController extends GetxController {
   }
 
   /// ---------------- GOOGLE LOGIN ----------------
-
   Future<bool> signInWithGoogle() async {
     try {
       _setLoading(true);
 
       final GoogleSignInAccount account = await _googleSignIn.authenticate();
 
-      final String? idToken = account.authentication.idToken;
+      final authentication = account.authentication;
 
-      if (idToken == null) {
+      final idToken = authentication.idToken;
+
+      if (idToken == null || idToken.isEmpty) {
         throw Exception("Google ID Token is null");
       }
 
@@ -130,8 +145,13 @@ class AuthController extends GetxController {
       await _saveUserSession(response);
 
       return true;
-    } catch (e) {
-      debugPrint("Google Login Error: $e");
+    } on GoogleSignInException catch (e) {
+      debugPrint("Google Sign-In Error: ${e.code}");
+      debugPrint("Google Sign-In Message: ${e.description}");
+      return false;
+    } catch (e, s) {
+      debugPrint(e.toString());
+      debugPrint(s.toString());
       return false;
     } finally {
       _setLoading(false);
@@ -176,41 +196,36 @@ class AuthController extends GetxController {
       _setLoading(false);
     }
   }
-  
 
   //----------Comlete profile -------------
   /// ---------------- COMPLETE PROFILE ----------------
-Future<bool> completeProfile() async {
-  try {
-    _setLoading(true);
+  Future<bool> completeProfile() async {
+    try {
+      _setLoading(true);
 
-    final response = await ApiHandler.post(
-      ApiEndpoints.completeProfile,
-      headers: {
-        "Authorization": "Bearer $accessToken",
-      },
-      body: {
-        "name": nameController.text.trim(),
-        "email": emailController.text.trim(),
-        "phone": phoneNumber,
-      },
-    );
+      final response = await ApiHandler.post(
+        ApiEndpoints.completeProfile,
+        headers: {"Authorization": "Bearer $accessToken"},
+        body: {
+          "name": nameController.text.trim(),
+          "email": emailController.text.trim(),
+          "phone": phoneNumber,
+        },
+      );
 
-    if (response["profile"] != null) {
-      profile = Map<String, dynamic>.from(response["profile"]);
-      await StorageService.saveProfile(profile!);
+      if (response["profile"] != null) {
+        profile = Map<String, dynamic>.from(response["profile"]);
+        await StorageService.saveProfile(profile!);
+      }
+
+      return true;
+    } catch (e) {
+      debugPrint("Complete Profile Error: $e");
+      return false;
+    } finally {
+      _setLoading(false);
     }
-
-    return true;
-  } catch (e) {
-    debugPrint("Complete Profile Error: $e");
-    return false;
-  } finally {
-    _setLoading(false);
   }
-}
-
-
 
   Future<void> _saveUserSession(Map<String, dynamic> response) async {
     isNewUser = response["isNew"] ?? false;
@@ -231,4 +246,30 @@ Future<bool> completeProfile() async {
 
     update();
   }
+
+
+  Future<void> logout() async {
+  await StorageService.logout();
+
+  phoneController.clear();
+  otpController.clear();
+  nameController.clear();
+  emailController.clear();
+
+  accessToken = null;
+  profile = null;
+  isNewUser = false;
+  phoneNumber = "";
+  selectedCountryCode = "+974";
+  isLoading = false;
+
+  // Optional: Sign out from Google
+  try {
+    await _googleSignIn.signOut();
+  } catch (_) {}
+
+  update();
+
+  Get.offAll(() => WelcomeScreen());
+}
 }

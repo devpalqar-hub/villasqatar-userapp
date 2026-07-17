@@ -4,7 +4,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:villas_qatar/Core/constants/app_colors.dart';
+import 'package:villas_qatar/Core/services/storage_service.dart';
 import 'package:villas_qatar/Core/theme/app_textstyles.dart';
+import 'package:villas_qatar/modules/mainscreen/mainscreen.dart';
 
 
 import 'welcome_screen.dart';
@@ -18,14 +20,23 @@ class SplashScreen extends StatefulWidget {
 
 class _SplashScreenState extends State<SplashScreen> {
   @override
-  void initState() {
-    super.initState();
+ @override
+void initState() {
+  super.initState();
+  _navigate();
+}
 
-    Timer(const Duration(seconds: 3), () {
-      Get.off(() =>  WelcomeScreen());
-    });
+Future<void> _navigate() async {
+  await Future.delayed(const Duration(seconds: 3));
+
+  final token = StorageService.getToken();
+
+  if (token != null && token.isNotEmpty) {
+    Get.offAll(() => const MainScreen());
+  } else {
+    Get.offAll(() => WelcomeScreen());
   }
-
+}
   @override
   Widget build(BuildContext context) {
     return Scaffold(

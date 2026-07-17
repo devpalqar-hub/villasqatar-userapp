@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:villas_qatar/Core/theme/app_textstyles.dart';
-import 'package:villas_qatar/modules/propertdetail/propertydetailscreen.dart';
+import 'package:villas_qatar/modules/propertydetailscreen/propertydetailscreen.dart';
 
 import '../../../core/constants/app_colors.dart';
 

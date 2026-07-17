@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:villas_qatar/modules/chat/views/chatlistscreen.dart';
+import 'package:villas_qatar/modules/chats/views/chatlistscreen.dart';
 import 'package:villas_qatar/modules/home/views/home_screen.dart';
 import 'package:villas_qatar/modules/mainscreen/home_bottom_nav.dart';
 import 'package:villas_qatar/modules/propertylist/views/Mypropertiesscreen.dart';
-import 'package:villas_qatar/modules/propertylist/views/listyourproperty_screen..dart';
+import 'package:villas_qatar/modules/propertylist/views/add_listproperty.dart';
 import 'package:villas_qatar/modules/searchscreen/view/search_screen.dart';
 import 'package:villas_qatar/modules/settings/view/setting_screen.dart';
 

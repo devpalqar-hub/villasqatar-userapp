@@ -242,12 +242,12 @@ void _showLogoutDialog(BuildContext context) {
                   onPressed: () async {
                     Get.back();
 
-                    await StorageService.logout();
                     if (Get.isRegistered<AuthController>()) {
-                      Get.find<AuthController>().reset();
+                      await Get.find<AuthController>().logout();
+                    } else {
+                      await StorageService.logout();
+                      Get.offAll(() => WelcomeScreen());
                     }
-                    Get.offAll(() => WelcomeScreen());
-                    // or AuthScreen(), WelcomeScreen(), LoginScreen()
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppColors.primary,

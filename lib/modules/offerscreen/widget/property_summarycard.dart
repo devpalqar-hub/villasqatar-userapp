@@ -1,15 +1,28 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:intl/intl.dart';
 import 'package:villas_qatar/Core/constants/app_colors.dart';
 import 'package:villas_qatar/Core/theme/app_textstyles.dart';
+import 'package:villas_qatar/modules/propertylist/model/myproperty_model.dart';
 
 class PropertySummaryCard extends StatelessWidget {
-  const PropertySummaryCard({super.key});
+  final Property property;
+
+  const PropertySummaryCard({
+    super.key,
+    required this.property,
+  });
 
   @override
   Widget build(BuildContext context) {
+    final image =
+        property.photos.isNotEmpty ? property.photos.first.url : "";
+
     return Container(
-      padding: EdgeInsets.symmetric(horizontal:16.w,vertical: 10.h),
+      padding: EdgeInsets.symmetric(
+        horizontal: 16.w,
+        vertical: 10.h,
+      ),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(18.r),
@@ -23,12 +36,25 @@ class PropertySummaryCard extends StatelessWidget {
           /// Property Image
           ClipRRect(
             borderRadius: BorderRadius.circular(14.r),
-            child: Image.asset(
-              "assets/villa.jpg",
-              width: 110.w,
-              height: 100.h,
-              fit: BoxFit.cover,
-            ),
+            child: image.isNotEmpty
+                ? Image.network(
+                    image,
+                    width: 110.w,
+                    height: 100.h,
+                    fit: BoxFit.cover,
+                    errorBuilder: (_, __, ___) => Image.asset(
+                      "assets/villa.jpg",
+                      width: 110.w,
+                      height: 100.h,
+                      fit: BoxFit.cover,
+                    ),
+                  )
+                : Image.asset(
+                    "assets/villa.jpg",
+                    width: 110.w,
+                    height: 100.h,
+                    fit: BoxFit.cover,
+                  ),
           ),
 
           SizedBox(width: 14.w),
@@ -37,33 +63,34 @@ class PropertySummaryCard extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                /// Featured
-               
-
+                /// Property Name
                 Text(
-                  "Luxury Villa in The Pearl",
+                  property.propertyName,
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
                   style: AppTextStyles.body13.copyWith(
                     fontWeight: FontWeight.w700,
                     color: Colors.black87,
-                    height: 1.1,
+                    height: 1.2,
                   ),
                 ),
 
                 SizedBox(height: 6.h),
 
+                /// Location
                 Row(
                   children: [
                     Icon(
                       Icons.location_on_outlined,
                       size: 15.sp,
-                      color: AppColors.primary
+                      color: AppColors.primary,
                     ),
-                    SizedBox(width: 3.w),
+                    SizedBox(width: 4.w),
                     Expanded(
                       child: Text(
-                        "The Pearl, Doha",
+                        "${property.areaName}, ${property.municipality}",
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
                         style: AppTextStyles.body13.copyWith(
                           color: Colors.grey.shade700,
                         ),
@@ -74,8 +101,9 @@ class PropertySummaryCard extends StatelessWidget {
 
                 SizedBox(height: 10.h),
 
+                /// Price
                 Text(
-                  "QAR 3,250,000",
+                  "QAR ${NumberFormat('#,##0').format(property.price)}",
                   style: AppTextStyles.title16.copyWith(
                     color: AppColors.primary,
                     fontWeight: FontWeight.w700,
@@ -86,11 +114,24 @@ class PropertySummaryCard extends StatelessWidget {
 
                 Row(
                   children: [
-                    _feature(Icons.bed_outlined, "5"),
+                    _feature(
+                      Icons.bed_outlined,
+                      property.bedrooms.toString(),
+                    ),
+
                     SizedBox(width: 14.w),
-                    _feature(Icons.bathtub_outlined, "6"),
+
+                    _feature(
+                      Icons.bathtub_outlined,
+                      property.bathrooms.toString(),
+                    ),
+
                     SizedBox(width: 14.w),
-                    _feature(Icons.square_foot_outlined, "450 sqm"),
+
+                    _feature(
+                      Icons.square_foot_outlined,
+                      "${property.area.toStringAsFixed(0)} sqm",
+                    ),
                   ],
                 ),
               ],

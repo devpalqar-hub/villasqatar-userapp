@@ -1,11 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-class ListPropertyController extends GetxController {
-  /// Current Step
-  final RxInt currentStep = 0.obs;
+import 'package:villas_qatar/Core/network/api_endpoints.dart';
+import 'package:villas_qatar/Core/network/api_handler.dart';
+import 'package:villas_qatar/modules/propertylist/model/listing_options_model.dart';
 
-  /// Step Titles
+class ListPropertyController extends GetxController {
+  //--------------------------------------------------
+  // STEP
+  //--------------------------------------------------
+
+  int currentStep = 0;
+
   final List<String> steps = [
     "Basic Info",
     "Details",
@@ -14,9 +20,18 @@ class ListPropertyController extends GetxController {
     "Media",
   ];
 
-  //-------------------------------------------------------
-  /// Owner Details
-  //-------------------------------------------------------
+  //--------------------------------------------------
+  // LOADING
+  //--------------------------------------------------
+
+  bool isLoading = false;
+  bool isSubmitting = false;
+
+  String error = "";
+
+  //--------------------------------------------------
+  // OWNER
+  //--------------------------------------------------
 
   final fullNameController = TextEditingController();
 
@@ -26,19 +41,19 @@ class ListPropertyController extends GetxController {
 
   final descriptionController = TextEditingController();
 
-  final RxString countryCode = "+974".obs;
+  String countryCode = "+974";
 
-  final RxBool whatsappVerified = true.obs;
+  bool whatsappVerified = true;
 
-  //-------------------------------------------------------
-  /// Property Details
-  //-------------------------------------------------------
+  //--------------------------------------------------
+  // PROPERTY
+  //--------------------------------------------------
 
-  final RxString propertyType = "".obs;
+  String propertyType = "";
 
-  final RxString propertyPurpose = "".obs;
+  String propertyPurpose = "";
 
-  final RxString propertyCategory = "".obs;
+  String propertyCategory = "";
 
   final bedroomsController = TextEditingController();
 
@@ -48,30 +63,9 @@ class ListPropertyController extends GetxController {
 
   final priceController = TextEditingController();
 
-  //-------------------------------------------------------
-  /// Features
-  //-------------------------------------------------------
-
-  final amenities = <String>[
-    "Parking",
-    "Swimming Pool",
-    "Gym",
-    "Garden",
-    "Security",
-    "Balcony",
-    "Elevator",
-    "Air Conditioning",
-    "Maid Room",
-    "Kids Area",
-    "Pet Friendly",
-    "Internet",
-  ];
-
-  final RxList<String> selectedAmenities = <String>[].obs;
-
-  //-------------------------------------------------------
-  /// Location
-  //-------------------------------------------------------
+  //--------------------------------------------------
+  // LOCATION
+  //--------------------------------------------------
 
   final addressController = TextEditingController();
 
@@ -82,48 +76,121 @@ class ListPropertyController extends GetxController {
   final buildingController = TextEditingController();
 
   final landmarkController = TextEditingController();
+  final propertyNameController = TextEditingController();
+  final otherFeatureController = TextEditingController();
+  final streetController = TextEditingController();
+  final livingRoomsController = TextEditingController();
 
-  final RxDouble latitude = 0.0.obs;
+  final parkingSpacesController = TextEditingController();
 
-  final RxDouble longitude = 0.0.obs;
+  final floorNumberController = TextEditingController();
 
-  //-------------------------------------------------------
-  /// Media
-  //-------------------------------------------------------
+  final totalFloorsController = TextEditingController();
+  final yearBuiltController = TextEditingController();
+  final latitudeController = TextEditingController();
 
-  final RxList<String> images = <String>[].obs;
+  final longitudeController = TextEditingController();
 
-  final RxString video = "".obs;
+  bool showOtpField = false;
 
-  //-------------------------------------------------------
-  /// Loading
-  //-------------------------------------------------------
+  final otpController = TextEditingController();
 
-  final RxBool isSubmitting = false.obs;
+  double latitude = 0;
 
-  //-------------------------------------------------------
-  /// Step Navigation
-  //-------------------------------------------------------
+  double longitude = 0;
+
+  //--------------------------------------------------
+  // OPTIONS FROM API
+  //--------------------------------------------------
+
+  List<String> amenities = [];
+
+  List<String> nearbyTags = [];
+
+  List<String> furnishingOptions = [];
+
+  List<String> areaSuggestions = [];
+
+  //--------------------------------------------------
+  // SELECTED
+  //--------------------------------------------------
+
+  final Set<String> selectedAmenities = {};
+
+  final Set<String> selectedNearbyTags = {};
+
+  final Set<String> selectedFurnishing = {};
+
+  //--------------------------------------------------
+  // MEDIA
+  //--------------------------------------------------
+
+  final List<String> images = [];
+
+  String video = "";
+
+  //--------------------------------------------------
+  // INIT
+  //--------------------------------------------------
+  //--------------------------------------------------
+  // STEP NAVIGATION
+  //--------------------------------------------------
 
   void nextStep() {
-    if (currentStep.value < 4) {
-      currentStep.value++;
+    if (currentStep < steps.length - 1) {
+      currentStep++;
+      update();
     }
   }
 
   void previousStep() {
-    if (currentStep.value > 0) {
-      currentStep.value--;
+    if (currentStep > 0) {
+      currentStep--;
+      update();
     }
   }
 
   void goToStep(int index) {
-    currentStep.value = index;
+    currentStep = index;
+    update();
   }
 
-  //-------------------------------------------------------
-  /// Amenities
-  //-------------------------------------------------------
+  //--------------------------------------------------
+  // PROPERTY
+  //--------------------------------------------------
+
+  void setPropertyType(String value) {
+    propertyType = value;
+    update();
+  }
+
+  void setPropertyPurpose(String value) {
+    propertyPurpose = value;
+    update();
+  }
+
+  void setPropertyCategory(String value) {
+    propertyCategory = value;
+    update();
+  }
+
+  //--------------------------------------------------
+  // COUNTRY CODE
+  //--------------------------------------------------
+
+  void setCountryCode(String value) {
+    countryCode = value;
+    update();
+  }
+
+  void setWhatsappVerified(bool value) {
+    whatsappVerified = value;
+    update();
+  }
+
+  //--------------------------------------------------
+  // AMENITIES
+  //--------------------------------------------------
 
   void toggleAmenity(String value) {
     if (selectedAmenities.contains(value)) {
@@ -131,27 +198,74 @@ class ListPropertyController extends GetxController {
     } else {
       selectedAmenities.add(value);
     }
+
+    update();
   }
 
-  //-------------------------------------------------------
-  /// Media
-  //-------------------------------------------------------
+  //--------------------------------------------------
+  // NEARBY TAGS
+  //--------------------------------------------------
+
+  void toggleNearbyTag(String value) {
+    if (selectedNearbyTags.contains(value)) {
+      selectedNearbyTags.remove(value);
+    } else {
+      selectedNearbyTags.add(value);
+    }
+
+    update();
+  }
+
+  //--------------------------------------------------
+  // FURNISHING
+  //--------------------------------------------------
+
+  void toggleFurnishing(String value) {
+    if (selectedFurnishing.contains(value)) {
+      selectedFurnishing.remove(value);
+    } else {
+      selectedFurnishing.add(value);
+    }
+
+    update();
+  }
+
+  //--------------------------------------------------
+  // LOCATION
+  //--------------------------------------------------
+  void setLatitude(double value) {
+    latitude = value;
+    latitudeController.text = value == 0 ? "" : value.toString();
+    update();
+  }
+
+  void setLongitude(double value) {
+    longitude = value;
+    longitudeController.text = value == 0 ? "" : value.toString();
+    update();
+  }
+  //--------------------------------------------------
+  // MEDIA
+  //--------------------------------------------------
 
   void addImage(String path) {
     images.add(path);
+    update();
   }
 
   void removeImage(int index) {
     images.removeAt(index);
+    update();
   }
 
   void setVideo(String path) {
-    video.value = path;
+    video = path;
+    update();
   }
 
-  //-------------------------------------------------------
-  /// Save Draft
-  //-------------------------------------------------------
+  //--------------------------------------------------
+  // SAVE DRAFT
+  //--------------------------------------------------
 
   void saveDraft() {
     Get.snackbar(
@@ -161,29 +275,56 @@ class ListPropertyController extends GetxController {
     );
   }
 
-  //-------------------------------------------------------
-  /// Submit
-  //-------------------------------------------------------
+  //--------------------------------------------------
+  // SUBMIT
+  //--------------------------------------------------
 
-  Future<void> submitProperty() async {
-    isSubmitting.value = true;
+  //--------------------------------------------------
+  // CLEAR
+  //--------------------------------------------------
 
-    await Future.delayed(
-      const Duration(seconds: 2),
-    );
+  void clearForm() {
+    fullNameController.clear();
+    phoneController.clear();
+    emailController.clear();
+    descriptionController.clear();
 
-    isSubmitting.value = false;
+    bedroomsController.clear();
+    bathroomsController.clear();
+    areaController.clear();
+    priceController.clear();
 
-    Get.snackbar(
-      "Success",
-      "Property Listed Successfully",
-      snackPosition: SnackPosition.BOTTOM,
-    );
+    addressController.clear();
+    cityController.clear();
+    areaNameController.clear();
+    buildingController.clear();
+    landmarkController.clear();
+
+    propertyType = "";
+    propertyPurpose = "";
+    propertyCategory = "";
+
+    latitude = 0;
+    longitude = 0;
+    latitudeController.clear();
+    longitudeController.clear();
+
+    selectedAmenities.clear();
+    selectedNearbyTags.clear();
+    selectedFurnishing.clear();
+
+    images.clear();
+
+    video = "";
+
+    currentStep = 0;
+
+    update();
   }
 
-  //-------------------------------------------------------
-  /// Dispose
-  //-------------------------------------------------------
+  //--------------------------------------------------
+  // DISPOSE
+  //--------------------------------------------------
 
   @override
   void onClose() {
@@ -202,7 +343,155 @@ class ListPropertyController extends GetxController {
     areaNameController.dispose();
     buildingController.dispose();
     landmarkController.dispose();
+    otherFeatureController.dispose();
+    streetController.dispose();
+    livingRoomsController.dispose();
+    parkingSpacesController.dispose();
+    floorNumberController.dispose();
+    totalFloorsController.dispose();
+    yearBuiltController.dispose();
+    latitudeController.dispose();
+    longitudeController.dispose();
 
     super.onClose();
   }
+
+  @override
+  void onInit() {
+    super.onInit();
+
+    fetchListingOptions();
+  }
+
+  //--------------------------------------------------
+  // API
+  //--------------------------------------------------
+  Future<void> fetchListingOptions() async {
+    try {
+      isLoading = true;
+      error = "";
+      update();
+
+      final response = await ApiHandler.get(ApiEndpoints.listingOptions);
+
+      final model = ListingOptionsModel.fromJson(response);
+
+      amenities = model.amenities;
+      nearbyTags = model.nearbyTags;
+      furnishingOptions = model.furnishingOptions;
+      areaSuggestions = model.areaSuggestions;
+    } catch (e) {
+      error = e.toString();
+    } finally {
+      isLoading = false;
+      update();
+    }
+  }
+
+  Future<void> addProperty() async {
+    try {
+      isSubmitting = true;
+      update();
+
+      final body = {
+        "propertyName": propertyNameController.text.trim(),
+        "description": descriptionController.text.trim(),
+
+        "purpose": propertyPurpose,
+        "type": propertyType.toUpperCase(),
+
+        "latitude": latitude,
+        "longitude": longitude,
+
+        "bedrooms": int.tryParse(bedroomsController.text.trim()) ?? 0,
+
+        "bathrooms": int.tryParse(bathroomsController.text.trim()) ?? 0,
+
+        "area": double.tryParse(areaController.text.trim()) ?? 0,
+
+        "livingRooms": int.tryParse(livingRoomsController.text.trim()) ?? 0,
+
+        "parkingSpaces": int.tryParse(parkingSpacesController.text.trim()) ?? 0,
+
+        "floorNumber": int.tryParse(floorNumberController.text.trim()) ?? 0,
+
+        "totalFloors": int.tryParse(totalFloorsController.text.trim()) ?? 0,
+
+        /// Optional
+        "yearBuilt": null,
+
+        "furnishingStatus": selectedFurnishing.isEmpty
+            ? null
+            : selectedFurnishing.first,
+
+        /// Optional custom properties
+        "extraProperties": {},
+
+        "price": double.tryParse(priceController.text.trim()) ?? 0,
+
+        "priceNegotiable": false,
+
+        "addressLine1": addressController.text.trim(),
+
+        "addressLine2": streetController.text.trim(),
+
+        "areaName": areaNameController.text.trim(),
+
+        "municipality": cityController.text.trim(),
+
+        "contactPhone": "$countryCode${phoneController.text.trim()}",
+
+        "contactWhatsapp": "$countryCode${phoneController.text.trim()}",
+
+        "contactVerified": whatsappVerified,
+
+        "amenities": selectedAmenities.toList(),
+
+        "nearbyTags": selectedNearbyTags.toList(),
+
+        "otherFeatures": otherFeatureController.text.trim(),
+
+        /// TODO:
+        /// Replace with uploaded image URLs after image upload API.
+        "photos": images
+            .asMap()
+            .entries
+            .map((e) => {"url": e.value, "sortOrder": e.key, "caption": ""})
+            .toList(),
+      };
+
+      await ApiHandler.post(ApiEndpoints.mypropertyList, body: body);
+
+      Get.snackbar(
+        "Success",
+        "Property listed successfully.",
+        snackPosition: SnackPosition.BOTTOM,
+      );
+
+      clearForm();
+    } catch (e) {
+      Get.snackbar("Error", e.toString(), snackPosition: SnackPosition.BOTTOM);
+    } finally {
+      isSubmitting = false;
+      update();
+    }
+  }
+
+
+  Future<void> sendOtp() async {
+  // API call
+
+  showOtpField = true;
+  update();
+}
+
+
+Future<void> verifyOtp() async {
+  // Verify OTP API
+
+  whatsappVerified = true;
+  showOtpField = false;
+
+  update();
+}
 }

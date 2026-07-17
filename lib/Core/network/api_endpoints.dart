@@ -12,4 +12,8 @@ class ApiEndpoints {
 
   // Profile
   static const String completeProfile = "/api/auth/complete-profile";
+  static const mypropertyList = "/api/listings/my";
+  static const propertyList = "/api/listings";
+  static const listingOptions = "/api/listings/options";
+   static const String chatConversations = "/api/chat/conversations";
 }
