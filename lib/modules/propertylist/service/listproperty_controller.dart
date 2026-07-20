@@ -1,9 +1,14 @@
+import 'dart:convert';
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:http/http.dart' as http;
 
 import 'package:villas_qatar/Core/network/api_endpoints.dart';
 import 'package:villas_qatar/Core/network/api_handler.dart';
+import 'package:villas_qatar/Core/services/storage_service.dart';
 import 'package:villas_qatar/modules/propertylist/model/listing_options_model.dart';
+import 'package:villas_qatar/modules/propertylist/model/upload_property_model.dart';
 
 class ListPropertyController extends GetxController {
   //--------------------------------------------------
@@ -26,6 +31,10 @@ class ListPropertyController extends GetxController {
 
   bool isLoading = false;
   bool isSubmitting = false;
+  bool isUploadingImages = false;
+  final List<UploadedPropertyPhoto> uploadedPhotos = [];
+
+
 
   String error = "";
 
@@ -392,6 +401,13 @@ class ListPropertyController extends GetxController {
     try {
       isSubmitting = true;
       update();
+      final uploadedImageUrls = await uploadAllPropertyImages();
+
+      debugPrint("========== UPLOADED IMAGES ==========");
+      debugPrint(uploadedImageUrls.toString());
+      if (images.isNotEmpty && uploadedImageUrls.length != images.length) {
+        throw Exception("Some images could not be uploaded.");
+      }
 
       final body = {
         "propertyName": propertyNameController.text.trim(),
@@ -450,17 +466,14 @@ class ListPropertyController extends GetxController {
         "nearbyTags": selectedNearbyTags.toList(),
 
         "otherFeatures": otherFeatureController.text.trim(),
-
-        /// TODO:
-        /// Replace with uploaded image URLs after image upload API.
-        "photos": images
-            .asMap()
-            .entries
-            .map((e) => {"url": e.value, "sortOrder": e.key, "caption": ""})
-            .toList(),
+        "photos": uploadedImageUrls
+           
       };
 
-      await ApiHandler.post(ApiEndpoints.mypropertyList, body: body);
+      debugPrint("========== ADD PROPERTY ==========");
+      debugPrint("PHOTOS: ${body["photos"]}");
+
+      await ApiHandler.post(ApiEndpoints.propertyAdd, body: body);
 
       Get.snackbar(
         "Success",
@@ -477,21 +490,95 @@ class ListPropertyController extends GetxController {
     }
   }
 
-
   Future<void> sendOtp() async {
-  // API call
+    // API call
 
-  showOtpField = true;
-  update();
+    showOtpField = true;
+    update();
+  }
+
+  Future<String?> uploadPropertyImage(File image) async {
+  try {
+    final token = StorageService.getToken();
+
+    final request = http.MultipartRequest(
+      "POST",
+      Uri.parse("${ApiHandler.baseUrl}/api/upload"),
+    );
+
+    request.headers.addAll({
+      "Authorization": "Bearer $token",
+      "Accept": "application/json",
+    });
+
+    // field name from Swagger = file
+    request.files.add(
+      await http.MultipartFile.fromPath(
+        "file",
+        image.path,
+      ),
+    );
+
+    debugPrint("========== PROPERTY IMAGE UPLOAD ==========");
+    debugPrint("URL: ${request.url}");
+    debugPrint("FILE: ${image.path}");
+
+    final streamedResponse = await request.send();
+    final response = await http.Response.fromStream(streamedResponse);
+
+    debugPrint("STATUS: ${response.statusCode}");
+    debugPrint("BODY: ${response.body}");
+
+    if (response.statusCode == 200 ||
+        response.statusCode == 201) {
+      final data = jsonDecode(response.body);
+
+      return data["url"]?.toString();
+    }
+
+    final error = jsonDecode(response.body);
+
+    throw Exception(
+      error["message"] ?? "Image upload failed",
+    );
+  } catch (e) {
+    debugPrint("PROPERTY IMAGE UPLOAD ERROR: $e");
+    rethrow;
+  }
 }
 
+Future<List<Map<String, dynamic>>> uploadAllPropertyImages() async {
+  final List<Map<String, dynamic>> photos = [];
 
-Future<void> verifyOtp() async {
-  // Verify OTP API
+  for (int i = 0; i < images.length; i++) {
+    final imageFile = File(images[i]);
 
-  whatsappVerified = true;
-  showOtpField = false;
+    final imageUrl = await uploadPropertyImage(imageFile);
 
-  update();
+    if (imageUrl == null || imageUrl.isEmpty) {
+      throw Exception("Failed to upload image ${i + 1}");
+    }
+
+    photos.add({
+      "url": imageUrl,
+      "sortOrder": i,
+      "caption": "",
+    });
+
+    debugPrint(
+      "IMAGE ${i + 1}/${images.length} UPLOADED: $imageUrl",
+    );
+  }
+
+  return photos;
 }
+
+  Future<void> verifyOtp() async {
+    // Verify OTP API
+
+    whatsappVerified = true;
+    showOtpField = false;
+
+    update();
+  }
 }

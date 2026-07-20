@@ -3,6 +3,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get_core/src/get_main.dart';
 import 'package:get/get_instance/src/extension_instance.dart';
 import 'package:get/get_navigation/src/extension_navigation.dart';
+import 'package:get/get_navigation/src/routes/transitions_type.dart';
 import 'package:get/get_state_manager/src/simple/get_state.dart';
 import 'package:get/get_utils/src/extensions/internacionalization.dart';
 import 'package:villas_qatar/Core/constants/app_colors.dart';
@@ -10,6 +11,7 @@ import 'package:villas_qatar/Core/theme/app_textstyles.dart';
 import 'package:villas_qatar/modules/propertydetailscreen/propertydetailscreen.dart';
 import 'package:villas_qatar/modules/propertylist/model/myproperty_model.dart';
 import 'package:villas_qatar/modules/searchscreen/service/searchlist_screen.dart';
+import 'package:villas_qatar/modules/wishlist/service/wishlist_controller.dart';
 
 class PropertiesSection extends StatelessWidget {
   final PropertySearchController controller;
@@ -17,6 +19,7 @@ class PropertiesSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final WishlistController wishlistController = Get.put(WishlistController());
     return GetBuilder<PropertySearchController>(
       builder: (controller) {
         if (controller.isLoading) {
@@ -44,7 +47,6 @@ class PropertiesSection extends StatelessWidget {
                     color: Colors.black,
                   ),
                 ),
-                
               ],
             ),
 
@@ -74,8 +76,16 @@ class PropertyCard extends StatelessWidget {
       borderRadius: BorderRadius.circular(10.r),
       onTap: () async {
         final controller = Get.find<PropertySearchController>();
+
         await controller.fetchPropertyDetails(property.id);
-        Get.to(() => const PropertyDetailsScreen());
+
+        if (controller.selectedProperty != null) {
+          Get.to(
+            () => const PropertyDetailsScreen(),
+            transition: Transition.rightToLeft,
+            duration: const Duration(milliseconds: 250),
+          );
+        }
       },
       child: Container(
         margin: EdgeInsets.only(bottom: 18.h),
@@ -123,44 +133,97 @@ class PropertyCard extends StatelessWidget {
                         ),
                 ),
 
-                Positioned(
-                  left: 14.w,
-                  top: 14.h,
-                  child: Container(
-                    padding: EdgeInsets.symmetric(
-                      horizontal: 12.w,
-                      vertical: 6.h,
-                    ),
-                    decoration: BoxDecoration(
-                      color: AppColors.primary,
-                      borderRadius: BorderRadius.circular(5.r),
-                    ),
-                    child: Text(
-                      "FEATURED".tr,
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 10.sp,
-                        fontWeight: FontWeight.w700,
-                      ),
-                    ),
-                  ),
-                ),
+                // Positioned(
+                //   left: 14.w,
+                //   top: 14.h,
+                //   child: Container(
+                //     padding: EdgeInsets.symmetric(
+                //       horizontal: 12.w,
+                //       vertical: 6.h,
+                //     ),
+                //     decoration: BoxDecoration(
+                //       color: AppColors.primary,
+                //       borderRadius: BorderRadius.circular(5.r),
+                //     ),
+                //     child: Text(
+                //       "FEATURED".tr,
+                //       style: TextStyle(
+                //         color: Colors.white,
+                //         fontSize: 10.sp,
+                //         fontWeight: FontWeight.w700,
+                //       ),
+                //     ),
+                //   ),
+                // ),
 
                 Positioned(
                   right: 14.w,
                   top: 14.h,
-                  child: Container(
-                    width: 38.w,
-                    height: 38.w,
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      shape: BoxShape.circle,
-                    ),
-                    child: Icon(
-                      Icons.favorite_border,
-                      color: AppColors.primary,
-                      size: 20.sp,
-                    ),
+                  child: Builder(
+                    builder: (context) {
+                      if (!Get.isRegistered<WishlistController>()) {
+                        return Container(
+                          width: 38.w,
+                          height: 38.w,
+                          decoration: const BoxDecoration(
+                            color: Colors.white,
+                            shape: BoxShape.circle,
+                          ),
+                          child: Icon(
+                            Icons.favorite_border,
+                            color: AppColors.primary,
+                            size: 20.sp,
+                          ),
+                        );
+                      }
+
+                      return GetBuilder<WishlistController>(
+                        builder: (wishlistController) {
+                          final isWishlisted = wishlistController.isWishlisted(
+                            property.id,
+                          );
+
+                          final isLoading = wishlistController
+                              .isPropertyLoading(property.id);
+
+                          return InkWell(
+                            customBorder: const CircleBorder(),
+                            onTap: isLoading
+                                ? null
+                                : () async {
+                                    await wishlistController.toggleWishlist(
+                                      property.id,
+                                    );
+                                  },
+                            child: Container(
+                              width: 38.w,
+                              height: 38.w,
+                              alignment: Alignment.center,
+                              decoration: const BoxDecoration(
+                                color: Colors.white,
+                                shape: BoxShape.circle,
+                              ),
+                              child: isLoading
+                                  ? SizedBox(
+                                      width: 17.w,
+                                      height: 17.w,
+                                      child: const CircularProgressIndicator(
+                                        strokeWidth: 2,
+                                        color: AppColors.primary,
+                                      ),
+                                    )
+                                  : Icon(
+                                      isWishlisted
+                                          ? Icons.favorite
+                                          : Icons.favorite_border,
+                                      color: AppColors.primary,
+                                      size: 20.sp,
+                                    ),
+                            ),
+                          );
+                        },
+                      );
+                    },
                   ),
                 ),
 
@@ -286,6 +349,9 @@ class PropertyCard extends StatelessWidget {
                           ),
                         ),
                       ),
+
+                      
+
                     ],
                   ),
                 ],

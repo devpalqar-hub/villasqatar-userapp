@@ -18,20 +18,26 @@ class ChatListModel {
   });
 
   factory ChatListModel.fromJson(Map<String, dynamic> json) {
-    return ChatListModel(
-      id: json["id"],
-      createdAt: DateTime.parse(json["createdAt"]),
-      updatedAt: DateTime.parse(json["updatedAt"]),
-      listing: Listing.fromJson(json["listing"]),
-      user: ChatUser.fromJson(json["user"]),
-      participants: (json["participants"] as List)
-          .map((e) => Participant.fromJson(e))
-          .toList(),
-      lastMessage: json["lastMessage"] == null
-          ? null
-          : LastMessage.fromJson(json["lastMessage"]),
-    );
-  }
+  print("========== RAW CHAT LIST ==========");
+  print("LISTING JSON: ${json["listing"]}");
+  print("CONTACT PHONE RAW: ${json["listing"]?["contactPhone"]}");
+  print("CREATED BY: ${json["listing"]?["createdBy"]}");
+  print("===================================");
+
+  return ChatListModel(
+    id: json["id"] ?? "",
+    createdAt: DateTime.parse(json["createdAt"]),
+    updatedAt: DateTime.parse(json["updatedAt"]),
+    listing: Listing.fromJson(json["listing"] ?? {}),
+    user: ChatUser.fromJson(json["user"]),
+    participants: (json["participants"] as List? ?? [])
+        .map((e) => Participant.fromJson(e))
+        .toList(),
+    lastMessage: json["lastMessage"] == null
+        ? null
+        : LastMessage.fromJson(json["lastMessage"]),
+  );
+}
   Participant? get otherParticipant {
   try {
     return participants.firstWhere(

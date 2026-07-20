@@ -6,7 +6,9 @@ import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
+import 'package:http/http.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:mime/mime.dart';
 import 'package:socket_io_client/socket_io_client.dart' as IO;
 
 import '../../../Core/network/api_handler.dart';
@@ -484,12 +486,35 @@ void _onSocketError(dynamic data) {
         "Accept": "application/json",
       });
 
-      request.files.add(await http.MultipartFile.fromPath("file", image.path));
+      final mimeType = lookupMimeType(image.path) ?? "image/png";
+
+debugPrint("Mime Type: $mimeType");
+debugPrint("File Exists: ${await image.exists()}");
+debugPrint("File Size: ${await image.length()}");
+debugPrint("File Name: ${image.path.split('/').last}");
+
+request.files.add(
+  await http.MultipartFile.fromPath(
+    "file",
+    image.path,
+    filename: image.path.split('/').last,
+    contentType: MediaType.parse(mimeType),
+  ),
+);
 
       debugPrint("=========== CHAT IMAGE UPLOAD ==========");
       debugPrint("URL : ${request.url}");
       debugPrint("FILE : ${image.path}");
+      debugPrint("=========== REQUEST ==========");
+debugPrint("URL: ${request.url}");
+debugPrint("Headers: ${request.headers}");
 
+for (final file in request.files) {
+  debugPrint("Field: ${file.field}");
+  debugPrint("Filename: ${file.filename}");
+  debugPrint("Length: ${file.length}");
+  debugPrint("ContentType: ${file.contentType}");
+}
       final streamedResponse = await request.send();
 
       final response = await http.Response.fromStream(streamedResponse);

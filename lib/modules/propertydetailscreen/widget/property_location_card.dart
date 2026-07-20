@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:google_maps_flutter/google_maps_flutter.dart';
+// import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:villas_qatar/Core/constants/app_colors.dart';
 import 'package:villas_qatar/modules/propertylist/model/myproperty_model.dart';
@@ -42,32 +42,32 @@ class PropertyLocationCard extends StatelessWidget {
                 SizedBox(
                   height: 180.h,
                   width: double.infinity,
-                  child: GoogleMap(
-                    initialCameraPosition: const CameraPosition(
-                      target: LatLng(0, 0),
-                      zoom: 2,
-                    ),
-                    onMapCreated: (GoogleMapController controller) {
-                      controller.animateCamera(
-                        CameraUpdate.newLatLngZoom(
-                          LatLng(
-                            property.latitude.toDouble(),
-                            property.longitude.toDouble(),
-                          ),
-                          16,
-                        ),
-                      );
-                    },
-                    markers: {
-                      Marker(
-                        markerId: const MarkerId("property"),
-                        position: LatLng(
-                          property.latitude.toDouble(),
-                          property.longitude.toDouble(),
-                        ),
-                      ),
-                    },
-                  ),
+                  // child: GoogleMap(
+                  //   initialCameraPosition: const CameraPosition(
+                  //     target: LatLng(0, 0),
+                  //     zoom: 2,
+                  //   ),
+                  //   onMapCreated: (GoogleMapController controller) {
+                  //     controller.animateCamera(
+                  //       CameraUpdate.newLatLngZoom(
+                  //         LatLng(
+                  //           property.latitude.toDouble(),
+                  //           property.longitude.toDouble(),
+                  //         ),
+                  //         16,
+                  //       ),
+                  //     );
+                  //   },
+                  //   markers: {
+                  //     Marker(
+                  //       markerId: const MarkerId("property"),
+                  //       position: LatLng(
+                  //         property.latitude.toDouble(),
+                  //         property.longitude.toDouble(),
+                  //       ),
+                  //     ),
+                  //   },
+                  // ),
                 ),
                 Positioned(
                   left: 12.w,

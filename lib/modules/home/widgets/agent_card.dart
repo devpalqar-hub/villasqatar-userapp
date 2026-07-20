@@ -6,7 +6,6 @@ import 'package:villas_qatar/Core/constants/app_colors.dart';
 import 'package:villas_qatar/modules/agent/view/agent_detailscreen.dart';
 
 class AgentCards extends StatelessWidget {
-
   final String image;
   final String name;
   final String designation;
@@ -151,81 +150,75 @@ class AgentCards extends StatelessWidget {
             const Spacer(),
 
             /// Chat & Call Buttons
-           Row(
-  children: [
-    Expanded(
-      child: InkWell(
-        borderRadius: BorderRadius.circular(10.r),
-        onTap: _openWhatsApp,
-        child: Container(
-          height: 38.h,
-          decoration: BoxDecoration(
-            color: const Color(0xffFFF4F6),
-            borderRadius: BorderRadius.circular(10.r),
-          ),
-          child: Center(
-            child: FaIcon(
-              FontAwesomeIcons.whatsapp,
-              color: const Color(0xFF25D366),
-              size: 20.sp,
-            ),
-          ),
-        ),
-      ),
-    ),
+            Row(
+              children: [
+                Expanded(
+                  child: InkWell(
+                    borderRadius: BorderRadius.circular(10.r),
+                    onTap: _openWhatsApp,
+                    child: Container(
+                      height: 38.h,
+                      decoration: BoxDecoration(
+                        color: const Color(0xffFFF4F6),
+                        borderRadius: BorderRadius.circular(10.r),
+                      ),
+                      child: Center(
+                        child: FaIcon(
+                          FontAwesomeIcons.whatsapp,
+                          color: const Color(0xFF25D366),
+                          size: 20.sp,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
 
-    SizedBox(width: 10.w),
+                SizedBox(width: 10.w),
 
-    Expanded(
-      child: InkWell(
-        borderRadius: BorderRadius.circular(10.r),
-        onTap: _makeCall,
-        child: Container(
-          height: 38.h,
-          decoration: BoxDecoration(
-            color: const Color(0xffFFF4F6),
-            borderRadius: BorderRadius.circular(10.r),
-          ),
-          child: Center(
-            child: Icon(
-              Icons.call_outlined,
-              color: AppColors.primary,
-              size: 20.sp,
+                Expanded(
+                  child: InkWell(
+                    borderRadius: BorderRadius.circular(10.r),
+                    onTap: _makeCall,
+                    child: Container(
+                      height: 38.h,
+                      decoration: BoxDecoration(
+                        color: const Color(0xffFFF4F6),
+                        borderRadius: BorderRadius.circular(10.r),
+                      ),
+                      child: Center(
+                        child: Icon(
+                          Icons.call_outlined,
+                          color: AppColors.primary,
+                          size: 20.sp,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
             ),
-          ),
-        ),
-      ),
-    ),
-  ],
-),
           ],
         ),
       ),
     );
   }
 
+  Future<void> _openWhatsApp() async {
+    // Remove spaces, +, -, etc.
+    final number = phone.replaceAll(RegExp(r'[^0-9]'), '');
 
-Future<void> _openWhatsApp() async {
-  // Remove spaces, +, -, etc.
-  final number = phone.replaceAll(RegExp(r'[^0-9]'), '');
+    final Uri uri = Uri.parse("https://wa.me/$number?text=Hello");
 
-  final Uri uri = Uri.parse(
-    "https://wa.me/$number?text=Hello",
-  );
-
-  if (await canLaunchUrl(uri)) {
-    await launchUrl(uri, mode: LaunchMode.externalApplication);
+    if (await canLaunchUrl(uri)) {
+      await launchUrl(uri, mode: LaunchMode.externalApplication);
+    }
   }
-}
 
-Future<void> _makeCall() async {
-  final Uri uri = Uri(
-    scheme: 'tel',
-    path: phone,
-  );
+  Future<void> _makeCall() async {
+    final Uri uri = Uri(scheme: 'tel', path: phone);
 
-  if (await canLaunchUrl(uri)) {
-    await launchUrl(uri);
+    if (await canLaunchUrl(uri)) {
+      await launchUrl(uri);
+    }
   }
-}
 }

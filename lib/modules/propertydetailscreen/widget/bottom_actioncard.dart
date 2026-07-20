@@ -7,6 +7,7 @@ import 'package:get/get_core/src/get_main.dart';
 import 'package:intl/intl.dart';
 import 'package:villas_qatar/Core/constants/app_colors.dart';
 import 'package:villas_qatar/modules/offerscreen/view/make_offerscreen.dart';
+import 'package:villas_qatar/modules/visits/service/visit_controller.dart';
 import 'package:villas_qatar/modules/propertydetailscreen/widget/make_offer_Dailogue.dart';
 import 'package:villas_qatar/modules/propertylist/model/myproperty_model.dart';
 
@@ -82,17 +83,7 @@ class BottomActionCard extends StatelessWidget {
                         ),
                       ),
                       onPressed: () {
-                        showDialog(
-                          context: context,
-                          barrierDismissible: true,
-                          builder: (_) => Dialog(
-                            backgroundColor: Colors.transparent,
-                            insetPadding: const EdgeInsets.symmetric(
-                              horizontal: 20,
-                            ),
-                            child: MakeOfferDialog(property: property),
-                          ),
-                        );
+                        showMakeOfferBottomSheet(context, property);
                       },
                       label: Text(
                         "Make an Offer",
@@ -124,7 +115,7 @@ class BottomActionCard extends StatelessWidget {
                         ),
                       ),
                       onPressed: () {
-                        _showScheduleVisitSheet(context);
+                        _showScheduleVisitSheet(context, property: property);
                       },
 
                       label: Text(
@@ -147,7 +138,16 @@ class BottomActionCard extends StatelessWidget {
   }
 }
 
-void _showScheduleVisitSheet(BuildContext context) {
+void _showScheduleVisitSheet(
+  BuildContext context, {
+  required Property property,
+}) {
+  final VisitController visitController = Get.isRegistered<VisitController>()
+      ? Get.find<VisitController>()
+      : Get.put(VisitController());
+
+  final TextEditingController noteController = TextEditingController();
+
   final slots = [
     "09:00 AM",
     "10:30 AM",
@@ -159,6 +159,8 @@ void _showScheduleVisitSheet(BuildContext context) {
 
   DateTime selectedDate = DateTime.now();
   int selectedSlot = 0;
+  bool isLoading = false;
+
   showModalBottomSheet(
     context: context,
     isScrollControlled: true,
@@ -166,225 +168,347 @@ void _showScheduleVisitSheet(BuildContext context) {
     builder: (_) {
       return StatefulBuilder(
         builder: (context, setState) {
-          return Container(
-            padding: EdgeInsets.fromLTRB(
-              20.w,
-              18.h,
-              20.w,
-              MediaQuery.of(context).padding.bottom + 20.h,
+          return Padding(
+            padding: EdgeInsets.only(
+              bottom: MediaQuery.of(context).viewInsets.bottom,
             ),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.vertical(top: Radius.circular(24.r)),
-            ),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Center(
-                  child: Container(
-                    width: 45.w,
-                    height: 5.h,
-                    decoration: BoxDecoration(
-                      color: Colors.grey.shade300,
-                      borderRadius: BorderRadius.circular(20),
+            child: Container(
+              padding: EdgeInsets.fromLTRB(
+                20.w,
+                18.h,
+                20.w,
+                MediaQuery.of(context).padding.bottom + 20.h,
+              ),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.vertical(top: Radius.circular(24.r)),
+              ),
+              child: SingleChildScrollView(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Center(
+                      child: Container(
+                        width: 45.w,
+                        height: 5.h,
+                        decoration: BoxDecoration(
+                          color: Colors.grey.shade300,
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                      ),
                     ),
-                  ),
-                ),
 
-                SizedBox(height: 18.h),
+                    SizedBox(height: 18.h),
 
-                Text(
-                  "Schedule a Visit",
-                  style: TextStyle(
-                    fontSize: 18.sp,
-                    fontWeight: FontWeight.w700,
-                  ),
-                ),
-
-                SizedBox(height: 18.h),
-
-                Text(
-                  "Select Visit Date",
-                  style: TextStyle(
-                    fontSize: 13.sp,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-
-                SizedBox(height: 12.h),
-
-                InkWell(
-                  borderRadius: BorderRadius.circular(12.r),
-                  onTap: () async {
-                    final picked = await showDatePicker(
-                      context: context,
-                      initialDate: selectedDate,
-                      firstDate: DateTime.now(),
-                      lastDate: DateTime.now().add(const Duration(days: 90)),
-                      builder: (context, child) {
-                        return Theme(
-                          data: Theme.of(context).copyWith(
-                            colorScheme: const ColorScheme.light(
-                              primary: AppColors.primary,
-                              onPrimary: Colors.white,
-                              surface: Colors.white,
-                              onSurface: Colors.black,
-                            ),
-                            datePickerTheme: DatePickerThemeData(
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(18),
-                              ),
-                            ),
-                          ),
-                          child: child!,
-                        );
-                      },
-                    );
-
-                    if (picked != null) {
-                      setState(() {
-                        selectedDate = picked;
-                      });
-                    }
-                  },
-                  child: Container(
-                    padding: EdgeInsets.symmetric(
-                      horizontal: 16.w,
-                      vertical: 14.h,
+                    Text(
+                      "Schedule a Visit",
+                      style: TextStyle(
+                        fontSize: 18.sp,
+                        fontWeight: FontWeight.w700,
+                      ),
                     ),
-                    decoration: BoxDecoration(
-                      color: Colors.white,
+
+                    SizedBox(height: 18.h),
+
+                    Text(
+                      "Select Visit Date",
+                      style: TextStyle(
+                        fontSize: 13.sp,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+
+                    SizedBox(height: 12.h),
+
+                    /// DATE PICKER
+                    InkWell(
                       borderRadius: BorderRadius.circular(12.r),
-                      border: Border.all(color: AppColors.fieldBorder),
-                    ),
-                    child: Row(
-                      children: [
-                        const Icon(
-                          Icons.calendar_month_outlined,
-                          color: AppColors.primary,
-                        ),
+                      onTap: isLoading
+                          ? null
+                          : () async {
+                              final picked = await showDatePicker(
+                                context: context,
+                                initialDate: selectedDate,
+                                firstDate: DateTime.now(),
+                                lastDate: DateTime.now().add(
+                                  const Duration(days: 90),
+                                ),
+                                builder: (context, child) {
+                                  return Theme(
+                                    data: Theme.of(context).copyWith(
+                                      colorScheme: const ColorScheme.light(
+                                        primary: AppColors.primary,
+                                        onPrimary: Colors.white,
+                                        surface: Colors.white,
+                                        onSurface: Colors.black,
+                                      ),
+                                      datePickerTheme: DatePickerThemeData(
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius: BorderRadius.circular(
+                                            18,
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                    child: child!,
+                                  );
+                                },
+                              );
 
-                        SizedBox(width: 12.w),
-
-                        Expanded(
-                          child: Text(
-                            DateFormat('EEE, dd MMM yyyy').format(selectedDate),
-                            style: TextStyle(
-                              fontSize: 14.sp,
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-                        ),
-
-                        const Icon(
-                          Icons.keyboard_arrow_down,
-                          color: Colors.grey,
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-
-                SizedBox(height: 22.h),
-
-                Text(
-                  "Available Time",
-                  style: TextStyle(
-                    fontSize: 13.sp,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-
-                SizedBox(height: 12.h),
-
-                Wrap(
-                  spacing: 10,
-                  runSpacing: 10,
-                  children: List.generate(slots.length, (i) {
-                    final selected = selectedSlot == i;
-
-                    return GestureDetector(
-                      onTap: () {
-                        setState(() => selectedSlot = i);
-                      },
+                              if (picked != null) {
+                                setState(() {
+                                  selectedDate = picked;
+                                });
+                              }
+                            },
                       child: Container(
                         padding: EdgeInsets.symmetric(
                           horizontal: 16.w,
-                          vertical: 10.h,
+                          vertical: 14.h,
                         ),
                         decoration: BoxDecoration(
-                          color: selected
-                              ? AppColors.primary.withOpacity(.08)
-                              : Colors.white,
+                          color: Colors.white,
                           borderRadius: BorderRadius.circular(12.r),
-                          border: Border.all(
-                            color: selected
-                                ? AppColors.primary
-                                : AppColors.fieldBorder,
-                          ),
+                          border: Border.all(color: AppColors.fieldBorder),
                         ),
-                        child: Text(
-                          slots[i],
-                          style: TextStyle(
-                            color: selected
-                                ? AppColors.primary
-                                : Colors.black87,
-                            fontWeight: FontWeight.w600,
-                          ),
+                        child: Row(
+                          children: [
+                            const Icon(
+                              Icons.calendar_month_outlined,
+                              color: AppColors.primary,
+                            ),
+
+                            SizedBox(width: 12.w),
+
+                            Expanded(
+                              child: Text(
+                                DateFormat(
+                                  'EEE, dd MMM yyyy',
+                                ).format(selectedDate),
+                                style: TextStyle(
+                                  fontSize: 14.sp,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            ),
+
+                            const Icon(
+                              Icons.keyboard_arrow_down,
+                              color: Colors.grey,
+                            ),
+                          ],
                         ),
                       ),
-                    );
-                  }),
-                ),
-
-                SizedBox(height: 20.h),
-
-                TextField(
-                  maxLines: 3,
-                  decoration: InputDecoration(
-                    hintText: "Add a note (Optional)",
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12.r),
                     ),
-                  ),
-                ),
 
-                SizedBox(height: 24.h),
+                    SizedBox(height: 22.h),
 
-                SizedBox(
-                  width: double.infinity,
-                  height: 50.h,
-                  child: ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: AppColors.primary,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12.r),
-                      ),
-                    ),
-                    onPressed: () {
-                      Navigator.pop(context);
-
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text("Visit Scheduled Successfully"),
-                        ),
-                      );
-                    },
-                    child: Text(
-                      "Book Visit",
+                    Text(
+                      "Available Time",
                       style: TextStyle(
-                        fontSize: 15.sp,
-                        fontWeight: FontWeight.w700,
-                        color: Colors.white,
+                        fontSize: 13.sp,
+                        fontWeight: FontWeight.w600,
                       ),
                     ),
-                  ),
+
+                    SizedBox(height: 12.h),
+
+                    /// TIME SLOTS
+                    Wrap(
+                      spacing: 10,
+                      runSpacing: 10,
+                      children: List.generate(slots.length, (i) {
+                        final selected = selectedSlot == i;
+
+                        return GestureDetector(
+                          onTap: isLoading
+                              ? null
+                              : () {
+                                  setState(() {
+                                    selectedSlot = i;
+                                  });
+                                },
+                          child: Container(
+                            padding: EdgeInsets.symmetric(
+                              horizontal: 16.w,
+                              vertical: 10.h,
+                            ),
+                            decoration: BoxDecoration(
+                              color: selected
+                                  ? AppColors.primary.withOpacity(.08)
+                                  : Colors.white,
+                              borderRadius: BorderRadius.circular(12.r),
+                              border: Border.all(
+                                color: selected
+                                    ? AppColors.primary
+                                    : AppColors.fieldBorder,
+                              ),
+                            ),
+                            child: Text(
+                              slots[i],
+                              style: TextStyle(
+                                color: selected
+                                    ? AppColors.primary
+                                    : Colors.black87,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ),
+                        );
+                      }),
+                    ),
+
+                    SizedBox(height: 20.h),
+
+                    /// NOTES
+                    TextField(
+                      controller: noteController,
+                      maxLines: 3,
+                      enabled: !isLoading,
+                      decoration: InputDecoration(
+                        hintText: "Add a note (Optional)",
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12.r),
+                        ),
+                      ),
+                    ),
+
+                    SizedBox(height: 24.h),
+
+                    /// BOOK VISIT
+                    SizedBox(
+                      width: double.infinity,
+                      height: 50.h,
+                      child: ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: AppColors.primary,
+                          disabledBackgroundColor: AppColors.primary
+                              .withOpacity(.6),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12.r),
+                          ),
+                        ),
+                        onPressed: isLoading
+                            ? null
+                            : () async {
+                                // Selected time string
+                                // Example: "10:30 AM"
+                                final String selectedTimeString =
+                                    slots[selectedSlot];
+
+                                // Convert "10:30 AM" to DateTime to get hour/minute
+                                final DateTime parsedTime = DateFormat(
+                                  "hh:mm a",
+                                ).parse(selectedTimeString);
+
+                                // Combine selected DATE + selected TIME
+                                final DateTime scheduledAt = DateTime(
+                                  selectedDate.year,
+                                  selectedDate.month,
+                                  selectedDate.day,
+                                  parsedTime.hour,
+                                  parsedTime.minute,
+                                );
+
+                                debugPrint("========== VISIT DATA ==========");
+                                debugPrint("Property ID: ${property.id}");
+                                debugPrint(
+                                  "Selected Date: "
+                                  "${DateFormat('yyyy-MM-dd').format(selectedDate)}",
+                                );
+                                debugPrint(
+                                  "Selected Time: $selectedTimeString",
+                                );
+                                debugPrint("Scheduled Local: $scheduledAt");
+                                debugPrint(
+                                  "Scheduled UTC: "
+                                  "${scheduledAt.toUtc().toIso8601String()}",
+                                );
+                                debugPrint(
+                                  "Notes: ${noteController.text.trim()}",
+                                );
+                                debugPrint("===============================");
+
+                                setState(() {
+                                  isLoading = true;
+                                });
+
+                                final bool success = await visitController
+                                    .scheduleVisit(
+                                      propertyId: property.id,
+
+                                      // DATE + TIME passed here
+                                      scheduledAt: scheduledAt,
+
+                                      notes: noteController.text.trim(),
+                                    );
+
+                                if (!context.mounted) return;
+
+                                if (success) {
+                                  Navigator.pop(context);
+                                  return;
+                                }
+
+                                setState(() {
+                                  isLoading = false;
+                                });
+                              },
+                        child: isLoading
+                            ? SizedBox(
+                                width: 22.w,
+                                height: 22.w,
+                                child: const CircularProgressIndicator(
+                                  strokeWidth: 2,
+                                  valueColor: AlwaysStoppedAnimation<Color>(
+                                    Colors.white,
+                                  ),
+                                ),
+                              )
+                            : Text(
+                                "Book Visit",
+                                style: TextStyle(
+                                  fontSize: 15.sp,
+                                  fontWeight: FontWeight.w700,
+                                  color: Colors.white,
+                                ),
+                              ),
+                      ),
+                    ),
+                  ],
                 ),
-              ],
+              ),
             ),
           );
         },
+      );
+    },
+  );
+}
+void showMakeOfferBottomSheet(
+  BuildContext context,
+  Property property,
+) {
+  showModalBottomSheet(
+    context: context,
+    isScrollControlled: true,
+    useSafeArea: true,
+    backgroundColor:
+        Colors.transparent,
+    barrierColor:
+        Colors.black.withOpacity(.35),
+    builder: (_) {
+      return Padding(
+        padding: EdgeInsets.only(
+          bottom:
+              MediaQuery.of(context)
+                  .viewInsets
+                  .bottom,
+        ),
+        child: MakeOfferBottomSheet(
+          property: property,
+        ),
       );
     },
   );

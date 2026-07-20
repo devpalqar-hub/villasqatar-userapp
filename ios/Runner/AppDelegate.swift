@@ -13,5 +13,5 @@ import UIKit
   func didInitializeImplicitFlutterEngine(_ engineBridge: FlutterImplicitEngineBridge) {
     GeneratedPluginRegistrant.register(with: engineBridge.pluginRegistry)
   }
-  GMSServices.provideAPIKey("YOUR_GOOGLE_MAPS_API_KEY")
+  
 }

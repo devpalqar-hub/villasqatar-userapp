@@ -2,14 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
-
 import 'package:villas_qatar/Core/constants/app_colors.dart';
 import 'package:villas_qatar/modules/chats/models/chat_lsit_model.dart';
 import 'package:villas_qatar/modules/chats/service/chat_list_controller.dart';
 import 'package:villas_qatar/modules/chats/views/chat_startscreen.dart';
-
+import 'package:villas_qatar/modules/visits/view/visit_list_screen.dart';
 import '../service/chat_controller.dart';
-import 'chatscreen.dart';
+
 
 class ChatListScreen extends StatelessWidget {
   ChatListScreen({super.key});
@@ -23,7 +22,7 @@ class ChatListScreen extends StatelessWidget {
       backgroundColor: AppColors.background,
       body: SafeArea(
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 12),
+          padding: EdgeInsets.symmetric(horizontal: 12.h),
           child: Column(
             children: [
               _buildTopBar(),
@@ -64,7 +63,7 @@ class ChatListScreen extends StatelessWidget {
                     return RefreshIndicator(
                       onRefresh: controller.refreshList,
                       child: ListView.builder(
-                        padding: const EdgeInsets.symmetric(vertical: 6),
+                        padding: EdgeInsets.symmetric(vertical: 6.h),
                         itemCount: controller.filteredConversations.length,
                         itemBuilder: (_, index) {
                           final conversation =
@@ -78,6 +77,15 @@ class ChatListScreen extends StatelessWidget {
                             conversation: conversation,
                             participant: seller,
                             onTap: () {
+                              debugPrint("🔥🔥🔥 CHAT TILE CLICKED 🔥🔥🔥");
+                              debugPrint("CONVERSATION ID: ${conversation.id}");
+                              debugPrint(
+                                "LISTING ID: ${conversation.listing.id}",
+                              );
+                              debugPrint(
+                                "CONTACT PHONE: '${conversation.listing.contactPhone}'",
+                              );
+
                               if (Get.isRegistered<ChatController>()) {
                                 Get.delete<ChatController>(force: true);
                               }
@@ -89,7 +97,12 @@ class ChatListScreen extends StatelessWidget {
                                 ),
                               );
 
-                              Get.to(() => const ChatStartScreen());
+                              Get.to(
+                                () => ChatStartScreen(
+                                  listing: conversation.listing,
+                                  showPropertyCard: false,
+                                ),
+                              );
                             },
                           );
                         },
@@ -114,27 +127,32 @@ class ChatListScreen extends StatelessWidget {
             icon: const Icon(Icons.arrow_back, color: AppColors.primary),
             onPressed: () {},
           ),
-          const Expanded(
+          Expanded(
             child: Text(
               'My Chats',
               textAlign: TextAlign.center,
               style: TextStyle(
-                fontSize: 18,
+                fontSize: 18.sp,
                 fontWeight: FontWeight.w700,
                 color: Colors.black87,
               ),
             ),
           ),
-          // IconButton(
-          //   icon: const Icon(Icons.tune, color: AppColors.primary),
-          //   onPressed: () {},
-          // ),
+           IconButton(
+          tooltip: "My Visits",
+          icon: const Icon(
+            Icons.calendar_month_outlined,
+            color: AppColors.primary,
+          ),
+          onPressed: () {
+            Get.to(() => const VisitListScreen());
+          },
+        ),
         ],
       ),
     );
   }
 }
-
 class _ConversationTile extends StatelessWidget {
   final ChatListModel conversation;
   final Participant participant;
@@ -150,162 +168,357 @@ class _ConversationTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final message = conversation.lastMessage;
-    final bool unread = false;
 
-    return InkWell(
-      onTap: onTap,
-      borderRadius: BorderRadius.circular(12.r),
-      child: Container(
-        margin: EdgeInsets.symmetric(horizontal: 10.w, vertical: 5.h),
-        padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 10.h),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(12.r),
-          border: Border.all(color: AppColors.fieldBorder),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(.03),
-              blurRadius: 8,
-              offset: const Offset(0, 2),
-            ),
-          ],
-        ),
-        child: Row(
-          children: [
-            ClipRRect(
-              borderRadius: BorderRadius.circular(12.r),
-              child: conversation.listing.image.isNotEmpty
-                  ? Image.network(
-                      conversation.listing.image,
-                      width: 52.w,
-                      height: 52.w,
-                      fit: BoxFit.cover,
-                      errorBuilder: (_, error, stackTrace) {
-                        debugPrint("Image Error: $error");
-                        debugPrint("Image URL: ${conversation.listing.image}");
-                        return _placeholder();
-                      },
-                    )
-                  : _placeholder(),
-            ),
+    final String propertyName =
+        conversation.listing.propertyName.trim().isNotEmpty
+            ? conversation.listing.propertyName.trim()
+            : "Property";
 
-            SizedBox(width: 12.w),
+    final String sellerName =
+        conversation.otherParticipant?.user.name?.trim().isNotEmpty == true
+            ? conversation.otherParticipant!.user.name!.trim()
+            : "Seller";
 
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    children: [
-                      Expanded(
-                        child: Text(
-                          conversation.otherParticipant?.user.name ?? "Seller",
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                          style: TextStyle(
-                            fontSize: 13.sp,
-                            fontWeight: FontWeight.w700,
-                            color: AppColors.textPrimary,
-                          ),
-                        ),
-                      ),
+    final String propertyType =
+        conversation.listing.type.trim();
 
-                      SizedBox(width: 8.w),
+    final String purpose =
+        conversation.listing.purpose.trim();
 
-                      Text(
-                        _formatTime(conversation.updatedAt),
-                        style: TextStyle(
-                          fontSize: 10.sp,
-                          color: unread
-                              ? AppColors.primary
-                              : AppColors.textSecondary,
-                        ),
-                      ),
-                    ],
-                  ),
-
-                  SizedBox(height: 3.h),
-
-                  /// Property Type
-                  Text(
-                    "${conversation.listing.type} • ${conversation.listing.purpose}",
-                    style: TextStyle(
-                      fontSize: 10.sp,
-                      color: AppColors.textSecondary,
-                    ),
-                  ),
-
-                  SizedBox(height: 4.h),
-
-                  /// Last Message
-                  Text(
-                    message?.content ?? "No Message",
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: TextStyle(
-                      fontSize: 11.sp,
-                      color: AppColors.textSecondary,
-                    ),
-                  ),
-
-                  SizedBox(height: 6.h),
-
-                  /// Property Name
-                  Container(
-                    padding: EdgeInsets.symmetric(
-                      horizontal: 8.w,
-                      vertical: 4.h,
-                    ),
-                    decoration: BoxDecoration(
-                      color: AppColors.primary.withOpacity(.08),
-                      borderRadius: BorderRadius.circular(6.r),
-                    ),
-                    child: Text(
-                      conversation.listing.propertyName,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: TextStyle(
-                        fontSize: 9.sp,
-                        fontWeight: FontWeight.w600,
-                        color: AppColors.primary,
-                      ),
-                    ),
-                  ),
-                ],
+    return Padding(
+      padding: EdgeInsets.symmetric(
+        horizontal: 4.w,
+        vertical: 5.h,
+      ),
+      child: Material(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(14.r),
+        child: InkWell(
+          onTap: onTap,
+          borderRadius: BorderRadius.circular(14.r),
+          child: Container(
+            padding: EdgeInsets.all(11.w),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(14.r),
+              border: Border.all(
+                color: const Color(0xffECECEC),
               ),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(.025),
+                  blurRadius: 12,
+                  offset: const Offset(0, 3),
+                ),
+              ],
             ),
-          ],
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // ============================================
+                // PROPERTY IMAGE
+                // ============================================
+
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(11.r),
+                  child: SizedBox(
+                    width: 72.w,
+                    height: 76.h,
+                    child: conversation.listing.image.isNotEmpty
+                        ? Image.network(
+                            conversation.listing.image,
+                            fit: BoxFit.cover,
+                            errorBuilder: (_, error, stackTrace) {
+                              debugPrint(
+                                "Image Error: $error",
+                              );
+
+                              return _placeholder();
+                            },
+                          )
+                        : _placeholder(),
+                  ),
+                ),
+
+                SizedBox(width: 11.w),
+
+                // ============================================
+                // DETAILS
+                // ============================================
+
+                Expanded(
+                  child: SizedBox(
+                    height: 76.h,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        // ====================================
+                        // PROPERTY NAME + TIME
+                        // PROPERTY NAME IS PRIMARY
+                        // ====================================
+
+                        Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Expanded(
+                              child: Text(
+                                propertyName,
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                style: TextStyle(
+                                  fontSize: 13.5.sp,
+                                  height: 1.2,
+                                  fontWeight: FontWeight.w700,
+                                  color: const Color(0xff202020),
+                                ),
+                              ),
+                            ),
+
+                            SizedBox(width: 8.w),
+
+                            Padding(
+                              padding: EdgeInsets.only(top: 1.h),
+                              child: Text(
+                                _formatTime(
+                                  conversation.updatedAt,
+                                ),
+                                style: TextStyle(
+                                  fontSize: 9.sp,
+                                  fontWeight: FontWeight.w500,
+                                  color: const Color(0xff929292),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+
+                        SizedBox(height: 5.h),
+
+                        // ====================================
+                        // PROPERTY TYPE / PURPOSE
+                        // ====================================
+
+                        Row(
+                          children: [
+                            if (propertyType.isNotEmpty)
+                              _smallTag(
+                                propertyType,
+                              ),
+
+                            if (propertyType.isNotEmpty &&
+                                purpose.isNotEmpty)
+                              SizedBox(width: 5.w),
+
+                            // if (purpose.isNotEmpty)
+                            //   _smallTag(
+                            //     purpose,
+                            //   ),
+                          ],
+                        ),
+
+                        const Spacer(),
+
+                        // ====================================
+                        // LAST MESSAGE
+                        // ====================================
+
+                        Row(
+                          children: [
+                            Icon(
+                              Icons.chat_bubble_outline_rounded,
+                              size: 12.sp,
+                              color: const Color(0xff999999),
+                            ),
+
+                            SizedBox(width: 5.w),
+
+                            Expanded(
+                              child: Text(
+                                message?.content ?? "No messages yet",
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                style: TextStyle(
+                                  fontSize: 10.5.sp,
+                                  height: 1.2,
+                                  color: const Color(0xff6F6F6F),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+
+                        SizedBox(height: 5.h),
+
+                        // ====================================
+                        // SELLER
+                        // ====================================
+
+                        Row(
+                          children: [
+                            Container(
+                              width: 18.w,
+                              height: 18.w,
+                              alignment: Alignment.center,
+                              decoration: BoxDecoration(
+                                color: AppColors.primary.withOpacity(.08),
+                                shape: BoxShape.circle,
+                              ),
+                              child: Icon(
+                                Icons.person_outline_rounded,
+                                size: 11.sp,
+                                color: AppColors.primary,
+                              ),
+                            ),
+
+                            SizedBox(width: 5.w),
+
+                            Text(
+                              "Chat with ",
+                              style: TextStyle(
+                                fontSize: 9.sp,
+                                color: const Color(0xff999999),
+                              ),
+                            ),
+
+                            Expanded(
+                              child: Text(
+                                sellerName,
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                style: TextStyle(
+                                  fontSize: 9.5.sp,
+                                  fontWeight: FontWeight.w600,
+                                  color: AppColors.primary,
+                                ),
+                              ),
+                            ),
+
+                            Icon(
+                              Icons.chevron_right_rounded,
+                              size: 16.sp,
+                              color: const Color(0xffAAAAAA),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
         ),
       ),
     );
   }
 
-  Widget _placeholder() {
+  // ============================================================
+  // SMALL PROPERTY TAG
+  // ============================================================
+
+  Widget _smallTag(String text) {
     return Container(
-      width: 52.w,
-      height: 52.w,
-      color: AppColors.primarySoft,
-      child: Icon(Icons.home, color: AppColors.primary, size: 24.sp),
+      padding: EdgeInsets.symmetric(
+        horizontal: 7.w,
+        vertical: 2.5.h,
+      ),
+      decoration: BoxDecoration(
+        color: AppColors.primary.withOpacity(.06),
+        borderRadius: BorderRadius.circular(5.r),
+      ),
+      child: Text(
+        _formatLabel(text),
+        maxLines: 1,
+        overflow: TextOverflow.ellipsis,
+        style: TextStyle(
+          fontSize: 8.sp,
+          fontWeight: FontWeight.w600,
+          color: AppColors.primary,
+        ),
+      ),
     );
   }
 
-  String _formatTime(DateTime date) {
-    final now = DateTime.now();
+  // ============================================================
+  // IMAGE PLACEHOLDER
+  // ============================================================
 
-    if (now.year == date.year &&
-        now.month == date.month &&
-        now.day == date.day) {
-      return DateFormat("hh:mm a").format(date);
-    }
-
-    if (now.difference(date).inDays == 1) {
-      return "Yesterday";
-    }
-
-    if (now.difference(date).inDays < 7) {
-      return DateFormat("EEE").format(date);
-    }
-
-    return DateFormat("dd MMM").format(date);
+  Widget _placeholder() {
+    return Container(
+      width: 72.w,
+      height: 76.h,
+      color: AppColors.primarySoft,
+      alignment: Alignment.center,
+      child: Icon(
+        Icons.home_work_outlined,
+        color: AppColors.primary,
+        size: 25.sp,
+      ),
+    );
   }
-}
+
+  // ============================================================
+  // FORMAT API ENUM
+  // Example:
+  // FOR_RENT -> For Rent
+  // APARTMENT -> Apartment
+  // ============================================================
+
+  String _formatLabel(String value) {
+    if (value.trim().isEmpty) return "";
+
+    return value
+        .replaceAll("_", " ")
+        .toLowerCase()
+        .split(" ")
+        .where((word) => word.isNotEmpty)
+        .map(
+          (word) =>
+              "${word[0].toUpperCase()}${word.substring(1)}",
+        )
+        .join(" ");
+  }
+
+  // ============================================================
+  // TIME
+  // ============================================================
+String _formatTime(DateTime date) {
+  final DateTime now = DateTime.now();
+
+  final DateTime today = DateTime(
+    now.year,
+    now.month,
+    now.day,
+  );
+
+  final DateTime messageDate = DateTime(
+    date.year,
+    date.month,
+    date.day,
+  );
+
+  final int difference =
+      today.difference(messageDate).inDays;
+
+  // Today
+  if (difference == 0) {
+    return DateFormat('hh:mm a').format(date);
+  }
+
+  // Yesterday
+  if (difference == 1) {
+    return 'Yesterday';
+  }
+
+  // Within last 7 days
+  if (difference > 1 && difference < 7) {
+    return DateFormat('EEE').format(date);
+  }
+
+  // Same year -> 21 Jul
+  if (date.year == now.year) {
+    return DateFormat('dd MMM').format(date);
+  }
+
+  // Older year -> 21 Jul 2025
+  return DateFormat('dd MMM yyyy').format(date);
+}}

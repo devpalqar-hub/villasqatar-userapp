@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:get/get.dart';
+
+import 'package:villas_qatar/Core/constants/app_colors.dart';
 import 'package:villas_qatar/Core/theme/app_textstyles.dart';
 import 'package:villas_qatar/modules/propertydetailscreen/propertydetailscreen.dart';
-
-import '../../../core/constants/app_colors.dart';
+import 'package:villas_qatar/modules/wishlist/service/wishlist_controller.dart';
 
 class PropertyCard extends StatelessWidget {
   final String image;
@@ -12,11 +14,16 @@ class PropertyCard extends StatelessWidget {
   final String distance;
   final String price;
   final String sqm;
-  // final String timeAgo;
-  // final String views;
   final String beds;
+
   final bool verified;
-  final String tag;
+  final bool isFeatured;
+
+  final String? propertyId;
+  final String? slug;
+
+  final int bathrooms;
+  final double area;
 
   const PropertyCard({
     super.key,
@@ -26,114 +33,242 @@ class PropertyCard extends StatelessWidget {
     required this.distance,
     required this.price,
     required this.sqm,
-    // required this.timeAgo,
-    // required this.views,
     required this.beds,
+    this.isFeatured = true,
     this.verified = true,
-    this.tag = 'Featured',
+    this.propertyId,
+    this.slug,
+    this.bathrooms = 0,
+    this.area = 0,
   });
 
   @override
   Widget build(BuildContext context) {
+    /// Use already registered WishlistController.
+    ///
+    /// If it is not registered yet, create it once.
+    final WishlistController wishlistController =
+        Get.isRegistered<WishlistController>()
+            ? Get.find<WishlistController>()
+            : Get.put(WishlistController());
+
     return InkWell(
       borderRadius: BorderRadius.circular(10.r),
+
+      /// =========================================================
+      /// CARD TAP -> PROPERTY DETAILS
+      /// =========================================================
       onTap: () {
-        Navigator.push(
-          context,
-          PageRouteBuilder(
-            transitionDuration: const Duration(milliseconds: 900),
-            reverseTransitionDuration: const Duration(milliseconds: 350),
-            pageBuilder: (_, animation, secondaryAnimation) =>
-                const PropertyDetailsScreen(),
-            transitionsBuilder: (_, animation, secondaryAnimation, child) {
-              const begin = Offset(1.0, 0.0); // Right
-              const end = Offset.zero;
-              const curve = Curves.easeOutCubic;
+        final String id = propertyId?.trim() ?? '';
 
-              final tween = Tween(
-                begin: begin,
-                end: end,
-              ).chain(CurveTween(curve: curve));
+        if (id.isEmpty) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text(
+                "Property details are not available",
+              ),
+            ),
+          );
 
-              return SlideTransition(
-                position: animation.drive(tween),
-                child: child,
-              );
-            },
+          return;
+        }
+
+        Get.to(
+          () => const PropertyDetailsScreen(),
+          arguments: {
+            "propertyId": id,
+          },
+          transition: Transition.rightToLeft,
+          duration: const Duration(
+            milliseconds: 500,
           ),
         );
       },
+
       child: Container(
         width: 168.w,
-        margin: EdgeInsets.only(right: 12.w),
+        margin: EdgeInsets.only(
+          right: 5.w,
+        ),
         decoration: BoxDecoration(
           color: Colors.white,
-          borderRadius: BorderRadius.circular(10.r),
+          borderRadius: BorderRadius.circular(
+            10.r,
+          ),
+          border: Border.all(
+            color: Colors.grey.shade200,
+            width: 1,
+          ),
           boxShadow: [
             BoxShadow(
               color: Colors.black.withOpacity(.06),
               blurRadius: 12,
-              offset: const Offset(0, 4),
+              offset: const Offset(
+                0,
+                4,
+              ),
             ),
           ],
         ),
+        clipBehavior: Clip.antiAlias,
+
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+          crossAxisAlignment:
+              CrossAxisAlignment.start,
           children: [
-            /// IMAGE
+            /// ===================================================
+            /// IMAGE SECTION
+            /// ===================================================
             Stack(
               children: [
-                ClipRRect(
-                  borderRadius: BorderRadius.vertical(
-                    top: Radius.circular(10.r),
-                  ),
-                  child: Image.asset(
-                    image,
-                    height: 120.h,
-                    width: double.infinity,
-                    fit: BoxFit.cover,
-                  ),
-                ),
+                _buildImage(),
 
-                /// TAG
-                Positioned(
-                  top: 10.h,
-                  left: 10.w,
-                  child: Container(
-                    padding: EdgeInsets.symmetric(
-                      horizontal: 10.w,
-                      vertical: 5.h,
-                    ),
-                    decoration: BoxDecoration(
-                      color: AppColors.primary,
-                      borderRadius: BorderRadius.circular(8.r),
-                    ),
-                    child: Text(
-                      tag,
-                      style: AppTextStyles.medium13.copyWith(
-                        color: Colors.white,
-                        fontSize: 10.sp,
+                /// =================================================
+                /// FEATURED TAG
+                /// =================================================
+                if (isFeatured)
+                  Positioned(
+                    top: 10.h,
+                    left: 10.w,
+                    child: Container(
+                      padding: EdgeInsets.symmetric(
+                        horizontal: 10.w,
+                        vertical: 5.h,
+                      ),
+                      decoration: BoxDecoration(
+                        color: AppColors.primary,
+                        borderRadius:
+                            BorderRadius.circular(
+                          8.r,
+                        ),
+                      ),
+                      child: Text(
+                        "Featured",
+                        style: AppTextStyles.medium13
+                            .copyWith(
+                          color: Colors.white,
+                          fontSize: 10.sp,
+                        ),
                       ),
                     ),
                   ),
-                ),
 
-                /// FAVORITE
+                /// =================================================
+                /// WISHLIST BUTTON
+                /// =================================================
                 Positioned(
                   top: 10.h,
                   right: 10.w,
-                  child: Container(
-                    width: 24.w,
-                    height: 24.w,
-                    decoration: const BoxDecoration(
-                      color: Colors.white,
-                      shape: BoxShape.circle,
-                    ),
-                    child: Icon(Icons.favorite_border, size: 18.sp),
+
+                  /// GetBuilder rebuilds the heart whenever
+                  /// WishlistController calls update().
+                  child: GetBuilder<
+                      WishlistController>(
+                    init: wishlistController,
+                    builder: (controller) {
+                      final String id =
+                          propertyId?.trim() ?? '';
+
+                      final bool wishlisted =
+                          id.isNotEmpty &&
+                              controller
+                                  .isWishlisted(id);
+
+                      final bool wishlistLoading =
+                          id.isNotEmpty &&
+                              controller
+                                  .isPropertyLoading(
+                                id,
+                              );
+
+                      /// Material + InkWell gives this button
+                      /// its own tap target.
+                      ///
+                      /// Tapping here calls wishlist API.
+                      /// Tapping rest of card opens details.
+                      return Material(
+                        color: Colors.transparent,
+                        child: InkWell(
+                          customBorder:
+                              const CircleBorder(),
+
+                          onTap: wishlistLoading
+                              ? null
+                              : () async {
+                                  if (id.isEmpty) {
+                                    ScaffoldMessenger
+                                            .of(context)
+                                        .showSnackBar(
+                                      const SnackBar(
+                                        content: Text(
+                                          "Property ID is not available",
+                                        ),
+                                      ),
+                                    );
+
+                                    return;
+                                  }
+
+                                  /// Calls:
+                                  /// WishlistController
+                                  ///     .toggleWishlist(id)
+                                  ///
+                                  /// which internally calls:
+                                  ///
+                                  /// POST wishlistByProperty(id)
+                                  await controller
+                                      .toggleWishlist(
+                                    id,
+                                  );
+                                },
+
+                          child: Container(
+                            width: 32.w,
+                            height: 32.w,
+                            alignment:
+                                Alignment.center,
+                            decoration:
+                                const BoxDecoration(
+                              color: Colors.white,
+                              shape:
+                                  BoxShape.circle,
+                            ),
+
+                            /// Show loader only for the
+                            /// property currently being toggled.
+                            child: wishlistLoading
+                                ? SizedBox(
+                                    width: 15.w,
+                                    height: 15.w,
+                                    child:
+                                        const CircularProgressIndicator(
+                                      strokeWidth: 2,
+                                      color: AppColors
+                                          .primary,
+                                    ),
+                                  )
+                                : Icon(
+                                    wishlisted
+                                        ? Icons.favorite
+                                        : Icons
+                                            .favorite_border,
+                                    size: 18.sp,
+                                    color: wishlisted
+                                        ? AppColors
+                                            .primary
+                                        : Colors
+                                            .black87,
+                                  ),
+                          ),
+                        ),
+                      );
+                    },
                   ),
                 ),
 
-                /// BOTTOM INFO
+                /// =================================================
+                /// IMAGE BOTTOM INFO
+                /// =================================================
                 Positioned(
                   bottom: 8.h,
                   left: 10.w,
@@ -141,7 +276,9 @@ class PropertyCard extends StatelessWidget {
                   child: Column(
                     children: [
                       Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        mainAxisAlignment:
+                            MainAxisAlignment
+                                .spaceBetween,
                         children: [
                           Row(
                             children: [
@@ -150,54 +287,67 @@ class PropertyCard extends StatelessWidget {
                                 color: Colors.white,
                                 size: 14.sp,
                               ),
-                              SizedBox(width: 4.w),
+                              SizedBox(
+                                width: 4.w,
+                              ),
                               Text(
                                 beds,
-                                style: AppTextStyles.medium13.copyWith(
-                                  color: Colors.white,
+                                style: AppTextStyles
+                                    .medium13
+                                    .copyWith(
+                                  color:
+                                      Colors.white,
                                   fontSize: 11.sp,
                                 ),
                               ),
                             ],
                           ),
+
                           Row(
                             children: [
                               Icon(
-                                Icons.remove_red_eye_outlined,
+                                Icons
+                                    .remove_red_eye_outlined,
                                 color: Colors.white,
                                 size: 14.sp,
                               ),
-                              SizedBox(width: 4.w),
-                              // Text(
-                              //   views,
-                              //   style:
-                              //       AppTextStyles.medium13.copyWith(
-                              //     color: Colors.white,
-                              //     fontSize: 11.sp,
-                              //   ),
-                              // ),
+                              SizedBox(
+                                width: 4.w,
+                              ),
                             ],
                           ),
                         ],
                       ),
 
-                      SizedBox(height: 6.h),
+                      SizedBox(
+                        height: 6.h,
+                      ),
 
+                      /// VERIFIED
                       Row(
                         children: [
                           Icon(
                             verified
                                 ? Icons.verified
-                                : Icons.warning_amber_rounded,
+                                : Icons
+                                    .warning_amber_rounded,
                             color: verified
-                                ? const Color(0xFF22C55E)
+                                ? const Color(
+                                    0xFF22C55E,
+                                  )
                                 : Colors.orange,
                             size: 14.sp,
                           ),
-                          SizedBox(width: 4.w),
+                          SizedBox(
+                            width: 4.w,
+                          ),
                           Text(
-                            verified ? 'Verified' : 'Not Verified',
-                            style: AppTextStyles.medium13.copyWith(
+                            verified
+                                ? 'Verified'
+                                : 'Not Verified',
+                            style: AppTextStyles
+                                .medium13
+                                .copyWith(
                               color: Colors.white,
                               fontSize: 10.sp,
                             ),
@@ -210,23 +360,35 @@ class PropertyCard extends StatelessWidget {
               ],
             ),
 
+            /// ===================================================
+            /// PROPERTY INFORMATION
+            /// ===================================================
             Padding(
-              padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 8.h),
+              padding: EdgeInsets.symmetric(
+                horizontal: 8.w,
+                vertical: 8.h,
+              ),
               child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+                crossAxisAlignment:
+                    CrossAxisAlignment.start,
                 children: [
                   /// TITLE
                   Text(
                     title,
                     maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                    style: AppTextStyles.title16.copyWith(
+                    overflow:
+                        TextOverflow.ellipsis,
+                    style:
+                        AppTextStyles.title16.copyWith(
                       fontSize: 12.sp,
-                      color: AppColors.textPrimary,
+                      color:
+                          AppColors.textPrimary,
                     ),
                   ),
 
-                  SizedBox(height: 6.h),
+                  SizedBox(
+                    height: 6.h,
+                  ),
 
                   /// LOCATION
                   Row(
@@ -236,74 +398,124 @@ class PropertyCard extends StatelessWidget {
                         size: 12.sp,
                         color: Colors.grey,
                       ),
-                      SizedBox(width: 4.w),
+
+                      SizedBox(
+                        width: 4.w,
+                      ),
+
                       Expanded(
                         child: Text(
                           location,
-                          overflow: TextOverflow.ellipsis,
-                          style: AppTextStyles.body13.copyWith(
+                          maxLines: 1,
+                          overflow:
+                              TextOverflow.ellipsis,
+                          style: AppTextStyles
+                              .body13
+                              .copyWith(
                             fontSize: 8.sp,
                             color: Colors.grey,
                           ),
                         ),
                       ),
-                      Text(
-                        distance,
-                        style: AppTextStyles.medium13.copyWith(
-                          fontSize: 8.sp,
-                          color: AppColors.primary,
+
+                      if (distance.isNotEmpty)
+                        Text(
+                          distance,
+                          style: AppTextStyles
+                              .medium13
+                              .copyWith(
+                            fontSize: 8.sp,
+                            color:
+                                AppColors.primary,
+                          ),
                         ),
-                      ),
                     ],
                   ),
 
-                  SizedBox(height: 5.h),
+                  SizedBox(
+                    height: 5.h,
+                  ),
 
                   /// PRICE
                   Text(
                     price,
-                    style: AppTextStyles.bold14.copyWith(
+                    maxLines: 1,
+                    overflow:
+                        TextOverflow.ellipsis,
+                    style:
+                        AppTextStyles.bold14.copyWith(
                       fontSize: 10.sp,
-                      color: AppColors.textPrimary,
+                      color:
+                          AppColors.textPrimary,
                     ),
                   ),
 
-                  SizedBox(height: 5.h),
+                  SizedBox(
+                    height: 5.h,
+                  ),
 
-                  /// FOOTER
+                  /// =================================================
+                  /// BEDS / BATHS / AREA
+                  /// =================================================
                   Row(
                     children: [
-                      Text(
-                        "5 Beds",
-                        style: TextStyle(color: Colors.grey, fontSize: 10.sp),
-                      ),
-                      SizedBox(width: 6.w),
-                      Container(
-                        width: 4.w,
-                        height: 4.w,
-                        decoration: const BoxDecoration(
-                          color: Colors.grey,
-                          shape: BoxShape.circle,
+                      Flexible(
+                        child: Text(
+                          "$beds Beds",
+                          maxLines: 1,
+                          overflow:
+                              TextOverflow.ellipsis,
+                          style: TextStyle(
+                            color: Colors.grey,
+                            fontSize: 10.sp,
+                          ),
                         ),
                       ),
-                      SizedBox(width: 6.w),
-                      Text(
-                        "6 Baths",
-                        style: TextStyle(color: Colors.grey, fontSize: 10.sp),
+
+                      SizedBox(
+                        width: 6.w,
                       ),
-                      SizedBox(width: 6.w),
-                      Container(
-                        width: 4.w,
-                        height: 4.w,
-                        decoration: const BoxDecoration(
-                          color: Colors.grey,
-                          shape: BoxShape.circle,
+
+                      _buildDot(),
+
+                      SizedBox(
+                        width: 6.w,
+                      ),
+
+                      Flexible(
+                        child: Text(
+                          "$bathrooms Baths",
+                          maxLines: 1,
+                          overflow:
+                              TextOverflow.ellipsis,
+                          style: TextStyle(
+                            color: Colors.grey,
+                            fontSize: 10.sp,
+                          ),
                         ),
                       ),
-                      SizedBox(width: 6.w),
-                      Text(
-                        "450 sqm",
-                        style: TextStyle(color: Colors.grey, fontSize: 10.sp),
+
+                      SizedBox(
+                        width: 6.w,
+                      ),
+
+                      _buildDot(),
+
+                      SizedBox(
+                        width: 6.w,
+                      ),
+
+                      Flexible(
+                        child: Text(
+                          _areaText(),
+                          maxLines: 1,
+                          overflow:
+                              TextOverflow.ellipsis,
+                          style: TextStyle(
+                            color: Colors.grey,
+                            fontSize: 10.sp,
+                          ),
+                        ),
                       ),
                     ],
                   ),
@@ -313,6 +525,143 @@ class PropertyCard extends StatelessWidget {
           ],
         ),
       ),
+    );
+  }
+
+  // =============================================================
+  // AREA TEXT
+  // =============================================================
+
+  String _areaText() {
+    /// Prefer area if it has a valid value.
+    if (area > 0) {
+      return "${area.toStringAsFixed(0)} sqm";
+    }
+
+    /// Otherwise use the sqm string passed from parent.
+    if (sqm.trim().isNotEmpty) {
+      return "${sqm.trim()} sqm";
+    }
+
+    return "0 sqm";
+  }
+
+  // =============================================================
+  // DOT SEPARATOR
+  // =============================================================
+
+  Widget _buildDot() {
+    return Container(
+      width: 4.w,
+      height: 4.w,
+      decoration: const BoxDecoration(
+        color: Colors.grey,
+        shape: BoxShape.circle,
+      ),
+    );
+  }
+
+  // =============================================================
+  // PROPERTY IMAGE
+  // =============================================================
+
+  Widget _buildImage() {
+    final String cleanImage =
+        image.trim();
+
+    final bool validNetworkImage =
+        cleanImage.startsWith(
+          'https://',
+        ) ||
+        cleanImage.startsWith(
+          'http://',
+        );
+
+    /// NETWORK IMAGE
+    if (validNetworkImage) {
+      return Image.network(
+        cleanImage,
+        height: 120.h,
+        width: double.infinity,
+        fit: BoxFit.cover,
+        loadingBuilder: (
+          context,
+          child,
+          loadingProgress,
+        ) {
+          if (loadingProgress == null) {
+            return child;
+          }
+
+          return _imagePlaceholder(
+            showLoader: true,
+          );
+        },
+        errorBuilder: (
+          context,
+          error,
+          stackTrace,
+        ) {
+          return _imagePlaceholder();
+        },
+      );
+    }
+
+    /// LOCAL ASSET
+    if (cleanImage.startsWith(
+      'assets/',
+    )) {
+      return Image.asset(
+        cleanImage,
+        height: 120.h,
+        width: double.infinity,
+        fit: BoxFit.cover,
+        errorBuilder: (
+          context,
+          error,
+          stackTrace,
+        ) {
+          return _imagePlaceholder();
+        },
+      );
+    }
+
+    /// INVALID / EMPTY IMAGE
+    return _imagePlaceholder();
+  }
+
+  // =============================================================
+  // IMAGE PLACEHOLDER
+  // =============================================================
+
+  Widget _imagePlaceholder({
+    bool showLoader = false,
+  }) {
+    return Container(
+      height: 120.h,
+      width: double.infinity,
+      color: const Color(
+        0xffF2F2F2,
+      ),
+      alignment: Alignment.center,
+      child: showLoader
+          ? SizedBox(
+              width: 20.w,
+              height: 20.w,
+              child:
+                  const CircularProgressIndicator(
+                strokeWidth: 2,
+                color: Color(
+                  0xFF8E123E,
+                ),
+              ),
+            )
+          : Icon(
+              Icons.home_work_outlined,
+              size: 28.sp,
+              color:
+                  Colors.grey.shade400,
+            ),
     );
   }
 }

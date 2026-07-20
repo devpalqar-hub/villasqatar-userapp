@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:get/get.dart';
 import 'package:get/get_utils/src/extensions/internacionalization.dart';
+import 'package:villas_qatar/modules/Plans/model/featured_property_model.dart';
+import 'package:villas_qatar/modules/Plans/services/featured_properties_controller.dart';
 import 'package:villas_qatar/modules/home/widgets/agent_card.dart';
+import 'package:villas_qatar/modules/home/widgets/boost_property_banner.dart';
 import 'package:villas_qatar/modules/home/widgets/category_card.dart';
 import 'package:villas_qatar/modules/home/widgets/explore.dart';
 import 'package:villas_qatar/modules/home/widgets/hero_banner.dart';
@@ -15,8 +19,70 @@ import 'package:villas_qatar/modules/home/widgets/sponser_banner.dart';
 import 'package:villas_qatar/modules/home/widgets/why_choose_card.dart';
 import 'package:villas_qatar/modules/pricestimator/views/price_estimator_screen.dart';
 
-class HomeScreen extends StatelessWidget {
-  const HomeScreen({super.key});
+class HomeScreen extends StatefulWidget {
+  final void Function(String propertyName) onSearch;
+  final void Function(String type) onCategorySelected;
+
+  const HomeScreen({
+    super.key,
+    required this.onSearch,
+    required this.onCategorySelected,
+  });
+
+  @override
+  State<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
+  late final FeaturedPropertiesController featuredController;
+
+  final ScrollController featuredScrollController = ScrollController();
+
+  @override
+  void initState() {
+    super.initState();
+
+    featuredController = Get.isRegistered<FeaturedPropertiesController>()
+        ? Get.find<FeaturedPropertiesController>()
+        : Get.put(FeaturedPropertiesController(), permanent: true);
+
+    /// Fetch HOME_PAGE featured properties.
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      featuredController.fetchFeaturedProperties(
+        location: FeaturedLocation.homePage,
+        limit: 5,
+      );
+    });
+
+    /// Listen for horizontal pagination.
+    featuredScrollController.addListener(_onFeaturedScroll);
+  }
+
+  void _onFeaturedScroll() {
+    if (!featuredScrollController.hasClients) {
+      return;
+    }
+
+    final position = featuredScrollController.position;
+
+    /// Fetch next page when user gets close
+    /// to the end of horizontal list.
+    if (position.pixels >= position.maxScrollExtent - 150) {
+      featuredController.loadMore(
+        location: FeaturedLocation.homePage,
+        limit: 5,
+      );
+    }
+  }
+
+  @override
+  void dispose() {
+    featuredScrollController.removeListener(_onFeaturedScroll);
+
+    featuredScrollController.dispose();
+
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -27,8 +93,8 @@ class HomeScreen extends StatelessWidget {
           child: Column(
             spacing: 12.h,
             children: [
-              const HomeHeader(),
-              HomeBanner(),
+              HomeHeader(),
+              HomeBanner(onSearch: widget.onSearch),
               QuickActionsCard(),
 
               SectionHeader(title: "Near You".tr),
@@ -137,75 +203,63 @@ class HomeScreen extends StatelessWidget {
                   ),
                 ),
               ),
-              SectionHeader(title: "Property Categories".tr),
+              SectionHeader(title: "Property Categories".tr, showSeeAll: false),
 
               SizedBox(
                 height: 70.h,
                 child: ListView(
                   scrollDirection: Axis.horizontal,
                   children: [
-                    CategoryCard(title: 'Villas'.tr, icon: Icons.home_outlined),
+                    CategoryCard(
+                      title: 'Villas'.tr,
+                      icon: Icons.home_outlined,
+                      onTap: () => widget.onCategorySelected("VILLA"),
+                    ),
+
                     SizedBox(width: 5.w),
-                    CategoryCard(title: 'Apartments'.tr, icon: Icons.apartment),
+
+                    CategoryCard(
+                      title: 'Apartments'.tr,
+                      icon: Icons.apartment,
+                      onTap: () => widget.onCategorySelected("APARTMENT"),
+                    ),
+
                     SizedBox(width: 5.w),
+
                     CategoryCard(
                       title: 'Townhouses'.tr,
                       icon: Icons.house_siding,
+                      onTap: () => widget.onCategorySelected("TOWNHOUSE"),
                     ),
-                    SizedBox(width: 5.w),
-                    CategoryCard(title: 'Offices'.tr, icon: Icons.business),
-                    SizedBox(width: 5.w),
-                    CategoryCard(title: 'Commercial'.tr, icon: Icons.store),
-                    SizedBox(width: 5.w),
-                    CategoryCard(title: 'Land'.tr, icon: Icons.map_outlined),
-                  ],
-                ),
-              ),
 
-              SectionHeader(title: "Featured Properties".tr),
+                    SizedBox(width: 5.w),
 
-              SizedBox(
-                height: 225.h,
-                child: ListView(
-                  scrollDirection: Axis.horizontal,
-                  children: const [
-                    PropertyCard(
-                      image: 'assets/villa.jpg',
-                      title: 'Luxury Villa in Al Waab',
-                      location: 'Al Waab, Doha',
-                      distance: '2.3 km away',
-                      price: 'QAR 3,250,000',
-                      sqm: '220 SQM',
-                      // timeAgo: '2 hours ago',
-                      // views: '412',
-                      beds: '25',
+                    CategoryCard(
+                      title: 'Offices'.tr,
+                      icon: Icons.business,
+                      onTap: () => widget.onCategorySelected("OFFICE"),
                     ),
-                    PropertyCard(
-                      image: 'assets/villa3.jpeg',
-                      title: 'Luxury Villa in Al Waab',
-                      location: 'Al Waab, Doha',
-                      distance: '2.3 km away',
-                      price: 'QAR 3,250,000',
-                      sqm: '220 SQM',
-                      // timeAgo: '2 hours ago',
-                      // views: '412',
-                      beds: '25',
+
+                    SizedBox(width: 5.w),
+
+                    CategoryCard(
+                      title: 'Commercial'.tr,
+                      icon: Icons.store,
+                      onTap: () => widget.onCategorySelected("COMMERCIAL"),
                     ),
-                    PropertyCard(
-                      image: 'assets/villa1.webp',
-                      title: 'Luxury Villa in Al Waab',
-                      location: 'Al Waab, Doha',
-                      distance: '2.3 km away',
-                      price: 'QAR 3,250,000',
-                      sqm: '220 SQM',
-                      // timeAgo: '2 hours ago',
-                      // views: '412',
-                      beds: '25',
+
+                    SizedBox(width: 5.w),
+
+                    CategoryCard(
+                      title: 'Land'.tr,
+                      icon: Icons.map_outlined,
+                      onTap: () => widget.onCategorySelected("LAND"),
                     ),
                   ],
                 ),
               ),
 
+              _buildFeaturedPropertiesSection(),
               InvestmentBanner(),
 
               SectionHeader(title: "Featured Agents".tr),
@@ -257,7 +311,7 @@ class HomeScreen extends StatelessWidget {
                   },
                 ),
               ),
-
+              BoostPropertyBanner(),
               SectionHeader(title: "Explore Qatar".tr),
               ExploreQatarSection(),
 
@@ -266,6 +320,181 @@ class HomeScreen extends StatelessWidget {
           ),
         ),
       ),
+    );
+  }
+
+  Widget _buildFeaturedPropertiesSection() {
+    return GetBuilder<FeaturedPropertiesController>(
+      builder: (controller) {
+        final List<FeaturedProperty> properties = controller.homeProperties;
+
+        final bool loading = controller.isLoading(FeaturedLocation.homePage);
+
+        final bool loadingMore = controller.isLoadingMore(
+          FeaturedLocation.homePage,
+        );
+
+        final String error = controller.getError(FeaturedLocation.homePage);
+
+        final bool canLoadMore = controller.hasMore(FeaturedLocation.homePage);
+
+        /// --------------------------------------------
+        /// INITIAL LOADING
+        /// --------------------------------------------
+
+        if (loading && properties.isEmpty) {
+          return Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              SectionHeader(title: "Featured Properties".tr),
+
+              SizedBox(
+                height: 225.h,
+                child: const Center(
+                  child: CircularProgressIndicator(color: Color(0xFF8E123E)),
+                ),
+              ),
+            ],
+          );
+        }
+
+        /// --------------------------------------------
+        /// ERROR
+        /// --------------------------------------------
+
+        if (error.isNotEmpty && properties.isEmpty) {
+          return Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              SectionHeader(title: "Featured Properties".tr),
+
+              Container(
+                width: double.infinity,
+                height: 130.h,
+
+                alignment: Alignment.center,
+
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(
+                      Icons.error_outline_rounded,
+                      color: Colors.grey,
+                      size: 25.sp,
+                    ),
+
+                    SizedBox(height: 6.h),
+
+                    Text(
+                      "Unable to load featured properties",
+                      style: TextStyle(fontSize: 10.sp, color: Colors.grey),
+                    ),
+
+                    SizedBox(height: 3.h),
+
+                    TextButton(
+                      onPressed: () {
+                        controller.refreshFeatured(
+                          location: FeaturedLocation.homePage,
+                          limit: 5,
+                        );
+                      },
+                      child: const Text("Try Again"),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          );
+        }
+
+        if (properties.isEmpty) {
+          return const SizedBox.shrink();
+        }
+
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            SectionHeader(title: "Featured Properties".tr),
+            SizedBox(height: 10.h),
+            SizedBox(
+              height: 225.h,
+
+              child: ListView.separated(
+                controller: featuredScrollController,
+
+                scrollDirection: Axis.horizontal,
+
+                physics: const BouncingScrollPhysics(),
+
+                padding: EdgeInsets.zero,
+
+                itemCount: properties.length + (canLoadMore ? 1 : 0),
+
+                separatorBuilder: (context, index) {
+                  return SizedBox(width: 10.w);
+                },
+
+                itemBuilder: (context, index) {
+                  /// PAGINATION LOADER AT END
+                  if (index == properties.length) {
+                    return SizedBox(
+                      width: 55.w,
+
+                      child: Center(
+                        child: loadingMore
+                            ? SizedBox(
+                                width: 22.w,
+                                height: 22.w,
+
+                                child: const CircularProgressIndicator(
+                                  strokeWidth: 2,
+                                  color: Color(0xFF8E123E),
+                                ),
+                              )
+                            : const SizedBox.shrink(),
+                      ),
+                    );
+                  }
+
+                  final FeaturedProperty featured = properties[index];
+
+                  final property = featured.listing;
+
+                  return PropertyCard(
+                    image: property.imageUrl,
+
+                    title: property.propertyName,
+
+                    location: property.formattedLocation,
+
+                    distance: '',
+
+                    price: property.price.toString(),
+
+                    sqm: '${property.area.toStringAsFixed(0)} SQM',
+
+                    beds: property.bedrooms.toString(),
+
+                    verified: property.contactVerified,
+
+                    isFeatured: property.isFeatured,
+
+                    propertyId: property.id,
+
+                    slug: property.slug,
+
+                    bathrooms: property.bathrooms,
+
+                    area: property.area,
+                   
+                  );
+                },
+              ),
+            ),
+          ],
+        );
+      },
     );
   }
 }

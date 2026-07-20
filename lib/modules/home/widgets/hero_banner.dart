@@ -1,28 +1,52 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:get/get_utils/src/extensions/internacionalization.dart';
+import 'package:get/get.dart';
+import 'package:villas_qatar/modules/searchscreen/view/search_screen.dart';
 
-class HomeBanner extends StatelessWidget {
-  const HomeBanner({super.key});
+class HomeBanner extends StatefulWidget {
+  final void Function(String propertyName) onSearch;
+  const HomeBanner({super.key, required this.onSearch});
+
+  @override
+  State<HomeBanner> createState() => _HomeBannerState();
+}
+
+class _HomeBannerState extends State<HomeBanner> {
+  final TextEditingController searchController = TextEditingController();
+
+  void _searchProperty() {
+  final propertyName = searchController.text.trim();
+
+  if (propertyName.isEmpty) return;
+
+  FocusScope.of(context).unfocus();
+
+  // Pass search value first
+  widget.onSearch(propertyName);
+
+  // Then clear TextField
+  searchController.clear();
+}
+  @override
+  void dispose() {
+    searchController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
     return Container(
       height: 230.h,
-
       child: ClipRRect(
         borderRadius: BorderRadius.circular(20.r),
         child: Stack(
           children: [
             /// Background Image
             Positioned.fill(
-              child: Image.asset(
-                "assets/auth_bg 1.png", // Your asset image
-                fit: BoxFit.cover,
-              ),
+              child: Image.asset("assets/auth_bg 1.png", fit: BoxFit.cover),
             ),
 
-            /// White Gradient Overlay
+            /// White Gradient
             Positioned.fill(
               child: Container(
                 decoration: BoxDecoration(
@@ -84,7 +108,7 @@ class HomeBanner extends StatelessWidget {
                       style: TextStyle(
                         fontSize: 11.sp,
                         color: Colors.grey.shade700,
-                        height: 1.4.h,
+                        height: 1.4,
                       ),
                     ),
                   ),
@@ -99,11 +123,11 @@ class HomeBanner extends StatelessWidget {
                       decoration: BoxDecoration(
                         color: Colors.white,
                         borderRadius: BorderRadius.circular(10.r),
-                        boxShadow: [
+                        boxShadow: const [
                           BoxShadow(
                             color: Colors.black12,
                             blurRadius: 15,
-                            offset: const Offset(0, 4),
+                            offset: Offset(0, 4),
                           ),
                         ],
                       ),
@@ -117,10 +141,18 @@ class HomeBanner extends StatelessWidget {
 
                           Expanded(
                             child: TextField(
+                              controller: searchController,
+
+                              /// Keyboard search/enter
+                              textInputAction: TextInputAction.search,
+
+                              onSubmitted: (_) {
+                                _searchProperty();
+                              },
+
                               decoration: InputDecoration(
                                 border: InputBorder.none,
-                                hintText:
-                                    "Search location, property name or type".tr,
+                                hintText: "Search property name".tr,
                                 isDense: true,
                                 isCollapsed: true,
                                 hintStyle: TextStyle(
@@ -130,19 +162,24 @@ class HomeBanner extends StatelessWidget {
                               ),
                             ),
                           ),
+
+                          /// Arrow Button
                           Padding(
                             padding: EdgeInsets.only(right: 8.w),
-                            child: Container(
-                              width: 35.w,
-                              height: 25.h,
-                              decoration: BoxDecoration(
-                                color: const Color(0xffA61E3D),
-                                borderRadius: BorderRadius.circular(30.r),
-                              ),
-                              child: Icon(
-                                Icons.tune,
-                                color: Colors.white,
-                                size: 14.sp,
+                            child: GestureDetector(
+                              onTap: _searchProperty,
+                              child: Container(
+                                width: 35.w,
+                                height: 28.h,
+                                decoration: BoxDecoration(
+                                  color: const Color(0xffA61E3D),
+                                  borderRadius: BorderRadius.circular(30.r),
+                                ),
+                                child: Icon(
+                                  Icons.arrow_forward_rounded,
+                                  color: Colors.white,
+                                  size: 16.sp,
+                                ),
                               ),
                             ),
                           ),

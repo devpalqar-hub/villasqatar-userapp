@@ -9,13 +9,12 @@ import 'package:villas_qatar/modules/onboard/views/complete_profile_screen.dart'
 import 'package:villas_qatar/modules/onboard/views/login_screen.dart';
 
 class WelcomeScreen extends StatelessWidget {
-WelcomeScreen({super.key});
- 
- final AuthController controller = Get.put(AuthController());
+  WelcomeScreen({super.key});
+
+  final AuthController controller = Get.put(AuthController());
   @override
   Widget build(BuildContext context) {
     return GetBuilder<AuthController>(
-     
       builder: (controller) {
         return Scaffold(
           body: Stack(
@@ -109,19 +108,22 @@ WelcomeScreen({super.key});
                               image: "assets/google.png",
                               text: "Google",
                               onTap: () async {
-  final success = await controller.signInWithGoogle();
+                                final success = await controller
+                                    .signInWithGoogle();
 
-  debugPrint("Google Success: $success");
-  debugPrint("Is New User: ${controller.isNewUser}");
+                                debugPrint("Google Success: $success");
+                                debugPrint(
+                                  "Is New User: ${controller.isNewUser}",
+                                );
 
-  if (success) {
-    if (controller.isNewUser) {
-      Get.off(() => CompleteProfileScreen());
-    } else {
-      Get.off(() => MainScreen());
-    }
-  }
-}
+                                if (success) {
+                                  if (controller.isNewUser) {
+                                    Get.off(() => CompleteProfileScreen());
+                                  } else {
+                                    Get.off(() => MainScreen());
+                                  }
+                                }
+                              },
                             ),
                           ),
                           SizedBox(width: 16.w),
@@ -189,7 +191,7 @@ WelcomeScreen({super.key});
   Widget _buildWhatsAppButton() {
     return InkWell(
       onTap: () {
-        Get.to(() =>  LoginScreen());
+        Get.to(() => LoginScreen());
       },
       borderRadius: BorderRadius.circular(8.r),
       child: Container(

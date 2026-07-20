@@ -70,7 +70,7 @@ class EmptyConversationWidget extends StatelessWidget {
                 boxShadow: [
                   BoxShadow(
                     color: Colors.black.withOpacity(.04),
-                    blurRadius: 10,
+                    blurRadius: 10.r,
                     offset: const Offset(0, 4),
                   ),
                 ],
@@ -128,10 +128,10 @@ class EmptyConversationWidget extends StatelessWidget {
           child: Icon(
             icon,
             color: AppColors.primary,
-            size: 18,
+            size: 18.sp,
           ),
         ),
-        const SizedBox(width: 12),
+      SizedBox(width: 12.w),
         Expanded(
           child: Text(
             title,

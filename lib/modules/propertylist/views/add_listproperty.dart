@@ -1674,10 +1674,13 @@ Future<void> _pickImages() async {
 
   if (files.isEmpty) return;
 
-  for (final image in files) {
+  final remaining = 20 - controller.images.length;
+
+  for (final image in files.take(remaining)) {
     controller.addImage(image.path);
   }
 }
+
 Future<void> _pickVideo() async {
   final file = await _picker.pickVideo(
     source: ImageSource.gallery,

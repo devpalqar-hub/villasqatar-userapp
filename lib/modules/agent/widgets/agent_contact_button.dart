@@ -21,66 +21,65 @@ class AgentContactButtons extends StatelessWidget {
       children: [
 
         Expanded(
-          child: _button(
-            Icons.call_outlined,
-            "Call",
-          ),
+          child: _contactButton(
+  FaIcon(
+    FontAwesomeIcons.phone,
+    size: 20,
+  ),
+  "Call",
+  () {
+    // WhatsApp action
+  },
+)
         ),
 
         SizedBox(width: 12.w),
 
        Expanded(
-  child: _button(
+  child: _contactButton(
+  FaIcon(
     FontAwesomeIcons.whatsapp,
-    "WhatsApp",
+    size: 20,
   ),
+  "WhatsApp",
+  () {
+    // WhatsApp action
+  },
+)
 ),
         SizedBox(width: 12.w),
 
         Expanded(
-          child: _button(
-            Icons.email_outlined,
-            "Email",
-          ),
+          child:_contactButton(
+  FaIcon(
+    FontAwesomeIcons.mailchimp,
+    size: 20,
+  ),
+  "Email",
+  () {
+    // WhatsApp action
+  },
+)
         ),
       ],
     );
   }
 
-  Widget _button(
-    IconData icon,
-    String text,
-  ) {
-    return Container(
-      height: 54.h,
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(14.r),
-        border: Border.all(
-          color: AppColors.fieldBorder,
-        ),
-      ),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-
-          Icon(
-            icon,
-            color: AppColors.primary,
-            size: 20.sp,
-          ),
-
-          SizedBox(height: 4.h),
-
-          Text(
-            text,
-            style: TextStyle(
-              fontSize: 11.sp,
-              fontWeight: FontWeight.w600,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
+Widget _contactButton(
+  Widget icon,
+  String text,
+  VoidCallback onTap,
+) {
+  return InkWell(
+    onTap: onTap,
+    child: Row(
+      children: [
+        icon,
+        const SizedBox(width: 8),
+        Text(text),
+      ],
+    ),
+  );
+}
+ 
 }

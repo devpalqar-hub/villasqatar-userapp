@@ -2,8 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:villas_qatar/Core/theme/app_textstyles.dart';
 
-
-
 class LocationCard extends StatelessWidget {
   final String title;
   final String distance;
@@ -23,10 +21,7 @@ class LocationCard extends StatelessWidget {
       margin: EdgeInsets.only(right: 10.w),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(12.r),
-        image: DecorationImage(
-          image: AssetImage(image),
-          fit: BoxFit.cover,
-        ),
+        image: DecorationImage(image: AssetImage(image), fit: BoxFit.cover),
       ),
       child: Container(
         padding: EdgeInsets.all(8.w),
@@ -35,10 +30,7 @@ class LocationCard extends StatelessWidget {
           gradient: LinearGradient(
             begin: Alignment.bottomCenter,
             end: Alignment.topCenter,
-            colors: [
-              Colors.black.withOpacity(.65),
-              Colors.transparent,
-            ],
+            colors: [Colors.black.withOpacity(.65), Colors.transparent],
           ),
         ),
         child: Column(
@@ -59,11 +51,7 @@ class LocationCard extends StatelessWidget {
 
             Row(
               children: [
-                Icon(
-                  Icons.location_on,
-                  color: Colors.white,
-                  size: 12.sp,
-                ),
+                Icon(Icons.location_on, color: Colors.white, size: 12.sp),
 
                 SizedBox(width: 2.w),
 

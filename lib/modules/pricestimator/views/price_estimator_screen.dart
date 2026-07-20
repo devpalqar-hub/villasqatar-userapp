@@ -44,13 +44,16 @@ class _PriceEstimatorScreenState extends State<PriceEstimatorScreen> {
       appBar: _buildAppBar(context),
       body: SafeArea(
         child: ListView(
-          padding: EdgeInsets.symmetric(horizontal: 5.w,vertical: 10.h),
+          padding: EdgeInsets.symmetric(horizontal: 5.w, vertical: 10.h),
           children: [
             _buildHero(context),
             Padding(
               padding: const EdgeInsets.fromLTRB(16, 10, 16, 0),
               child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 20,
+                  vertical: 18,
+                ),
                 decoration: BoxDecoration(
                   color: Colors.white,
                   borderRadius: BorderRadius.circular(10.r),
@@ -99,7 +102,8 @@ class _PriceEstimatorScreenState extends State<PriceEstimatorScreen> {
                                 const SizedBox(width: 14),
                                 Expanded(
                                   child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
                                     children: [
                                       Text(
                                         "Location",
@@ -132,14 +136,14 @@ class _PriceEstimatorScreenState extends State<PriceEstimatorScreen> {
                               ],
                             ),
                           ),
-        
+
                           Container(
                             margin: const EdgeInsets.symmetric(horizontal: 18),
                             height: 58,
                             width: 1,
                             color: const Color(0xFFE4E4EA),
                           ),
-        
+
                           /// Area
                           Expanded(
                             child: Row(
@@ -153,7 +157,8 @@ class _PriceEstimatorScreenState extends State<PriceEstimatorScreen> {
                                 const SizedBox(width: 14),
                                 Expanded(
                                   child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
                                     children: [
                                       const Text(
                                         "Area (sqft)",
@@ -176,7 +181,12 @@ class _PriceEstimatorScreenState extends State<PriceEstimatorScreen> {
                                             fontSize: 12.sp,
                                           ),
                                           suffixStyle: TextStyle(
-                                            color: Color.fromARGB(255, 44, 44, 150),
+                                            color: Color.fromARGB(
+                                              255,
+                                              44,
+                                              44,
+                                              150,
+                                            ),
                                             fontSize: 12.sp,
                                             fontWeight: FontWeight.w500,
                                           ),
@@ -191,7 +201,7 @@ class _PriceEstimatorScreenState extends State<PriceEstimatorScreen> {
                         ],
                       ),
                     ),
-                SizedBox(height: 12.h),
+                    SizedBox(height: 12.h),
                     _sectionLabel('Property Type'),
                     const SizedBox(height: 8),
                     _buildTypeGrid(),
@@ -416,216 +426,201 @@ class _PriceEstimatorScreenState extends State<PriceEstimatorScreen> {
       ),
     );
   }
-Widget _buildTypeGrid() {
-  return SingleChildScrollView(
-    scrollDirection: Axis.horizontal,
-    child: Row(
-      children: List.generate(_types.length, (i) {
-        final selected = _selectedType == i;
 
-        return Padding(
-          padding: EdgeInsets.only(right: i == _types.length - 1 ? 0 : 10),
-          child: InkWell(
-            onTap: () => setState(() => _selectedType = i),
-            borderRadius: BorderRadius.circular(12),
-            child: Container(
-              width: 75.w,   // Fixed width
-              height: 75.h,  // Fixed height
-              decoration: BoxDecoration(
-                color: selected ? AppColors.primary : AppColors.surface,
-                borderRadius: BorderRadius.circular(12),
-                border: Border.all(
-                  color: selected
-                      ? AppColors.primary
-                      : AppColors.divider,
-                ),
-              ),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(
-                    _types[i].icon,
-                    size: 22,
-                    color: selected
-                        ? Colors.white
-                        : AppColors.primary,
+  Widget _buildTypeGrid() {
+    return SingleChildScrollView(
+      scrollDirection: Axis.horizontal,
+      child: Row(
+        children: List.generate(_types.length, (i) {
+          final selected = _selectedType == i;
+
+          return Padding(
+            padding: EdgeInsets.only(right: i == _types.length - 1 ? 0 : 10),
+            child: InkWell(
+              onTap: () => setState(() => _selectedType = i),
+              borderRadius: BorderRadius.circular(12),
+              child: Container(
+                width: 75.w, // Fixed width
+                height: 75.h, // Fixed height
+                decoration: BoxDecoration(
+                  color: selected ? AppColors.primary : AppColors.surface,
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(
+                    color: selected ? AppColors.primary : AppColors.divider,
                   ),
-           SizedBox(height: 8),
-                  Text(
-                    _types[i].label,
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      fontSize: 10.sp,
-                      fontWeight: FontWeight.w600,
-                      color: selected
-                          ? Colors.white
-                          : AppColors.textPrimary,
+                ),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(
+                      _types[i].icon,
+                      size: 22,
+                      color: selected ? Colors.white : AppColors.primary,
                     ),
-                  ),
-                ],
+                    SizedBox(height: 8),
+                    Text(
+                      _types[i].label,
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        fontSize: 10.sp,
+                        fontWeight: FontWeight.w600,
+                        color: selected ? Colors.white : AppColors.textPrimary,
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ),
-          ),
-        );
-      }),
-    ),
-  );
-}
-
-Widget _buildDetailGrid() {
-  return Column(
-    spacing: 10.h,
-    children: [
-      /// Row 1
-      Row(
-        children: [
-          Expanded(
-            child: _detailCard(
-              icon: Icons.bed_outlined,
-              title: "BHK",
-              value: "Select",
-            ),
-          ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: _detailCard(
-              icon: Icons.bathtub_outlined,
-              title: "Bathrooms",
-              value: "Select",
-            ),
-          ),
-        ],
+          );
+        }),
       ),
+    );
+  }
 
-      
-
-      /// Row 2
-      Row(
-        children: [
-          Expanded(
-            child: _detailCard(
-              icon: Icons.chair_outlined,
-              title: "Furnishing",
-              value: "Select",
-            ),
-          ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: _detailCard(
-              icon: Icons.layers_outlined,
-              title: "Floor",
-              value: "Any",
-            ),
-          ),
-        ],
-      ),
-
-
-      /// Row 3
-      Row(
-        children: [
-          Expanded(
-            child: _detailCard(
-              icon: Icons.apartment_outlined,
-              title: "Total Floors",
-              value: "Any",
-            ),
-          ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: _detailCard(
-              icon: Icons.calendar_today_outlined,
-              title: "Age of Property",
-              value: "Any",
-            ),
-          ),
-        ],
-      ),
-
-
-
-      /// Row 4
-      _detailCard(
-        icon: Icons.directions_car_outlined,
-        title: "Parking",
-        value: "Any",
-        fullWidth: true,
-      ),
-    ],
-  );
-}
-Widget _detailCard({
-  required IconData icon,
-  required String title,
-  required String value,
-  bool fullWidth = false,
-}) {
-  return Container(
-    width: fullWidth ? double.infinity : null,
-    height: 74,
-    padding: const EdgeInsets.symmetric(horizontal: 16),
-    decoration: BoxDecoration(
-      color: Colors.white,
-      borderRadius: BorderRadius.circular(10.r),
-      border: Border.all(
-        color: const Color(0xFFE9EAF3),
-      ),
-      boxShadow: [
-        BoxShadow(
-          color: Colors.black.withOpacity(.03),
-          blurRadius: 12,
-          offset: const Offset(0, 3),
-        ),
-      ],
-    ),
-    child: Row(
+  Widget _buildDetailGrid() {
+    return Column(
+      spacing: 10.h,
       children: [
-        Icon(
-          icon,
-          size: 20.sp,
-          color: const Color(0xff1E2344),
+        /// Row 1
+        Row(
+          children: [
+            Expanded(
+              child: _detailCard(
+                icon: Icons.bed_outlined,
+                title: "BHK",
+                value: "Select",
+              ),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: _detailCard(
+                icon: Icons.bathtub_outlined,
+                title: "Bathrooms",
+                value: "Select",
+              ),
+            ),
+          ],
         ),
 
-      
-    SizedBox(width: 10.w,),
-        Expanded(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                title,
-                 maxLines: 1,
-                  softWrap: false,
-                overflow: TextOverflow.ellipsis,
-                style: const TextStyle(
-                  fontSize: 10,
-                  fontWeight: FontWeight.w700,
-                  color: Color(0xff1E2344),
-                ),
+        /// Row 2
+        Row(
+          children: [
+            Expanded(
+              child: _detailCard(
+                icon: Icons.chair_outlined,
+                title: "Furnishing",
+                value: "Select",
               ),
-              const SizedBox(height: 4),
-              Text(
-                value,
-                style: const TextStyle(
-                  fontSize: 12,
-                  color: Color(0xff8C91A6),
-                  fontWeight: FontWeight.w500,
-                ),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: _detailCard(
+                icon: Icons.layers_outlined,
+                title: "Floor",
+                value: "Any",
               ),
-            ],
-          ),
+            ),
+          ],
         ),
 
-        const Icon(
-          Icons.keyboard_arrow_down_rounded,
-          size: 24,
-          color: Color(0xff1E2344),
+        /// Row 3
+        Row(
+          children: [
+            Expanded(
+              child: _detailCard(
+                icon: Icons.apartment_outlined,
+                title: "Total Floors",
+                value: "Any",
+              ),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: _detailCard(
+                icon: Icons.calendar_today_outlined,
+                title: "Age of Property",
+                value: "Any",
+              ),
+            ),
+          ],
+        ),
+
+        /// Row 4
+        _detailCard(
+          icon: Icons.directions_car_outlined,
+          title: "Parking",
+          value: "Any",
+          fullWidth: true,
         ),
       ],
-    ),
-  );
-}
+    );
+  }
+
+  Widget _detailCard({
+    required IconData icon,
+    required String title,
+    required String value,
+    bool fullWidth = false,
+  }) {
+    return Container(
+      width: fullWidth ? double.infinity : null,
+      height: 74,
+      padding: const EdgeInsets.symmetric(horizontal: 16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(10.r),
+        border: Border.all(color: const Color(0xFFE9EAF3)),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(.03),
+            blurRadius: 12,
+            offset: const Offset(0, 3),
+          ),
+        ],
+      ),
+      child: Row(
+        children: [
+          Icon(icon, size: 20.sp, color: const Color(0xff1E2344)),
+
+          SizedBox(width: 10.w),
+          Expanded(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  title,
+                  maxLines: 1,
+                  softWrap: false,
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(
+                    fontSize: 10,
+                    fontWeight: FontWeight.w700,
+                    color: Color(0xff1E2344),
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  value,
+                  style: const TextStyle(
+                    fontSize: 12,
+                    color: Color(0xff8C91A6),
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ],
+            ),
+          ),
+
+          const Icon(
+            Icons.keyboard_arrow_down_rounded,
+            size: 24,
+            color: Color(0xff1E2344),
+          ),
+        ],
+      ),
+    );
+  }
+
   Widget _buildHighlightsField() {
     return Container(
       decoration: BoxDecoration(
@@ -657,8 +652,8 @@ Widget _detailCard({
             padding: const EdgeInsets.only(bottom: 6),
             child: Text(
               '${_highlightsController.text.length}/100',
-              style: const TextStyle(
-                fontSize: 10.5,
+              style:  TextStyle(
+                fontSize: 10.5.sp,
                 color: AppColors.textSecondary,
               ),
             ),
@@ -672,25 +667,25 @@ Widget _detailCard({
     return Container(
       decoration: BoxDecoration(
         color: AppColors.surface,
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(12.r),
         border: Border.all(color: AppColors.divider),
       ),
       child: Theme(
         data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
         child: ExpansionTile(
           onExpansionChanged: (v) => setState(() => _advancedOpen = v),
-          tilePadding: const EdgeInsets.symmetric(horizontal: 14),
-          title: const Text(
+          tilePadding:  EdgeInsets.symmetric(horizontal: 14.w),
+          title:  Text(
             'Advanced Options',
             style: TextStyle(
-              fontSize: 13,
+              fontSize: 13.sp,
               fontWeight: FontWeight.w600,
               color: AppColors.textPrimary,
             ),
           ),
-          subtitle: const Text(
+          subtitle:  Text(
             'Add more details for a more accurate estimate',
-            style: TextStyle(fontSize: 11, color: AppColors.textSecondary),
+            style: TextStyle(fontSize: 11.sp, color: AppColors.textSecondary),
           ),
           trailing: Icon(
             _advancedOpen ? Icons.keyboard_arrow_up : Icons.keyboard_arrow_down,
@@ -705,7 +700,7 @@ Widget _detailCard({
                     hint: 'View (e.g. Sea, City, Garden)',
                     icon: Icons.visibility_outlined,
                   ),
-                  const SizedBox(height: 10),
+                 SizedBox(height: 10.h),
                   _textField(
                     hint: 'Amenities (e.g. Pool, Gym)',
                     icon: Icons.pool_outlined,
@@ -722,17 +717,17 @@ Widget _detailCard({
   Widget _buildCta() {
     return InkWell(
       onTap: () {},
-      borderRadius: BorderRadius.circular(14),
+      borderRadius: BorderRadius.circular(14.r),
       child: Container(
         width: double.infinity,
-        padding: const EdgeInsets.symmetric(vertical: 16),
+        padding: EdgeInsets.symmetric(vertical: 16.h),
         decoration: BoxDecoration(
           gradient: AppColors.buttonGradient,
-          borderRadius: BorderRadius.circular(14),
+          borderRadius: BorderRadius.circular(14.r),
           boxShadow: [
             BoxShadow(
               color: AppColors.primary.withOpacity(0.35),
-              blurRadius: 14,
+              blurRadius: 14.r,
               offset: const Offset(0, 6),
             ),
           ],
@@ -740,27 +735,27 @@ Widget _detailCard({
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Icon(Icons.auto_awesome, color: Colors.white, size: 18),
-            const SizedBox(width: 8),
+             Icon(Icons.auto_awesome, color: Colors.white, size: 18.sp),
+            SizedBox(width: 8.w),
             Column(
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
-              children: const [
+              children: [
                 Text(
                   'Get AI Estimate',
                   style: TextStyle(
                     color: Colors.white,
                     fontWeight: FontWeight.w700,
-                    fontSize: 14.5,
+                    fontSize: 14.5.sp,
                   ),
                 ),
                 Text(
                   'View estimated price & range',
-                  style: TextStyle(color: Colors.white70, fontSize: 10.5),
+                  style: TextStyle(color: Colors.white70, fontSize: 10.5.sp),
                 ),
               ],
             ),
-            const SizedBox(width: 10),
+            SizedBox(width: 10.w),
             const Icon(Icons.arrow_forward, color: Colors.white, size: 18),
           ],
         ),
@@ -771,12 +766,12 @@ Widget _detailCard({
   Widget _buildFooterNote() {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
-      children: const [
-        Icon(Icons.lock_outline, size: 13, color: AppColors.textSecondary),
-        SizedBox(width: 6),
+      children: [
+        Icon(Icons.lock_outline, size: 13.sp, color: AppColors.textSecondary),
+        SizedBox(width: 6.w),
         Text(
           'Your information is secure and private',
-          style: TextStyle(fontSize: 11, color: AppColors.textSecondary),
+          style: TextStyle(fontSize: 11.sp, color: AppColors.textSecondary),
         ),
       ],
     );

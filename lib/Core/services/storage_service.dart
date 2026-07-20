@@ -74,6 +74,16 @@ class StorageService {
     return await _prefs!.remove(profileKey);
   }
 
+  static String getUserId() {
+  final Map<String, dynamic>? profile =
+      getProfile();
+
+  return profile?['id']
+          ?.toString()
+          .trim() ??
+      '';
+}
+
   /// ================= LANGUAGE =================
 
   static Future<bool> saveLanguage(String language) async {

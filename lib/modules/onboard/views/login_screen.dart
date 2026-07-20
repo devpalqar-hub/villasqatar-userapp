@@ -12,7 +12,7 @@ import 'otp_screen.dart';
 class LoginScreen extends StatelessWidget {
   LoginScreen({super.key});
 
- final AuthController controller = Get.find<AuthController>();
+  final AuthController controller = Get.find<AuthController>();
 
   @override
   Widget build(BuildContext context) {

@@ -8,7 +8,6 @@ import 'package:villas_qatar/Core/services/storage_service.dart';
 import 'package:villas_qatar/Core/theme/app_textstyles.dart';
 import 'package:villas_qatar/modules/mainscreen/mainscreen.dart';
 
-
 import 'welcome_screen.dart';
 
 class SplashScreen extends StatefulWidget {
@@ -20,23 +19,24 @@ class SplashScreen extends StatefulWidget {
 
 class _SplashScreenState extends State<SplashScreen> {
   @override
- @override
-void initState() {
-  super.initState();
-  _navigate();
-}
-
-Future<void> _navigate() async {
-  await Future.delayed(const Duration(seconds: 3));
-
-  final token = StorageService.getToken();
-
-  if (token != null && token.isNotEmpty) {
-    Get.offAll(() => const MainScreen());
-  } else {
-    Get.offAll(() => WelcomeScreen());
+  @override
+  void initState() {
+    super.initState();
+    _navigate();
   }
-}
+
+  Future<void> _navigate() async {
+    await Future.delayed(const Duration(seconds: 3));
+
+    final token = StorageService.getToken();
+
+    if (token != null && token.isNotEmpty) {
+      Get.offAll(() => const MainScreen());
+    } else {
+      Get.offAll(() => WelcomeScreen());
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -44,17 +44,12 @@ Future<void> _navigate() async {
         children: [
           /// Background Image
           Positioned.fill(
-            child: Image.asset(
-              'assets/background.png',
-              fit: BoxFit.cover,
-            ),
+            child: Image.asset('assets/background.png', fit: BoxFit.cover),
           ),
 
           SafeArea(
             child: Column(
               children: [
-                
-
                 /// Logo
                 Center(
                   child: Image.asset(
@@ -84,16 +79,15 @@ Future<void> _navigate() async {
                   textAlign: TextAlign.center,
                   style: AppTextStyles.bold16.copyWith(
                     fontSize: 21.sp,
-                    color: AppColors.primary
+                    color: AppColors.primary,
                   ),
                 ),
 
                 SizedBox(height: 10.h),
+
                 /// Description
                 Padding(
-                  padding: EdgeInsets.symmetric(
-                    horizontal: 50.w,
-                  ),
+                  padding: EdgeInsets.symmetric(horizontal: 50.w),
                   child: Text(
                     'Discover premium villas and properties\nin the best locations across Qatar'
                         .tr,
@@ -108,33 +102,30 @@ Future<void> _navigate() async {
                 const Spacer(),
 
                 /// Bottom Content
-                
                 Column(
-                    children: [
-                      Text(
-                        'Premium Living. Perfect Location'.tr,
-                        style: AppTextStyles.body14.copyWith(
-                          fontSize: 12.sp,
-                          color: Colors.white,
-                        ),
+                  children: [
+                    Text(
+                      'Premium Living. Perfect Location'.tr,
+                      style: AppTextStyles.body14.copyWith(
+                        fontSize: 12.sp,
+                        color: Colors.white,
                       ),
+                    ),
 
-                      SizedBox(height: 15.h),
+                    SizedBox(height: 15.h),
 
-                      Row(
-                        mainAxisAlignment:
-                            MainAxisAlignment.center,
-                        children: [
-                          _indicator(true),
-                          SizedBox(width: 8.w),
-                          _indicator(false),
-                          SizedBox(width: 8.w),
-                          _indicator(false),
-                        ],
-                      ),
-                    ],
-                  ),
-                
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        _indicator(true),
+                        SizedBox(width: 8.w),
+                        _indicator(false),
+                        SizedBox(width: 8.w),
+                        _indicator(false),
+                      ],
+                    ),
+                  ],
+                ),
               ],
             ),
           ),
@@ -148,9 +139,7 @@ Future<void> _navigate() async {
       width: 30.w,
       height: 2.h,
       decoration: BoxDecoration(
-        color: active
-            ? Colors.white
-            : Colors.white.withOpacity(0.35),
+        color: active ? Colors.white : Colors.white.withOpacity(0.35),
         borderRadius: BorderRadius.circular(20.r),
       ),
     );

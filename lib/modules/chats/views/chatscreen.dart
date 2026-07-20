@@ -41,8 +41,8 @@ class ChatScreen extends StatelessWidget {
 
             return Row(
               children: [
-                const CircleAvatar(
-                  radius: 20,
+             CircleAvatar(
+                  radius: 20.r,
                   backgroundColor: AppColors.primarySoft,
                   child: Icon(
                     Icons.person,
@@ -213,15 +213,15 @@ class TextBubble extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 2),
+      padding:  EdgeInsets.symmetric(vertical: 2.h),
       child: Row(
         mainAxisAlignment:
             isMe ? MainAxisAlignment.end : MainAxisAlignment.start,
         crossAxisAlignment: CrossAxisAlignment.end,
         children: [
           if (!isMe) ...[
-            const CircleAvatar(
-              radius: 15,
+        CircleAvatar(
+              radius: 15.r,
               backgroundColor: AppColors.primarySoft,
               child: Icon(
                 Icons.person,
@@ -229,7 +229,7 @@ class TextBubble extends StatelessWidget {
                 color: AppColors.primary,
               ),
             ),
-            const SizedBox(width: 8),
+        SizedBox(width: 8.w),
           ],
 
           Flexible(
@@ -242,17 +242,17 @@ class TextBubble extends StatelessWidget {
                     maxWidth:
                         MediaQuery.of(context).size.width * .72,
                   ),
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 14,
-                    vertical: 10,
+                  padding:  EdgeInsets.symmetric(
+                    horizontal: 14.w,
+                    vertical: 10.h,
                   ),
                   decoration: BoxDecoration(
                     color: isMe
                         ? AppColors.primary
                         : Colors.white,
                     borderRadius: BorderRadius.only(
-                      topLeft: const Radius.circular(18),
-                      topRight: const Radius.circular(18),
+                      topLeft:  Radius.circular(18.r),
+                      topRight: Radius.circular(18.r),
                       bottomLeft:
                           Radius.circular(isMe ? 18 : 5),
                       bottomRight:
@@ -273,15 +273,15 @@ class TextBubble extends StatelessWidget {
                 const SizedBox(height: 4),
 
                 Padding(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 4,
+                  padding:  EdgeInsets.symmetric(
+                    horizontal: 4.h,
                   ),
                   child: Text(
                     DateFormat("hh:mm a")
                         .format(message.createdAt),
-                    style: const TextStyle(
+                    style: TextStyle(
                       color: AppColors.textSecondary,
-                      fontSize: 10,
+                      fontSize: 10.sp,
                     ),
                   ),
                 ),
@@ -297,7 +297,7 @@ class TextBubble extends StatelessWidget {
     switch (message.type.toUpperCase()) {
       case "IMAGE":
         return ClipRRect(
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(12.r),
           child: GestureDetector(
             onTap: () {
               if (message.mediaUrl == null) return;
@@ -305,7 +305,7 @@ class TextBubble extends StatelessWidget {
               showDialog(
                 context: context,
                 builder: (_) => Dialog(
-                  insetPadding: const EdgeInsets.all(20),
+                  insetPadding:  EdgeInsets.all(20.w),
                   child: InteractiveViewer(
                     child: Image.network(
                       message.mediaUrl!,
@@ -317,7 +317,7 @@ class TextBubble extends StatelessWidget {
             },
             child: Image.network(
               message.mediaUrl ?? "",
-              width: 220,
+              width: 220.w,
               fit: BoxFit.cover,
               errorBuilder: (_, __, ___) {
                 return const Icon(Icons.image_not_supported);
@@ -334,7 +334,7 @@ class TextBubble extends StatelessWidget {
               Icons.location_on,
               color: Colors.red,
             ),
-            const SizedBox(height: 8),
+          SizedBox(height: 8.h),
             Text(
               message.locationLabel ?? "",
               style: TextStyle(
@@ -350,8 +350,8 @@ class TextBubble extends StatelessWidget {
         return Text(
           message.content ?? "",
           style: TextStyle(
-            fontSize: 14,
-            height: 1.45,
+            fontSize: 14.sp,
+            height: 1.h,
             color: isMe
                 ? Colors.white
                 : AppColors.textPrimary,
@@ -403,7 +403,7 @@ class InputBar extends StatelessWidget {
           children: [
             /// Attachment
             IconButton(
-              splashRadius: 22,
+              splashRadius: 22.r,
               icon: Icon(
                 Icons.add_circle_outline,
                 size: 22.sp,
@@ -444,7 +444,7 @@ class InputBar extends StatelessWidget {
             ),
 
             IconButton(
-              splashRadius: 22,
+              splashRadius: 22.r,
               icon: Icon(
                 Icons.emoji_emotions_outlined,
                 color: AppColors.textSecondary,

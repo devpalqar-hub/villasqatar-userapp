@@ -12,7 +12,7 @@ import 'package:villas_qatar/modules/onboard/controller/auth_controller.dart';
 class CompleteProfileScreen extends StatelessWidget {
   CompleteProfileScreen({super.key});
 
- final AuthController controller = Get.put(AuthController());
+  final AuthController controller = Get.put(AuthController());
   @override
   Widget build(BuildContext context) {
     return GetBuilder<AuthController>(

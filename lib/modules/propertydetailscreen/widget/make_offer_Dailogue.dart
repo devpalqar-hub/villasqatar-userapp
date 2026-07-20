@@ -8,418 +8,876 @@ import '../../chats/service/chat_controller.dart';
 import '../../chats/views/chat_startscreen.dart';
 import '../../propertylist/model/myproperty_model.dart';
 
-class MakeOfferDialog extends StatefulWidget {
+class MakeOfferBottomSheet extends StatefulWidget {
   final Property property;
 
-  const MakeOfferDialog({
+  const MakeOfferBottomSheet({
     super.key,
     required this.property,
   });
 
   @override
-  State<MakeOfferDialog> createState() => _MakeOfferDialogState();
+  State<MakeOfferBottomSheet> createState() =>
+      _MakeOfferBottomSheetState();
 }
 
-class _MakeOfferDialogState extends State<MakeOfferDialog>
-    with SingleTickerProviderStateMixin {
-  late final TextEditingController offerController;
+class _MakeOfferBottomSheetState
+    extends State<MakeOfferBottomSheet> {
+  late final TextEditingController
+      offerController;
 
   String currency = "QAR";
-
-  late AnimationController animationController;
-  late Animation<double> scaleAnimation;
-  late Animation<double> opacityAnimation;
 
   @override
   void initState() {
     super.initState();
 
-    offerController = TextEditingController(
-      text: widget.property.price.toStringAsFixed(0),
+    offerController =
+        TextEditingController(
+      text: widget.property.price
+          .toStringAsFixed(0),
     );
-
-    animationController = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 260),
-    );
-
-    scaleAnimation = Tween<double>(
-      begin: .85,
-      end: 1,
-    ).animate(
-      CurvedAnimation(
-        parent: animationController,
-        curve: Curves.easeOutBack,
-      ),
-    );
-
-    opacityAnimation = Tween<double>(
-      begin: 0,
-      end: 1,
-    ).animate(animationController);
-
-    animationController.forward();
   }
 
   @override
   void dispose() {
     offerController.dispose();
-    animationController.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    return FadeTransition(
-      opacity: opacityAnimation,
-      child: ScaleTransition(
-        scale: scaleAnimation,
-        child: Dialog(
-          elevation: 0,
-          backgroundColor: Colors.transparent,
-          insetPadding: EdgeInsets.symmetric(horizontal: 16.w),
-          child: Container(
+    return Container(
+      constraints: BoxConstraints(
+        maxHeight:
+            MediaQuery.of(context)
+                    .size
+                    .height *
+                0.65,
+      ),
+      decoration: BoxDecoration(
+        color: const Color(0xffFAFAFA),
+        borderRadius:
+            BorderRadius.vertical(
+          top: Radius.circular(24.r),
+        ),
+      ),
+      clipBehavior: Clip.antiAlias,
+      child: Column(
+        children: [
+          // ==========================================
+          // DRAG HANDLE
+          // ==========================================
+
+          SizedBox(height: 10.h),
+
+          Container(
+            width: 42.w,
+            height: 4.h,
             decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(20.r),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withOpacity(.08),
-                  blurRadius: 30,
-                  offset: const Offset(0, 12),
+              color:
+                  const Color(0xffD5D5D5),
+              borderRadius:
+                  BorderRadius.circular(
+                20.r,
+              ),
+            ),
+          ),
+
+          // ==========================================
+          // HEADER
+          // ==========================================
+
+          Padding(
+            padding:
+                EdgeInsets.fromLTRB(
+              16.w,
+              14.h,
+              10.w,
+              12.h,
+            ),
+            child: Row(
+              children: [
+                Expanded(
+                  child: Text(
+                    "Make an Offer",
+                    style: TextStyle(
+                      fontSize: 17.sp,
+                      fontWeight:
+                          FontWeight.w700,
+                      color:
+                          const Color(
+                        0xff1F1F1F,
+                      ),
+                    ),
+                  ),
+                ),
+
+                IconButton(
+                  onPressed: Get.back,
+                  icon: Icon(
+                    Icons.close_rounded,
+                    size: 22.sp,
+                    color:
+                        const Color(
+                      0xff333333,
+                    ),
+                  ),
                 ),
               ],
             ),
-            child: Padding(
-              padding: EdgeInsets.fromLTRB(
-                22.w,
-                10.h,
-                22.w,
-                10.h,
+          ),
+
+          const Divider(
+            height: 1,
+            thickness: 1,
+            color: Color(0xffEEEEEE),
+          ),
+
+          // ==========================================
+          // SCROLLABLE CONTENT
+          // ==========================================
+
+          Expanded(
+            child: SingleChildScrollView(
+              physics:
+                  const BouncingScrollPhysics(),
+              keyboardDismissBehavior:
+                  ScrollViewKeyboardDismissBehavior
+                      .onDrag,
+              padding:
+                  EdgeInsets.fromLTRB(
+                16.w,
+                18.h,
+                16.w,
+                20.h,
               ),
               child: Column(
-                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment:
+                    CrossAxisAlignment.start,
                 children: [
-                  /// Close
-                  Row(
-                    children: [
-                      const Spacer(),
-                      InkWell(
-                        borderRadius: BorderRadius.circular(100),
-                        onTap: Get.back,
-                        child: Container(
-                          width: 30.w,
-                          height: 30.w,
-                          decoration: BoxDecoration(
-                            color: Colors.grey.shade100,
-                            shape: BoxShape.circle,
-                          ),
-                          child: Icon(
-                            Icons.close,
-                            size: 15.sp,
-                            color: Colors.grey.shade700,
-                          ),
-                        ),
-                      ),
-                    ],
+                  // ==================================
+                  // SECTION 1
+                  // ==================================
+
+                  _sectionTitle(
+                    "Property Price",
+                    subtitle:
+                        "Review the listed price before making your offer",
+                    step: "1",
                   ),
 
-                  SizedBox(height: 6.h),
+                  SizedBox(height: 14.h),
 
-                  /// Title
-                  Text(
-                    "Make an Offer",
-                    style: AppTextStyles.title16.copyWith(
-                      fontWeight: FontWeight.w800,
-                      color: AppColors.primary,
-                    ),
+                  // ==================================
+                  // LISTED PRICE CARD
+                  // ==================================
+
+                  _buildListedPriceCard(),
+
+                  SizedBox(height: 22.h),
+
+                  // ==================================
+                  // SECTION 2
+                  // ==================================
+
+                  _sectionTitle(
+                    "Your Offer",
+                    subtitle:
+                        "Enter the amount you would like to offer",
+                    step: "2",
                   ),
 
-                  SizedBox(height: 4.h),
+                  SizedBox(height: 14.h),
 
-                  Text(
-                    "Enter your best offer for this property.",
-                    textAlign: TextAlign.center,
-                    style: AppTextStyles.body12.copyWith(
-                      color: Colors.grey.shade600,
-                    ),
-                  ),
+                  // ==================================
+                  // OFFER FIELD
+                  // ==================================
 
-                  SizedBox(height: 15.h),
+                  _buildOfferField(),
 
-                  /// Property Price
-                  Container(
-                    width: double.infinity,
-                    padding: EdgeInsets.symmetric(horizontal:12.w,vertical: 6.h),
-                    decoration: BoxDecoration(
-                      color: const Color(0xffFAF6F8),
-                      borderRadius: BorderRadius.circular(10.r),
-                      border: Border.all(
-                        color: AppColors.fieldBorder,
-                      ),
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          "Listed Price",
-                          style: AppTextStyles.body12.copyWith(
-                            color: Colors.grey.shade600,
-                          ),
-                        ),
-                        SizedBox(height: 6.h),
-                        Text(
-                          "QAR ${_formatPrice(widget.property.price)}",
-                          style: AppTextStyles.title16.copyWith(
-                            color: AppColors.primary,
-                            fontWeight: FontWeight.w800,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
+                  SizedBox(height: 16.h),
 
-                  SizedBox(height: 15.h),
+                  // ==================================
+                  // INFO BOX
+                  // ==================================
 
-                  /// Offer Label
-                  Align(
-                    alignment: Alignment.centerLeft,
-                    child: Text(
-                      "Offer Amount",
-                      style: AppTextStyles.body13.copyWith(
-                        fontWeight: FontWeight.w700,
-                      ),
-                    ),
-                  ),
-
-                  SizedBox(height: 4.h),
-
-                  /// Offer Field
-                  Container(
-                    decoration: BoxDecoration(
-                      color: AppColors.fieldBg,
-                      borderRadius: BorderRadius.circular(10.r),
-                      border: Border.all(
-                        color: AppColors.fieldBorder,
-                      ),
-                    ),
-                    child: Row(
-                      children: [
-                        Expanded(
-                          child: TextField(
-                            controller: offerController,
-                            keyboardType:
-                                const TextInputType.numberWithOptions(
-                              decimal: true,
-                            ),
-                            style: AppTextStyles.title14.copyWith(
-                              fontWeight: FontWeight.w700,
-                            ),
-                            decoration: InputDecoration(
-                              border: InputBorder.none,
-                              contentPadding: EdgeInsets.symmetric(
-                                horizontal: 16.w,
-                                vertical: 16.h,
-                              ),
-                              hintText: "Enter amount",
-                            ),
-                          ),
-                        ),
-
-                        Container(
-                          height: 32.h,
-                          width: 1,
-                          color: AppColors.fieldBorder,
-                        ),
-
-                        Padding(
-                          padding: EdgeInsets.symmetric(horizontal: 10.w),
-                          child: DropdownButtonHideUnderline(
-                            child: DropdownButton<String>(
-                              value: currency,
-                              borderRadius: BorderRadius.circular(12),
-                              icon: const Icon(
-                                Icons.keyboard_arrow_down_rounded,
-                              ),
-                              style: AppTextStyles.medium14.copyWith(
-                                color: Colors.black87,
-                              ),
-                              items: const [
-                                DropdownMenuItem(
-                                  value: "QAR",
-                                  child: Text("QAR"),
-                                ),
-                                DropdownMenuItem(
-                                  value: "USD",
-                                  child: Text("USD"),
-                                ),
-                                DropdownMenuItem(
-                                  value: "AED",
-                                  child: Text("AED"),
-                                ),
-                              ],
-                              onChanged: (value) {
-                                if (value == null) return;
-
-                                setState(() {
-                                  currency = value;
-                                });
-                              },
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-
-                  SizedBox(height: 20.h),
-
-                  Divider(
-                    color: Colors.grey.shade200,
-                    height: 1,
-                  ),
-
-                  SizedBox(height: 18.h),
-                                    Text(
-                    "Continue the conversation with the property owner.",
-                    textAlign: TextAlign.center,
-                    style: AppTextStyles.body12.copyWith(
-                      color: Colors.grey.shade600,
-                    ),
-                  ),
-
-                  SizedBox(height: 15.h),
-
-                  Row(
-                    children: [
-                      ///================ Chat Button ===================
-                      Expanded(
-                        child: SizedBox(
-                          height: 50.h,
-                          child: OutlinedButton.icon(
-                            onPressed: () {
-                              Get.back();
-
-                              if (Get.isRegistered<ChatController>()) {
-                                Get.delete<ChatController>();
-                              }
-
-                              Get.put(
-                                ChatController(
-                                  listingId: widget.property.id!,
-                                ),
-                              );
-
-                              Get.to(
-                                () => ChatStartScreen(
-                                  property: widget.property,
-                                  showPropertyCard: false,
-                                ),
-                              );
-                            },
-                            icon: Icon(
-                              Icons.chat_bubble_outline_rounded,
-                              size: 15.sp,
-                            ),
-                            label: Text(
-                              "Chat Seller",
-                              style: AppTextStyles.body12.copyWith(
-                                fontWeight: FontWeight.w800,
-                              ),
-                            ),
-                            style: OutlinedButton.styleFrom(
-                              foregroundColor: AppColors.primary,
-                              side: const BorderSide(
-                                color: AppColors.primary,
-                              ),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(10.r),
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-
-                      SizedBox(width: 12.w),
-
-                      ///================ Send Offer ===================
-                      Expanded(
-                        child: SizedBox(
-                          height: 50.h,
-                          child: ElevatedButton.icon(
-                            onPressed: () {
-                              if (offerController.text.trim().isEmpty) {
-                                Get.snackbar(
-                                  "Offer Required",
-                                  "Please enter your offer amount.",
-                                  snackPosition: SnackPosition.BOTTOM,
-                                );
-                                return;
-                              }
-
-                              Get.back();
-
-                              if (Get.isRegistered<ChatController>()) {
-                                Get.delete<ChatController>();
-                              }
-
-                              Get.put(
-                                ChatController(
-                                  listingId: widget.property.id!,
-                                ),
-                              );
-
-                              Get.to(
-                                () => ChatStartScreen(
-                                  property: widget.property,
-                                  initialMessage:
-                                      "I'm ready to buy this property for $currency ${offerController.text}",
-                                ),
-                              );
-                            },
-                            icon: Icon(
-                              Icons.send_rounded,
-                              size: 15.sp,
-                              color: Colors.white,
-                            ),
-                            label: Text(
-                              "Send Offer",
-                              style: AppTextStyles.body12.copyWith(
-                                color: Colors.white,
-                                fontWeight: FontWeight.w800,
-                              ),
-                            ),
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: AppColors.primary,
-                              elevation: 0,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(14.r),
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-
-                  SizedBox(height: 6.h),
+                  _buildOfferInfo(),
                 ],
               ),
             ),
           ),
+
+          // ==========================================
+          // FIXED BOTTOM BAR
+          // ==========================================
+
+          _buildBottomBar(),
+        ],
+      ),
+    );
+  }
+
+  // ================================================
+  // SECTION TITLE
+  // ================================================
+
+  Widget _sectionTitle(
+    String title, {
+    required String subtitle,
+    required String step,
+  }) {
+    return Row(
+      crossAxisAlignment:
+          CrossAxisAlignment.start,
+      children: [
+        Container(
+          width: 25.w,
+          height: 25.w,
+          alignment: Alignment.center,
+          decoration:
+              const BoxDecoration(
+            color: AppColors.primary,
+            shape: BoxShape.circle,
+          ),
+          child: Text(
+            step,
+            style: TextStyle(
+              color: Colors.white,
+              fontSize: 10.sp,
+              fontWeight:
+                  FontWeight.w700,
+            ),
+          ),
+        ),
+
+        SizedBox(width: 10.w),
+
+        Expanded(
+          child: Column(
+            crossAxisAlignment:
+                CrossAxisAlignment.start,
+            children: [
+              Text(
+                title,
+                style: TextStyle(
+                  fontSize: 14.sp,
+                  fontWeight:
+                      FontWeight.w700,
+                  color:
+                      const Color(
+                    0xff222222,
+                  ),
+                ),
+              ),
+
+              SizedBox(height: 3.h),
+
+              Text(
+                subtitle,
+                style: TextStyle(
+                  fontSize: 9.5.sp,
+                  color:
+                      const Color(
+                    0xff888888,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  // ================================================
+  // LISTED PRICE
+  // ================================================
+
+  Widget _buildListedPriceCard() {
+    return Container(
+      width: double.infinity,
+      padding: EdgeInsets.all(14.w),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius:
+            BorderRadius.circular(14.r),
+        border: Border.all(
+          color:
+              const Color(0xffEAEAEA),
+        ),
+        boxShadow: [
+          BoxShadow(
+            color:
+                Colors.black.withOpacity(
+              .025,
+            ),
+            blurRadius: 10,
+            offset:
+                const Offset(0, 3),
+          ),
+        ],
+      ),
+      child: Row(
+        children: [
+          Container(
+            width: 44.w,
+            height: 44.w,
+            decoration: BoxDecoration(
+              color:AppColors.primary
+                  .withOpacity(.07),
+              borderRadius:
+                  BorderRadius.circular(
+                11.r,
+              ),
+            ),
+            child: Icon(
+              Icons
+                  .home_work_outlined,
+              color: AppColors.primary,
+              size: 21.sp,
+            ),
+          ),
+
+          SizedBox(width: 12.w),
+
+          Expanded(
+            child: Column(
+              crossAxisAlignment:
+                  CrossAxisAlignment.start,
+              children: [
+                Text(
+                  "Listed Price",
+                  style: TextStyle(
+                    fontSize: 9.5.sp,
+                    color:
+                        const Color(
+                      0xff777777,
+                    ),
+                  ),
+                ),
+
+                SizedBox(height: 4.h),
+
+                Text(
+                  "QAR ${_formatPrice(widget.property.price)}",
+                  style: TextStyle(
+                    fontSize: 16.sp,
+                    fontWeight:
+                        FontWeight.w800,
+                    color: AppColors.primary,
+                  ),
+                ),
+              ],
+            ),
+          ),
+
+          Container(
+            padding:
+                EdgeInsets.symmetric(
+              horizontal: 8.w,
+              vertical: 5.h,
+            ),
+            decoration: BoxDecoration(
+              color: AppColors.primary
+                  .withOpacity(.06),
+              borderRadius:
+                  BorderRadius.circular(
+                7.r,
+              ),
+            ),
+            child: Text(
+              "LISTED",
+              style: TextStyle(
+                fontSize: 7.sp,
+                fontWeight:
+                    FontWeight.w700,
+                color:AppColors.primary,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // ================================================
+  // OFFER FIELD
+  // ================================================
+
+  Widget _buildOfferField() {
+    return Column(
+      crossAxisAlignment:
+          CrossAxisAlignment.start,
+      children: [
+        Text(
+          "Offer Amount",
+          style:
+              AppTextStyles.body13.copyWith(
+            fontSize: 11.sp,
+            fontWeight:
+                FontWeight.w700,
+            color:
+                const Color(0xff333333),
+          ),
+        ),
+
+        SizedBox(height: 7.h),
+
+        Container(
+          height: 52.h,
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius:
+                BorderRadius.circular(
+              12.r,
+            ),
+            border: Border.all(
+              color:
+                  const Color(
+                0xffE5E5E5,
+              ),
+            ),
+          ),
+          child: Row(
+            children: [
+              Expanded(
+                child: TextField(
+                  controller:
+                      offerController,
+                  keyboardType:
+                      const TextInputType
+                          .numberWithOptions(
+                    decimal: true,
+                  ),
+                  style: TextStyle(
+                    fontSize: 13.sp,
+                    fontWeight:
+                        FontWeight.w700,
+                    color:
+                        const Color(
+                      0xff222222,
+                    ),
+                  ),
+                  decoration:
+                      InputDecoration(
+                    hintText:
+                        "Enter amount",
+                    hintStyle:
+                        TextStyle(
+                      fontSize: 11.sp,
+                      color:
+                          const Color(
+                        0xff999999,
+                      ),
+                    ),
+                    border:
+                        InputBorder.none,
+                    enabledBorder:
+                        InputBorder.none,
+                    focusedBorder:
+                        InputBorder.none,
+                    contentPadding:
+                        EdgeInsets
+                            .symmetric(
+                      horizontal: 14.w,
+                      vertical: 15.h,
+                    ),
+                  ),
+                ),
+              ),
+
+              Container(
+                height: 30.h,
+                width: 1,
+                color:
+                    const Color(
+                  0xffE5E5E5,
+                ),
+              ),
+
+              Padding(
+                padding:
+                    EdgeInsets.only(
+                  left: 10.w,
+                  right: 10.w,
+                ),
+                child:
+                    DropdownButtonHideUnderline(
+                  child:
+                      DropdownButton<String>(
+                    value: currency,
+                    borderRadius:
+                        BorderRadius
+                            .circular(
+                      12.r,
+                    ),
+                    icon: Icon(
+                      Icons
+                          .keyboard_arrow_down_rounded,
+                      size: 18.sp,
+                      color:
+                          AppColors.primary,
+                    ),
+                    style: TextStyle(
+                      fontSize: 11.sp,
+                      fontWeight:
+                          FontWeight.w700,
+                      color:
+                            AppColors.primary,
+                         
+                    ),
+                    items: const [
+                      DropdownMenuItem(
+                        value: "QAR",
+                        child:
+                            Text("QAR"),
+                      ),
+                      DropdownMenuItem(
+                        value: "USD",
+                        child:
+                            Text("USD"),
+                      ),
+                      DropdownMenuItem(
+                        value: "AED",
+                        child:
+                            Text("AED"),
+                      ),
+                    ],
+                    onChanged: (value) {
+                      if (value == null) {
+                        return;
+                      }
+
+                      setState(() {
+                        currency = value;
+                      });
+                    },
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  // ================================================
+  // OFFER INFO
+  // ================================================
+
+  Widget _buildOfferInfo() {
+    return Container(
+      width: double.infinity,
+      padding:
+          EdgeInsets.symmetric(
+        horizontal: 12.w,
+        vertical: 11.h,
+      ),
+      decoration: BoxDecoration(
+        color:
+              AppColors.primary.withOpacity(
+          .045,
+        ),
+        borderRadius:
+            BorderRadius.circular(10.r),
+        border: Border.all(
+          color:
+                AppColors.primary.withOpacity(
+            .10,
+          ),
+        ),
+      ),
+      child: Row(
+        crossAxisAlignment:
+            CrossAxisAlignment.start,
+        children: [
+          Icon(
+            Icons
+                .info_outline_rounded,
+            size: 17.sp,
+            color:    AppColors.primary,
+          ),
+
+          SizedBox(width: 9.w),
+
+          Expanded(
+            child: Text(
+              "Your offer will be sent directly to the property owner. You can continue the conversation through chat.",
+              style: TextStyle(
+                fontSize: 9.5.sp,
+                height: 1.45,
+                color:
+                    const Color(
+                  0xff666666,
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // ================================================
+  // BOTTOM BAR
+  // ================================================
+
+  Widget _buildBottomBar() {
+    return Container(
+      padding: EdgeInsets.fromLTRB(
+        16.w,
+        11.h,
+        16.w,
+        10.h,
+      ),
+      decoration:
+          const BoxDecoration(
+        color: Colors.white,
+        border: Border(
+          top: BorderSide(
+            color:
+                Color(0xffEEEEEE),
+          ),
+        ),
+      ),
+      child: SafeArea(
+        top: false,
+        child: Row(
+          children: [
+            // ======================================
+            // CHAT SELLER
+            // ======================================
+
+            Expanded(
+              child: SizedBox(
+                height: 48.h,
+                child:
+                    OutlinedButton(
+                  onPressed:
+                      _openChat,
+                  style:
+                      OutlinedButton
+                          .styleFrom(
+                    foregroundColor:
+                           AppColors.primary,
+                    side:
+                        const BorderSide(
+                      color:
+                            AppColors.primary,
+                    ),
+                    elevation: 0,
+                    shape:
+                        RoundedRectangleBorder(
+                      borderRadius:
+                          BorderRadius
+                              .circular(
+                        12.r,
+                      ),
+                    ),
+                  ),
+                  child: Row(
+                    mainAxisAlignment:
+                        MainAxisAlignment
+                            .center,
+                    children: [
+                      Icon(
+                        Icons
+                            .chat_bubble_outline_rounded,
+                        size: 16.sp,
+                      ),
+
+                      SizedBox(
+                        width: 7.w,
+                      ),
+
+                      Text(
+                        "Chat Seller",
+                        style:
+                            TextStyle(
+                          fontSize:
+                              10.5.sp,
+                          fontWeight:
+                              FontWeight
+                                  .w700,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+
+            SizedBox(width: 10.w),
+
+            // ======================================
+            // SEND OFFER
+            // ======================================
+
+            Expanded(
+              child: SizedBox(
+                height: 48.h,
+                child:
+                    ElevatedButton(
+                  onPressed:
+                      _sendOffer,
+                  style:
+                      ElevatedButton
+                          .styleFrom(
+                    backgroundColor:
+                          AppColors.primary,
+                    foregroundColor:
+                        Colors.white,
+                    elevation: 0,
+                    shape:
+                        RoundedRectangleBorder(
+                      borderRadius:
+                          BorderRadius
+                              .circular(
+                        12.r,
+                      ),
+                    ),
+                  ),
+                  child: Row(
+                    mainAxisAlignment:
+                        MainAxisAlignment
+                            .center,
+                    children: [
+                      Text(
+                        "Send Offer",
+                        style:
+                            TextStyle(
+                          fontSize:
+                              10.5.sp,
+                          fontWeight:
+                              FontWeight
+                                  .w700,
+                        ),
+                      ),
+
+                      SizedBox(
+                        width: 7.w,
+                      ),
+
+                      Icon(
+                        Icons
+                            .send_rounded,
+                        size: 15.sp,
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ],
         ),
       ),
     );
   }
 
-  String _formatPrice(num? price) {
-    if (price == null) return "0";
+  // ================================================
+  // CHAT SELLER
+  // ================================================
+
+  void _openChat() {
+    Get.back();
+
+    if (Get.isRegistered<
+        ChatController>()) {
+      Get.delete<ChatController>();
+    }
+
+    Get.put(
+      ChatController(
+        listingId:
+            widget.property.id!,
+      ),
+    );
+
+    Get.to(
+      () => ChatStartScreen(
+        property: widget.property,
+        showPropertyCard: false,
+      ),
+    );
+  }
+
+  // ================================================
+  // SEND OFFER
+  // ================================================
+
+  void _sendOffer() {
+    final String offer =
+        offerController.text.trim();
+
+    if (offer.isEmpty) {
+      Get.snackbar(
+        "Offer Required",
+        "Please enter your offer amount.",
+        snackPosition:
+            SnackPosition.BOTTOM,
+      );
+
+      return;
+    }
+
+    final double? amount =
+        double.tryParse(offer);
+
+    if (amount == null ||
+        amount <= 0) {
+      Get.snackbar(
+        "Invalid Offer",
+        "Please enter a valid offer amount.",
+        snackPosition:
+            SnackPosition.BOTTOM,
+      );
+
+      return;
+    }
+
+    Get.back();
+
+    if (Get.isRegistered<
+        ChatController>()) {
+      Get.delete<ChatController>();
+    }
+
+    Get.put(
+      ChatController(
+        listingId:
+            widget.property.id!,
+      ),
+    );
+
+    Get.to(
+      () => ChatStartScreen(
+        property: widget.property,
+        initialMessage:
+            "I'm ready to buy this property for $currency ${offerController.text.trim()}",
+      ),
+    );
+  }
+
+  // ================================================
+  // FORMAT PRICE
+  // ================================================
+
+  String _formatPrice(
+    num? price,
+  ) {
+    if (price == null) {
+      return "0";
+    }
 
     return price
         .toStringAsFixed(0)
         .replaceAllMapped(
-          RegExp(r'\B(?=(\d{3})+(?!\d))'),
-          (match) => ",",
-        );
+      RegExp(
+        r'\B(?=(\d{3})+(?!\d))',
+      ),
+      (match) => ",",
+    );
   }
 }

@@ -5,7 +5,6 @@ import 'package:villas_qatar/Core/theme/app_textstyles.dart';
 
 import '../../../Core/constants/app_colors.dart';
 
-
 class WhyChooseCard extends StatelessWidget {
   const WhyChooseCard({super.key});
 
@@ -59,11 +58,7 @@ class WhyChooseCard extends StatelessWidget {
             ),
           ),
 
-          Icon(
-            Icons.arrow_forward_ios,
-            size: 16.sp,
-            color: AppColors.primary,
-          ),
+          Icon(Icons.arrow_forward_ios, size: 16.sp, color: AppColors.primary),
         ],
       ),
     );

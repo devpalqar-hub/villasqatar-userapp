@@ -25,10 +25,7 @@ class InvestmentBanner extends StatelessWidget {
           children: [
             /// Background Image
             Positioned.fill(
-              child: Image.asset(
-                "assets/banner_img.png",
-                fit: BoxFit.cover,
-              ),
+              child: Image.asset("assets/banner_img.png", fit: BoxFit.cover),
             ),
 
             /// Burgundy overlay (same feel as screenshot)
@@ -42,10 +39,7 @@ class InvestmentBanner extends StatelessWidget {
 
             /// Content
             Padding(
-              padding: EdgeInsets.symmetric(
-                horizontal: 22.w,
-                vertical: 22.h,
-              ),
+              padding: EdgeInsets.symmetric(horizontal: 22.w, vertical: 22.h),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -74,7 +68,7 @@ class InvestmentBanner extends StatelessWidget {
                     ),
                   ),
 
-               SizedBox(height: 12.h),
+                  SizedBox(height: 12.h),
 
                   SizedBox(
                     width: 160.w,

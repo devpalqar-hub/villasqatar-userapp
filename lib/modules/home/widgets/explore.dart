@@ -34,8 +34,6 @@ class ExploreQatarSection extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-       
-
         SizedBox(height: 18.h),
 
         ...List.generate(
@@ -67,11 +65,9 @@ class _ExploreCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-  
-
     return Container(
       height: 60.h,
-      padding: EdgeInsets.symmetric(horizontal: 18.w,vertical: 10.h),
+      padding: EdgeInsets.symmetric(horizontal: 18.w, vertical: 10.h),
       decoration: BoxDecoration(
         color: const Color(0xffFCF8F9),
         borderRadius: BorderRadius.circular(6.r),
@@ -85,11 +81,7 @@ class _ExploreCard extends StatelessWidget {
               color: Color(0xffFCECEF),
               shape: BoxShape.circle,
             ),
-            child: Icon(
-              icon,
-              color: AppColors.primary,
-              size: 18.sp,
-            ),
+            child: Icon(icon, color: AppColors.primary, size: 18.sp),
           ),
 
           SizedBox(width: 18.w),
@@ -108,8 +100,6 @@ class _ExploreCard extends StatelessWidget {
                   ),
                 ),
 
-              
-
                 Text(
                   subtitle,
                   style: TextStyle(
@@ -122,11 +112,7 @@ class _ExploreCard extends StatelessWidget {
             ),
           ),
 
-          Icon(
-            Icons.chevron_right,
-            color: AppColors.primary,
-            size: 30.sp,
-          ),
+          Icon(Icons.chevron_right, color: AppColors.primary, size: 30.sp),
         ],
       ),
     );

@@ -6,10 +6,7 @@ import 'package:villas_qatar/modules/chats/service/chat_controller.dart';
 class InputBar extends StatelessWidget {
   final ChatController controller;
 
-  const InputBar({
-    super.key,
-    required this.controller,
-  });
+  const InputBar({super.key, required this.controller});
 
   @override
   Widget build(BuildContext context) {
@@ -22,20 +19,15 @@ class InputBar extends StatelessWidget {
       ),
       color: AppColors.background,
       child: Container(
-        padding: EdgeInsets.symmetric(
-          horizontal: 8.w,
-          vertical: 6.h,
-        ),
+        padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 6.h),
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(30.r),
-          border: Border.all(
-            color: AppColors.fieldBorder,
-          ),
+          border: Border.all(color: AppColors.fieldBorder),
           boxShadow: [
             BoxShadow(
               color: Colors.black.withOpacity(.06),
-              blurRadius: 12,
+              blurRadius: 12.r,
               offset: const Offset(0, 4),
             ),
           ],
@@ -44,7 +36,7 @@ class InputBar extends StatelessWidget {
           children: [
             /// Attachment
             IconButton(
-              splashRadius: 22,
+              splashRadius: 22.r,
               icon: Icon(
                 Icons.add_circle_outline,
                 size: 22.sp,
@@ -76,7 +68,7 @@ class InputBar extends StatelessWidget {
 
             /// Emoji
             IconButton(
-              splashRadius: 22,
+              splashRadius: 22.r,
               icon: Icon(
                 Icons.emoji_emotions_outlined,
                 size: 22.sp,
@@ -94,7 +86,7 @@ class InputBar extends StatelessWidget {
                 shape: BoxShape.circle,
               ),
               child: IconButton(
-                splashRadius: 22,
+                splashRadius: 22.r,
                 icon: Icon(
                   Icons.send_rounded,
                   size: 18.sp,
@@ -120,43 +112,43 @@ class InputBar extends StatelessWidget {
       context: context,
       backgroundColor: Colors.white,
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(
-          top: Radius.circular(24.r),
-        ),
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24.r)),
       ),
       builder: (_) {
         return SafeArea(
           child: Padding(
-            padding: EdgeInsets.all(20.w),
-            child: Wrap(
-              spacing: 20.w,
-              runSpacing: 20.h,
-              children: [
-                _AttachmentItem(
-                  icon: Icons.photo,
-                  title: "Gallery",
-                  onTap: () {
-                    Navigator.pop(context);
-                    controller.pickImageFromGallery();
-                  },
-                ),
-                _AttachmentItem(
-                  icon: Icons.camera_alt,
-                  title: "Camera",
-                  onTap: () {
-                    Navigator.pop(context);
-                    controller.pickImageFromCamera();
-                  },
-                ),
-                _AttachmentItem(
-                  icon: Icons.location_on,
-                  title: "Location",
-                  onTap: () {
-                    Navigator.pop(context);
-                    controller.sendLocation();
-                  },
-                ),
-              ],
+            padding: EdgeInsets.symmetric(vertical: 20.h),
+            child: SizedBox(
+              height: 85.h,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  _AttachmentItem(
+                    icon: Icons.photo,
+                    title: "Gallery",
+                    onTap: () {
+                      Navigator.pop(context);
+                      controller.pickImageFromGallery();
+                    },
+                  ),
+                  _AttachmentItem(
+                    icon: Icons.camera_alt,
+                    title: "Camera",
+                    onTap: () {
+                      Navigator.pop(context);
+                      controller.pickImageFromCamera();
+                    },
+                  ),
+                  _AttachmentItem(
+                    icon: Icons.location_on,
+                    title: "Location",
+                    onTap: () {
+                      Navigator.pop(context);
+                      controller.sendLocation();
+                    },
+                  ),
+                ],
+              ),
             ),
           ),
         );
@@ -192,19 +184,12 @@ class _AttachmentItem extends StatelessWidget {
                 color: AppColors.primary.withOpacity(.08),
                 borderRadius: BorderRadius.circular(16.r),
               ),
-              child: Icon(
-                icon,
-                color: AppColors.primary,
-                size: 28.sp,
-              ),
+              child: Icon(icon, color: AppColors.primary, size: 28.sp),
             ),
             SizedBox(height: 8.h),
             Text(
               title,
-              style: TextStyle(
-                fontSize: 12.sp,
-                fontWeight: FontWeight.w500,
-              ),
+              style: TextStyle(fontSize: 12.sp, fontWeight: FontWeight.w500),
             ),
           ],
         ),

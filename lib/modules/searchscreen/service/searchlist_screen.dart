@@ -4,6 +4,7 @@ import 'package:villas_qatar/Core/network/api_handler.dart';
 import 'package:villas_qatar/modules/propertylist/model/myproperty_model.dart';
 
 class PropertySearchController extends GetxController {
+  
   bool isLoading = false;
   bool isLoadingMore = false;
   bool hasMore = true;
@@ -39,6 +40,7 @@ class PropertySearchController extends GetxController {
     super.onInit();
     fetchProperties();
   }
+  
 
   Future<void> fetchProperties({bool loadMore = false}) async {
     if (loadMore) {
@@ -97,7 +99,7 @@ class PropertySearchController extends GetxController {
       }
 
       final endpoint =
-          "${ApiEndpoints.mypropertyList}?${Uri(queryParameters: query).query}";
+          "${ApiEndpoints.propertyList}?${Uri(queryParameters: query).query}";
 
       final response = await ApiHandler.get(endpoint);
 
@@ -124,15 +126,34 @@ class PropertySearchController extends GetxController {
       update();
     }
   }
-
+  
+  
   Future<void> refreshProperties() async {
     await fetchProperties();
   }
 
+ 
+  
   void searchProperty(String value) {
-    search = value.trim();
-    fetchProperties();
-  }
+  search = value.trim();
+  fetchProperties();
+}
+
+bool _initialSearchApplied = false;
+
+void applyInitialSearch(String? value) {
+  if (_initialSearchApplied) return;
+
+  final query = value?.trim() ?? "";
+
+  if (query.isEmpty) return;
+
+  _initialSearchApplied = true;
+
+  search = query;
+
+  fetchProperties();
+}
 
   void applyFilters({
     String? search,

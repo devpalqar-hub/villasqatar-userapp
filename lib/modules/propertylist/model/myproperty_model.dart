@@ -14,6 +14,7 @@ class MyPropertyModel {
 
 class Property {
   final String id;
+  final String slug;
   final String propertyName;
   final String description;
   final String purpose;
@@ -58,9 +59,12 @@ class Property {
   final int totalFloors;
   final int? yearBuilt;
   final bool contactVerified;
+  final bool isWishlisted;
+  final DateTime? wishlistedAt;
 
   Property({
     required this.id,
+    required this.slug,
     required this.propertyName,
     required this.description,
     required this.purpose,
@@ -93,11 +97,14 @@ class Property {
     required this.totalFloors,
     required this.yearBuilt,
     required this.contactVerified,
+    required this.isWishlisted,
+    this.wishlistedAt,
   });
 
   factory Property.fromJson(Map<String, dynamic> json) {
     return Property(
       id: json["id"] ?? "",
+      slug:json["slug"]?? "",
       propertyName: json["propertyName"] ?? "",
       description: json["description"] ?? "",
       purpose: json["purpose"] ?? "",
@@ -130,6 +137,11 @@ class Property {
       totalFloors: json["totalFloors"] ?? 0,
       yearBuilt: json["yearBuilt"],
       contactVerified: json["contactVerified"] ?? false,
+      isWishlisted: json["isWishlisted"] ?? false,
+
+      wishlistedAt: json["wishlistedAt"] != null
+          ? DateTime.tryParse(json["wishlistedAt"].toString())
+          : null,
     );
   }
 }

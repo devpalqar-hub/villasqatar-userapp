@@ -12,8 +12,8 @@ import 'package:villas_qatar/modules/onboard/controller/auth_controller.dart';
 import 'package:villas_qatar/modules/onboard/views/complete_profile_screen.dart';
 
 class OtpScreen extends StatelessWidget {
-   OtpScreen({super.key});
- final AuthController controller = Get.put(AuthController());
+  OtpScreen({super.key});
+  final AuthController controller = Get.put(AuthController());
   Widget otpBox(bool active) {
     return Container(
       width: 45.w,
@@ -155,7 +155,9 @@ class OtpScreen extends StatelessWidget {
                           ? null
                           : () async {
                               final success = await controller.verifyOtp();
-                             debugPrint("Navigation isNewUser: ${controller.isNewUser}");
+                              debugPrint(
+                                "Navigation isNewUser: ${controller.isNewUser}",
+                              );
                               if (!success) return;
 
                               if (controller.isNewUser) {

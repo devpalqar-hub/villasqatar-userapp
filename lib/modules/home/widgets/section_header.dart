@@ -5,13 +5,16 @@ import 'package:villas_qatar/Core/theme/app_textstyles.dart';
 
 import '../../../Core/constants/app_colors.dart';
 
-
 class SectionHeader extends StatelessWidget {
   final String title;
+  final bool showSeeAll;
+  final VoidCallback? onSeeAllTap;
 
   const SectionHeader({
     super.key,
     required this.title,
+    this.showSeeAll = true,
+    this.onSeeAllTap,
   });
 
   @override
@@ -27,21 +30,27 @@ class SectionHeader extends StatelessWidget {
 
         const Spacer(),
 
-        Text(
-          'See all'.tr,
-          style: AppTextStyles.medium13.copyWith(
-            color: AppColors.primary,
-            fontSize: 11.sp,
+        if (showSeeAll)
+          InkWell(
+            onTap: onSeeAllTap,
+            child: Row(
+              children: [
+                Text(
+                  'See all'.tr,
+                  style: AppTextStyles.medium13.copyWith(
+                    color: AppColors.primary,
+                    fontSize: 11.sp,
+                  ),
+                ),
+                SizedBox(width: 4.w),
+                Icon(
+                  Icons.arrow_forward,
+                  color: AppColors.primary,
+                  size: 16.sp,
+                ),
+              ],
+            ),
           ),
-        ),
-
-        SizedBox(width: 4.w),
-
-        Icon(
-          Icons.arrow_forward,
-          color: AppColors.primary,
-          size: 16.sp,
-        ),
       ],
     );
   }
