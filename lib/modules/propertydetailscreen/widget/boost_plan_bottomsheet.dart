@@ -8,39 +8,26 @@ import 'package:villas_qatar/modules/Plans/services/plan_controller.dart';
 class BoostPlanBottomSheet extends StatefulWidget {
   final String propertyId;
 
-  const BoostPlanBottomSheet({
-    super.key,
-    required this.propertyId,
-  });
+  const BoostPlanBottomSheet({super.key, required this.propertyId});
 
   @override
-  State<BoostPlanBottomSheet> createState() =>
-      _BoostPlanBottomSheetState();
+  State<BoostPlanBottomSheet> createState() => _BoostPlanBottomSheetState();
 }
 
-class _BoostPlanBottomSheetState
-    extends State<BoostPlanBottomSheet> {
-  static const Color primaryColor =
-      Color(0xff9E123F);
+class _BoostPlanBottomSheetState extends State<BoostPlanBottomSheet> {
+  static const Color primaryColor = Color(0xff9E123F);
 
-  late final FeaturedPlanController
-      planController;
-  final TextEditingController searchController =
-    TextEditingController();
+  late final FeaturedPlanController planController;
+  final TextEditingController searchController = TextEditingController();
   String searchQuery = '';
 
   @override
   void initState() {
     super.initState();
 
-    planController =
-        Get.isRegistered<
-                FeaturedPlanController>()
-            ? Get.find<
-                FeaturedPlanController>()
-            : Get.put(
-                FeaturedPlanController(),
-              );
+    planController = Get.isRegistered<FeaturedPlanController>()
+        ? Get.find<FeaturedPlanController>()
+        : Get.put(FeaturedPlanController());
 
     // If your FeaturedPlanController already
     // fetches plans inside onInit(), this is enough.
@@ -55,460 +42,325 @@ class _BoostPlanBottomSheetState
   }
 
   @override
-void dispose() {
-  searchController.dispose();
-  super.dispose();
-}
-  
+  void dispose() {
+    searchController.dispose();
+    super.dispose();
+  }
 
-
-@override
-Widget build(BuildContext context) {
-  return Container(
-    height:
-        MediaQuery.of(context).size.height *
-            0.80,
-    decoration: BoxDecoration(
-      color: const Color(0xffFAFAFA),
-      borderRadius: BorderRadius.vertical(
-        top: Radius.circular(24.r),
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: MediaQuery.of(context).size.height * 0.80,
+      decoration: BoxDecoration(
+        color: const Color(0xffFAFAFA),
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24.r)),
       ),
-    ),
-    clipBehavior: Clip.antiAlias,
-    child: Column(
-      children: [
-        // =====================================================
-        // DRAG HANDLE
-        // =====================================================
+      clipBehavior: Clip.antiAlias,
+      child: Column(
+        children: [
+          // =====================================================
+          // DRAG HANDLE
+          // =====================================================
+          SizedBox(height: 10.h),
 
-        SizedBox(height: 10.h),
-
-        Container(
-          width: 42.w,
-          height: 4.h,
-          decoration: BoxDecoration(
-            color: const Color(0xffD5D5D5),
-            borderRadius:
-                BorderRadius.circular(20.r),
+          Container(
+            width: 42.w,
+            height: 4.h,
+            decoration: BoxDecoration(
+              color: const Color(0xffD5D5D5),
+              borderRadius: BorderRadius.circular(20.r),
+            ),
           ),
-        ),
 
-        // =====================================================
-        // HEADER
-        // =====================================================
-
-        Padding(
-          padding: EdgeInsets.fromLTRB(
-            16.w,
-            10.h,
-            10.w,
-            8.h,
-          ),
-          child: Row(
-            children: [
-              Expanded(
-                child: Text(
-                  "Boost Property",
-                  style: TextStyle(
-                    fontSize: 17.sp,
-                    fontWeight:
-                        FontWeight.w700,
-                    color:
-                        const Color(
-                          0xff1F1F1F,
-                        ),
+          // =====================================================
+          // HEADER
+          // =====================================================
+          Padding(
+            padding: EdgeInsets.fromLTRB(16.w, 10.h, 10.w, 8.h),
+            child: Row(
+              children: [
+                Expanded(
+                  child: Text(
+                    "Boost Property",
+                    style: TextStyle(
+                      fontSize: 17.sp,
+                      fontWeight: FontWeight.w700,
+                      color: const Color(0xff1F1F1F),
+                    ),
                   ),
                 ),
-              ),
 
-              IconButton(
-                onPressed: Get.back,
-                icon: Icon(
-                  Icons.close_rounded,
-                  size: 22.sp,
-                  color:
-                      const Color(
-                        0xff333333,
-                      ),
+                IconButton(
+                  onPressed: Get.back,
+                  icon: Icon(
+                    Icons.close_rounded,
+                    size: 22.sp,
+                    color: const Color(0xff333333),
+                  ),
                 ),
-              ),
-            ],
-          ),
-        ),
-
-        const Divider(
-          height: 1,
-          thickness: 1,
-          color: Color(0xffEEEEEE),
-        ),
-
-        // =====================================================
-        // FIXED CONTENT
-        // =====================================================
-
-        Expanded(
-          child: Padding(
-            padding: EdgeInsets.fromLTRB(
-              16.w,
-              16.h,
-              16.w,
-              8.h,
+              ],
             ),
-            child: Column(
-              crossAxisAlignment:
-                  CrossAxisAlignment.start,
-              children: [
-                // =============================================
-                // SECTION TITLE
-                // =============================================
+          ),
 
-                _sectionTitle(
-                  "Choose Boost Plan",
-                  subtitle:
-                      "Select how you want to promote your listing",
-                  step: "1",
-                ),
+          const Divider(height: 1, thickness: 1, color: Color(0xffEEEEEE)),
 
-                SizedBox(height: 14.h),
+          // =====================================================
+          // FIXED CONTENT
+          // =====================================================
+          Expanded(
+            child: Padding(
+              padding: EdgeInsets.fromLTRB(16.w, 16.h, 16.w, 8.h),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // =============================================
+                  // SECTION TITLE
+                  // =============================================
+                  _sectionTitle(
+                    "Choose Boost Plan",
+                    subtitle: "Select how you want to promote your listing",
+                    step: "1",
+                  ),
 
-                // =============================================
-                // SEARCH FIELD
-                // =============================================
+                  SizedBox(height: 14.h),
 
-                _buildSearchField(),
+                  // =============================================
+                  // SEARCH FIELD
+                  // =============================================
+                  _buildSearchField(),
 
-                SizedBox(height: 14.h),
+                  SizedBox(height: 14.h),
 
-                // =============================================
-                // PLAN LIST
-                // ONLY THIS AREA SCROLLS
-                // =============================================
+                  // =============================================
+                  // PLAN LIST
+                  // ONLY THIS AREA SCROLLS
+                  // =============================================
+                  SizedBox(
+                    height: 300.h,
+                    child: GetBuilder<FeaturedPlanController>(
+                      builder: (controller) {
+                        if (controller.isLoading) {
+                          return _buildLoadingBox("Loading boost plans...");
+                        }
 
-                SizedBox(
-                  height: 300.h,
-                  child: GetBuilder<
-                      FeaturedPlanController>(
-                    builder: (controller) {
-                      if (controller
-                          .isLoading) {
-                        return _buildLoadingBox(
-                          "Loading boost plans...",
-                        );
-                      }
+                        if (controller.error.isNotEmpty) {
+                          return _buildPlanError(controller);
+                        }
 
-                      if (controller
-                          .error.isNotEmpty) {
-                        return _buildPlanError(
-                          controller,
-                        );
-                      }
+                        if (controller.plans.isEmpty) {
+                          return _buildEmptyPlans();
+                        }
 
-                      if (controller
-                          .plans.isEmpty) {
-                        return _buildEmptyPlans();
-                      }
+                        // Search locally through
+                        // already loaded plans.
+                        final query = searchQuery.trim().toLowerCase();
 
-                      // Search locally through
-                      // already loaded plans.
-                      final query =
-                          searchQuery
-                              .trim()
-                              .toLowerCase();
-
-                      final filteredPlans =
-                          controller.plans.where(
-                        (plan) {
+                        final filteredPlans = controller.plans.where((plan) {
                           if (query.isEmpty) {
                             return true;
                           }
 
-                          final name =
-                              plan.name
-                                  .toLowerCase();
+                          final name = plan.name.toLowerCase();
 
-                          final location =
-                              plan.location
-                                  .toLowerCase();
+                          final location = plan.location.toLowerCase();
 
-                          final duration =
-                              plan
-                                  .formattedDuration
-                                  .toLowerCase();
+                          final duration = plan.formattedDuration.toLowerCase();
 
-                          final price =
-                              plan
-                                  .formattedPrice
-                                  .toLowerCase();
+                          final price = plan.formattedPrice.toLowerCase();
 
-                          return name.contains(
-                                query,
-                              ) ||
-                              location.contains(
-                                query,
-                              ) ||
-                              duration.contains(
-                                query,
-                              ) ||
-                              price.contains(
-                                query,
+                          return name.contains(query) ||
+                              location.contains(query) ||
+                              duration.contains(query) ||
+                              price.contains(query);
+                        }).toList();
+
+                        if (filteredPlans.isEmpty) {
+                          return _buildNoSearchResults();
+                        }
+
+                        return Scrollbar(
+                          thumbVisibility: filteredPlans.length > 3,
+                          child: ListView.separated(
+                            padding: EdgeInsets.only(right: 2.w, bottom: 4.h),
+                            physics: const BouncingScrollPhysics(),
+                            keyboardDismissBehavior:
+                                ScrollViewKeyboardDismissBehavior.onDrag,
+                            itemCount: filteredPlans.length,
+                            separatorBuilder: (_, __) => SizedBox(height: 10.h),
+                            itemBuilder: (context, index) {
+                              final plan = filteredPlans[index];
+
+                              return _buildPlanCard(
+                                plan: plan,
+                                controller: controller,
                               );
-                        },
-                      ).toList();
-
-                      if (filteredPlans
-                          .isEmpty) {
-                        return _buildNoSearchResults();
-                      }
-
-                      return Scrollbar(
-                        thumbVisibility:
-                            filteredPlans.length >
-                                3,
-                        child:
-                            ListView.separated(
-                          padding:
-                              EdgeInsets.only(
-                            right: 2.w,
-                            bottom: 4.h,
+                            },
                           ),
-                          physics:
-                              const BouncingScrollPhysics(),
-                          keyboardDismissBehavior:
-                              ScrollViewKeyboardDismissBehavior
-                                  .onDrag,
-                          itemCount:
-                              filteredPlans
-                                  .length,
-                          separatorBuilder:
-                              (_, __) =>
-                                  SizedBox(
-                            height: 10.h,
-                          ),
-                          itemBuilder:
-                              (context, index) {
-                            final plan =
-                                filteredPlans[
-                                    index];
-
-                            return _buildPlanCard(
-                              plan: plan,
-                              controller:
-                                  controller,
-                            );
-                          },
-                        ),
-                      );
-                    },
+                        );
+                      },
+                    ),
                   ),
-                ),
 
-                SizedBox(height: 6.h),
+                  SizedBox(height: 6.h),
 
-                // =============================================
-                // FIXED SECURE PAYMENT TEXT
-                // =============================================
-
-                _buildSecurePaymentInfo(),
-              ],
+                  // =============================================
+                  // FIXED SECURE PAYMENT TEXT
+                  // =============================================
+                  _buildSecurePaymentInfo(),
+                ],
+              ),
             ),
           ),
-        ),
 
-        // =====================================================
-        // FIXED BOTTOM BAR
-        // =====================================================
-
-        _buildBottomBar(),
-      ],
-    ),
-  );
-}
- 
+          // =====================================================
+          // FIXED BOTTOM BAR
+          // =====================================================
+          _buildBottomBar(),
+        ],
+      ),
+    );
+  }
 
   // ============================================================
   // SECTION HEADER
   // ============================================================
-Widget _buildSearchField() {
-  return Container(
-    height: 46.h,
-    decoration: BoxDecoration(
-      color: Colors.white,
-      borderRadius:
-          BorderRadius.circular(12.r),
-      border: Border.all(
-        color:
-            const Color(0xffE8E8E8),
-      ),
-      boxShadow: [
-        BoxShadow(
-          color: Colors.black
-              .withOpacity(.025),
-          blurRadius: 8,
-          offset:
-              const Offset(0, 2),
-        ),
-      ],
-    ),
-    child: TextField(
-      controller: searchController,
-
-      textInputAction:
-          TextInputAction.search,
-
-      style: TextStyle(
-        fontSize: 11.sp,
-        fontWeight:
-            FontWeight.w500,
-        color:
-            const Color(0xff222222),
-      ),
-
-      onChanged: (value) {
-        setState(() {
-          searchQuery = value;
-        });
-      },
-
-      decoration: InputDecoration(
-        hintText:
-            "Search boost plans",
-
-        hintStyle: TextStyle(
-          fontSize: 10.5.sp,
-          fontWeight:
-              FontWeight.w400,
-          color:
-              const Color(
-                0xff9A9A9A,
-              ),
-        ),
-
-        prefixIcon: Icon(
-          Icons.search_rounded,
-          size: 20.sp,
-          color:
-              const Color(
-                0xff777777,
-              ),
-        ),
-
-        suffixIcon:
-            searchQuery.isNotEmpty
-                ? GestureDetector(
-                    onTap: () {
-                      searchController
-                          .clear();
-
-                      setState(() {
-                        searchQuery = '';
-                      });
-                    },
-                    child: Icon(
-                      Icons
-                          .close_rounded,
-                      size: 18.sp,
-                      color:
-                          const Color(
-                            0xff777777,
-                          ),
-                    ),
-                  )
-                : null,
-
-        contentPadding:
-            EdgeInsets.symmetric(
-          vertical: 13.h,
-        ),
-
-        border:
-            InputBorder.none,
-
-        enabledBorder:
-            InputBorder.none,
-
-        focusedBorder:
-            InputBorder.none,
-      ),
-    ),
-  );
-}
-Widget _buildNoSearchResults() {
-  return Center(
-    child: Padding(
-      padding:
-          EdgeInsets.symmetric(
-        horizontal: 20.w,
-      ),
-      child: Column(
-        mainAxisSize:
-            MainAxisSize.min,
-        children: [
-          Container(
-            width: 48.w,
-            height: 48.w,
-            decoration:
-                BoxDecoration(
-              color: primaryColor
-                  .withOpacity(.06),
-              shape: BoxShape.circle,
-            ),
-            child: Icon(
-              Icons
-                  .search_off_rounded,
-              size: 23.sp,
-              color: primaryColor,
-            ),
-          ),
-
-          SizedBox(height: 10.h),
-
-          Text(
-            "No plans found",
-            style: TextStyle(
-              fontSize: 12.sp,
-              fontWeight:
-                  FontWeight.w700,
-              color:
-                  const Color(
-                    0xff222222,
-                  ),
-            ),
-          ),
-
-          SizedBox(height: 4.h),
-
-          Text(
-            "Try searching with another keyword",
-            textAlign:
-                TextAlign.center,
-            style: TextStyle(
-              fontSize: 9.5.sp,
-              color:
-                  const Color(
-                    0xff888888,
-                  ),
-            ),
+  Widget _buildSearchField() {
+    return Container(
+      height: 46.h,
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(12.r),
+        border: Border.all(color: const Color(0xffE8E8E8)),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(.025),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
           ),
         ],
       ),
-    ),
-  );
-}
+      child: TextField(
+        controller: searchController,
+
+        textInputAction: TextInputAction.search,
+
+        style: TextStyle(
+          fontSize: 11.sp,
+          fontWeight: FontWeight.w500,
+          color: const Color(0xff222222),
+        ),
+
+        onChanged: (value) {
+          setState(() {
+            searchQuery = value;
+          });
+        },
+
+        decoration: InputDecoration(
+          hintText: "Search boost plans",
+
+          hintStyle: TextStyle(
+            fontSize: 10.5.sp,
+            fontWeight: FontWeight.w400,
+            color: const Color(0xff9A9A9A),
+          ),
+
+          prefixIcon: Icon(
+            Icons.search_rounded,
+            size: 20.sp,
+            color: const Color(0xff777777),
+          ),
+
+          suffixIcon: searchQuery.isNotEmpty
+              ? GestureDetector(
+                  onTap: () {
+                    searchController.clear();
+
+                    setState(() {
+                      searchQuery = '';
+                    });
+                  },
+                  child: Icon(
+                    Icons.close_rounded,
+                    size: 18.sp,
+                    color: const Color(0xff777777),
+                  ),
+                )
+              : null,
+
+          contentPadding: EdgeInsets.symmetric(vertical: 13.h),
+
+          border: InputBorder.none,
+
+          enabledBorder: InputBorder.none,
+
+          focusedBorder: InputBorder.none,
+        ),
+      ),
+    );
+  }
+
+  Widget _buildNoSearchResults() {
+    return Center(
+      child: Padding(
+        padding: EdgeInsets.symmetric(horizontal: 20.w),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              width: 48.w,
+              height: 48.w,
+              decoration: BoxDecoration(
+                color: primaryColor.withOpacity(.06),
+                shape: BoxShape.circle,
+              ),
+              child: Icon(
+                Icons.search_off_rounded,
+                size: 23.sp,
+                color: primaryColor,
+              ),
+            ),
+
+            SizedBox(height: 10.h),
+
+            Text(
+              "No plans found",
+              style: TextStyle(
+                fontSize: 12.sp,
+                fontWeight: FontWeight.w700,
+                color: const Color(0xff222222),
+              ),
+            ),
+
+            SizedBox(height: 4.h),
+
+            Text(
+              "Try searching with another keyword",
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontSize: 9.5.sp,
+                color: const Color(0xff888888),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   Widget _sectionTitle(
     String title, {
     required String subtitle,
     required String step,
   }) {
     return Row(
-      crossAxisAlignment:
-          CrossAxisAlignment.start,
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Container(
           width: 25.w,
           height: 25.w,
           alignment: Alignment.center,
-          decoration:
-              const BoxDecoration(
+          decoration: const BoxDecoration(
             color: primaryColor,
             shape: BoxShape.circle,
           ),
@@ -517,8 +369,7 @@ Widget _buildNoSearchResults() {
             style: TextStyle(
               color: Colors.white,
               fontSize: 10.sp,
-              fontWeight:
-                  FontWeight.w700,
+              fontWeight: FontWeight.w700,
             ),
           ),
         ),
@@ -527,19 +378,14 @@ Widget _buildNoSearchResults() {
 
         Expanded(
           child: Column(
-            crossAxisAlignment:
-                CrossAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
                 title,
                 style: TextStyle(
                   fontSize: 14.sp,
-                  fontWeight:
-                      FontWeight.w700,
-                  color:
-                      const Color(
-                        0xff222222,
-                      ),
+                  fontWeight: FontWeight.w700,
+                  color: const Color(0xff222222),
                 ),
               ),
 
@@ -549,10 +395,7 @@ Widget _buildNoSearchResults() {
                 subtitle,
                 style: TextStyle(
                   fontSize: 9.5.sp,
-                  color:
-                      const Color(
-                        0xff888888,
-                      ),
+                  color: const Color(0xff888888),
                 ),
               ),
             ],
@@ -569,11 +412,9 @@ Widget _buildNoSearchResults() {
 
   Widget _buildPlanCard({
     required FeaturedPlanModel plan,
-    required FeaturedPlanController
-        controller,
+    required FeaturedPlanController controller,
   }) {
-    final bool selected =
-        controller.isPlanSelected(plan);
+    final bool selected = controller.isPlanSelected(plan);
 
     return Material(
       color: Colors.transparent,
@@ -581,27 +422,17 @@ Widget _buildNoSearchResults() {
         onTap: () {
           controller.selectPlan(plan);
         },
-        borderRadius:
-            BorderRadius.circular(14.r),
+        borderRadius: BorderRadius.circular(14.r),
         child: AnimatedContainer(
-          duration:
-              const Duration(
-                milliseconds: 180,
-              ),
+          duration: const Duration(milliseconds: 180),
           width: double.infinity,
           padding: EdgeInsets.all(12.w),
           decoration: BoxDecoration(
             color: Colors.white,
-            borderRadius:
-                BorderRadius.circular(14.r),
+            borderRadius: BorderRadius.circular(14.r),
             border: Border.all(
-              color: selected
-                  ? primaryColor
-                  : const Color(
-                      0xffEAEAEA,
-                    ),
-              width:
-                  selected ? 1.4 : 1,
+              color: selected ? primaryColor : const Color(0xffEAEAEA),
+              width: selected ? 1.4 : 1,
             ),
           ),
           child: Row(
@@ -609,14 +440,9 @@ Widget _buildNoSearchResults() {
               Container(
                 width: 42.w,
                 height: 42.w,
-                decoration:
-                    BoxDecoration(
-                  color: primaryColor
-                      .withOpacity(.07),
-                  borderRadius:
-                      BorderRadius.circular(
-                    11.r,
-                  ),
+                decoration: BoxDecoration(
+                  color: primaryColor.withOpacity(.07),
+                  borderRadius: BorderRadius.circular(11.r),
                 ),
                 child: Icon(
                   _getPlanIcon(plan),
@@ -629,9 +455,7 @@ Widget _buildNoSearchResults() {
 
               Expanded(
                 child: Column(
-                  crossAxisAlignment:
-                      CrossAxisAlignment
-                          .start,
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Row(
                       children: [
@@ -639,63 +463,32 @@ Widget _buildNoSearchResults() {
                           child: Text(
                             plan.name,
                             maxLines: 1,
-                            overflow:
-                                TextOverflow
-                                    .ellipsis,
-                            style:
-                                TextStyle(
-                              fontSize:
-                                  11.5.sp,
-                              fontWeight:
-                                  FontWeight
-                                      .w700,
-                              color:
-                                  const Color(
-                                    0xff222222,
-                                  ),
+                            overflow: TextOverflow.ellipsis,
+                            style: TextStyle(
+                              fontSize: 11.5.sp,
+                              fontWeight: FontWeight.w700,
+                              color: const Color(0xff222222),
                             ),
                           ),
                         ),
 
-                        if (plan
-                            .isHomePage)
+                        if (plan.isHomePage)
                           Container(
-                            margin:
-                                EdgeInsets.only(
-                              left: 6.w,
+                            margin: EdgeInsets.only(left: 6.w),
+                            padding: EdgeInsets.symmetric(
+                              horizontal: 6.w,
+                              vertical: 3.h,
                             ),
-                            padding:
-                                EdgeInsets
-                                    .symmetric(
-                              horizontal:
-                                  6.w,
-                              vertical:
-                                  3.h,
-                            ),
-                            decoration:
-                                BoxDecoration(
-                              color:
-                                  primaryColor
-                                      .withOpacity(
-                                .07,
-                              ),
-                              borderRadius:
-                                  BorderRadius
-                                      .circular(
-                                6.r,
-                              ),
+                            decoration: BoxDecoration(
+                              color: primaryColor.withOpacity(.07),
+                              borderRadius: BorderRadius.circular(6.r),
                             ),
                             child: Text(
                               "POPULAR",
-                              style:
-                                  TextStyle(
-                                fontSize:
-                                    6.5.sp,
-                                fontWeight:
-                                    FontWeight
-                                        .w700,
-                                color:
-                                    primaryColor,
+                              style: TextStyle(
+                                fontSize: 6.5.sp,
+                                fontWeight: FontWeight.w700,
+                                color: primaryColor,
                               ),
                             ),
                           ),
@@ -707,29 +500,18 @@ Widget _buildNoSearchResults() {
                     Row(
                       children: [
                         Icon(
-                          Icons
-                              .schedule_outlined,
+                          Icons.schedule_outlined,
                           size: 12.sp,
-                          color:
-                              const Color(
-                                0xff888888,
-                              ),
+                          color: const Color(0xff888888),
                         ),
 
-                        SizedBox(
-                          width: 4.w,
-                        ),
+                        SizedBox(width: 4.w),
 
                         Text(
-                          plan
-                              .formattedDuration,
-                          style:
-                              TextStyle(
+                          plan.formattedDuration,
+                          style: TextStyle(
                             fontSize: 9.sp,
-                            color:
-                                const Color(
-                                  0xff777777,
-                                ),
+                            color: const Color(0xff777777),
                           ),
                         ),
                       ],
@@ -741,15 +523,13 @@ Widget _buildNoSearchResults() {
               SizedBox(width: 10.w),
 
               Column(
-                crossAxisAlignment:
-                    CrossAxisAlignment.end,
+                crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
                   Text(
                     plan.formattedPrice,
                     style: TextStyle(
                       fontSize: 13.sp,
-                      fontWeight:
-                          FontWeight.w800,
+                      fontWeight: FontWeight.w800,
                       color: primaryColor,
                     ),
                   ),
@@ -759,28 +539,20 @@ Widget _buildNoSearchResults() {
                   Container(
                     width: 22.w,
                     height: 22.w,
-                    decoration:
-                        BoxDecoration(
-                      shape:
-                          BoxShape.circle,
-                      color: selected
-                          ? primaryColor
-                          : Colors.white,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: selected ? primaryColor : Colors.white,
                       border: Border.all(
                         color: selected
                             ? primaryColor
-                            : const Color(
-                                0xffCCCCCC,
-                              ),
+                            : const Color(0xffCCCCCC),
                       ),
                     ),
                     child: selected
                         ? Icon(
-                            Icons
-                                .check_rounded,
+                            Icons.check_rounded,
                             size: 13.sp,
-                            color:
-                                Colors.white,
+                            color: Colors.white,
                           )
                         : null,
                   ),
@@ -793,12 +565,8 @@ Widget _buildNoSearchResults() {
     );
   }
 
-  IconData _getPlanIcon(
-    FeaturedPlanModel plan,
-  ) {
-    if (plan.location
-            .toUpperCase() ==
-        "HOME_PAGE") {
+  IconData _getPlanIcon(FeaturedPlanModel plan) {
+    if (plan.location.toUpperCase() == "HOME_PAGE") {
       return Icons.home_rounded;
     }
 
@@ -807,12 +575,10 @@ Widget _buildNoSearchResults() {
     }
 
     if (plan.durationDays >= 7) {
-      return Icons
-          .workspace_premium_outlined;
+      return Icons.workspace_premium_outlined;
     }
 
-    return Icons
-        .rocket_launch_outlined;
+    return Icons.rocket_launch_outlined;
   }
 
   // ============================================================
@@ -821,34 +587,21 @@ Widget _buildNoSearchResults() {
 
   Widget _buildSecurePaymentInfo() {
     return Padding(
-      padding:
-          EdgeInsets.symmetric(
-        vertical: 6.h,
-      ),
+      padding: EdgeInsets.symmetric(vertical: 6.h),
       child: Row(
-        mainAxisAlignment:
-            MainAxisAlignment.center,
+        mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Icon(
             Icons.lock_outline_rounded,
             size: 13.sp,
-            color:
-                const Color(
-                  0xff777777,
-                ),
+            color: const Color(0xff777777),
           ),
 
           SizedBox(width: 5.w),
 
           Text(
             "Secure payment powered by Stripe",
-            style: TextStyle(
-              fontSize: 9.sp,
-              color:
-                  const Color(
-                    0xff777777,
-                  ),
-            ),
+            style: TextStyle(fontSize: 9.sp, color: const Color(0xff777777)),
           ),
         ],
       ),
@@ -861,33 +614,19 @@ Widget _buildNoSearchResults() {
   // ============================================================
 
   Widget _buildBottomBar() {
-    return GetBuilder<
-        FeaturedPlanController>(
+    return GetBuilder<FeaturedPlanController>(
       builder: (controller) {
-        final FeaturedPlanModel? plan =
-            controller.selectedPlan;
+        final FeaturedPlanModel? plan = controller.selectedPlan;
 
-        if (controller.isLoading ||
-            plan == null) {
+        if (controller.isLoading || plan == null) {
           return const SizedBox.shrink();
         }
 
         return Container(
-          padding: EdgeInsets.fromLTRB(
-            16.w,
-            11.h,
-            16.w,
-            10.h,
-          ),
-          decoration:
-              const BoxDecoration(
+          padding: EdgeInsets.fromLTRB(16.w, 11.h, 16.w, 10.h),
+          decoration: const BoxDecoration(
             color: Colors.white,
-            border: Border(
-              top: BorderSide(
-                color:
-                    Color(0xffEEEEEE),
-              ),
-            ),
+            border: Border(top: BorderSide(color: Color(0xffEEEEEE))),
           ),
           child: SafeArea(
             top: false,
@@ -895,52 +634,33 @@ Widget _buildNoSearchResults() {
               children: [
                 Expanded(
                   child: Column(
-                    mainAxisSize:
-                        MainAxisSize.min,
-                    crossAxisAlignment:
-                        CrossAxisAlignment
-                            .start,
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
                         "Total",
                         style: TextStyle(
                           fontSize: 9.sp,
-                          color:
-                              const Color(
-                                0xff777777,
-                              ),
+                          color: const Color(0xff777777),
                         ),
                       ),
 
-                      SizedBox(
-                        height: 2.h,
-                      ),
+                      SizedBox(height: 2.h),
 
                       Text(
-                        plan
-                            .formattedPrice,
-                        style:
-                            TextStyle(
-                          fontSize:
-                              16.sp,
-                          fontWeight:
-                              FontWeight
-                                  .w800,
-                          color:
-                              primaryColor,
+                        plan.formattedPrice,
+                        style: TextStyle(
+                          fontSize: 16.sp,
+                          fontWeight: FontWeight.w800,
+                          color: primaryColor,
                         ),
                       ),
 
                       Text(
-                        plan
-                            .formattedDuration,
-                        style:
-                            TextStyle(
+                        plan.formattedDuration,
+                        style: TextStyle(
                           fontSize: 8.sp,
-                          color:
-                              const Color(
-                                0xff888888,
-                              ),
+                          color: const Color(0xff888888),
                         ),
                       ),
                     ],
@@ -952,56 +672,32 @@ Widget _buildNoSearchResults() {
                 SizedBox(
                   height: 48.h,
                   width: 190.w,
-                  child:
-                      ElevatedButton(
+                  child: ElevatedButton(
                     onPressed: () {
-                      _continueToPayment(
-                        plan,
-                      );
+                      _continueToPayment(plan);
                     },
-                    style:
-                        ElevatedButton
-                            .styleFrom(
-                      backgroundColor:
-                          primaryColor,
-                      foregroundColor:
-                          Colors.white,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: primaryColor,
+                      foregroundColor: Colors.white,
                       elevation: 0,
-                      shape:
-                          RoundedRectangleBorder(
-                        borderRadius:
-                            BorderRadius
-                                .circular(
-                          12.r,
-                        ),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12.r),
                       ),
                     ),
                     child: Row(
-                      mainAxisAlignment:
-                          MainAxisAlignment
-                              .center,
+                      mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Text(
                           "Continue",
-                          style:
-                              TextStyle(
-                            fontSize:
-                                11.sp,
-                            fontWeight:
-                                FontWeight
-                                    .w700,
+                          style: TextStyle(
+                            fontSize: 11.sp,
+                            fontWeight: FontWeight.w700,
                           ),
                         ),
 
-                        SizedBox(
-                          width: 7.w,
-                        ),
+                        SizedBox(width: 7.w),
 
-                        Icon(
-                          Icons
-                              .arrow_forward_rounded,
-                          size: 17.sp,
-                        ),
+                        Icon(Icons.arrow_forward_rounded, size: 17.sp),
                       ],
                     ),
                   ),
@@ -1018,31 +714,21 @@ Widget _buildNoSearchResults() {
   // LOADING
   // ============================================================
 
-  Widget _buildLoadingBox(
-    String message,
-  ) {
+  Widget _buildLoadingBox(String message) {
     return Container(
       width: double.infinity,
-      padding:
-          EdgeInsets.symmetric(
-        vertical: 28.h,
-      ),
+      padding: EdgeInsets.symmetric(vertical: 28.h),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius:
-            BorderRadius.circular(14.r),
-        border: Border.all(
-          color:
-              const Color(0xffEAEAEA),
-        ),
+        borderRadius: BorderRadius.circular(14.r),
+        border: Border.all(color: const Color(0xffEAEAEA)),
       ),
       child: Column(
         children: [
           SizedBox(
             width: 22.w,
             height: 22.w,
-            child:
-                const CircularProgressIndicator(
+            child: const CircularProgressIndicator(
               strokeWidth: 2,
               color: primaryColor,
             ),
@@ -1052,13 +738,7 @@ Widget _buildNoSearchResults() {
 
           Text(
             message,
-            style: TextStyle(
-              fontSize: 10.sp,
-              color:
-                  const Color(
-                    0xff777777,
-                  ),
-            ),
+            style: TextStyle(fontSize: 10.sp, color: const Color(0xff777777)),
           ),
         ],
       ),
@@ -1069,37 +749,24 @@ Widget _buildNoSearchResults() {
   // PLAN ERROR
   // ============================================================
 
-  Widget _buildPlanError(
-    FeaturedPlanController controller,
-  ) {
+  Widget _buildPlanError(FeaturedPlanController controller) {
     return Container(
       width: double.infinity,
       padding: EdgeInsets.all(16.w),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius:
-            BorderRadius.circular(12.r),
-        border: Border.all(
-          color: Colors.grey.shade200,
-        ),
+        borderRadius: BorderRadius.circular(12.r),
+        border: Border.all(color: Colors.grey.shade200),
       ),
       child: Column(
         children: [
-          Icon(
-            Icons.error_outline_rounded,
-            color: primaryColor,
-            size: 28.sp,
-          ),
+          Icon(Icons.error_outline_rounded, color: primaryColor, size: 28.sp),
 
           SizedBox(height: 8.h),
 
           Text(
             "Unable to load boost plans",
-            style: TextStyle(
-              fontSize: 12.sp,
-              fontWeight:
-                  FontWeight.w700,
-            ),
+            style: TextStyle(fontSize: 12.sp, fontWeight: FontWeight.w700),
           ),
 
           SizedBox(height: 4.h),
@@ -1107,11 +774,7 @@ Widget _buildNoSearchResults() {
           Text(
             controller.error,
             textAlign: TextAlign.center,
-            style: TextStyle(
-              fontSize: 10.sp,
-              color:
-                  Colors.grey.shade600,
-            ),
+            style: TextStyle(fontSize: 10.sp, color: Colors.grey.shade600),
           ),
 
           SizedBox(height: 10.h),
@@ -1120,8 +783,7 @@ Widget _buildNoSearchResults() {
             onPressed: () {
               controller.retry();
             },
-            child:
-                const Text("Try Again"),
+            child: const Text("Try Again"),
           ),
         ],
       ),
@@ -1135,47 +797,28 @@ Widget _buildNoSearchResults() {
   Widget _buildEmptyPlans() {
     return Container(
       width: double.infinity,
-      padding:
-          EdgeInsets.symmetric(
-        vertical: 25.h,
-        horizontal: 16.w,
-      ),
+      padding: EdgeInsets.symmetric(vertical: 25.h, horizontal: 16.w),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius:
-            BorderRadius.circular(12.r),
-        border: Border.all(
-          color: Colors.grey.shade200,
-        ),
+        borderRadius: BorderRadius.circular(12.r),
+        border: Border.all(color: Colors.grey.shade200),
       ),
       child: Column(
         children: [
-          Icon(
-            Icons
-                .rocket_launch_outlined,
-            size: 30.sp,
-            color: Colors.grey,
-          ),
+          Icon(Icons.rocket_launch_outlined, size: 30.sp, color: Colors.grey),
 
           SizedBox(height: 8.h),
 
           Text(
             "No boost plans available",
-            style: TextStyle(
-              fontSize: 12.sp,
-              fontWeight:
-                  FontWeight.w600,
-            ),
+            style: TextStyle(fontSize: 12.sp, fontWeight: FontWeight.w600),
           ),
 
           SizedBox(height: 3.h),
 
           Text(
             "Please check again later.",
-            style: TextStyle(
-              fontSize: 10.sp,
-              color: Colors.grey,
-            ),
+            style: TextStyle(fontSize: 10.sp, color: Colors.grey),
           ),
         ],
       ),
@@ -1187,49 +830,32 @@ Widget _buildNoSearchResults() {
   // PROPERTY ID COMES DIRECTLY FROM DETAILS PAGE
   // ============================================================
 
-  void _continueToPayment(
-    FeaturedPlanModel plan,
-  ) {
-    final String listingId =
-        widget.propertyId.trim();
+  void _continueToPayment(FeaturedPlanModel plan) {
+    final String listingId = widget.propertyId.trim();
 
     if (listingId.isEmpty) {
       Get.snackbar(
         "Unable to Boost",
         "Property ID is missing.",
-        snackPosition:
-            SnackPosition.BOTTOM,
+        snackPosition: SnackPosition.BOTTOM,
       );
 
       return;
     }
 
-    final String planId =
-        plan.id;
+    final String planId = plan.id;
 
-    debugPrint(
-      "========== BOOST CHECKOUT ==========",
-    );
+    debugPrint("========== BOOST CHECKOUT ==========");
 
-    debugPrint(
-      "Listing ID: $listingId",
-    );
+    debugPrint("Listing ID: $listingId");
 
-    debugPrint(
-      "Plan ID: $planId",
-    );
+    debugPrint("Plan ID: $planId");
 
-    debugPrint(
-      "Plan Name: ${plan.name}",
-    );
+    debugPrint("Plan Name: ${plan.name}");
 
-    debugPrint(
-      "Price: ${plan.formattedPrice}",
-    );
+    debugPrint("Price: ${plan.formattedPrice}");
 
-    debugPrint(
-      "Duration: ${plan.formattedDuration}",
-    );
+    debugPrint("Duration: ${plan.formattedDuration}");
 
     // POST /api/featured/checkout
     //
@@ -1242,8 +868,7 @@ Widget _buildNoSearchResults() {
     Get.snackbar(
       "Ready for Payment",
       "${plan.name} - ${plan.formattedPrice}",
-      snackPosition:
-          SnackPosition.BOTTOM,
+      snackPosition: SnackPosition.BOTTOM,
     );
   }
 }

@@ -13,9 +13,7 @@ class OfferSuccessDialog extends StatelessWidget {
     return Dialog(
       insetPadding: EdgeInsets.symmetric(horizontal: 28.w),
       backgroundColor: Colors.white,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(24.r),
-      ),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24.r)),
       child: Padding(
         padding: EdgeInsets.all(24.w),
         child: Column(
@@ -28,11 +26,7 @@ class OfferSuccessDialog extends StatelessWidget {
                 color: Color(0xffF4FFF6),
                 shape: BoxShape.circle,
               ),
-              child: Icon(
-                Icons.check_circle,
-                color: Colors.green,
-                size: 52.sp,
-              ),
+              child: Icon(Icons.check_circle, color: Colors.green, size: 52.sp),
             ),
 
             SizedBox(height: 20.h),
@@ -74,9 +68,7 @@ class OfferSuccessDialog extends StatelessWidget {
                 },
                 child: Text(
                   "Done".tr,
-                  style: AppTextStyles.bold16.copyWith(
-                    color: Colors.white,
-                  ),
+                  style: AppTextStyles.bold16.copyWith(color: Colors.white),
                 ),
               ),
             ),

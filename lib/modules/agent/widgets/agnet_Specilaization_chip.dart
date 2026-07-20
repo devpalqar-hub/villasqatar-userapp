@@ -5,24 +5,16 @@ import 'package:villas_qatar/Core/constants/app_colors.dart';
 class AgentSpecializationChip extends StatelessWidget {
   final String title;
 
-  const AgentSpecializationChip({
-    super.key,
-    required this.title,
-  });
+  const AgentSpecializationChip({super.key, required this.title});
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: EdgeInsets.symmetric(
-        horizontal: 14.w,
-        vertical: 10.h,
-      ),
+      padding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 10.h),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(12.r),
-        border: Border.all(
-          color: AppColors.fieldBorder,
-        ),
+        border: Border.all(color: AppColors.fieldBorder),
       ),
       child: Text(
         title,

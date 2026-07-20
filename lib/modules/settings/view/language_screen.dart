@@ -7,15 +7,12 @@ class LanguageScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title:  Text("Select Language".tr),
-        centerTitle: true,
-      ),
+      appBar: AppBar(title: Text("Select Language".tr), centerTitle: true),
       body: Column(
         children: [
           ListTile(
             leading: const Icon(Icons.language),
-            title:  Text("English".tr),
+            title: Text("English".tr),
             trailing: Get.locale?.languageCode == 'en'
                 ? const Icon(Icons.check, color: Colors.blue)
                 : null,
@@ -29,7 +26,7 @@ class LanguageScreen extends StatelessWidget {
 
           ListTile(
             leading: const Icon(Icons.language),
-            title:  Text("العربية".tr),
+            title: Text("العربية".tr),
             trailing: Get.locale?.languageCode == 'ar'
                 ? const Icon(Icons.check, color: Colors.blue)
                 : null,

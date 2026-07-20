@@ -40,24 +40,24 @@ class _VisitListScreenState extends State<VisitListScreen> {
       backgroundColor: const Color(0xffF8F8F8),
       body: SafeArea(
         child: Padding(
-          padding:  EdgeInsets.symmetric(horizontal: 2.w),
+          padding: EdgeInsets.symmetric(horizontal: 2.w),
           child: Column(
             children: [
               _buildTopBar(),
-          
+
               SizedBox(height: 4.h),
-          
+
               _buildTabs(),
-          
+
               SizedBox(height: 12.h),
-          
+
               Expanded(
                 child: GetBuilder<VisitController>(
                   builder: (controller) {
                     if (selectedTab == 0) {
                       return _buildOwnerVisits(controller);
                     }
-          
+
                     return _buildVisitorVisits(controller);
                   },
                 ),

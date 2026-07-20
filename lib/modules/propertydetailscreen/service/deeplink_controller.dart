@@ -16,60 +16,30 @@ class DeepLinkController extends GetxController {
   /// FETCH PROPERTY USING SLUG
   /// GET /api/listings/slug/{slug}
   /// ============================================================
-  Future<Property?> fetchPropertyBySlug({
-    required String slug,
-  }) async {
+  Future<Property?> fetchPropertyBySlug({required String slug}) async {
     try {
       isLoading = true;
       error = '';
       property = null;
       update();
 
-      debugPrint(
-        "========== FETCH PROPERTY BY SLUG ==========",
-      );
-      debugPrint("Slug: $slug");
-
-      final response = await ApiHandler.get(
-        ApiEndpoints.propertyBySlug(slug),
-      );
-
-      debugPrint(
-        "Property By Slug Response: $response",
-      );
-
+      final response = await ApiHandler.get(ApiEndpoints.propertyBySlug(slug));
       if (response is Map<String, dynamic>) {
         property = Property.fromJson(response);
-
-        debugPrint(
-          "Property Loaded: ${property?.propertyName}",
-        );
-
         return property;
       }
 
       if (response is Map) {
-        property = Property.fromJson(
-          Map<String, dynamic>.from(response),
-        );
+        property = Property.fromJson(Map<String, dynamic>.from(response));
 
         return property;
       }
 
-      throw Exception(
-        "Invalid property response",
-      );
+      throw Exception("Invalid property response");
     } catch (e) {
-      error = e
-          .toString()
-          .replaceFirst(
-            "Exception: ",
-            "",
-          );
+      error = e.toString().replaceFirst("Exception: ", "");
 
-      debugPrint(
-        "Fetch Property By Slug Error: $e",
-      );
+      debugPrint("Fetch Property By Slug Error: $e");
 
       return null;
     } finally {

@@ -11,8 +11,7 @@ import 'package:villas_qatar/modules/onboard/views/welcome_screen.dart';
 class ApiHandler {
   ApiHandler._();
 
-  static const String baseUrl =
-      "https://apivillas.palqar.cloud";
+  static const String baseUrl = "https://apivillas.palqar.cloud";
 
   static Future<dynamic> get(
     String endpoint, {
@@ -21,29 +20,17 @@ class ApiHandler {
     try {
       final String url = "$baseUrl$endpoint";
 
-      final requestHeaders =
-          _headers(headers);
+      final requestHeaders = _headers(headers);
 
-      _printRequest(
-        method: "GET",
-        url: url,
-        headers: requestHeaders,
-      );
+      _printRequest(method: "GET", url: url, headers: requestHeaders);
 
-      final response = await http.get(
-        Uri.parse(url),
-        headers: requestHeaders,
-      );
+      final response = await http.get(Uri.parse(url), headers: requestHeaders);
 
       _printResponse(response);
 
-      return await _handleResponse(
-        response,
-      );
+      return await _handleResponse(response);
     } on SocketException {
-      throw Exception(
-        "No Internet Connection",
-      );
+      throw Exception("No Internet Connection");
     }
   }
 
@@ -59,8 +46,7 @@ class ApiHandler {
     try {
       final String url = "$baseUrl$endpoint";
 
-      final requestHeaders =
-          _headers(headers);
+      final requestHeaders = _headers(headers);
 
       _printRequest(
         method: "POST",
@@ -72,20 +58,14 @@ class ApiHandler {
       final response = await http.post(
         Uri.parse(url),
         headers: requestHeaders,
-        body: body != null
-            ? jsonEncode(body)
-            : null,
+        body: body != null ? jsonEncode(body) : null,
       );
 
       _printResponse(response);
 
-      return await _handleResponse(
-        response,
-      );
+      return await _handleResponse(response);
     } on SocketException {
-      throw Exception(
-        "No Internet Connection",
-      );
+      throw Exception("No Internet Connection");
     }
   }
 
@@ -101,8 +81,7 @@ class ApiHandler {
     try {
       final String url = "$baseUrl$endpoint";
 
-      final requestHeaders =
-          _headers(headers);
+      final requestHeaders = _headers(headers);
 
       _printRequest(
         method: "PUT",
@@ -114,20 +93,14 @@ class ApiHandler {
       final response = await http.put(
         Uri.parse(url),
         headers: requestHeaders,
-        body: body != null
-            ? jsonEncode(body)
-            : null,
+        body: body != null ? jsonEncode(body) : null,
       );
 
       _printResponse(response);
 
-      return await _handleResponse(
-        response,
-      );
+      return await _handleResponse(response);
     } on SocketException {
-      throw Exception(
-        "No Internet Connection",
-      );
+      throw Exception("No Internet Connection");
     }
   }
 
@@ -143,8 +116,7 @@ class ApiHandler {
     try {
       final String url = "$baseUrl$endpoint";
 
-      final requestHeaders =
-          _headers(headers);
+      final requestHeaders = _headers(headers);
 
       _printRequest(
         method: "PATCH",
@@ -156,20 +128,14 @@ class ApiHandler {
       final response = await http.patch(
         Uri.parse(url),
         headers: requestHeaders,
-        body: body != null
-            ? jsonEncode(body)
-            : null,
+        body: body != null ? jsonEncode(body) : null,
       );
 
       _printResponse(response);
 
-      return await _handleResponse(
-        response,
-      );
+      return await _handleResponse(response);
     } on SocketException {
-      throw Exception(
-        "No Internet Connection",
-      );
+      throw Exception("No Internet Connection");
     }
   }
 
@@ -184,14 +150,9 @@ class ApiHandler {
     try {
       final String url = "$baseUrl$endpoint";
 
-      final requestHeaders =
-          _headers(headers);
+      final requestHeaders = _headers(headers);
 
-      _printRequest(
-        method: "DELETE",
-        url: url,
-        headers: requestHeaders,
-      );
+      _printRequest(method: "DELETE", url: url, headers: requestHeaders);
 
       final response = await http.delete(
         Uri.parse(url),
@@ -200,13 +161,9 @@ class ApiHandler {
 
       _printResponse(response);
 
-      return await _handleResponse(
-        response,
-      );
+      return await _handleResponse(response);
     } on SocketException {
-      throw Exception(
-        "No Internet Connection",
-      );
+      throw Exception("No Internet Connection");
     }
   }
 
@@ -214,20 +171,14 @@ class ApiHandler {
   // HEADERS
   // ============================================================
 
-  static Map<String, String> _headers(
-    Map<String, String>? headers,
-  ) {
-    final String? token =
-        StorageService.getToken();
+  static Map<String, String> _headers(Map<String, String>? headers) {
+    final String? token = StorageService.getToken();
 
     return {
       "Content-Type": "application/json",
       "Accept": "application/json",
 
-      if (token != null &&
-          token.isNotEmpty)
-        "Authorization":
-            "Bearer $token",
+      if (token != null && token.isNotEmpty) "Authorization": "Bearer $token",
 
       ...?headers,
     };
@@ -237,16 +188,12 @@ class ApiHandler {
   // RESPONSE HANDLER
   // ============================================================
 
-  static Future<dynamic> _handleResponse(
-    http.Response response,
-  ) async {
+  static Future<dynamic> _handleResponse(http.Response response) async {
     dynamic data;
 
     if (response.body.isNotEmpty) {
       try {
-        data = jsonDecode(
-          response.body,
-        );
+        data = jsonDecode(response.body);
       } catch (_) {
         data = response.body;
       }
@@ -262,83 +209,38 @@ class ApiHandler {
         return null;
 
       case 400:
-        throw Exception(
-          _getErrorMessage(
-            data,
-            "Bad Request",
-          ),
-        );
+        throw Exception(_getErrorMessage(data, "Bad Request"));
 
       case 401:
         await StorageService.logout();
 
-        if (Get.isRegistered<
-            AuthController>()) {
-          Get.delete<AuthController>(
-            force: true,
-          );
+        if (Get.isRegistered<AuthController>()) {
+          Get.delete<AuthController>(force: true);
         }
 
-        Get.offAll(
-          () => WelcomeScreen(),
-        );
+        Get.offAll(() => WelcomeScreen());
 
-        throw Exception(
-          _getErrorMessage(
-            data,
-            "Session Expired",
-          ),
-        );
+        throw Exception(_getErrorMessage(data, "Session Expired"));
 
       case 403:
-        throw Exception(
-          _getErrorMessage(
-            data,
-            "Forbidden",
-          ),
-        );
+        throw Exception(_getErrorMessage(data, "Forbidden"));
 
       case 404:
-        throw Exception(
-          _getErrorMessage(
-            data,
-            "Not Found",
-          ),
-        );
+        throw Exception(_getErrorMessage(data, "Not Found"));
 
       case 409:
-        throw Exception(
-          _getErrorMessage(
-            data,
-            "Conflict",
-          ),
-        );
+        throw Exception(_getErrorMessage(data, "Conflict"));
 
       case 422:
-        throw Exception(
-          _getErrorMessage(
-            data,
-            "Invalid Data",
-          ),
-        );
+        throw Exception(_getErrorMessage(data, "Invalid Data"));
 
       case 500:
       case 502:
       case 503:
-        throw Exception(
-          _getErrorMessage(
-            data,
-            "Server Error",
-          ),
-        );
+        throw Exception(_getErrorMessage(data, "Server Error"));
 
       default:
-        throw Exception(
-          _getErrorMessage(
-            data,
-            "Error ${response.statusCode}",
-          ),
-        );
+        throw Exception(_getErrorMessage(data, "Error ${response.statusCode}"));
     }
   }
 
@@ -346,16 +248,11 @@ class ApiHandler {
   // ERROR MESSAGE
   // ============================================================
 
-  static String _getErrorMessage(
-    dynamic data,
-    String fallback,
-  ) {
+  static String _getErrorMessage(dynamic data, String fallback) {
     if (data is Map) {
-      final dynamic message =
-          data["message"];
+      final dynamic message = data["message"];
 
-      if (message is String &&
-          message.isNotEmpty) {
+      if (message is String && message.isNotEmpty) {
         return message;
       }
 
@@ -363,17 +260,14 @@ class ApiHandler {
         return message.join(", ");
       }
 
-      final dynamic error =
-          data["error"];
+      final dynamic error = data["error"];
 
-      if (error is String &&
-          error.isNotEmpty) {
+      if (error is String && error.isNotEmpty) {
         return error;
       }
     }
 
-    if (data is String &&
-        data.isNotEmpty) {
+    if (data is String && data.isNotEmpty) {
       return data;
     }
 
@@ -425,9 +319,7 @@ class ApiHandler {
   // RESPONSE LOG
   // ============================================================
 
-  static void _printResponse(
-    http.Response response,
-  ) {
+  static void _printResponse(http.Response response) {
     // print(
     //   "========================================",
     // );
@@ -438,10 +330,7 @@ class ApiHandler {
 
     if (response.body.isNotEmpty) {
       try {
-        final dynamic json =
-            jsonDecode(
-          response.body,
-        );
+        final dynamic json = jsonDecode(response.body);
 
         // print("RESPONSE:");
 

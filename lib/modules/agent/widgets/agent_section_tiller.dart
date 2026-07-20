@@ -5,10 +5,7 @@ import 'package:villas_qatar/Core/constants/app_colors.dart';
 class AgentSectionTitle extends StatelessWidget {
   final String title;
 
-  const AgentSectionTitle({
-    super.key,
-    required this.title,
-  });
+  const AgentSectionTitle({super.key, required this.title});
 
   @override
   Widget build(BuildContext context) {

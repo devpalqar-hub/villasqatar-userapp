@@ -12,9 +12,7 @@ class AgentReviewCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(16.r),
-        border: Border.all(
-          color: AppColors.fieldBorder,
-        ),
+        border: Border.all(color: AppColors.fieldBorder),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withOpacity(.03),
@@ -25,10 +23,8 @@ class AgentReviewCard extends StatelessWidget {
       ),
       child: Column(
         children: [
-
           Row(
             children: [
-
               CircleAvatar(
                 radius: 22.r,
                 backgroundColor: AppColors.primary.withOpacity(.1),
@@ -45,7 +41,6 @@ class AgentReviewCard extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-
                     Text(
                       "John Smith",
                       style: TextStyle(
@@ -59,11 +54,8 @@ class AgentReviewCard extends StatelessWidget {
                     Row(
                       children: List.generate(
                         5,
-                        (index) => Icon(
-                          Icons.star,
-                          size: 15.sp,
-                          color: Colors.amber,
-                        ),
+                        (index) =>
+                            Icon(Icons.star, size: 15.sp, color: Colors.amber),
                       ),
                     ),
                   ],
@@ -72,10 +64,7 @@ class AgentReviewCard extends StatelessWidget {
 
               Text(
                 "2 days ago",
-                style: TextStyle(
-                  color: Colors.grey,
-                  fontSize: 11.sp,
-                ),
+                style: TextStyle(color: Colors.grey, fontSize: 11.sp),
               ),
             ],
           ),

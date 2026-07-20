@@ -75,16 +75,14 @@ class ChatController extends GetxController {
     messages.clear();
     myUserId = StorageService.getProfile()?["id"] ?? "";
     if (initialConversationId != null) {
-    conversationId = initialConversationId!;
-  }
+      conversationId = initialConversationId!;
+    }
 
-  scrollController.addListener(() {
-    debugPrint("📜 Scroll Listener Triggered");
-    _scrollListener();
-  });
+    scrollController.addListener(() {
+      debugPrint("📜 Scroll Listener Triggered");
+      _scrollListener();
+    });
     connectSocket();
-
-    
   }
 
   ///---------------------------------------------------
@@ -127,91 +125,88 @@ class ChatController extends GetxController {
   ///---------------------------------------------------
   /// REGISTER EVENTS
   ///---------------------------------------------------
-   ///---------------------------------------------------
-/// REGISTER EVENTS
-///---------------------------------------------------
-void _registerSocketListeners() {
-  socket.onConnect((_) {
-    debugPrint("════════ SOCKET CONNECTED ════════");
-    debugPrint("Socket Connected");
-    debugPrint("══════════════════════════════════");
-  });
-
-  socket.onDisconnect((_) {
-    debugPrint("════════ SOCKET DISCONNECTED ═════");
-    debugPrint("Socket Disconnected");
-    debugPrint("══════════════════════════════════");
-
-    isConnected = false;
-    update();
-  });
-
-  socket.onConnectError((data) {
-    debugPrint("════════ CONNECT ERROR ═══════════");
-    debugPrint(data.toString());
-    debugPrint("══════════════════════════════════");
-  });
-
-  socket.onError((data) {
-    debugPrint("════════ SOCKET ERROR ════════════");
-    debugPrint(data.toString());
-    debugPrint("══════════════════════════════════");
-  });
-
-  socket.onAny((event, data) {
-    debugPrint("");
-    debugPrint("════════ SOCKET EVENT RECEIVED ════════");
-    debugPrint("EVENT : $event");
-    debugPrint("DATA  : $data");
-    debugPrint("═══════════════════════════════════════");
-  });
-
-  socket.on("connected", _onConnected);
-  socket.on("conversation_joined", _onConversationJoined);
-  socket.on("new_message", _onNewMessage);
-  socket.on("typing", _onTyping);
-  socket.on("error", _onSocketError);
-}
   ///---------------------------------------------------
-  /// CONNECTED
- void _onConnected(dynamic data) {
-  debugPrint("");
-  debugPrint("════════ CONNECTED EVENT ════════");
-  debugPrint("DATA : $data");
-  debugPrint("User : $myUserId");
-  debugPrint("Conversation : $conversationId");
-  debugPrint("═════════════════════════════════");
+  /// REGISTER EVENTS
+  ///---------------------------------------------------
+  void _registerSocketListeners() {
+    socket.onConnect((_) {
+      debugPrint("════════ SOCKET CONNECTED ════════");
+      debugPrint("Socket Connected");
+      debugPrint("══════════════════════════════════");
+    });
 
-  isConnected = true;
-  update();
+    socket.onDisconnect((_) {
+      debugPrint("════════ SOCKET DISCONNECTED ═════");
+      debugPrint("Socket Disconnected");
+      debugPrint("══════════════════════════════════");
 
-  if (conversationId.isNotEmpty) {
-    loadMessages();
+      isConnected = false;
+      update();
+    });
+
+    socket.onConnectError((data) {
+      debugPrint("════════ CONNECT ERROR ═══════════");
+      debugPrint(data.toString());
+      debugPrint("══════════════════════════════════");
+    });
+
+    socket.onError((data) {
+      debugPrint("════════ SOCKET ERROR ════════════");
+      debugPrint(data.toString());
+      debugPrint("══════════════════════════════════");
+    });
+
+    socket.onAny((event, data) {
+      debugPrint("");
+      debugPrint("════════ SOCKET EVENT RECEIVED ════════");
+      debugPrint("EVENT : $event");
+      debugPrint("DATA  : $data");
+      debugPrint("═══════════════════════════════════════");
+    });
+
+    socket.on("connected", _onConnected);
+    socket.on("conversation_joined", _onConversationJoined);
+    socket.on("new_message", _onNewMessage);
+    socket.on("typing", _onTyping);
+    socket.on("error", _onSocketError);
   }
 
-  joinConversation();
-}
+  ///---------------------------------------------------
+  /// CONNECTED
+  void _onConnected(dynamic data) {
+    debugPrint("");
+    debugPrint("════════ CONNECTED EVENT ════════");
+    debugPrint("DATA : $data");
+    debugPrint("User : $myUserId");
+    debugPrint("Conversation : $conversationId");
+    debugPrint("═════════════════════════════════");
+
+    isConnected = true;
+    update();
+
+    if (conversationId.isNotEmpty) {
+      loadMessages();
+    }
+
+    joinConversation();
+  }
 
   ///---------------------------------------------------
   /// JOIN CONVERSATION
   ///---------------------------------------------------
   void joinConversation() {
-  final payload = conversationId.isNotEmpty
-      ? {
-          "conversationId": conversationId,
-        }
-      : {
-          "listingId": listingId,
-        };
+    final payload = conversationId.isNotEmpty
+        ? {"conversationId": conversationId}
+        : {"listingId": listingId};
 
-  debugPrint("");
-  debugPrint("════════ SOCKET EMIT ════════════");
-  debugPrint("EVENT : join_conversation");
-  debugPrint("DATA  : $payload");
-  debugPrint("═════════════════════════════════");
+    debugPrint("");
+    debugPrint("════════ SOCKET EMIT ════════════");
+    debugPrint("EVENT : join_conversation");
+    debugPrint("DATA  : $payload");
+    debugPrint("═════════════════════════════════");
 
-  socket.emit("join_conversation", payload);
-}
+    socket.emit("join_conversation", payload);
+  }
 
   void setConversation(ConversationModel conversation) {
     selectedConversation = conversation;
@@ -221,134 +216,137 @@ void _registerSocketListeners() {
   ///---------------------------------------------------
   /// CONVERSATION JOINED
   ///---------------------------------------------------
-void _onConversationJoined(dynamic data) {
-  try {
-    debugPrint("");
-    debugPrint("════════ CONVERSATION JOINED ═══════");
-    debugPrint(data.toString());
+  void _onConversationJoined(dynamic data) {
+    try {
+      debugPrint("");
+      debugPrint("════════ CONVERSATION JOINED ═══════");
+      debugPrint(data.toString());
 
-    conversation = ConversationModel.fromJson(data);
+      conversation = ConversationModel.fromJson(data);
 
-    conversationId = conversation!.conversation.id;
-    messages = conversation!.messages;
+      conversationId = conversation!.conversation.id;
+      messages = conversation!.messages;
 
-    page = 1;
-    hasMore = true;
-    isLoadingMore = false;
-    isLoading = false;
+      page = 1;
+      hasMore = true;
+      isLoadingMore = false;
+      isLoading = false;
 
-    debugPrint("Conversation Id : $conversationId");
-    debugPrint("Messages Count  : ${messages.length}");
-    debugPrint("═══════════════════════════════════");
+      debugPrint("Conversation Id : $conversationId");
+      debugPrint("Messages Count  : ${messages.length}");
+      debugPrint("═══════════════════════════════════");
 
-    update();
+      update();
 
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      scrollToBottom();
-    });
-  } catch (e) {
-    debugPrint("Conversation Parse Error : $e");
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        scrollToBottom();
+      });
+    } catch (e) {
+      debugPrint("Conversation Parse Error : $e");
+    }
   }
-}
+
   ///---------------------------------------------------
   /// NEW MESSAGE
   ///---------------------------------------------------
-void _onNewMessage(dynamic data) {
-  try {
-    debugPrint("");
-    debugPrint("════════ NEW MESSAGE ═══════════");
-    debugPrint(data.toString());
+  void _onNewMessage(dynamic data) {
+    try {
+      debugPrint("");
+      debugPrint("════════ NEW MESSAGE ═══════════");
+      debugPrint(data.toString());
 
-    final message = MessageModel.fromJson(data);
+      final message = MessageModel.fromJson(data);
 
-    debugPrint("Message Id      : ${message.id}");
-    debugPrint("Conversation Id : ${message.conversationId}");
-    debugPrint("Type            : ${message.type}");
-    debugPrint("Content         : ${message.content}");
+      debugPrint("Message Id      : ${message.id}");
+      debugPrint("Conversation Id : ${message.conversationId}");
+      debugPrint("Type            : ${message.type}");
+      debugPrint("Content         : ${message.content}");
 
-    if (message.conversationId != conversationId) {
-      debugPrint("Ignored (Different Conversation)");
-      return;
+      if (message.conversationId != conversationId) {
+        debugPrint("Ignored (Different Conversation)");
+        return;
+      }
+
+      messages.add(message);
+
+      debugPrint("Total Messages : ${messages.length}");
+      debugPrint("═════════════════════════════════");
+
+      update();
+
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        scrollToBottom();
+      });
+    } catch (e) {
+      debugPrint("Message Parse Error : $e");
     }
-
-    messages.add(message);
-
-    debugPrint("Total Messages : ${messages.length}");
-    debugPrint("═════════════════════════════════");
-
-    update();
-
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      scrollToBottom();
-    });
-  } catch (e) {
-    debugPrint("Message Parse Error : $e");
   }
-}
 
   ///---------------------------------------------------
   /// TYPING
   ///---------------------------------------------------
   void _onTyping(dynamic data) {
-  try {
-    debugPrint("");
-    debugPrint("════════ TYPING EVENT ═══════════");
-    debugPrint(data.toString());
+    try {
+      debugPrint("");
+      debugPrint("════════ TYPING EVENT ═══════════");
+      debugPrint(data.toString());
 
-    if (data["conversationId"] != conversationId) return;
-    if (data["userId"] == myUserId) return;
+      if (data["conversationId"] != conversationId) return;
+      if (data["userId"] == myUserId) return;
 
-    isTyping = true;
-    update();
-
-    typingTimer?.cancel();
-
-    typingTimer = Timer(const Duration(seconds: 2), () {
-      isTyping = false;
+      isTyping = true;
       update();
-    });
 
-    debugPrint("Typing User : ${data["userId"]}");
-    debugPrint("═════════════════════════════════");
-  } catch (e) {
-    debugPrint("Typing Error : $e");
+      typingTimer?.cancel();
+
+      typingTimer = Timer(const Duration(seconds: 2), () {
+        isTyping = false;
+        update();
+      });
+
+      debugPrint("Typing User : ${data["userId"]}");
+      debugPrint("═════════════════════════════════");
+    } catch (e) {
+      debugPrint("Typing Error : $e");
+    }
   }
-}
+
   ///---------------------------------------------------
   /// SOCKET ERROR
   ///---------------------------------------------------
-void _onSocketError(dynamic data) {
-  debugPrint("");
-  debugPrint("════════ SOCKET ERROR EVENT ═══════");
-  debugPrint(data.toString());
-  debugPrint("═══════════════════════════════════");
+  void _onSocketError(dynamic data) {
+    debugPrint("");
+    debugPrint("════════ SOCKET ERROR EVENT ═══════");
+    debugPrint(data.toString());
+    debugPrint("═══════════════════════════════════");
 
-  Get.snackbar("Chat", data["message"] ?? "Something went wrong");
-}
+    Get.snackbar("Chat", data["message"] ?? "Something went wrong");
+  }
+
   ///---------------------------------------------------
   /// SCROLL
   void _scrollListener() {
-  debugPrint("════════════ SCROLL ════════════");
+    debugPrint("════════════ SCROLL ════════════");
 
-  if (!scrollController.hasClients) {
-    debugPrint("❌ No Clients");
-    return;
+    if (!scrollController.hasClients) {
+      debugPrint("❌ No Clients");
+      return;
+    }
+
+    debugPrint("Pixels      : ${scrollController.position.pixels}");
+    debugPrint("Max Scroll  : ${scrollController.position.maxScrollExtent}");
+    debugPrint("Min Scroll  : ${scrollController.position.minScrollExtent}");
+    debugPrint("Page        : $page");
+    debugPrint("Has More    : $hasMore");
+    debugPrint("LoadingMore : $isLoadingMore");
+
+    if (scrollController.position.pixels <= 120) {
+      debugPrint("🔥 TOP REACHED -> LOAD MORE");
+      loadOlderMessages();
+    }
+
+    debugPrint("═══════════════════════════════");
   }
-
-  debugPrint("Pixels      : ${scrollController.position.pixels}");
-  debugPrint("Max Scroll  : ${scrollController.position.maxScrollExtent}");
-  debugPrint("Min Scroll  : ${scrollController.position.minScrollExtent}");
-  debugPrint("Page        : $page");
-  debugPrint("Has More    : $hasMore");
-  debugPrint("LoadingMore : $isLoadingMore");
-
-  if (scrollController.position.pixels <= 120) {
-    debugPrint("🔥 TOP REACHED -> LOAD MORE");
-    loadOlderMessages();
-  }
-
-  debugPrint("═══════════════════════════════");
-}
 
   ///---------------------------------------------------
   /// PLACEHOLDERS
@@ -488,33 +486,33 @@ void _onSocketError(dynamic data) {
 
       final mimeType = lookupMimeType(image.path) ?? "image/png";
 
-debugPrint("Mime Type: $mimeType");
-debugPrint("File Exists: ${await image.exists()}");
-debugPrint("File Size: ${await image.length()}");
-debugPrint("File Name: ${image.path.split('/').last}");
+      debugPrint("Mime Type: $mimeType");
+      debugPrint("File Exists: ${await image.exists()}");
+      debugPrint("File Size: ${await image.length()}");
+      debugPrint("File Name: ${image.path.split('/').last}");
 
-request.files.add(
-  await http.MultipartFile.fromPath(
-    "file",
-    image.path,
-    filename: image.path.split('/').last,
-    contentType: MediaType.parse(mimeType),
-  ),
-);
+      request.files.add(
+        await http.MultipartFile.fromPath(
+          "file",
+          image.path,
+          filename: image.path.split('/').last,
+          contentType: MediaType.parse(mimeType),
+        ),
+      );
 
       debugPrint("=========== CHAT IMAGE UPLOAD ==========");
       debugPrint("URL : ${request.url}");
       debugPrint("FILE : ${image.path}");
       debugPrint("=========== REQUEST ==========");
-debugPrint("URL: ${request.url}");
-debugPrint("Headers: ${request.headers}");
+      debugPrint("URL: ${request.url}");
+      debugPrint("Headers: ${request.headers}");
 
-for (final file in request.files) {
-  debugPrint("Field: ${file.field}");
-  debugPrint("Filename: ${file.filename}");
-  debugPrint("Length: ${file.length}");
-  debugPrint("ContentType: ${file.contentType}");
-}
+      for (final file in request.files) {
+        debugPrint("Field: ${file.field}");
+        debugPrint("Filename: ${file.filename}");
+        debugPrint("Length: ${file.length}");
+        debugPrint("ContentType: ${file.contentType}");
+      }
       final streamedResponse = await request.send();
 
       final response = await http.Response.fromStream(streamedResponse);

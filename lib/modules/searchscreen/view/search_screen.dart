@@ -14,10 +14,7 @@ import '../../../core/theme/app_textstyles.dart';
 class SearchScreen extends StatelessWidget {
   final String? initialSearch;
 
-  SearchScreen({
-    super.key,
-    this.initialSearch,
-  });
+  SearchScreen({super.key, this.initialSearch});
 
   final PropertySearchController controller = Get.put(
     PropertySearchController(),

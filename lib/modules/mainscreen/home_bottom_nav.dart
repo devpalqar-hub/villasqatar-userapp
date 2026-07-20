@@ -14,7 +14,7 @@ class HomeBottomNav extends StatelessWidget {
     required this.currentIndex,
     required this.onChanged,
   });
-  
+
   @override
   Widget build(BuildContext context) {
     return SafeArea(
@@ -30,16 +30,8 @@ class HomeBottomNav extends StatelessWidget {
         ),
         child: Row(
           children: [
-            _navItem(
-              icon: Icons.home_rounded,
-              label: "Home".tr,
-              index: 0,
-            ),
-            _navItem(
-              icon: Icons.search,
-              label: "Search".tr,
-              index: 1,
-            ),
+            _navItem(icon: Icons.home_rounded, label: "Home".tr, index: 0),
+            _navItem(icon: Icons.search, label: "Search".tr, index: 1),
             _navItem(
               icon: Icons.favorite_border,
               label: "My Property".tr,
@@ -51,12 +43,7 @@ class HomeBottomNav extends StatelessWidget {
               index: 3,
               showBadge: true,
             ),
-            _navItem(
-              icon: Icons.person_outline,
-              label: "Profile".tr,
-              index: 4,
-            ),
-          
+            _navItem(icon: Icons.person_outline, label: "Profile".tr, index: 4),
           ],
         ),
       ),
@@ -89,11 +76,7 @@ class HomeBottomNav extends StatelessWidget {
                         : Colors.transparent,
                     shape: BoxShape.circle,
                   ),
-                  child: Icon(
-                    icon,
-                    color: Colors.white,
-                    size: 18.sp,
-                  ),
+                  child: Icon(icon, color: Colors.white, size: 18.sp),
                 ),
 
                 if (showBadge)
@@ -128,8 +111,7 @@ class HomeBottomNav extends StatelessWidget {
               style: TextStyle(
                 color: Colors.white,
                 fontSize: 10.sp,
-                fontWeight:
-                    selected ? FontWeight.w700 : FontWeight.w500,
+                fontWeight: selected ? FontWeight.w700 : FontWeight.w500,
               ),
             ),
           ],

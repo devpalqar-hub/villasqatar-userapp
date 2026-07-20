@@ -11,20 +11,14 @@ import '../../propertylist/model/myproperty_model.dart';
 class MakeOfferBottomSheet extends StatefulWidget {
   final Property property;
 
-  const MakeOfferBottomSheet({
-    super.key,
-    required this.property,
-  });
+  const MakeOfferBottomSheet({super.key, required this.property});
 
   @override
-  State<MakeOfferBottomSheet> createState() =>
-      _MakeOfferBottomSheetState();
+  State<MakeOfferBottomSheet> createState() => _MakeOfferBottomSheetState();
 }
 
-class _MakeOfferBottomSheetState
-    extends State<MakeOfferBottomSheet> {
-  late final TextEditingController
-      offerController;
+class _MakeOfferBottomSheetState extends State<MakeOfferBottomSheet> {
+  late final TextEditingController offerController;
 
   String currency = "QAR";
 
@@ -32,10 +26,8 @@ class _MakeOfferBottomSheetState
   void initState() {
     super.initState();
 
-    offerController =
-        TextEditingController(
-      text: widget.property.price
-          .toStringAsFixed(0),
+    offerController = TextEditingController(
+      text: widget.property.price.toStringAsFixed(0),
     );
   }
 
@@ -49,18 +41,11 @@ class _MakeOfferBottomSheetState
   Widget build(BuildContext context) {
     return Container(
       constraints: BoxConstraints(
-        maxHeight:
-            MediaQuery.of(context)
-                    .size
-                    .height *
-                0.65,
+        maxHeight: MediaQuery.of(context).size.height * 0.65,
       ),
       decoration: BoxDecoration(
         color: const Color(0xffFAFAFA),
-        borderRadius:
-            BorderRadius.vertical(
-          top: Radius.circular(24.r),
-        ),
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24.r)),
       ),
       clipBehavior: Clip.antiAlias,
       child: Column(
@@ -68,34 +53,22 @@ class _MakeOfferBottomSheetState
           // ==========================================
           // DRAG HANDLE
           // ==========================================
-
           SizedBox(height: 10.h),
 
           Container(
             width: 42.w,
             height: 4.h,
             decoration: BoxDecoration(
-              color:
-                  const Color(0xffD5D5D5),
-              borderRadius:
-                  BorderRadius.circular(
-                20.r,
-              ),
+              color: const Color(0xffD5D5D5),
+              borderRadius: BorderRadius.circular(20.r),
             ),
           ),
 
           // ==========================================
           // HEADER
           // ==========================================
-
           Padding(
-            padding:
-                EdgeInsets.fromLTRB(
-              16.w,
-              14.h,
-              10.w,
-              12.h,
-            ),
+            padding: EdgeInsets.fromLTRB(16.w, 14.h, 10.w, 12.h),
             child: Row(
               children: [
                 Expanded(
@@ -103,12 +76,8 @@ class _MakeOfferBottomSheetState
                     "Make an Offer",
                     style: TextStyle(
                       fontSize: 17.sp,
-                      fontWeight:
-                          FontWeight.w700,
-                      color:
-                          const Color(
-                        0xff1F1F1F,
-                      ),
+                      fontWeight: FontWeight.w700,
+                      color: const Color(0xff1F1F1F),
                     ),
                   ),
                 ),
@@ -118,48 +87,29 @@ class _MakeOfferBottomSheetState
                   icon: Icon(
                     Icons.close_rounded,
                     size: 22.sp,
-                    color:
-                        const Color(
-                      0xff333333,
-                    ),
+                    color: const Color(0xff333333),
                   ),
                 ),
               ],
             ),
           ),
 
-          const Divider(
-            height: 1,
-            thickness: 1,
-            color: Color(0xffEEEEEE),
-          ),
+          const Divider(height: 1, thickness: 1, color: Color(0xffEEEEEE)),
 
           // ==========================================
           // SCROLLABLE CONTENT
           // ==========================================
-
           Expanded(
             child: SingleChildScrollView(
-              physics:
-                  const BouncingScrollPhysics(),
-              keyboardDismissBehavior:
-                  ScrollViewKeyboardDismissBehavior
-                      .onDrag,
-              padding:
-                  EdgeInsets.fromLTRB(
-                16.w,
-                18.h,
-                16.w,
-                20.h,
-              ),
+              physics: const BouncingScrollPhysics(),
+              keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
+              padding: EdgeInsets.fromLTRB(16.w, 18.h, 16.w, 20.h),
               child: Column(
-                crossAxisAlignment:
-                    CrossAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   // ==================================
                   // SECTION 1
                   // ==================================
-
                   _sectionTitle(
                     "Property Price",
                     subtitle:
@@ -172,7 +122,6 @@ class _MakeOfferBottomSheetState
                   // ==================================
                   // LISTED PRICE CARD
                   // ==================================
-
                   _buildListedPriceCard(),
 
                   SizedBox(height: 22.h),
@@ -180,11 +129,9 @@ class _MakeOfferBottomSheetState
                   // ==================================
                   // SECTION 2
                   // ==================================
-
                   _sectionTitle(
                     "Your Offer",
-                    subtitle:
-                        "Enter the amount you would like to offer",
+                    subtitle: "Enter the amount you would like to offer",
                     step: "2",
                   ),
 
@@ -193,7 +140,6 @@ class _MakeOfferBottomSheetState
                   // ==================================
                   // OFFER FIELD
                   // ==================================
-
                   _buildOfferField(),
 
                   SizedBox(height: 16.h),
@@ -201,7 +147,6 @@ class _MakeOfferBottomSheetState
                   // ==================================
                   // INFO BOX
                   // ==================================
-
                   _buildOfferInfo(),
                 ],
               ),
@@ -211,7 +156,6 @@ class _MakeOfferBottomSheetState
           // ==========================================
           // FIXED BOTTOM BAR
           // ==========================================
-
           _buildBottomBar(),
         ],
       ),
@@ -228,15 +172,13 @@ class _MakeOfferBottomSheetState
     required String step,
   }) {
     return Row(
-      crossAxisAlignment:
-          CrossAxisAlignment.start,
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Container(
           width: 25.w,
           height: 25.w,
           alignment: Alignment.center,
-          decoration:
-              const BoxDecoration(
+          decoration: const BoxDecoration(
             color: AppColors.primary,
             shape: BoxShape.circle,
           ),
@@ -245,8 +187,7 @@ class _MakeOfferBottomSheetState
             style: TextStyle(
               color: Colors.white,
               fontSize: 10.sp,
-              fontWeight:
-                  FontWeight.w700,
+              fontWeight: FontWeight.w700,
             ),
           ),
         ),
@@ -255,19 +196,14 @@ class _MakeOfferBottomSheetState
 
         Expanded(
           child: Column(
-            crossAxisAlignment:
-                CrossAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
                 title,
                 style: TextStyle(
                   fontSize: 14.sp,
-                  fontWeight:
-                      FontWeight.w700,
-                  color:
-                      const Color(
-                    0xff222222,
-                  ),
+                  fontWeight: FontWeight.w700,
+                  color: const Color(0xff222222),
                 ),
               ),
 
@@ -277,10 +213,7 @@ class _MakeOfferBottomSheetState
                 subtitle,
                 style: TextStyle(
                   fontSize: 9.5.sp,
-                  color:
-                      const Color(
-                    0xff888888,
-                  ),
+                  color: const Color(0xff888888),
                 ),
               ),
             ],
@@ -300,21 +233,13 @@ class _MakeOfferBottomSheetState
       padding: EdgeInsets.all(14.w),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius:
-            BorderRadius.circular(14.r),
-        border: Border.all(
-          color:
-              const Color(0xffEAEAEA),
-        ),
+        borderRadius: BorderRadius.circular(14.r),
+        border: Border.all(color: const Color(0xffEAEAEA)),
         boxShadow: [
           BoxShadow(
-            color:
-                Colors.black.withOpacity(
-              .025,
-            ),
+            color: Colors.black.withOpacity(.025),
             blurRadius: 10,
-            offset:
-                const Offset(0, 3),
+            offset: const Offset(0, 3),
           ),
         ],
       ),
@@ -324,16 +249,11 @@ class _MakeOfferBottomSheetState
             width: 44.w,
             height: 44.w,
             decoration: BoxDecoration(
-              color:AppColors.primary
-                  .withOpacity(.07),
-              borderRadius:
-                  BorderRadius.circular(
-                11.r,
-              ),
+              color: AppColors.primary.withOpacity(.07),
+              borderRadius: BorderRadius.circular(11.r),
             ),
             child: Icon(
-              Icons
-                  .home_work_outlined,
+              Icons.home_work_outlined,
               color: AppColors.primary,
               size: 21.sp,
             ),
@@ -343,17 +263,13 @@ class _MakeOfferBottomSheetState
 
           Expanded(
             child: Column(
-              crossAxisAlignment:
-                  CrossAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
                   "Listed Price",
                   style: TextStyle(
                     fontSize: 9.5.sp,
-                    color:
-                        const Color(
-                      0xff777777,
-                    ),
+                    color: const Color(0xff777777),
                   ),
                 ),
 
@@ -363,8 +279,7 @@ class _MakeOfferBottomSheetState
                   "QAR ${_formatPrice(widget.property.price)}",
                   style: TextStyle(
                     fontSize: 16.sp,
-                    fontWeight:
-                        FontWeight.w800,
+                    fontWeight: FontWeight.w800,
                     color: AppColors.primary,
                   ),
                 ),
@@ -373,26 +288,17 @@ class _MakeOfferBottomSheetState
           ),
 
           Container(
-            padding:
-                EdgeInsets.symmetric(
-              horizontal: 8.w,
-              vertical: 5.h,
-            ),
+            padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 5.h),
             decoration: BoxDecoration(
-              color: AppColors.primary
-                  .withOpacity(.06),
-              borderRadius:
-                  BorderRadius.circular(
-                7.r,
-              ),
+              color: AppColors.primary.withOpacity(.06),
+              borderRadius: BorderRadius.circular(7.r),
             ),
             child: Text(
               "LISTED",
               style: TextStyle(
                 fontSize: 7.sp,
-                fontWeight:
-                    FontWeight.w700,
-                color:AppColors.primary,
+                fontWeight: FontWeight.w700,
+                color: AppColors.primary,
               ),
             ),
           ),
@@ -407,18 +313,14 @@ class _MakeOfferBottomSheetState
 
   Widget _buildOfferField() {
     return Column(
-      crossAxisAlignment:
-          CrossAxisAlignment.start,
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
           "Offer Amount",
-          style:
-              AppTextStyles.body13.copyWith(
+          style: AppTextStyles.body13.copyWith(
             fontSize: 11.sp,
-            fontWeight:
-                FontWeight.w700,
-            color:
-                const Color(0xff333333),
+            fontWeight: FontWeight.w700,
+            color: const Color(0xff333333),
           ),
         ),
 
@@ -428,58 +330,32 @@ class _MakeOfferBottomSheetState
           height: 52.h,
           decoration: BoxDecoration(
             color: Colors.white,
-            borderRadius:
-                BorderRadius.circular(
-              12.r,
-            ),
-            border: Border.all(
-              color:
-                  const Color(
-                0xffE5E5E5,
-              ),
-            ),
+            borderRadius: BorderRadius.circular(12.r),
+            border: Border.all(color: const Color(0xffE5E5E5)),
           ),
           child: Row(
             children: [
               Expanded(
                 child: TextField(
-                  controller:
-                      offerController,
-                  keyboardType:
-                      const TextInputType
-                          .numberWithOptions(
+                  controller: offerController,
+                  keyboardType: const TextInputType.numberWithOptions(
                     decimal: true,
                   ),
                   style: TextStyle(
                     fontSize: 13.sp,
-                    fontWeight:
-                        FontWeight.w700,
-                    color:
-                        const Color(
-                      0xff222222,
-                    ),
+                    fontWeight: FontWeight.w700,
+                    color: const Color(0xff222222),
                   ),
-                  decoration:
-                      InputDecoration(
-                    hintText:
-                        "Enter amount",
-                    hintStyle:
-                        TextStyle(
+                  decoration: InputDecoration(
+                    hintText: "Enter amount",
+                    hintStyle: TextStyle(
                       fontSize: 11.sp,
-                      color:
-                          const Color(
-                        0xff999999,
-                      ),
+                      color: const Color(0xff999999),
                     ),
-                    border:
-                        InputBorder.none,
-                    enabledBorder:
-                        InputBorder.none,
-                    focusedBorder:
-                        InputBorder.none,
-                    contentPadding:
-                        EdgeInsets
-                            .symmetric(
+                    border: InputBorder.none,
+                    enabledBorder: InputBorder.none,
+                    focusedBorder: InputBorder.none,
+                    contentPadding: EdgeInsets.symmetric(
                       horizontal: 14.w,
                       vertical: 15.h,
                     ),
@@ -487,62 +363,28 @@ class _MakeOfferBottomSheetState
                 ),
               ),
 
-              Container(
-                height: 30.h,
-                width: 1,
-                color:
-                    const Color(
-                  0xffE5E5E5,
-                ),
-              ),
+              Container(height: 30.h, width: 1, color: const Color(0xffE5E5E5)),
 
               Padding(
-                padding:
-                    EdgeInsets.only(
-                  left: 10.w,
-                  right: 10.w,
-                ),
-                child:
-                    DropdownButtonHideUnderline(
-                  child:
-                      DropdownButton<String>(
+                padding: EdgeInsets.only(left: 10.w, right: 10.w),
+                child: DropdownButtonHideUnderline(
+                  child: DropdownButton<String>(
                     value: currency,
-                    borderRadius:
-                        BorderRadius
-                            .circular(
-                      12.r,
-                    ),
+                    borderRadius: BorderRadius.circular(12.r),
                     icon: Icon(
-                      Icons
-                          .keyboard_arrow_down_rounded,
+                      Icons.keyboard_arrow_down_rounded,
                       size: 18.sp,
-                      color:
-                          AppColors.primary,
+                      color: AppColors.primary,
                     ),
                     style: TextStyle(
                       fontSize: 11.sp,
-                      fontWeight:
-                          FontWeight.w700,
-                      color:
-                            AppColors.primary,
-                         
+                      fontWeight: FontWeight.w700,
+                      color: AppColors.primary,
                     ),
                     items: const [
-                      DropdownMenuItem(
-                        value: "QAR",
-                        child:
-                            Text("QAR"),
-                      ),
-                      DropdownMenuItem(
-                        value: "USD",
-                        child:
-                            Text("USD"),
-                      ),
-                      DropdownMenuItem(
-                        value: "AED",
-                        child:
-                            Text("AED"),
-                      ),
+                      DropdownMenuItem(value: "QAR", child: Text("QAR")),
+                      DropdownMenuItem(value: "USD", child: Text("USD")),
+                      DropdownMenuItem(value: "AED", child: Text("AED")),
                     ],
                     onChanged: (value) {
                       if (value == null) {
@@ -570,34 +412,19 @@ class _MakeOfferBottomSheetState
   Widget _buildOfferInfo() {
     return Container(
       width: double.infinity,
-      padding:
-          EdgeInsets.symmetric(
-        horizontal: 12.w,
-        vertical: 11.h,
-      ),
+      padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 11.h),
       decoration: BoxDecoration(
-        color:
-              AppColors.primary.withOpacity(
-          .045,
-        ),
-        borderRadius:
-            BorderRadius.circular(10.r),
-        border: Border.all(
-          color:
-                AppColors.primary.withOpacity(
-            .10,
-          ),
-        ),
+        color: AppColors.primary.withOpacity(.045),
+        borderRadius: BorderRadius.circular(10.r),
+        border: Border.all(color: AppColors.primary.withOpacity(.10)),
       ),
       child: Row(
-        crossAxisAlignment:
-            CrossAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Icon(
-            Icons
-                .info_outline_rounded,
+            Icons.info_outline_rounded,
             size: 17.sp,
-            color:    AppColors.primary,
+            color: AppColors.primary,
           ),
 
           SizedBox(width: 9.w),
@@ -608,10 +435,7 @@ class _MakeOfferBottomSheetState
               style: TextStyle(
                 fontSize: 9.5.sp,
                 height: 1.45,
-                color:
-                    const Color(
-                  0xff666666,
-                ),
+                color: const Color(0xff666666),
               ),
             ),
           ),
@@ -626,21 +450,10 @@ class _MakeOfferBottomSheetState
 
   Widget _buildBottomBar() {
     return Container(
-      padding: EdgeInsets.fromLTRB(
-        16.w,
-        11.h,
-        16.w,
-        10.h,
-      ),
-      decoration:
-          const BoxDecoration(
+      padding: EdgeInsets.fromLTRB(16.w, 11.h, 16.w, 10.h),
+      decoration: const BoxDecoration(
         color: Colors.white,
-        border: Border(
-          top: BorderSide(
-            color:
-                Color(0xffEEEEEE),
-          ),
-        ),
+        border: Border(top: BorderSide(color: Color(0xffEEEEEE))),
       ),
       child: SafeArea(
         top: false,
@@ -649,58 +462,31 @@ class _MakeOfferBottomSheetState
             // ======================================
             // CHAT SELLER
             // ======================================
-
             Expanded(
               child: SizedBox(
                 height: 48.h,
-                child:
-                    OutlinedButton(
-                  onPressed:
-                      _openChat,
-                  style:
-                      OutlinedButton
-                          .styleFrom(
-                    foregroundColor:
-                           AppColors.primary,
-                    side:
-                        const BorderSide(
-                      color:
-                            AppColors.primary,
-                    ),
+                child: OutlinedButton(
+                  onPressed: _openChat,
+                  style: OutlinedButton.styleFrom(
+                    foregroundColor: AppColors.primary,
+                    side: const BorderSide(color: AppColors.primary),
                     elevation: 0,
-                    shape:
-                        RoundedRectangleBorder(
-                      borderRadius:
-                          BorderRadius
-                              .circular(
-                        12.r,
-                      ),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12.r),
                     ),
                   ),
                   child: Row(
-                    mainAxisAlignment:
-                        MainAxisAlignment
-                            .center,
+                    mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Icon(
-                        Icons
-                            .chat_bubble_outline_rounded,
-                        size: 16.sp,
-                      ),
+                      Icon(Icons.chat_bubble_outline_rounded, size: 16.sp),
 
-                      SizedBox(
-                        width: 7.w,
-                      ),
+                      SizedBox(width: 7.w),
 
                       Text(
                         "Chat Seller",
-                        style:
-                            TextStyle(
-                          fontSize:
-                              10.5.sp,
-                          fontWeight:
-                              FontWeight
-                                  .w700,
+                        style: TextStyle(
+                          fontSize: 10.5.sp,
+                          fontWeight: FontWeight.w700,
                         ),
                       ),
                     ],
@@ -714,57 +500,33 @@ class _MakeOfferBottomSheetState
             // ======================================
             // SEND OFFER
             // ======================================
-
             Expanded(
               child: SizedBox(
                 height: 48.h,
-                child:
-                    ElevatedButton(
-                  onPressed:
-                      _sendOffer,
-                  style:
-                      ElevatedButton
-                          .styleFrom(
-                    backgroundColor:
-                          AppColors.primary,
-                    foregroundColor:
-                        Colors.white,
+                child: ElevatedButton(
+                  onPressed: _sendOffer,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppColors.primary,
+                    foregroundColor: Colors.white,
                     elevation: 0,
-                    shape:
-                        RoundedRectangleBorder(
-                      borderRadius:
-                          BorderRadius
-                              .circular(
-                        12.r,
-                      ),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12.r),
                     ),
                   ),
                   child: Row(
-                    mainAxisAlignment:
-                        MainAxisAlignment
-                            .center,
+                    mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Text(
                         "Send Offer",
-                        style:
-                            TextStyle(
-                          fontSize:
-                              10.5.sp,
-                          fontWeight:
-                              FontWeight
-                                  .w700,
+                        style: TextStyle(
+                          fontSize: 10.5.sp,
+                          fontWeight: FontWeight.w700,
                         ),
                       ),
 
-                      SizedBox(
-                        width: 7.w,
-                      ),
+                      SizedBox(width: 7.w),
 
-                      Icon(
-                        Icons
-                            .send_rounded,
-                        size: 15.sp,
-                      ),
+                      Icon(Icons.send_rounded, size: 15.sp),
                     ],
                   ),
                 ),
@@ -783,23 +545,14 @@ class _MakeOfferBottomSheetState
   void _openChat() {
     Get.back();
 
-    if (Get.isRegistered<
-        ChatController>()) {
+    if (Get.isRegistered<ChatController>()) {
       Get.delete<ChatController>();
     }
 
-    Get.put(
-      ChatController(
-        listingId:
-            widget.property.id!,
-      ),
-    );
+    Get.put(ChatController(listingId: widget.property.id!));
 
     Get.to(
-      () => ChatStartScreen(
-        property: widget.property,
-        showPropertyCard: false,
-      ),
+      () => ChatStartScreen(property: widget.property, showPropertyCard: false),
     );
   }
 
@@ -808,30 +561,25 @@ class _MakeOfferBottomSheetState
   // ================================================
 
   void _sendOffer() {
-    final String offer =
-        offerController.text.trim();
+    final String offer = offerController.text.trim();
 
     if (offer.isEmpty) {
       Get.snackbar(
         "Offer Required",
         "Please enter your offer amount.",
-        snackPosition:
-            SnackPosition.BOTTOM,
+        snackPosition: SnackPosition.BOTTOM,
       );
 
       return;
     }
 
-    final double? amount =
-        double.tryParse(offer);
+    final double? amount = double.tryParse(offer);
 
-    if (amount == null ||
-        amount <= 0) {
+    if (amount == null || amount <= 0) {
       Get.snackbar(
         "Invalid Offer",
         "Please enter a valid offer amount.",
-        snackPosition:
-            SnackPosition.BOTTOM,
+        snackPosition: SnackPosition.BOTTOM,
       );
 
       return;
@@ -839,17 +587,11 @@ class _MakeOfferBottomSheetState
 
     Get.back();
 
-    if (Get.isRegistered<
-        ChatController>()) {
+    if (Get.isRegistered<ChatController>()) {
       Get.delete<ChatController>();
     }
 
-    Get.put(
-      ChatController(
-        listingId:
-            widget.property.id!,
-      ),
-    );
+    Get.put(ChatController(listingId: widget.property.id!));
 
     Get.to(
       () => ChatStartScreen(
@@ -864,20 +606,13 @@ class _MakeOfferBottomSheetState
   // FORMAT PRICE
   // ================================================
 
-  String _formatPrice(
-    num? price,
-  ) {
+  String _formatPrice(num? price) {
     if (price == null) {
       return "0";
     }
 
     return price
         .toStringAsFixed(0)
-        .replaceAllMapped(
-      RegExp(
-        r'\B(?=(\d{3})+(?!\d))',
-      ),
-      (match) => ",",
-    );
+        .replaceAllMapped(RegExp(r'\B(?=(\d{3})+(?!\d))'), (match) => ",");
   }
 }

@@ -486,29 +486,20 @@ void _showScheduleVisitSheet(
     },
   );
 }
-void showMakeOfferBottomSheet(
-  BuildContext context,
-  Property property,
-) {
+
+void showMakeOfferBottomSheet(BuildContext context, Property property) {
   showModalBottomSheet(
     context: context,
     isScrollControlled: true,
     useSafeArea: true,
-    backgroundColor:
-        Colors.transparent,
-    barrierColor:
-        Colors.black.withOpacity(.35),
+    backgroundColor: Colors.transparent,
+    barrierColor: Colors.black.withOpacity(.35),
     builder: (_) {
       return Padding(
         padding: EdgeInsets.only(
-          bottom:
-              MediaQuery.of(context)
-                  .viewInsets
-                  .bottom,
+          bottom: MediaQuery.of(context).viewInsets.bottom,
         ),
-        child: MakeOfferBottomSheet(
-          property: property,
-        ),
+        child: MakeOfferBottomSheet(property: property),
       );
     },
   );

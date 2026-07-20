@@ -33,9 +33,7 @@ class OfferInputField extends StatelessWidget {
       children: [
         Text(
           label,
-          style: AppTextStyles.medium14.copyWith(
-            fontWeight: FontWeight.w600,
-          ),
+          style: AppTextStyles.medium14.copyWith(fontWeight: FontWeight.w600),
         ),
 
         SizedBox(height: 8.h),
@@ -60,21 +58,15 @@ class OfferInputField extends StatelessWidget {
             ),
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(14.r),
-              borderSide: BorderSide(
-                color: Colors.grey.shade300,
-              ),
+              borderSide: BorderSide(color: Colors.grey.shade300),
             ),
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(14.r),
-              borderSide: BorderSide(
-                color: Colors.grey.shade300,
-              ),
+              borderSide: BorderSide(color: Colors.grey.shade300),
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(14.r),
-              borderSide: const BorderSide(
-                color: AppColors.primary,
-              ),
+              borderSide: const BorderSide(color: AppColors.primary),
             ),
           ),
         ),

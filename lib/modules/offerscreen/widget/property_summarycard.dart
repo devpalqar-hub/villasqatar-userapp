@@ -8,27 +8,18 @@ import 'package:villas_qatar/modules/propertylist/model/myproperty_model.dart';
 class PropertySummaryCard extends StatelessWidget {
   final Property property;
 
-  const PropertySummaryCard({
-    super.key,
-    required this.property,
-  });
+  const PropertySummaryCard({super.key, required this.property});
 
   @override
   Widget build(BuildContext context) {
-    final image =
-        property.photos.isNotEmpty ? property.photos.first.url : "";
+    final image = property.photos.isNotEmpty ? property.photos.first.url : "";
 
     return Container(
-      padding: EdgeInsets.symmetric(
-        horizontal: 16.w,
-        vertical: 10.h,
-      ),
+      padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 10.h),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(18.r),
-        border: Border.all(
-          color: const Color(0xffECECEC),
-        ),
+        border: Border.all(color: const Color(0xffECECEC)),
       ),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -114,10 +105,7 @@ class PropertySummaryCard extends StatelessWidget {
 
                 Row(
                   children: [
-                    _feature(
-                      Icons.bed_outlined,
-                      property.bedrooms.toString(),
-                    ),
+                    _feature(Icons.bed_outlined, property.bedrooms.toString()),
 
                     SizedBox(width: 14.w),
 
@@ -145,11 +133,7 @@ class PropertySummaryCard extends StatelessWidget {
   Widget _feature(IconData icon, String value) {
     return Row(
       children: [
-        Icon(
-          icon,
-          size: 15.sp,
-          color: Colors.grey.shade600,
-        ),
+        Icon(icon, size: 15.sp, color: Colors.grey.shade600),
         SizedBox(width: 4.w),
         Text(
           value,

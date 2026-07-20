@@ -27,10 +27,7 @@ class _WishlistScreenState extends State<WishlistScreen> {
 
     wishlistController = Get.isRegistered<WishlistController>()
         ? Get.find<WishlistController>()
-        : Get.put(
-            WishlistController(),
-            permanent: true,
-          );
+        : Get.put(WishlistController(), permanent: true);
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
       wishlistController.fetchWishlist();
@@ -46,8 +43,7 @@ class _WishlistScreenState extends State<WishlistScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xffFAFAFA),
-
+      //backgroundColor: const Color(0xffFAFAFA),
       appBar: AppBar(
         backgroundColor: Colors.white,
         elevation: 0,
@@ -74,28 +70,22 @@ class _WishlistScreenState extends State<WishlistScreen> {
 
       body: GetBuilder<WishlistController>(
         builder: (controller) {
-          if (controller.isLoading &&
-              controller.wishlistProperties.isEmpty) {
+          if (controller.isLoading && controller.wishlistProperties.isEmpty) {
             return const Center(
-              child: CircularProgressIndicator(
-                color: AppColors.primary,
-              ),
+              child: CircularProgressIndicator(color: AppColors.primary),
             );
           }
 
-          final filteredProperties =
-              controller.wishlistProperties.where((property) {
+          final filteredProperties = controller.wishlistProperties.where((
+            property,
+          ) {
             if (searchQuery.isEmpty) return true;
 
             final query = searchQuery.toLowerCase();
 
-            return property.propertyName
-                    .toLowerCase()
-                    .contains(query) ||
+            return property.propertyName.toLowerCase().contains(query) ||
                 property.areaName.toLowerCase().contains(query) ||
-                property.municipality
-                    .toLowerCase()
-                    .contains(query);
+                property.municipality.toLowerCase().contains(query);
           }).toList();
 
           return RefreshIndicator(
@@ -103,12 +93,7 @@ class _WishlistScreenState extends State<WishlistScreen> {
             onRefresh: controller.refreshWishlist,
             child: ListView(
               physics: const AlwaysScrollableScrollPhysics(),
-              padding: EdgeInsets.fromLTRB(
-                16.w,
-                16.h,
-                16.w,
-                30.h,
-              ),
+              padding: EdgeInsets.fromLTRB(16.w, 16.h, 16.w, 30.h),
               children: [
                 // SEARCH
                 _buildSearchField(),
@@ -120,17 +105,14 @@ class _WishlistScreenState extends State<WishlistScreen> {
                   children: [
                     Expanded(
                       child: Column(
-                        crossAxisAlignment:
-                            CrossAxisAlignment.start,
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
                             "Saved Properties".tr,
-                            style:
-                                AppTextStyles.title16.copyWith(
+                            style: AppTextStyles.title16.copyWith(
                               fontSize: 15.sp,
                               fontWeight: FontWeight.w700,
-                              color:
-                                  const Color(0xff202124),
+                              color: const Color(0xff202124),
                             ),
                           ),
 
@@ -141,8 +123,7 @@ class _WishlistScreenState extends State<WishlistScreen> {
                             style: TextStyle(
                               fontSize: 10.5.sp,
                               fontWeight: FontWeight.w400,
-                              color:
-                                  const Color(0xff8A8A8A),
+                              color: const Color(0xff8A8A8A),
                             ),
                           ),
                         ],
@@ -159,9 +140,7 @@ class _WishlistScreenState extends State<WishlistScreen> {
                   _buildNoSearchResults()
                 else
                   ...filteredProperties.map(
-                    (property) => WishlistPropertyCard(
-                      property: property,
-                    ),
+                    (property) => WishlistPropertyCard(property: property),
                   ),
               ],
             ),
@@ -177,9 +156,7 @@ class _WishlistScreenState extends State<WishlistScreen> {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(10.r),
-        border: Border.all(
-          color: const Color(0xffEEEEEE),
-        ),
+        border: Border.all(color: const Color(0xffEEEEEE)),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withOpacity(.025),
@@ -195,25 +172,17 @@ class _WishlistScreenState extends State<WishlistScreen> {
             searchQuery = value.trim();
           });
         },
-        style: TextStyle(
-          fontSize: 12.sp,
-          color: const Color(0xff333333),
-        ),
+        style: TextStyle(fontSize: 12.sp, color: const Color(0xff333333)),
         decoration: InputDecoration(
           border: InputBorder.none,
-          contentPadding: EdgeInsets.symmetric(
-            vertical: 13.h,
-          ),
+          contentPadding: EdgeInsets.symmetric(vertical: 13.h),
           prefixIcon: Icon(
             Icons.search_rounded,
             size: 20.sp,
             color: const Color(0xff8A8A8A),
           ),
           hintText: "Search saved properties".tr,
-          hintStyle: TextStyle(
-            fontSize: 11.sp,
-            color: const Color(0xff9A9A9A),
-          ),
+          hintStyle: TextStyle(fontSize: 11.sp, color: const Color(0xff9A9A9A)),
 
           suffixIcon: searchQuery.isNotEmpty
               ? GestureDetector(
@@ -268,13 +237,9 @@ class _WishlistScreenState extends State<WishlistScreen> {
           SizedBox(height: 6.h),
 
           Text(
-            "Save properties you love and find them easily here."
-                .tr,
+            "Save properties you love and find them easily here.".tr,
             textAlign: TextAlign.center,
-            style: TextStyle(
-              fontSize: 11.sp,
-              color: const Color(0xff888888),
-            ),
+            style: TextStyle(fontSize: 11.sp, color: const Color(0xff888888)),
           ),
         ],
       ),

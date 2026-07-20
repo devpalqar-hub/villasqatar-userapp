@@ -9,16 +9,9 @@ class MakeOfferController extends GetxController {
   final messageController = TextEditingController();
   final closingDateController = TextEditingController();
 
-  final currencies = [
-    "QAR",
-    "USD",
-    "AED",
-  ];
+  final currencies = ["QAR", "USD", "AED"];
 
-  final financingTypes = [
-    "Cash",
-    "Mortgage",
-  ];
+  final financingTypes = ["Cash", "Mortgage"];
 
   String selectedCurrency = "QAR";
   String selectedFinancing = "Cash";

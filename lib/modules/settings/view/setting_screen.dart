@@ -6,7 +6,7 @@ import 'package:get/get_utils/src/extensions/internacionalization.dart';
 import 'package:villas_qatar/Core/constants/app_colors.dart';
 import 'package:villas_qatar/Core/services/storage_service.dart';
 import 'package:villas_qatar/modules/onboard/controller/auth_controller.dart';
-import 'package:villas_qatar/modules/onboard/views/auth_screen.dart';
+import 'package:villas_qatar/modules/onboard/views/splash_screen.dart';
 import 'package:villas_qatar/modules/onboard/views/welcome_screen.dart';
 import 'package:villas_qatar/modules/settings/view/language_screen.dart';
 

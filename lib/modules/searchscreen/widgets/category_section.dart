@@ -5,48 +5,27 @@ import 'package:villas_qatar/Core/constants/app_colors.dart';
 import 'package:villas_qatar/Core/theme/app_textstyles.dart';
 import 'package:villas_qatar/modules/searchscreen/service/searchlist_screen.dart';
 
-
 class PropertyCategorySection extends StatelessWidget {
-  PropertyCategorySection({super.key,required this.controller,});
+  PropertyCategorySection({super.key, required this.controller});
 
- final PropertySearchController controller;
+  final PropertySearchController controller;
 
   final List<Map<String, dynamic>> categories = [
-    {
-      "title": "Villa",
-      "type": "VILLA",
-      "icon": Icons.home_outlined,
-    },
+    {"title": "Villa", "type": "VILLA", "icon": Icons.home_outlined},
     {
       "title": "Apartment",
       "type": "APARTMENT",
       "icon": Icons.apartment_outlined,
     },
-    {
-      "title": "Townhouse",
-      "type": "TOWNHOUSE",
-      "icon": Icons.house_outlined,
-    },
-    {
-      "title": "Penthouse",
-      "type": "PENTHOUSE",
-      "icon": Icons.apartment,
-    },
-    {
-      "title": "Studio",
-      "type": "STUDIO",
-      "icon": Icons.king_bed_outlined,
-    },
+    {"title": "Townhouse", "type": "TOWNHOUSE", "icon": Icons.house_outlined},
+    {"title": "Penthouse", "type": "PENTHOUSE", "icon": Icons.apartment},
+    {"title": "Studio", "type": "STUDIO", "icon": Icons.king_bed_outlined},
     {
       "title": "Commercial",
       "type": "COMMERCIAL",
       "icon": Icons.storefront_outlined,
     },
-    {
-      "title": "Land",
-      "type": "LAND",
-      "icon": Icons.landscape_outlined,
-    },
+    {"title": "Land", "type": "LAND", "icon": Icons.landscape_outlined},
   ];
 
   @override
@@ -73,17 +52,14 @@ class PropertyCategorySection extends StatelessWidget {
                 itemBuilder: (_, index) {
                   final item = categories[index];
 
-                  final bool selected =
-                      controller.type == item["type"];
+                  final bool selected = controller.type == item["type"];
 
                   return CategoryChip(
                     title: item["title"],
                     icon: item["icon"],
                     selected: selected,
                     onTap: () {
-                      controller.applyFilters(
-                        type: item["type"],
-                      );
+                      controller.applyFilters(type: item["type"]);
                     },
                   );
                 },
@@ -95,6 +71,7 @@ class PropertyCategorySection extends StatelessWidget {
     );
   }
 }
+
 class CategoryChip extends StatelessWidget {
   final String title;
   final IconData icon;
@@ -122,9 +99,7 @@ class CategoryChip extends StatelessWidget {
               width: 62.w,
               height: 62.w,
               decoration: BoxDecoration(
-                color: selected
-                    ? AppColors.primary
-                    : Colors.white,
+                color: selected ? AppColors.primary : Colors.white,
                 shape: BoxShape.circle,
                 boxShadow: [
                   BoxShadow(
@@ -138,9 +113,7 @@ class CategoryChip extends StatelessWidget {
               child: Icon(
                 icon,
                 size: 28.sp,
-                color: selected
-                    ? Colors.white
-                    : AppColors.primary,
+                color: selected ? Colors.white : AppColors.primary,
               ),
             ),
 
@@ -149,12 +122,8 @@ class CategoryChip extends StatelessWidget {
             Text(
               title.tr,
               style: AppTextStyles.body13.copyWith(
-                fontWeight: selected
-                    ? FontWeight.w700
-                    : FontWeight.w500,
-                color: selected
-                    ? AppColors.primary
-                    : Colors.black,
+                fontWeight: selected ? FontWeight.w700 : FontWeight.w500,
+                color: selected ? AppColors.primary : Colors.black,
               ),
             ),
           ],

@@ -487,7 +487,6 @@ class _HomeScreenState extends State<HomeScreen> {
                     bathrooms: property.bathrooms,
 
                     area: property.area,
-                   
                   );
                 },
               ),

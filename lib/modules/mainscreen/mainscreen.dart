@@ -18,11 +18,14 @@ class MainScreen extends StatefulWidget {
   final String? initialPurpose;
   final String? initialCategory;
 
-
-  const MainScreen({super.key, this.initialIndex = 0,this.initialSearch,
+  const MainScreen({
+    super.key,
+    this.initialIndex = 0,
+    this.initialSearch,
     this.initialType,
     this.initialPurpose,
-    this.initialCategory,});
+    this.initialCategory,
+  });
 
   @override
   State<MainScreen> createState() => _MainScreenState();

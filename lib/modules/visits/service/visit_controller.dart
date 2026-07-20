@@ -91,16 +91,10 @@ class VisitController extends GetxController {
     try {
       isAccepting = true;
       update();
-
-      debugPrint("========== ACCEPT VISIT ==========");
-      debugPrint("Visit ID: $visitId");
-
-      final response = await ApiHandler.patch(ApiEndpoints.acceptVisit(visitId),
-       body: {}, );
-
-      debugPrint("Accept Visit Response: $response");
-
-      // Refresh owner visits after accepting
+      final response = await ApiHandler.patch(
+        ApiEndpoints.acceptVisit(visitId),
+        body: {},
+      );
       await fetchOwnerVisits(showLoading: false);
 
       Get.snackbar(
@@ -125,11 +119,6 @@ class VisitController extends GetxController {
       update();
     }
   }
-
-  // =========================================================
-  // GET VISITS AS OWNER
-  // GET /api/visits/as-owner
-  // =========================================================
 
   Future<void> fetchOwnerVisits({bool showLoading = true}) async {
     try {

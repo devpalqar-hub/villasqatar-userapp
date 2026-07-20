@@ -4,7 +4,7 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:villas_qatar/Core/services/storage_service.dart';
-import 'package:villas_qatar/modules/onboard/views/auth_screen.dart';
+import 'package:villas_qatar/modules/onboard/views/splash_screen.dart';
 
 // ADD YOUR DEEP LINK SERVICE IMPORT
 import 'package:villas_qatar/Core/services/deep_link_service.dart';

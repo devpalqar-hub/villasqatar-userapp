@@ -13,7 +13,6 @@ import 'package:villas_qatar/Core/widgets/primary_button.dart';
 import 'package:villas_qatar/modules/mainscreen/mainscreen.dart';
 import 'package:villas_qatar/modules/propertylist/service/listproperty_controller.dart';
 
-
 class ListYourPropertyScreen extends StatefulWidget {
   const ListYourPropertyScreen({super.key});
 
@@ -22,10 +21,9 @@ class ListYourPropertyScreen extends StatefulWidget {
 }
 
 class _ListYourPropertyScreenState extends State<ListYourPropertyScreen> {
- 
   final ListPropertyController controller = Get.put(ListPropertyController());
   final ImagePicker _picker = ImagePicker();
-  
+
   final descriptionCtrl = TextEditingController();
   String currency = 'QAR';
 
@@ -65,12 +63,12 @@ class _ListYourPropertyScreenState extends State<ListYourPropertyScreen> {
 
   @override
   void _goNext() {
-  controller.nextStep();
-}
+    controller.nextStep();
+  }
 
   void _goBack() {
-  controller.previousStep();
-}
+    controller.previousStep();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -128,9 +126,6 @@ class _ListYourPropertyScreenState extends State<ListYourPropertyScreen> {
     );
   }
 
-  // ---------------------------------------------------------
-  // TOP BAR
-  // ---------------------------------------------------------
   Widget _buildTopBar() {
     return Padding(
       padding: const EdgeInsets.fromLTRB(12, 8, 16, 8),
@@ -182,7 +177,7 @@ class _ListYourPropertyScreenState extends State<ListYourPropertyScreen> {
         children: List.generate(stepLabels.length * 2 - 1, (index) {
           if (index.isOdd) {
             final leftStep = (index ~/ 2) + 1;
-           final isCompleted = leftStep < controller.currentStep + 1;
+            final isCompleted = leftStep < controller.currentStep + 1;
             return Expanded(
               child: Container(
                 height: 2,
@@ -195,7 +190,7 @@ class _ListYourPropertyScreenState extends State<ListYourPropertyScreen> {
           return _StepCircle(
             number: stepNumber,
             label: stepLabels[stepNumber - 1],
-           state: stepNumber < controller.currentStep + 1
+            state: stepNumber < controller.currentStep + 1
                 ? _StepState.completed
                 : stepNumber == controller.currentStep + 1
                 ? _StepState.active
@@ -223,7 +218,7 @@ class _ListYourPropertyScreenState extends State<ListYourPropertyScreen> {
   }
 
   Widget _stepContent() {
-  switch (controller.currentStep + 1) {
+    switch (controller.currentStep + 1) {
       case 1:
         return _buildStep1(key: const ValueKey('step1'));
       case 2:
@@ -265,83 +260,76 @@ class _ListYourPropertyScreenState extends State<ListYourPropertyScreen> {
         ),
 
         const SizedBox(height: 18),
-            _fieldLabel('Contact Number', required: true),
-const SizedBox(height: 8),
+        _fieldLabel('Contact Number', required: true),
+        const SizedBox(height: 8),
 
-Row(
-  children: [
-    _CountryCodeDropdown(
-      value: controller.countryCode,
-      onChanged: controller.setCountryCode,
-    ),
-    const SizedBox(width: 10),
-    Expanded(
-      child: _AppTextField(
-        controller: controller.phoneController,
-        hint: 'Enter mobile number',
-        keyboardType: TextInputType.phone,
-        enabled: !controller.whatsappVerified,
-      ),
-    ),
+        Row(
+          children: [
+            _CountryCodeDropdown(
+              value: controller.countryCode,
+              onChanged: controller.setCountryCode,
+            ),
+            const SizedBox(width: 10),
+            Expanded(
+              child: _AppTextField(
+                controller: controller.phoneController,
+                hint: 'Enter mobile number',
+                keyboardType: TextInputType.phone,
+                enabled: !controller.whatsappVerified,
+              ),
+            ),
 
-    if (controller.whatsappVerified) ...[
-      const SizedBox(width: 10),
-      const Icon(
-        Icons.verified,
-        color: Colors.green,
-        size: 22,
-      ),
-    ],
-  ],
-),
-if (!controller.whatsappVerified && !controller.showOtpField) ...[
-  const SizedBox(height: 12),
+            if (controller.whatsappVerified) ...[
+              const SizedBox(width: 10),
+              const Icon(Icons.verified, color: Colors.green, size: 22),
+            ],
+          ],
+        ),
+        if (!controller.whatsappVerified && !controller.showOtpField) ...[
+          const SizedBox(height: 12),
 
-  SizedBox(
-    width: double.infinity,
-    child: PrimaryButton(
-      title: "Send OTP",
-      onTap: controller.sendOtp,
-    ),
-  ),
-],
-if (controller.showOtpField && !controller.whatsappVerified) ...[
-  const SizedBox(height: 18),
+          SizedBox(
+            width: double.infinity,
+            child: PrimaryButton(title: "Send OTP", onTap: controller.sendOtp),
+          ),
+        ],
+        if (controller.showOtpField && !controller.whatsappVerified) ...[
+          const SizedBox(height: 18),
 
-  _fieldLabel("Verification Code", required: true),
+          _fieldLabel("Verification Code", required: true),
 
-  const SizedBox(height: 8),
+          const SizedBox(height: 8),
 
-  _AppTextField(
-    controller: controller.otpController,
-    hint: "Enter 6-digit OTP",
-    keyboardType: TextInputType.number,
-    prefixIcon: Icons.lock_outline,
-  ),
+          _AppTextField(
+            controller: controller.otpController,
+            hint: "Enter 6-digit OTP",
+            keyboardType: TextInputType.number,
+            prefixIcon: Icons.lock_outline,
+          ),
 
-  const SizedBox(height: 12),
+          const SizedBox(height: 12),
 
-  SizedBox(
-    width: double.infinity,
-    child: PrimaryButton(
-      title: "Verify OTP",
-      onTap: controller.verifyOtp,
-    ),
-  ),
+          SizedBox(
+            width: double.infinity,
+            child: PrimaryButton(
+              title: "Verify OTP",
+              onTap: controller.verifyOtp,
+            ),
+          ),
 
-  Align(
-    alignment: Alignment.centerRight,
-    child: TextButton(
-      onPressed: controller.sendOtp,
-      child: const Text("Resend OTP"),
-    ),
-  ),
-],
+          Align(
+            alignment: Alignment.centerRight,
+            child: TextButton(
+              onPressed: controller.sendOtp,
+              child: const Text("Resend OTP"),
+            ),
+          ),
+        ],
 
-const SizedBox(height: 18),
+        const SizedBox(height: 18),
 
-_fieldLabel('Email Address'),
-const SizedBox(height: 8),
+        _fieldLabel('Email Address'),
+        const SizedBox(height: 8),
 
         _AppTextField(
           controller: controller.emailController,
@@ -418,8 +406,6 @@ const SizedBox(height: 8),
       ),
     );
   }
-
-  
 
   // ---------------------------------------------------------
   // STEP 2 — PROPERTY DETAILS
@@ -687,206 +673,184 @@ const SizedBox(height: 8),
   // ---------------------------------------------------------
   // STEP 3 — FEATURES & AMENITIES
   // ---------------------------------------------------------
- Widget _buildStep3({Key? key}) {
-  return Column(
-    key: key,
-    crossAxisAlignment: CrossAxisAlignment.start,
-    children: [
-      _sectionHeader(
-        icon: Icons.widgets_outlined,
-        title: "Features & Amenities",
-        subtitle: "Select the amenities and nearby facilities",
-      ),
+  Widget _buildStep3({Key? key}) {
+    return Column(
+      key: key,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        _sectionHeader(
+          icon: Icons.widgets_outlined,
+          title: "Features & Amenities",
+          subtitle: "Select the amenities and nearby facilities",
+        ),
 
-      const SizedBox(height: 20),
+        const SizedBox(height: 20),
 
-      _buildFurnishingSection(),
+        _buildFurnishingSection(),
 
-      const SizedBox(height: 22),
+        const SizedBox(height: 22),
 
-      _buildAmenitiesSection(),
+        _buildAmenitiesSection(),
 
-      const SizedBox(height: 22),
+        const SizedBox(height: 22),
 
-      _buildNearbyTagsSection(),
+        _buildNearbyTagsSection(),
 
-      const SizedBox(height: 22),
+        const SizedBox(height: 22),
 
-      Row(
-        children: const [
-          Icon(
-            Icons.tune_outlined,
-            size: 18,
-            color: AppColors.primary,
-          ),
-          SizedBox(width: 8),
-          Expanded(
-            child: Text(
-              "Other Features",
-              style: TextStyle(
-                fontWeight: FontWeight.w700,
-                fontSize: 14,
+        Row(
+          children: const [
+            Icon(Icons.tune_outlined, size: 18, color: AppColors.primary),
+            SizedBox(width: 8),
+            Expanded(
+              child: Text(
+                "Other Features",
+                style: TextStyle(fontWeight: FontWeight.w700, fontSize: 14),
               ),
             ),
-          ),
-        ],
-      ),
+          ],
+        ),
 
-      const SizedBox(height: 4),
+        const SizedBox(height: 4),
 
-      const Padding(
-        padding: EdgeInsets.only(left: 26),
-        child: Text(
-          "Add any additional features not listed above",
-          style: TextStyle(
-            color: AppColors.hintGrey,
-            fontSize: 12,
+        const Padding(
+          padding: EdgeInsets.only(left: 26),
+          child: Text(
+            "Add any additional features not listed above",
+            style: TextStyle(color: AppColors.hintGrey, fontSize: 12),
           ),
         ),
-      ),
 
-      const SizedBox(height: 16),
+        const SizedBox(height: 16),
 
-      _fieldLabel("Other (Please specify)"),
+        _fieldLabel("Other (Please specify)"),
 
-      const SizedBox(height: 8),
+        const SizedBox(height: 8),
 
-      _AppTextField(
-        controller: controller.otherFeatureController,
-        hint: "Enter other features",
-        prefixIcon: Icons.edit_note_outlined,
-      ),
-    ],
-  );
-}
-Widget _buildFurnishingSection() {
-  return Column(
-    crossAxisAlignment: CrossAxisAlignment.start,
-    children: [
-      Row(
-        children: [
-          const Icon(
-            Icons.chair_outlined,
-            color: AppColors.primary,
-            size: 18,
-          ),
-          const SizedBox(width: 8),
-          const Expanded(
-            child: Text(
-              "Furnishing",
-              style: TextStyle(
-                fontWeight: FontWeight.w700,
-                fontSize: 14,
-              ),
-            ),
-          ),
-          _buildAddButton(_showFurnishingBottomSheet),
-        ],
-      ),
-
-      const SizedBox(height: 6),
-
-      _buildSelectedFurnishing(),
-    ],
-  );
-}
-Widget _buildAmenitiesSection() {
-  return Column(
-    crossAxisAlignment: CrossAxisAlignment.start,
-    children: [
-      Row(
-        children: [
-          const Icon(
-            Icons.widgets_outlined,
-            color: AppColors.primary,
-            size: 18,
-          ),
-          const SizedBox(width: 8),
-          const Expanded(
-            child: Text(
-              "Amenities",
-              style: TextStyle(
-                fontWeight: FontWeight.w700,
-                fontSize: 14,
-              ),
-            ),
-          ),
-          _buildAddButton(_showAmenitiesBottomSheet),
-        ],
-      ),
-
-      const SizedBox(height: 6),
-
-      _buildSelectedAmenities(),
-    ],
-  );
-}
-Widget _buildNearbyTagsSection() {
-  return Column(
-    crossAxisAlignment: CrossAxisAlignment.start,
-    children: [
-      Row(
-        children: [
-          const Icon(
-            Icons.location_on_outlined,
-            color: AppColors.primary,
-            size: 18,
-          ),
-          const SizedBox(width: 8),
-          const Expanded(
-            child: Text(
-              "Nearby Tags",
-              style: TextStyle(
-                fontWeight: FontWeight.w700,
-                fontSize: 14,
-              ),
-            ),
-          ),
-          _buildAddButton(_showNearbyTagsBottomSheet),
-        ],
-      ),
-
-      const SizedBox(height: 6),
-
-      _buildSelectedNearbyTags(),
-    ],
-  );
-}Widget _buildAddButton(VoidCallback onTap) {
-  return GestureDetector(
-    onTap: onTap,
-    child: Container(
-      padding: const EdgeInsets.symmetric(
-        horizontal: 12,
-        vertical: 6,
-      ),
-      decoration: BoxDecoration(
-        border: Border.all(
-          color: AppColors.primary,
+        _AppTextField(
+          controller: controller.otherFeatureController,
+          hint: "Enter other features",
+          prefixIcon: Icons.edit_note_outlined,
         ),
-        borderRadius: BorderRadius.circular(8.r),
-      ),
-      child: const Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(
-            Icons.add,
-            size: 16,
-            color: AppColors.primary,
-          ),
-          SizedBox(width: 4),
-          Text(
-            "Add",
-            style: TextStyle(
+      ],
+    );
+  }
+
+  Widget _buildFurnishingSection() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          children: [
+            const Icon(
+              Icons.chair_outlined,
               color: AppColors.primary,
-              fontWeight: FontWeight.w600,
-              fontSize: 12,
+              size: 18,
             ),
-          ),
-        ],
+            const SizedBox(width: 8),
+            const Expanded(
+              child: Text(
+                "Furnishing",
+                style: TextStyle(fontWeight: FontWeight.w700, fontSize: 14),
+              ),
+            ),
+            _buildAddButton(_showFurnishingBottomSheet),
+          ],
+        ),
+
+        const SizedBox(height: 6),
+
+        _buildSelectedFurnishing(),
+      ],
+    );
+  }
+
+  Widget _buildAmenitiesSection() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          children: [
+            const Icon(
+              Icons.widgets_outlined,
+              color: AppColors.primary,
+              size: 18,
+            ),
+            const SizedBox(width: 8),
+            const Expanded(
+              child: Text(
+                "Amenities",
+                style: TextStyle(fontWeight: FontWeight.w700, fontSize: 14),
+              ),
+            ),
+            _buildAddButton(_showAmenitiesBottomSheet),
+          ],
+        ),
+
+        const SizedBox(height: 6),
+
+        _buildSelectedAmenities(),
+      ],
+    );
+  }
+
+  Widget _buildNearbyTagsSection() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          children: [
+            const Icon(
+              Icons.location_on_outlined,
+              color: AppColors.primary,
+              size: 18,
+            ),
+            const SizedBox(width: 8),
+            const Expanded(
+              child: Text(
+                "Nearby Tags",
+                style: TextStyle(fontWeight: FontWeight.w700, fontSize: 14),
+              ),
+            ),
+            _buildAddButton(_showNearbyTagsBottomSheet),
+          ],
+        ),
+
+        const SizedBox(height: 6),
+
+        _buildSelectedNearbyTags(),
+      ],
+    );
+  }
+
+  Widget _buildAddButton(VoidCallback onTap) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+        decoration: BoxDecoration(
+          border: Border.all(color: AppColors.primary),
+          borderRadius: BorderRadius.circular(8.r),
+        ),
+        child: const Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(Icons.add, size: 16, color: AppColors.primary),
+            SizedBox(width: 4),
+            Text(
+              "Add",
+              style: TextStyle(
+                color: AppColors.primary,
+                fontWeight: FontWeight.w600,
+                fontSize: 12,
+              ),
+            ),
+          ],
+        ),
       ),
-    ),
-  );
-}
+    );
+  }
+
   Widget _buildSelectedAmenities() {
     if (controller.selectedAmenities.isEmpty) {
       return const Padding(
@@ -1499,197 +1463,170 @@ Widget _buildNearbyTagsSection() {
   // STEP 5 — PHOTOS & VIDEOS (MEDIA)
   // ---------------------------------------------------------
   // ---------------------------------------------------------
-// STEP 5
-// ---------------------------------------------------------
+  // STEP 5
+  // ---------------------------------------------------------
 
-Widget _buildStep5({Key? key}) {
-  return Column(
-    key: key,
-    crossAxisAlignment: CrossAxisAlignment.start,
-    children: [
-      _sectionHeader(
-        icon: Icons.camera_alt_outlined,
-        title: "Photos & Videos",
-        subtitle:
-            "Add high quality photos and videos to attract more buyers",
-      ),
+  Widget _buildStep5({Key? key}) {
+    return Column(
+      key: key,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        _sectionHeader(
+          icon: Icons.camera_alt_outlined,
+          title: "Photos & Videos",
+          subtitle: "Add high quality photos and videos to attract more buyers",
+        ),
 
-      const SizedBox(height: 20),
+        const SizedBox(height: 20),
 
-      //=========================================================
-      // PHOTOS
-      //=========================================================
+        //=========================================================
+        // PHOTOS
+        //=========================================================
+        _fieldLabel("Property Photos", required: true),
 
-      _fieldLabel("Property Photos", required: true),
-
-      const Padding(
-        padding: EdgeInsets.only(top: 2, bottom: 12),
-        child: Text(
-          "Upload clear and attractive photos (Max 20 photos)",
-          style: TextStyle(
-            color: AppColors.hintGrey,
-            fontSize: 12,
+        const Padding(
+          padding: EdgeInsets.only(top: 2, bottom: 12),
+          child: Text(
+            "Upload clear and attractive photos (Max 20 photos)",
+            style: TextStyle(color: AppColors.hintGrey, fontSize: 12),
           ),
         ),
-      ),
 
-      SizedBox(
-  height: 82,
-  child: ListView.separated(
-    scrollDirection: Axis.horizontal,
-    itemCount: controller.images.isEmpty ? 4 : controller.images.length,
-    separatorBuilder: (_, __) => const SizedBox(width: 8),
-    itemBuilder: (_, index) {
-      if (controller.images.isEmpty) {
-        const colors = [
-          Color(0xFFEFE3D8),
-          Color(0xFFE7DED6),
-          Color(0xFFEDEAE4),
-          Color(0xFFDCE4E8),
-        ];
+        SizedBox(
+          height: 82,
+          child: ListView.separated(
+            scrollDirection: Axis.horizontal,
+            itemCount: controller.images.isEmpty ? 4 : controller.images.length,
+            separatorBuilder: (_, __) => const SizedBox(width: 8),
+            itemBuilder: (_, index) {
+              if (controller.images.isEmpty) {
+                const colors = [
+                  Color(0xFFEFE3D8),
+                  Color(0xFFE7DED6),
+                  Color(0xFFEDEAE4),
+                  Color(0xFFDCE4E8),
+                ];
 
-        return _PhotoThumbnail(
-          color: colors[index],
-        );
-      }
+                return _PhotoThumbnail(color: colors[index]);
+              }
 
-      return _PhotoThumbnail(
-        imagePath: controller.images[index],
-        onRemove: () {
-          controller.removeImage(index);
-        },
-      );
-    },
-  ),
-),
-
-      const SizedBox(height: 14),
-
-      GestureDetector(
-        onTap: _pickImages,
-        child: const _DashedUploadBox(
-          icon: Icons.add_photo_alternate_outlined,
-          title: "Add Photos",
-          subtitle: "JPG, PNG up to 10MB each",
-          filled: true,
-        ),
-      ),
-
-      const SizedBox(height: 22),
-
-      //=========================================================
-      // VIDEOS
-      //=========================================================
-
-      _fieldLabel("Property Videos"),
-
-      const Padding(
-        padding: EdgeInsets.only(top: 2, bottom: 4),
-        child: Text(
-          "(Optional)",
-          style: TextStyle(
-            color: AppColors.hintGrey,
-            fontSize: 11,
+              return _PhotoThumbnail(
+                imagePath: controller.images[index],
+                onRemove: () {
+                  controller.removeImage(index);
+                },
+              );
+            },
           ),
         ),
-      ),
 
-      const Padding(
-        padding: EdgeInsets.only(bottom: 12),
-        child: Text(
-          "Upload video tour of your property (Max 3 videos)",
-          style: TextStyle(
-            color: AppColors.hintGrey,
-            fontSize: 12,
+        const SizedBox(height: 14),
+
+        GestureDetector(
+          onTap: _pickImages,
+          child: const _DashedUploadBox(
+            icon: Icons.add_photo_alternate_outlined,
+            title: "Add Photos",
+            subtitle: "JPG, PNG up to 10MB each",
+            filled: true,
           ),
         ),
-      ),
 
-      GestureDetector(
-        onTap: _pickVideo,
-        child: _DashedUploadBox(
-          icon: Icons.videocam_outlined,
-          title: controller.video.isEmpty
-              ? "Add Video"
-              : "Video Selected",
-          subtitle: controller.video.isEmpty
-              ? "MP4, MOV up to 50MB each"
-              : controller.video.split('/').last,
-        ),
-      ),
+        const SizedBox(height: 22),
 
-      const SizedBox(height: 16),
+        //=========================================================
+        // VIDEOS
+        //=========================================================
+        _fieldLabel("Property Videos"),
 
-      _buildVideoGuidelines(),
-
-      const SizedBox(height: 22),
-
-      //=========================================================
-      // DOCUMENTS
-      //=========================================================
-
-      _fieldLabel("Additional Documents"),
-
-      const Padding(
-        padding: EdgeInsets.only(top: 2, bottom: 4),
-        child: Text(
-          "(Optional)",
-          style: TextStyle(
-            color: AppColors.hintGrey,
-            fontSize: 11,
+        const Padding(
+          padding: EdgeInsets.only(top: 2, bottom: 4),
+          child: Text(
+            "(Optional)",
+            style: TextStyle(color: AppColors.hintGrey, fontSize: 11),
           ),
         ),
-      ),
 
-      const Padding(
-        padding: EdgeInsets.only(bottom: 12),
-        child: Text(
-          "Upload floor plans, brochures or other documents",
-          style: TextStyle(
-            color: AppColors.hintGrey,
-            fontSize: 12,
+        const Padding(
+          padding: EdgeInsets.only(bottom: 12),
+          child: Text(
+            "Upload video tour of your property (Max 3 videos)",
+            style: TextStyle(color: AppColors.hintGrey, fontSize: 12),
           ),
         ),
-      ),
 
-      // GestureDetector(
-      //   onTap: _pickDocument,
-      //   child: const _DashedUploadBox(
-      //     icon: Icons.upload_file_outlined,
-      //     title: "Upload Documents",
-      //     subtitle: "PDF, JPG, PNG up to 10MB each",
-      //   ),
-      // ),
+        GestureDetector(
+          onTap: _pickVideo,
+          child: _DashedUploadBox(
+            icon: Icons.videocam_outlined,
+            title: controller.video.isEmpty ? "Add Video" : "Video Selected",
+            subtitle: controller.video.isEmpty
+                ? "MP4, MOV up to 50MB each"
+                : controller.video.split('/').last,
+          ),
+        ),
 
-      const SizedBox(height: 18),
+        const SizedBox(height: 16),
 
-      _buildTipBox(),
-    ],
-  );
-}
-Future<void> _pickImages() async {
-  final files = await _picker.pickMultiImage(
-    imageQuality: 80,
-  );
+        _buildVideoGuidelines(),
 
-  if (files.isEmpty) return;
+        const SizedBox(height: 22),
 
-  final remaining = 20 - controller.images.length;
+        //=========================================================
+        // DOCUMENTS
+        //=========================================================
+        _fieldLabel("Additional Documents"),
 
-  for (final image in files.take(remaining)) {
-    controller.addImage(image.path);
+        const Padding(
+          padding: EdgeInsets.only(top: 2, bottom: 4),
+          child: Text(
+            "(Optional)",
+            style: TextStyle(color: AppColors.hintGrey, fontSize: 11),
+          ),
+        ),
+
+        const Padding(
+          padding: EdgeInsets.only(bottom: 12),
+          child: Text(
+            "Upload floor plans, brochures or other documents",
+            style: TextStyle(color: AppColors.hintGrey, fontSize: 12),
+          ),
+        ),
+
+        // GestureDetector(
+        //   onTap: _pickDocument,
+        //   child: const _DashedUploadBox(
+        //     icon: Icons.upload_file_outlined,
+        //     title: "Upload Documents",
+        //     subtitle: "PDF, JPG, PNG up to 10MB each",
+        //   ),
+        // ),
+        const SizedBox(height: 18),
+
+        _buildTipBox(),
+      ],
+    );
   }
-}
 
-Future<void> _pickVideo() async {
-  final file = await _picker.pickVideo(
-    source: ImageSource.gallery,
-  );
+  Future<void> _pickImages() async {
+    final files = await _picker.pickMultiImage(imageQuality: 80);
 
-  if (file == null) return;
+    if (files.isEmpty) return;
 
-  controller.setVideo(file.path);
-}
+    final remaining = 20 - controller.images.length;
+
+    for (final image in files.take(remaining)) {
+      controller.addImage(image.path);
+    }
+  }
+
+  Future<void> _pickVideo() async {
+    final file = await _picker.pickVideo(source: ImageSource.gallery);
+
+    if (file == null) return;
+
+    controller.setVideo(file.path);
+  }
 
   Widget _buildVideoGuidelines() {
     return Container(
@@ -1861,59 +1798,57 @@ Future<void> _pickVideo() async {
   }
 
   Widget _buildBottomButton() {
-  final isLastStep = controller.currentStep == controller.steps.length - 1;
+    final isLastStep = controller.currentStep == controller.steps.length - 1;
 
-  return SizedBox(
-    width: double.infinity,
-    height: 54,
-    child: ElevatedButton(
-      onPressed: () async {
-        if (isLastStep) {
-          await controller.addProperty();
-        } else {
-          controller.nextStep();
-        }
-      },
-      style: ElevatedButton.styleFrom(
-        backgroundColor: AppColors.primary,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(14),
+    return SizedBox(
+      width: double.infinity,
+      height: 54,
+      child: ElevatedButton(
+        onPressed: () async {
+          if (isLastStep) {
+            await controller.addProperty();
+          } else {
+            controller.nextStep();
+          }
+        },
+        style: ElevatedButton.styleFrom(
+          backgroundColor: AppColors.primary,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(14),
+          ),
+          elevation: 0,
         ),
-        elevation: 0,
-      ),
-      child: controller.isSubmitting
-          ? const SizedBox(
-              width: 22,
-              height: 22,
-              child: CircularProgressIndicator(
-                color: Colors.white,
-                strokeWidth: 2,
-              ),
-            )
-          : Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text(
-                  isLastStep
-                      ? 'Review & Publish'
-                      : 'Save & Continue',
-                  style: const TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w700,
+        child: controller.isSubmitting
+            ? const SizedBox(
+                width: 22,
+                height: 22,
+                child: CircularProgressIndicator(
+                  color: Colors.white,
+                  strokeWidth: 2,
+                ),
+              )
+            : Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    isLastStep ? 'Review & Publish' : 'Save & Continue',
+                    style: const TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w700,
+                      color: Colors.white,
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  const Icon(
+                    Icons.arrow_forward,
+                    size: 18,
                     color: Colors.white,
                   ),
-                ),
-                const SizedBox(width: 8),
-                const Icon(
-                  Icons.arrow_forward,
-                  size: 18,
-                  color: Colors.white,
-                ),
-              ],
-            ),
-    ),
-  );
-}
+                ],
+              ),
+      ),
+    );
+  }
 }
 
 // =================================================================
@@ -2543,11 +2478,7 @@ class _PhotoThumbnail extends StatelessWidget {
                     height: 78,
                     fit: BoxFit.cover,
                   )
-                : Container(
-                    width: 78,
-                    height: 78,
-                    color: color,
-                  ),
+                : Container(width: 78, height: 78, color: color),
           ),
 
           if (overlayLabel != null)
@@ -2582,11 +2513,7 @@ class _PhotoThumbnail extends StatelessWidget {
                     color: Colors.red,
                     shape: BoxShape.circle,
                   ),
-                  child: const Icon(
-                    Icons.close,
-                    color: Colors.white,
-                    size: 12,
-                  ),
+                  child: const Icon(Icons.close, color: Colors.white, size: 12),
                 ),
               ),
             ),
@@ -2595,6 +2522,7 @@ class _PhotoThumbnail extends StatelessWidget {
     );
   }
 }
+
 class _DashedUploadBox extends StatelessWidget {
   final IconData icon;
   final String title;
@@ -2612,14 +2540,9 @@ class _DashedUploadBox extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.symmetric(
-        horizontal: 16,
-        vertical: 20,
-      ),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
       decoration: BoxDecoration(
-        color: filled
-            ? AppColors.pinkChipBg
-            : Colors.white,
+        color: filled ? AppColors.pinkChipBg : Colors.white,
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
           color: AppColors.primary.withOpacity(.4),
@@ -2628,20 +2551,13 @@ class _DashedUploadBox extends StatelessWidget {
       ),
       child: Column(
         children: [
-          Icon(
-            icon,
-            color: AppColors.primary,
-            size: 32,
-          ),
+          Icon(icon, color: AppColors.primary, size: 32),
 
           const SizedBox(height: 10),
 
           Text(
             title,
-            style: const TextStyle(
-              fontWeight: FontWeight.w700,
-              fontSize: 14,
-            ),
+            style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 14),
           ),
 
           const SizedBox(height: 4),
@@ -2649,18 +2565,12 @@ class _DashedUploadBox extends StatelessWidget {
           Text(
             subtitle,
             textAlign: TextAlign.center,
-            style: const TextStyle(
-              color: AppColors.hintGrey,
-              fontSize: 12,
-            ),
+            style: const TextStyle(color: AppColors.hintGrey, fontSize: 12),
           ),
         ],
       ),
     );
   }
-
-
-  
 }
 
 // =================================================================

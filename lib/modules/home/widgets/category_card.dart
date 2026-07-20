@@ -8,7 +8,12 @@ class CategoryCard extends StatelessWidget {
   final IconData icon;
   final VoidCallback? onTap;
 
-  const CategoryCard({super.key, required this.title, required this.icon, this.onTap,});
+  const CategoryCard({
+    super.key,
+    required this.title,
+    required this.icon,
+    this.onTap,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -27,9 +32,9 @@ class CategoryCard extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Icon(icon, color: AppColors.primary, size: 18.sp),
-      
+
               SizedBox(height: 10.h),
-      
+
               Text(
                 title,
                 textAlign: TextAlign.center,
@@ -38,7 +43,7 @@ class CategoryCard extends StatelessWidget {
                 style: AppTextStyles.medium13.copyWith(
                   fontSize: 9.sp,
                   fontWeight: FontWeight.w600,
-      
+
                   color: Colors.black,
                 ),
               ),

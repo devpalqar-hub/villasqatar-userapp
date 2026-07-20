@@ -34,8 +34,6 @@ class ListPropertyController extends GetxController {
   bool isUploadingImages = false;
   final List<UploadedPropertyPhoto> uploadedPhotos = [];
 
-
-
   String error = "";
 
   //--------------------------------------------------
@@ -466,8 +464,7 @@ class ListPropertyController extends GetxController {
         "nearbyTags": selectedNearbyTags.toList(),
 
         "otherFeatures": otherFeatureController.text.trim(),
-        "photos": uploadedImageUrls
-           
+        "photos": uploadedImageUrls,
       };
 
       debugPrint("========== ADD PROPERTY ==========");
@@ -498,80 +495,66 @@ class ListPropertyController extends GetxController {
   }
 
   Future<String?> uploadPropertyImage(File image) async {
-  try {
-    final token = StorageService.getToken();
+    try {
+      final token = StorageService.getToken();
 
-    final request = http.MultipartRequest(
-      "POST",
-      Uri.parse("${ApiHandler.baseUrl}/api/upload"),
-    );
+      final request = http.MultipartRequest(
+        "POST",
+        Uri.parse("${ApiHandler.baseUrl}/api/upload"),
+      );
 
-    request.headers.addAll({
-      "Authorization": "Bearer $token",
-      "Accept": "application/json",
-    });
+      request.headers.addAll({
+        "Authorization": "Bearer $token",
+        "Accept": "application/json",
+      });
 
-    // field name from Swagger = file
-    request.files.add(
-      await http.MultipartFile.fromPath(
-        "file",
-        image.path,
-      ),
-    );
+      // field name from Swagger = file
+      request.files.add(await http.MultipartFile.fromPath("file", image.path));
 
-    debugPrint("========== PROPERTY IMAGE UPLOAD ==========");
-    debugPrint("URL: ${request.url}");
-    debugPrint("FILE: ${image.path}");
+      debugPrint("========== PROPERTY IMAGE UPLOAD ==========");
+      debugPrint("URL: ${request.url}");
+      debugPrint("FILE: ${image.path}");
 
-    final streamedResponse = await request.send();
-    final response = await http.Response.fromStream(streamedResponse);
+      final streamedResponse = await request.send();
+      final response = await http.Response.fromStream(streamedResponse);
 
-    debugPrint("STATUS: ${response.statusCode}");
-    debugPrint("BODY: ${response.body}");
+      debugPrint("STATUS: ${response.statusCode}");
+      debugPrint("BODY: ${response.body}");
 
-    if (response.statusCode == 200 ||
-        response.statusCode == 201) {
-      final data = jsonDecode(response.body);
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        final data = jsonDecode(response.body);
 
-      return data["url"]?.toString();
+        return data["url"]?.toString();
+      }
+
+      final error = jsonDecode(response.body);
+
+      throw Exception(error["message"] ?? "Image upload failed");
+    } catch (e) {
+      debugPrint("PROPERTY IMAGE UPLOAD ERROR: $e");
+      rethrow;
     }
-
-    final error = jsonDecode(response.body);
-
-    throw Exception(
-      error["message"] ?? "Image upload failed",
-    );
-  } catch (e) {
-    debugPrint("PROPERTY IMAGE UPLOAD ERROR: $e");
-    rethrow;
-  }
-}
-
-Future<List<Map<String, dynamic>>> uploadAllPropertyImages() async {
-  final List<Map<String, dynamic>> photos = [];
-
-  for (int i = 0; i < images.length; i++) {
-    final imageFile = File(images[i]);
-
-    final imageUrl = await uploadPropertyImage(imageFile);
-
-    if (imageUrl == null || imageUrl.isEmpty) {
-      throw Exception("Failed to upload image ${i + 1}");
-    }
-
-    photos.add({
-      "url": imageUrl,
-      "sortOrder": i,
-      "caption": "",
-    });
-
-    debugPrint(
-      "IMAGE ${i + 1}/${images.length} UPLOADED: $imageUrl",
-    );
   }
 
-  return photos;
-}
+  Future<List<Map<String, dynamic>>> uploadAllPropertyImages() async {
+    final List<Map<String, dynamic>> photos = [];
+
+    for (int i = 0; i < images.length; i++) {
+      final imageFile = File(images[i]);
+
+      final imageUrl = await uploadPropertyImage(imageFile);
+
+      if (imageUrl == null || imageUrl.isEmpty) {
+        throw Exception("Failed to upload image ${i + 1}");
+      }
+
+      photos.add({"url": imageUrl, "sortOrder": i, "caption": ""});
+
+      debugPrint("IMAGE ${i + 1}/${images.length} UPLOADED: $imageUrl");
+    }
+
+    return photos;
+  }
 
   Future<void> verifyOtp() async {
     // Verify OTP API

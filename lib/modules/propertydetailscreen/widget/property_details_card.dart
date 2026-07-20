@@ -87,9 +87,9 @@ class PropertyDetailsCard extends StatelessWidget {
                 color: const Color(0xff1F2937),
               ),
             ),
-      
+
             SizedBox(height: 18.h),
-      
+
             ...details.map(
               (item) => Padding(
                 padding: EdgeInsets.only(bottom: 8.h),
@@ -100,9 +100,9 @@ class PropertyDetailsCard extends StatelessWidget {
                       color: const Color(0xff3D3D3D),
                       size: 16.sp,
                     ),
-      
+
                     SizedBox(width: 14.w),
-      
+
                     Expanded(
                       child: Text(
                         item["title"].toString(),
@@ -113,7 +113,7 @@ class PropertyDetailsCard extends StatelessWidget {
                         ),
                       ),
                     ),
-      
+
                     Text(
                       item["value"].toString(),
                       style: TextStyle(
@@ -126,9 +126,8 @@ class PropertyDetailsCard extends StatelessWidget {
                 ),
               ),
             ),
-      
+
             SizedBox(height: 8.h),
-      
           ],
         ),
       ),

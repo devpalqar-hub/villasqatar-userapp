@@ -12,9 +12,7 @@ class AgentAboutCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(16.r),
-        border: Border.all(
-          color: AppColors.fieldBorder,
-        ),
+        border: Border.all(color: AppColors.fieldBorder),
       ),
       child: Text(
         "Ahmed Al-Mansoori has over 8 years of experience in Qatar's real estate market. He specializes in luxury villas, apartments, townhouses, commercial buildings and investment properties. His commitment to client satisfaction has earned him excellent reviews and long-term customer relationships.",

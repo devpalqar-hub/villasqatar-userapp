@@ -35,41 +35,27 @@ class WishlistController extends GetxController {
       error = "";
       update();
 
-      final response = await ApiHandler.get(
-        ApiEndpoints.wishlists,
-      );
+      final response = await ApiHandler.get(ApiEndpoints.wishlists);
 
       debugPrint("========== WISHLIST RESPONSE ==========");
       debugPrint(response.toString());
 
-      final List<dynamic> data = response is List
-          ? response
-          : [];
+      final List<dynamic> data = response is List ? response : [];
 
       wishlistProperties = data
-          .map(
-            (json) => Property.fromJson(
-              Map<String, dynamic>.from(json),
-            ),
-          )
+          .map((json) => Property.fromJson(Map<String, dynamic>.from(json)))
           .toList();
 
       /// Sync wishlist IDs
       wishlistedIds
         ..clear()
-        ..addAll(
-          wishlistProperties.map((property) => property.id),
-        );
+        ..addAll(wishlistProperties.map((property) => property.id));
 
-      debugPrint(
-        "WISHLIST COUNT: ${wishlistProperties.length}",
-      );
+      debugPrint("WISHLIST COUNT: ${wishlistProperties.length}");
     } catch (e) {
       error = e.toString();
 
-      debugPrint(
-        "FETCH WISHLIST ERROR: $e",
-      );
+      debugPrint("FETCH WISHLIST ERROR: $e");
     } finally {
       isLoading = false;
       update();
@@ -105,36 +91,24 @@ class WishlistController extends GetxController {
       final response = await ApiHandler.post(
         ApiEndpoints.wishlistByProperty(propertyId),
       );
-
-      debugPrint("========== WISHLIST TOGGLE ==========");
-      debugPrint("PROPERTY ID: $propertyId");
-      debugPrint("RESPONSE: $response");
-
-      final bool isNowWishlisted =
-          response["isWishlisted"] == true;
+      final bool isNowWishlisted = response["isWishlisted"] == true;
 
       if (isNowWishlisted) {
         wishlistedIds.add(propertyId);
       } else {
         wishlistedIds.remove(propertyId);
 
-        wishlistProperties.removeWhere(
-          (property) => property.id == propertyId,
-        );
+        wishlistProperties.removeWhere((property) => property.id == propertyId);
       }
 
-      debugPrint(
-        "IS WISHLISTED: $isNowWishlisted",
-      );
+      debugPrint("IS WISHLISTED: $isNowWishlisted");
 
       update();
 
       /// Refresh so wishlist screen has complete property data.
       await fetchWishlist();
     } catch (e) {
-      debugPrint(
-        "TOGGLE WISHLIST ERROR: $e",
-      );
+      debugPrint("TOGGLE WISHLIST ERROR: $e");
     } finally {
       loadingPropertyIds.remove(propertyId);
       update();

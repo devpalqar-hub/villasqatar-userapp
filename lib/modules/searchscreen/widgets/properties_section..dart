@@ -155,7 +155,6 @@ class PropertyCard extends StatelessWidget {
                 //     ),
                 //   ),
                 // ),
-
                 Positioned(
                   right: 14.w,
                   top: 14.h,
@@ -349,9 +348,6 @@ class PropertyCard extends StatelessWidget {
                           ),
                         ),
                       ),
-
-                      
-
                     ],
                   ),
                 ],

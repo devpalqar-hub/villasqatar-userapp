@@ -258,8 +258,10 @@ class _MakeOfferScreenState extends State<MakeOfferScreen> {
                               );
 
                               Get.to(
-                                () =>
-                                    ChatStartScreen(property: widget.property,showPropertyCard: false),
+                                () => ChatStartScreen(
+                                  property: widget.property,
+                                  showPropertyCard: false,
+                                ),
                               );
                             },
                             icon: Icon(
@@ -296,7 +298,7 @@ class _MakeOfferScreenState extends State<MakeOfferScreen> {
                               }
 
                               Get.put(
-                                ChatController(listingId: widget.property.id!,),
+                                ChatController(listingId: widget.property.id!),
                               );
 
                               Get.to(

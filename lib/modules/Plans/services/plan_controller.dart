@@ -5,8 +5,6 @@ import 'package:villas_qatar/Core/network/api_endpoints.dart';
 import 'package:villas_qatar/modules/Plans/model/featured_palnmodel.dart';
 
 class FeaturedPlanController extends GetxController {
- 
-
   bool isLoading = false;
 
   String error = '';
@@ -30,9 +28,7 @@ class FeaturedPlanController extends GetxController {
   /// FETCH PLANS
   /// ============================================================
 
-  Future<void> fetchFeaturedPlans({
-    bool showLoading = true,
-  }) async {
+  Future<void> fetchFeaturedPlans({bool showLoading = true}) async {
     try {
       if (showLoading) {
         isLoading = true;
@@ -42,53 +38,33 @@ class FeaturedPlanController extends GetxController {
 
       update();
 
-      debugPrint(
-        "========== FETCH FEATURED PLANS ==========",
-      );
+      debugPrint("========== FETCH FEATURED PLANS ==========");
 
-      final dynamic response =
-          await ApiHandler.get(
-        ApiEndpoints.featuredPlans,
-      );
+      final dynamic response = await ApiHandler.get(ApiEndpoints.featuredPlans);
 
-      debugPrint(
-        "Featured Plans Response: $response",
-      );
+      debugPrint("Featured Plans Response: $response");
 
       if (response is List) {
         plans = response
             .whereType<Map<String, dynamic>>()
-            .map(
-              (json) =>
-                  FeaturedPlanModel.fromJson(json),
-            )
+            .map((json) => FeaturedPlanModel.fromJson(json))
             .toList();
       } else {
         plans = [];
       }
 
       /// Only keep active plans.
-      plans = plans
-          .where(
-            (plan) => plan.isActive,
-          )
-          .toList();
+      plans = plans.where((plan) => plan.isActive).toList();
 
       /// Automatically select first plan.
       if (plans.isNotEmpty) {
         /// Keep previous selection if it still exists.
         if (selectedPlan != null) {
-          final previousId =
-              selectedPlan!.id;
+          final previousId = selectedPlan!.id;
 
-          final index = plans.indexWhere(
-            (plan) =>
-                plan.id == previousId,
-          );
+          final index = plans.indexWhere((plan) => plan.id == previousId);
 
-          selectedPlan = index >= 0
-              ? plans[index]
-              : plans.first;
+          selectedPlan = index >= 0 ? plans[index] : plans.first;
         } else {
           selectedPlan = plans.first;
         }
@@ -96,26 +72,15 @@ class FeaturedPlanController extends GetxController {
         selectedPlan = null;
       }
 
-      debugPrint(
-        "Featured Plans Loaded: ${plans.length}",
-      );
+      debugPrint("Featured Plans Loaded: ${plans.length}");
 
       if (selectedPlan != null) {
-        debugPrint(
-          "Selected Plan: ${selectedPlan!.name}",
-        );
+        debugPrint("Selected Plan: ${selectedPlan!.name}");
       }
     } catch (e) {
-      debugPrint(
-        "Fetch Featured Plans Error: $e",
-      );
+      debugPrint("Fetch Featured Plans Error: $e");
 
-      error = e
-          .toString()
-          .replaceFirst(
-            "Exception: ",
-            "",
-          );
+      error = e.toString().replaceFirst("Exception: ", "");
 
       plans = [];
       selectedPlan = null;
@@ -130,30 +95,18 @@ class FeaturedPlanController extends GetxController {
   /// SELECT PLAN
   /// ============================================================
 
-  void selectPlan(
-    FeaturedPlanModel plan,
-  ) {
+  void selectPlan(FeaturedPlanModel plan) {
     selectedPlan = plan;
 
-    debugPrint(
-      "========== PLAN SELECTED ==========",
-    );
+    debugPrint("========== PLAN SELECTED ==========");
 
-    debugPrint(
-      "Plan ID: ${plan.id}",
-    );
+    debugPrint("Plan ID: ${plan.id}");
 
-    debugPrint(
-      "Plan: ${plan.name}",
-    );
+    debugPrint("Plan: ${plan.name}");
 
-    debugPrint(
-      "Price: ${plan.formattedPrice}",
-    );
+    debugPrint("Price: ${plan.formattedPrice}");
 
-    debugPrint(
-      "Duration: ${plan.formattedDuration}",
-    );
+    debugPrint("Duration: ${plan.formattedDuration}");
 
     update();
   }
@@ -162,11 +115,8 @@ class FeaturedPlanController extends GetxController {
   /// CHECK SELECTED
   /// ============================================================
 
-  bool isPlanSelected(
-    FeaturedPlanModel plan,
-  ) {
-    return selectedPlan?.id ==
-        plan.id;
+  bool isPlanSelected(FeaturedPlanModel plan) {
+    return selectedPlan?.id == plan.id;
   }
 
   /// ============================================================

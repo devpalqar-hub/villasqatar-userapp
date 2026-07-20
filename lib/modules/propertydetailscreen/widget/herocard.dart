@@ -130,178 +130,175 @@ class _HeroImageCardState extends State<HeroImageCard> {
 
                       Row(
                         children: [
-                          _circleButton(
-  Icons.share_outlined,
-  () {
-    final String? slug = widget.property.slug;
+                          _circleButton(Icons.share_outlined, () {
+                            final String? slug = widget.property.slug;
 
-    if (slug == null || slug.trim().isEmpty) {
-      Get.snackbar(
-        "Unable to share",
-        "Property link is not available",
-      );
-      return;
-    }
+                            if (slug == null || slug.trim().isEmpty) {
+                              Get.snackbar(
+                                "Unable to share",
+                                "Property link is not available",
+                              );
+                              return;
+                            }
 
-    final String propertyLink =
-        "https://villas.palqar.cloud/property/"
-        "${Uri.encodeComponent(slug)}";
+                            final String propertyLink =
+                                "https://villas.palqar.cloud/property/"
+                                "${Uri.encodeComponent(slug)}";
 
-    final String message =
-        "Check out ${widget.property.propertyName}\n\n"
-        "$propertyLink";
+                            final String message =
+                                "Check out ${widget.property.propertyName}\n\n"
+                                "$propertyLink";
 
-    debugPrint("Property Share Link: $propertyLink");
+                            debugPrint("Property Share Link: $propertyLink");
 
-    Get.bottomSheet(
-      SafeArea(
-        child: Container(
-          padding: EdgeInsets.symmetric(
-            horizontal: 20.w,
-            vertical: 20.h,
-          ),
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.vertical(
-              top: Radius.circular(24.r),
-            ),
-          ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              // Handle
-              Container(
-                width: 40.w,
-                height: 4.h,
-                decoration: BoxDecoration(
-                  color: Colors.grey.shade300,
-                  borderRadius: BorderRadius.circular(10.r),
-                ),
-              ),
+                            Get.bottomSheet(
+                              SafeArea(
+                                child: Container(
+                                  padding: EdgeInsets.symmetric(
+                                    horizontal: 20.w,
+                                    vertical: 20.h,
+                                  ),
+                                  decoration: BoxDecoration(
+                                    color: Colors.white,
+                                    borderRadius: BorderRadius.vertical(
+                                      top: Radius.circular(24.r),
+                                    ),
+                                  ),
+                                  child: Column(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      // Handle
+                                      Container(
+                                        width: 40.w,
+                                        height: 4.h,
+                                        decoration: BoxDecoration(
+                                          color: Colors.grey.shade300,
+                                          borderRadius: BorderRadius.circular(
+                                            10.r,
+                                          ),
+                                        ),
+                                      ),
 
-              SizedBox(height: 20.h),
+                                      SizedBox(height: 20.h),
 
-              Text(
-                "Share Property",
-                style: TextStyle(
-                  fontSize: 18.sp,
-                  fontWeight: FontWeight.w700,
-                ),
-              ),
+                                      Text(
+                                        "Share Property",
+                                        style: TextStyle(
+                                          fontSize: 18.sp,
+                                          fontWeight: FontWeight.w700,
+                                        ),
+                                      ),
 
-              SizedBox(height: 20.h),
+                                      SizedBox(height: 20.h),
 
-              // WhatsApp
-              ListTile(
-                leading: Container(
-                  width: 44.w,
-                  height: 44.w,
-                  decoration: const BoxDecoration(
-                    color: Color(0xFF25D366),
-                    shape: BoxShape.circle,
-                  ),
-                  child: const Icon(
-                    Icons.chat,
-                    color: Colors.white,
-                  ),
-                ),
-                title: const Text(
-                  "Share on WhatsApp",
-                  style: TextStyle(
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-                onTap: () async {
-                  Get.back();
+                                      // WhatsApp
+                                      ListTile(
+                                        leading: Container(
+                                          width: 44.w,
+                                          height: 44.w,
+                                          decoration: const BoxDecoration(
+                                            color: Color(0xFF25D366),
+                                            shape: BoxShape.circle,
+                                          ),
+                                          child: const Icon(
+                                            Icons.chat,
+                                            color: Colors.white,
+                                          ),
+                                        ),
+                                        title: const Text(
+                                          "Share on WhatsApp",
+                                          style: TextStyle(
+                                            fontWeight: FontWeight.w600,
+                                          ),
+                                        ),
+                                        onTap: () async {
+                                          Get.back();
 
-                  final Uri whatsappUri = Uri.parse(
-                    "https://wa.me/?text="
-                    "${Uri.encodeComponent(message)}",
-                  );
+                                          final Uri whatsappUri = Uri.parse(
+                                            "https://wa.me/?text="
+                                            "${Uri.encodeComponent(message)}",
+                                          );
 
-                  try {
-                    final bool opened = await launchUrl(
-                      whatsappUri,
-                      mode: LaunchMode.externalApplication,
-                    );
+                                          try {
+                                            final bool opened = await launchUrl(
+                                              whatsappUri,
+                                              mode: LaunchMode
+                                                  .externalApplication,
+                                            );
 
-                    if (!opened) {
-                      Get.snackbar(
-                        "WhatsApp unavailable",
-                        "Unable to open WhatsApp",
-                      );
-                    }
-                  } catch (e) {
-                    debugPrint(
-                      "WhatsApp Share Error: $e",
-                    );
+                                            if (!opened) {
+                                              Get.snackbar(
+                                                "WhatsApp unavailable",
+                                                "Unable to open WhatsApp",
+                                              );
+                                            }
+                                          } catch (e) {
+                                            debugPrint(
+                                              "WhatsApp Share Error: $e",
+                                            );
 
-                    Get.snackbar(
-                      "Unable to share",
-                      "Could not open WhatsApp",
-                    );
-                  }
-                },
-              ),
+                                            Get.snackbar(
+                                              "Unable to share",
+                                              "Could not open WhatsApp",
+                                            );
+                                          }
+                                        },
+                                      ),
 
-              Divider(
-                color: Colors.grey.shade200,
-              ),
+                                      Divider(color: Colors.grey.shade200),
 
-              // Copy Link
-              ListTile(
-                leading: Container(
-                  width: 44.w,
-                  height: 44.w,
-                  decoration: BoxDecoration(
-                    color: const Color(0xff8E123E)
-                        .withOpacity(.1),
-                    shape: BoxShape.circle,
-                  ),
-                  child: const Icon(
-                    Icons.link_rounded,
-                    color: Color(0xff8E123E),
-                  ),
-                ),
-                title: const Text(
-                  "Copy Link",
-                  style: TextStyle(
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-                onTap: () async {
-                  await Clipboard.setData(
-                    ClipboardData(
-                      text: propertyLink,
-                    ),
-                  );
+                                      // Copy Link
+                                      ListTile(
+                                        leading: Container(
+                                          width: 44.w,
+                                          height: 44.w,
+                                          decoration: BoxDecoration(
+                                            color: const Color(
+                                              0xff8E123E,
+                                            ).withOpacity(.1),
+                                            shape: BoxShape.circle,
+                                          ),
+                                          child: const Icon(
+                                            Icons.link_rounded,
+                                            color: Color(0xff8E123E),
+                                          ),
+                                        ),
+                                        title: const Text(
+                                          "Copy Link",
+                                          style: TextStyle(
+                                            fontWeight: FontWeight.w600,
+                                          ),
+                                        ),
+                                        onTap: () async {
+                                          await Clipboard.setData(
+                                            ClipboardData(text: propertyLink),
+                                          );
 
-                  Get.back();
+                                          Get.back();
 
-                  Get.snackbar(
-                    "Link copied",
-                    "Property link copied to clipboard",
-                    snackPosition: SnackPosition.BOTTOM,
-                    duration: const Duration(
-                      seconds: 2,
-                    ),
-                  );
+                                          Get.snackbar(
+                                            "Link copied",
+                                            "Property link copied to clipboard",
+                                            snackPosition: SnackPosition.BOTTOM,
+                                            duration: const Duration(
+                                              seconds: 2,
+                                            ),
+                                          );
 
-                  debugPrint(
-                    "Copied Property Link: $propertyLink",
-                  );
-                },
-              ),
+                                          debugPrint(
+                                            "Copied Property Link: $propertyLink",
+                                          );
+                                        },
+                                      ),
 
-              SizedBox(height: 10.h),
-            ],
-          ),
-        ),
-      ),
-      isScrollControlled: true,
-    );
-  },
-),
+                                      SizedBox(height: 10.h),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                              isScrollControlled: true,
+                            );
+                          }),
                           SizedBox(width: 10.w),
 
                           GetBuilder<WishlistController>(

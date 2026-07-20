@@ -5,13 +5,9 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:villas_qatar/Core/constants/app_colors.dart';
 import 'package:villas_qatar/modules/propertylist/model/myproperty_model.dart';
 
-
 class AgentContactCard extends StatelessWidget {
   final Property property;
-  const AgentContactCard({
-    super.key,
-    required this.property,
-  });
+  const AgentContactCard({super.key, required this.property});
 
   @override
   Widget build(BuildContext context) {
@@ -104,93 +100,83 @@ class AgentContactCard extends StatelessWidget {
           SizedBox(width: 14.w),
 
           /// Actions
-         Row(
-  children: [
-    GestureDetector(
-      onTap:  () => _makeCall(property.contactPhone),
-      child: _actionButton(
-        color: AppColors.primary,
-        icon: const Icon(
-          Icons.call_outlined,
-          color: Colors.white,
-        ),
-        label: "Call",
-      ),
-    ),
+          Row(
+            children: [
+              GestureDetector(
+                onTap: () => _makeCall(property.contactPhone),
+                child: _actionButton(
+                  color: AppColors.primary,
+                  icon: const Icon(Icons.call_outlined, color: Colors.white),
+                  label: "Call",
+                ),
+              ),
 
-    SizedBox(width: 4.w),
+              SizedBox(width: 4.w),
 
-    GestureDetector(
-      onTap: () => _openWhatsApp(property.contactWhatsapp),
-      child: _actionButton(
-        color: const Color(0xff25D366),
-        icon: const FaIcon(
-          FontAwesomeIcons.whatsapp,
-          color: Colors.white,
-        ),
-        label: "WhatsApp",
-      ),
-    ),
-  ],
-),
+              GestureDetector(
+                onTap: () => _openWhatsApp(property.contactWhatsapp),
+                child: _actionButton(
+                  color: const Color(0xff25D366),
+                  icon: const FaIcon(
+                    FontAwesomeIcons.whatsapp,
+                    color: Colors.white,
+                  ),
+                  label: "WhatsApp",
+                ),
+              ),
+            ],
+          ),
         ],
       ),
     );
   }
-Widget _actionButton({
-  required Color color,
-  required Widget icon,
-  required String label,
-  Border? border,
-}) {
-  return Column(
-    children: [
-      Container(
-        width: 40.w,
-        height: 40.h,
-        decoration: BoxDecoration(
-          color: color,
-          shape: BoxShape.circle,
-          border: border,
+
+  Widget _actionButton({
+    required Color color,
+    required Widget icon,
+    required String label,
+    Border? border,
+  }) {
+    return Column(
+      children: [
+        Container(
+          width: 40.w,
+          height: 40.h,
+          decoration: BoxDecoration(
+            color: color,
+            shape: BoxShape.circle,
+            border: border,
+          ),
+          child: Center(child: icon),
         ),
-        child: Center(child: icon),
-      ),
-      SizedBox(height: 6.h),
-      Text(
-        label,
-        style: TextStyle(
-          fontSize: 11.sp,
-          fontWeight: FontWeight.w500,
-          color: const Color(0xff333333),
+        SizedBox(height: 6.h),
+        Text(
+          label,
+          style: TextStyle(
+            fontSize: 11.sp,
+            fontWeight: FontWeight.w500,
+            color: const Color(0xff333333),
+          ),
         ),
-      ),
-    ],
-  );
-}
-
-Future<void> _makeCall(String phone) async {
-  final uri = Uri(
-    scheme: 'tel',
-    path: phone,
-  );
-
-  if (await canLaunchUrl(uri)) {
-    await launchUrl(uri);
-  }
-}
-
-Future<void> _openWhatsApp(String phone) async {
-  final formattedPhone = phone.replaceAll("+", "");
-
-  final uri = Uri.parse(
-    "https://wa.me/$formattedPhone",
-  );
-
-  if (await canLaunchUrl(uri)) {
-    await launchUrl(
-      uri,
-      mode: LaunchMode.externalApplication,
+      ],
     );
   }
-}
+
+  Future<void> _makeCall(String phone) async {
+    final uri = Uri(scheme: 'tel', path: phone);
+
+    if (await canLaunchUrl(uri)) {
+      await launchUrl(uri);
+    }
+  }
+
+  Future<void> _openWhatsApp(String phone) async {
+    final formattedPhone = phone.replaceAll("+", "");
+
+    final uri = Uri.parse("https://wa.me/$formattedPhone");
+
+    if (await canLaunchUrl(uri)) {
+      await launchUrl(uri, mode: LaunchMode.externalApplication);
+    }
+  }
 }

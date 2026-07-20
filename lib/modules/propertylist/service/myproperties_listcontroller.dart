@@ -155,49 +155,50 @@ class MyPropertyController extends GetxController {
     properties.clear();
     await fetchProperties();
   }
+
   void applyFilters({
-  String? purpose,
-  String? type,
-  double? minPrice,
-  double? maxPrice,
-  bool? priceNegotiable,
-  int? minBedrooms,
-  int? maxBedrooms,
-  int? minBathrooms,
-  int? maxBathrooms,
-  double? minArea,
-  double? maxArea,
-  String? furnishingStatus,
-  String? municipality,
-  String? areaName,
-  String? sortBy,
-  String? sortOrder,
-}) {
-  this.purpose = purpose;
-  this.type = type;
+    String? purpose,
+    String? type,
+    double? minPrice,
+    double? maxPrice,
+    bool? priceNegotiable,
+    int? minBedrooms,
+    int? maxBedrooms,
+    int? minBathrooms,
+    int? maxBathrooms,
+    double? minArea,
+    double? maxArea,
+    String? furnishingStatus,
+    String? municipality,
+    String? areaName,
+    String? sortBy,
+    String? sortOrder,
+  }) {
+    this.purpose = purpose;
+    this.type = type;
 
-  this.minPrice = minPrice;
-  this.maxPrice = maxPrice;
+    this.minPrice = minPrice;
+    this.maxPrice = maxPrice;
 
-  this.priceNegotiable = priceNegotiable;
+    this.priceNegotiable = priceNegotiable;
 
-  this.minBedrooms = minBedrooms;
-  this.maxBedrooms = maxBedrooms;
+    this.minBedrooms = minBedrooms;
+    this.maxBedrooms = maxBedrooms;
 
-  this.minBathrooms = minBathrooms;
-  this.maxBathrooms = maxBathrooms;
+    this.minBathrooms = minBathrooms;
+    this.maxBathrooms = maxBathrooms;
 
-  this.minArea = minArea;
-  this.maxArea = maxArea;
+    this.minArea = minArea;
+    this.maxArea = maxArea;
 
-  this.furnishingStatus = furnishingStatus;
+    this.furnishingStatus = furnishingStatus;
 
-  this.municipality = municipality;
-  this.areaName = areaName;
+    this.municipality = municipality;
+    this.areaName = areaName;
 
-  this.sortBy = sortBy;
-  this.sortOrder = sortOrder;
+    this.sortBy = sortBy;
+    this.sortOrder = sortOrder;
 
-  fetchProperties();
-}
+    fetchProperties();
+  }
 }

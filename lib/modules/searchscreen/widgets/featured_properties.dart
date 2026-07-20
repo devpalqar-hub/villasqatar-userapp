@@ -291,7 +291,7 @@ class LocalityCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return GestureDetector(
       behavior: HitTestBehavior.opaque,
-       onTap: _openPropertyDetails,
+      onTap: _openPropertyDetails,
       child: Container(
         width: 160.w,
         height: 80.h,
@@ -307,16 +307,20 @@ class LocalityCard extends StatelessWidget {
           ],
         ),
         clipBehavior: Clip.antiAlias,
-      
+
         child: Row(
           children: [
             // =====================================================
             // LEFT IMAGE
             // =====================================================
-            SizedBox(width: 65.w, height: double.infinity, child: _buildImage()),
-      
+            SizedBox(
+              width: 65.w,
+              height: double.infinity,
+              child: _buildImage(),
+            ),
+
             SizedBox(width: 12.w),
-      
+
             // =====================================================
             // TEXT
             // =====================================================
@@ -334,9 +338,9 @@ class LocalityCard extends StatelessWidget {
                       fontWeight: FontWeight.w700,
                     ),
                   ),
-      
+
                   SizedBox(height: 4.h),
-      
+
                   Text(
                     properties,
                     maxLines: 1,
@@ -346,7 +350,7 @@ class LocalityCard extends StatelessWidget {
                       fontWeight: FontWeight.w800,
                     ),
                   ),
-      
+
                   SizedBox(height: 2.h),
                 ],
               ),
@@ -361,14 +365,12 @@ class LocalityCard extends StatelessWidget {
   // IMAGE
   // Supports API network image while preserving same dimensions.
   // =============================================================
-  
+
   void _openPropertyDetails() {
     final String id = propertyId.trim();
 
     if (id.isEmpty) {
-      debugPrint(
-        "FEATURED PROPERTY ERROR: Property ID is empty",
-      );
+      debugPrint("FEATURED PROPERTY ERROR: Property ID is empty");
 
       Get.snackbar(
         "Error",
@@ -379,18 +381,11 @@ class LocalityCard extends StatelessWidget {
       return;
     }
 
-    debugPrint(
-      "OPEN FEATURED PROPERTY DETAILS: $id",
-    );
+    debugPrint("OPEN FEATURED PROPERTY DETAILS: $id");
 
-    Get.to(
-      () => const PropertyDetailsScreen(),
-      arguments: {
-        "propertyId": id,
-      },
-    );
+    Get.to(() => const PropertyDetailsScreen(), arguments: {"propertyId": id});
   }
-  
+
   Widget _buildImage() {
     final String url = image.trim();
 

@@ -30,7 +30,6 @@ class AuthController extends GetxController {
     accessToken = StorageService.getToken();
     profile = StorageService.getProfile();
     _initializeGoogle();
-  
   }
 
   Future<void> _initializeGoogle() async {
@@ -72,11 +71,11 @@ class AuthController extends GetxController {
     await Future.delayed(const Duration(seconds: 3));
 
     final token = StorageService.getToken();
-        
+
     if (token != null && token.isNotEmpty) {
-     Get.to(MainScreen());
+      Get.to(MainScreen());
     } else {
-    Get.to(WelcomeScreen());
+      Get.to(WelcomeScreen());
     }
   }
 
@@ -247,29 +246,28 @@ class AuthController extends GetxController {
     update();
   }
 
-
   Future<void> logout() async {
-  await StorageService.logout();
+    await StorageService.logout();
 
-  phoneController.clear();
-  otpController.clear();
-  nameController.clear();
-  emailController.clear();
+    phoneController.clear();
+    otpController.clear();
+    nameController.clear();
+    emailController.clear();
 
-  accessToken = null;
-  profile = null;
-  isNewUser = false;
-  phoneNumber = "";
-  selectedCountryCode = "+974";
-  isLoading = false;
+    accessToken = null;
+    profile = null;
+    isNewUser = false;
+    phoneNumber = "";
+    selectedCountryCode = "+974";
+    isLoading = false;
 
-  // Optional: Sign out from Google
-  try {
-    await _googleSignIn.signOut();
-  } catch (_) {}
+    // Optional: Sign out from Google
+    try {
+      await _googleSignIn.signOut();
+    } catch (_) {}
 
-  update();
+    update();
 
-  Get.offAll(() => WelcomeScreen());
-}
+    Get.offAll(() => WelcomeScreen());
+  }
 }

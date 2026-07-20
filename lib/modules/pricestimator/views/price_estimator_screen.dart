@@ -652,7 +652,7 @@ class _PriceEstimatorScreenState extends State<PriceEstimatorScreen> {
             padding: const EdgeInsets.only(bottom: 6),
             child: Text(
               '${_highlightsController.text.length}/100',
-              style:  TextStyle(
+              style: TextStyle(
                 fontSize: 10.5.sp,
                 color: AppColors.textSecondary,
               ),
@@ -674,8 +674,8 @@ class _PriceEstimatorScreenState extends State<PriceEstimatorScreen> {
         data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
         child: ExpansionTile(
           onExpansionChanged: (v) => setState(() => _advancedOpen = v),
-          tilePadding:  EdgeInsets.symmetric(horizontal: 14.w),
-          title:  Text(
+          tilePadding: EdgeInsets.symmetric(horizontal: 14.w),
+          title: Text(
             'Advanced Options',
             style: TextStyle(
               fontSize: 13.sp,
@@ -683,7 +683,7 @@ class _PriceEstimatorScreenState extends State<PriceEstimatorScreen> {
               color: AppColors.textPrimary,
             ),
           ),
-          subtitle:  Text(
+          subtitle: Text(
             'Add more details for a more accurate estimate',
             style: TextStyle(fontSize: 11.sp, color: AppColors.textSecondary),
           ),
@@ -700,7 +700,7 @@ class _PriceEstimatorScreenState extends State<PriceEstimatorScreen> {
                     hint: 'View (e.g. Sea, City, Garden)',
                     icon: Icons.visibility_outlined,
                   ),
-                 SizedBox(height: 10.h),
+                  SizedBox(height: 10.h),
                   _textField(
                     hint: 'Amenities (e.g. Pool, Gym)',
                     icon: Icons.pool_outlined,
@@ -735,7 +735,7 @@ class _PriceEstimatorScreenState extends State<PriceEstimatorScreen> {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-             Icon(Icons.auto_awesome, color: Colors.white, size: 18.sp),
+            Icon(Icons.auto_awesome, color: Colors.white, size: 18.sp),
             SizedBox(width: 8.w),
             Column(
               mainAxisSize: MainAxisSize.min,

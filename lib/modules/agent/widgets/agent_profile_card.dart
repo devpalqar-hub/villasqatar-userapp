@@ -32,20 +32,14 @@ class AgentProfileCard extends StatelessWidget {
 
           Text(
             "Ahmed Al-Mansoori",
-            style: TextStyle(
-              fontSize: 18.sp,
-              fontWeight: FontWeight.w700,
-            ),
+            style: TextStyle(fontSize: 18.sp, fontWeight: FontWeight.w700),
           ),
 
           SizedBox(height: 4.h),
 
           Text(
             "Senior Property Consultant",
-            style: TextStyle(
-              fontSize: 13.sp,
-              color: Colors.grey.shade600,
-            ),
+            style: TextStyle(fontSize: 13.sp, color: Colors.grey.shade600),
           ),
 
           SizedBox(height: 12.h),
@@ -53,25 +47,18 @@ class AgentProfileCard extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              const Icon(Icons.star,
-                  color: Colors.amber, size: 18),
+              const Icon(Icons.star, color: Colors.amber, size: 18),
 
               SizedBox(width: 4.w),
 
               Text(
                 "4.9",
-                style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 13.sp,
-                ),
+                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13.sp),
               ),
 
               Text(
                 " (153 Reviews)",
-                style: TextStyle(
-                  fontSize: 12.sp,
-                  color: Colors.grey,
-                ),
+                style: TextStyle(fontSize: 12.sp, color: Colors.grey),
               ),
             ],
           ),
@@ -89,12 +76,7 @@ class AgentProfileCard extends StatelessWidget {
 
               SizedBox(width: 4.w),
 
-              Text(
-                "Doha, Qatar",
-                style: TextStyle(
-                  fontSize: 13.sp,
-                ),
-              ),
+              Text("Doha, Qatar", style: TextStyle(fontSize: 13.sp)),
             ],
           ),
         ],
