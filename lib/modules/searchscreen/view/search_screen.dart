@@ -12,9 +12,9 @@ import '../../../core/constants/app_colors.dart';
 import '../../../core/theme/app_textstyles.dart';
 
 class SearchScreen extends StatelessWidget {
-  final String? initialSearch;
+ 
 
-  SearchScreen({super.key, this.initialSearch});
+  SearchScreen({super.key, });
 
   final PropertySearchController controller = Get.put(
     PropertySearchController(),
@@ -22,10 +22,6 @@ class SearchScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      controller.applyInitialSearch(initialSearch);
-    });
-
     return Scaffold(
       backgroundColor: const Color(0xffFCFCFC),
       body: GetBuilder<PropertySearchController>(
@@ -177,7 +173,10 @@ class SearchScreen extends StatelessWidget {
                         ),
                       ),
                       SizedBox(height: 12.h),
-                      SearchFilterCard(controller: controller),
+                      SearchFilterCard(
+                        controller: controller,
+                       
+                      ),
 
                       SizedBox(height: 24.h),
                       PropertyCategorySection(controller: controller),

@@ -978,10 +978,6 @@ class _VisitListScreenState extends State<VisitListScreen> {
     return parts.join(", ");
   }
 
-  // ============================================================
-  // ACCEPT CONFIRMATION
-  // ============================================================
-
   void _confirmAccept(VisitController controller, VisitModel visit) {
     final localDate = visit.scheduledAt?.toLocal();
 
@@ -990,66 +986,189 @@ class _VisitListScreenState extends State<VisitListScreen> {
         : "";
 
     Get.dialog(
-      AlertDialog(
-        backgroundColor: Colors.white,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(18.r),
-        ),
-        title: Text(
-          "Accept Visit?",
-          style: TextStyle(fontSize: 17.sp, fontWeight: FontWeight.w700),
-        ),
-        content: Text(
-          dateTimeText.isEmpty
-              ? "Do you want to accept this visit request?"
-              : "Do you want to accept the visit scheduled for $dateTimeText?",
-          style: TextStyle(
-            fontSize: 13.sp,
-            height: 1.5,
-            color: Colors.grey.shade700,
-          ),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () {
-              Get.back();
-            },
-            child: Text(
-              "Cancel",
-              style: TextStyle(color: Colors.grey.shade600),
-            ),
-          ),
-
-          ElevatedButton(
-            style: ElevatedButton.styleFrom(
-              elevation: 0,
-              backgroundColor: AppColors.primary,
-              foregroundColor: Colors.white,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(9.r),
+      Dialog(
+        backgroundColor: Colors.transparent,
+        insetPadding: EdgeInsets.symmetric(horizontal: 26.w),
+        child: Container(
+          padding: EdgeInsets.fromLTRB(20.w, 16.h, 20.w, 20.h),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(18.r),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.08),
+                blurRadius: 24,
+                offset: const Offset(0, 8),
               ),
-            ),
-            onPressed: () async {
-              /// Close confirmation dialog first
-              Get.back();
-
-              final success = await controller.acceptVisit(visitId: visit.id);
-
-              if (success) {
-                /// Controller already refreshes
-                /// fetchOwnerVisits after accept.
-              }
-            },
-            child: const Text("Accept"),
+            ],
           ),
-        ],
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              /// TOP CLOSE BUTTON
+              Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  InkWell(
+                    borderRadius: BorderRadius.circular(50.r),
+                    onTap: () {
+                      /// Only close dialog
+                      Get.back();
+                    },
+                    child: Container(
+                      width: 32.w,
+                      height: 32.w,
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFF5F5F5),
+                        shape: BoxShape.circle,
+                      ),
+                      child: Icon(
+                        Icons.close_rounded,
+                        size: 18.sp,
+                        color: const Color(0xFF666666),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+
+              /// ICON
+              Container(
+                width: 56.w,
+                height: 56.w,
+                decoration: BoxDecoration(
+                  color: AppColors.primary.withOpacity(0.08),
+                  shape: BoxShape.circle,
+                ),
+                child: Icon(
+                  Icons.calendar_month_outlined,
+                  color: AppColors.primary,
+                  size: 27.sp,
+                ),
+              ),
+
+              SizedBox(height: 16.h),
+
+              /// TITLE
+              Text(
+                "Visit Request",
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: 18.sp,
+                  fontWeight: FontWeight.w700,
+                  color: const Color(0xFF222222),
+                ),
+              ),
+
+              SizedBox(height: 8.h),
+
+              /// DESCRIPTION
+              Text(
+                dateTimeText.isEmpty
+                    ? "Would you like to accept or reject this visit request?"
+                    : "The visit is scheduled for $dateTimeText. Would you like to accept or reject this request?",
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: 12.sp,
+                  fontWeight: FontWeight.w400,
+                  height: 1.5,
+                  color: const Color(0xFF777777),
+                ),
+              ),
+
+              SizedBox(height: 24.h),
+
+              /// ACCEPT + REJECT
+              Row(
+                children: [
+                  /// REJECT
+                  Expanded(
+                    child: SizedBox(
+                      height: 46.h,
+                      child: OutlinedButton(
+                        onPressed: () async {
+                          /// Close dialog
+                          Get.back();
+
+                          /// Reject / Close visit API
+                          final success = await controller.rejectVisit(
+                            visitId: visit.id,
+                          );
+
+                          if (success) {
+                            /// Controller already
+                            /// refreshes owner visits.
+                          }
+                        },
+                        style: OutlinedButton.styleFrom(
+                          foregroundColor: const Color(0xFFD32F2F),
+                          side: const BorderSide(color: Color(0xFFD32F2F)),
+                          elevation: 0,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10.r),
+                          ),
+                        ),
+                        child: Text(
+                          "Reject",
+                          style: TextStyle(
+                            fontSize: 12.sp,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+
+                  SizedBox(width: 10.w),
+
+                  /// ACCEPT
+                  Expanded(
+                    child: SizedBox(
+                      height: 46.h,
+                      child: ElevatedButton(
+                        onPressed: () async {
+                          /// Close dialog
+                          Get.back();
+
+                          final success = await controller.acceptVisit(
+                            visitId: visit.id,
+                          );
+
+                          if (success) {
+                            /// Controller already
+                            /// refreshes owner visits.
+                          }
+                        },
+                        style: ElevatedButton.styleFrom(
+                          elevation: 0,
+                          backgroundColor: AppColors.primary,
+                          foregroundColor: Colors.white,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10.r),
+                          ),
+                        ),
+                        child: Text(
+                          "Accept",
+                          style: TextStyle(
+                            fontSize: 12.sp,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
       ),
+
+      /// User can also tap outside to close.
+      /// Change to false if you only want X to close.
+      barrierDismissible: true,
     );
   }
-
-  // ============================================================
-  // EMPTY VIEW
-  // ============================================================
 
   Widget _emptyView({
     required IconData icon,

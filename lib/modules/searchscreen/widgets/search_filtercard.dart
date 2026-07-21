@@ -22,13 +22,13 @@ class SearchFilterCard extends StatefulWidget {
 class _SearchFilterCardState extends State<SearchFilterCard> {
   final ListPropertyController controller = Get.put(ListPropertyController());
 
-  int selectedTab = 0;
+
 
   final List<String> tabs = ["Buy".tr, "Rent".tr];
-  final TextEditingController searchController = TextEditingController();
 
   String selectedPropertyType = "Property Type";
   String selectedPrice = "Price Range";
+
   final List<String> propertyTypes = [
     "Property Type",
     "VILLA",
@@ -51,6 +51,9 @@ class _SearchFilterCardState extends State<SearchFilterCard> {
 
   @override
   Widget build(BuildContext context) {
+
+    final int selectedTab =
+      widget.controller.purpose == "RENT" ? 1 : 0;
     return Container(
       width: double.infinity,
       padding: EdgeInsets.only(top: 5.h, left: 16.w, right: 16.w, bottom: 5.h),
@@ -76,17 +79,12 @@ class _SearchFilterCardState extends State<SearchFilterCard> {
                 return Expanded(
                   child: InkWell(
                     borderRadius: BorderRadius.circular(8.r),
-                    onTap: () {
-                      setState(() {
-                        selectedTab = index;
-                      });
+                   onTap: () {
+  widget.controller.purpose =
+      index == 0 ? "SALE" : "RENT";
 
-                      if (index == 0) {
-                        widget.controller.purpose = "SALE";
-                      } else if (index == 1) {
-                        widget.controller.purpose = "RENT";
-                      }
-                    },
+  widget.controller.update();
+},
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
@@ -157,14 +155,35 @@ class _SearchFilterCardState extends State<SearchFilterCard> {
 
                       Expanded(
                         child: TextField(
-                          controller: searchController,
+                          controller: widget.controller.searchTextController,
+
+                          textInputAction: TextInputAction.search,
+
                           onChanged: (value) {
-                            widget.controller.search = value;
+                            widget.controller.search = value.trim();
+                          },
+
+                          onSubmitted: (value) {
+                            widget.controller.applyFilters(
+                              search: value.trim(),
+                              type: widget.controller.type,
+                              purpose: widget.controller.purpose,
+                              furnishingStatus:
+                                  widget.controller.furnishingStatus,
+                              nearbyTag: widget.controller.nearbyTag,
+                              minPrice: widget.controller.minPrice,
+                              maxPrice: widget.controller.maxPrice,
+                              minBedrooms: widget.controller.minBedrooms,
+                              minBathrooms: widget.controller.minBathrooms,
+                              minArea: widget.controller.minArea,
+                              maxArea: widget.controller.maxArea,
+                            );
                           },
 
                           style: AppTextStyles.body14.copyWith(
                             color: const Color(0xff32354A),
                           ),
+
                           decoration: InputDecoration(
                             isCollapsed: true,
                             border: InputBorder.none,
@@ -361,7 +380,7 @@ class _SearchFilterCardState extends State<SearchFilterCard> {
             child: ElevatedButton(
               onPressed: () async {
                 widget.controller.applyFilters(
-                  search: searchController.text.trim(),
+                  search: widget.controller.searchTextController.text.trim(),
                   type: widget.controller.type,
                   purpose: widget.controller.purpose,
                   furnishingStatus: widget.controller.furnishingStatus,
@@ -375,15 +394,11 @@ class _SearchFilterCardState extends State<SearchFilterCard> {
                 );
 
                 setState(() {
-                  searchController.clear();
-
                   selectedPropertyType = "Property Type";
                   selectedPrice = "Price Range";
 
-                  selectedTab = 0; // Buy
+                  
                 });
-
-                widget.controller.resetSearch();
               },
               style: ElevatedButton.styleFrom(
                 elevation: 0,
@@ -813,17 +828,43 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
                         child: SizedBox(
                           height: 52.h,
                           child: OutlinedButton(
-                            onPressed: () {
-                              widget.controller.clearFilters();
+                           onPressed: () {
+  widget.controller.applyFilters(
+    search: widget
+        .controller
+        .searchTextController
+        .text
+        .trim(),
 
-                              minPriceCtrl.clear();
-                              maxPriceCtrl.clear();
-                              bedCtrl.clear();
-                              bathCtrl.clear();
-                              areaCtrl.clear();
+    type: widget.controller.type,
 
-                              Navigator.pop(context);
-                            },
+    purpose: widget.controller.purpose,
+
+    furnishingStatus:
+        widget.controller.furnishingStatus,
+
+    nearbyTag:
+        widget.controller.nearbyTag,
+
+    minPrice:
+        widget.controller.minPrice,
+
+    maxPrice:
+        widget.controller.maxPrice,
+
+    minBedrooms:
+        widget.controller.minBedrooms,
+
+    minBathrooms:
+        widget.controller.minBathrooms,
+
+    minArea:
+        widget.controller.minArea,
+
+    maxArea:
+        widget.controller.maxArea,
+  );
+},
                             style: OutlinedButton.styleFrom(
                               side: const BorderSide(color: AppColors.primary),
                               shape: RoundedRectangleBorder(

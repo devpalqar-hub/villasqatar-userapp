@@ -7,9 +7,7 @@ import 'package:villas_qatar/modules/Plans/services/featured_properties_controll
 import 'package:villas_qatar/modules/home/widgets/agent_card.dart';
 import 'package:villas_qatar/modules/home/widgets/boost_property_banner.dart';
 import 'package:villas_qatar/modules/home/widgets/category_card.dart';
-import 'package:villas_qatar/modules/home/widgets/explore.dart';
 import 'package:villas_qatar/modules/home/widgets/hero_banner.dart';
-import 'package:villas_qatar/modules/mainscreen/home_bottom_nav.dart';
 import 'package:villas_qatar/modules/home/widgets/home_header.dart';
 import 'package:villas_qatar/modules/home/widgets/location_card.dart';
 import 'package:villas_qatar/modules/home/widgets/property_card.dart';
@@ -22,11 +20,13 @@ import 'package:villas_qatar/modules/pricestimator/views/price_estimator_screen.
 class HomeScreen extends StatefulWidget {
   final void Function(String propertyName) onSearch;
   final void Function(String type) onCategorySelected;
+  final void Function(String purpose) onPurposeSelected;
 
   const HomeScreen({
     super.key,
     required this.onSearch,
     required this.onCategorySelected,
+    required this.onPurposeSelected,
   });
 
   @override
@@ -95,8 +95,7 @@ class _HomeScreenState extends State<HomeScreen> {
             children: [
               HomeHeader(),
               HomeBanner(onSearch: widget.onSearch),
-              QuickActionsCard(),
-
+              QuickActionsCard(onPurposeSelected: widget.onPurposeSelected),
               SectionHeader(title: "Near You".tr),
 
               SizedBox(
@@ -118,88 +117,122 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
               ),
 
-              /// AI Price Estimator Button
+              /// AI PRICE ESTIMATOR - PREMIUM CARD
               Container(
                 width: double.infinity,
-                height: 58.h,
+                padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 14.h),
                 decoration: BoxDecoration(
-                  gradient: const LinearGradient(
-                    colors: [Color(0xFF8E123E), Color(0xFFB71C4A)],
-                  ),
+                  color: Colors.white,
                   borderRadius: BorderRadius.circular(16.r),
+                  border: Border.all(
+                    color: const Color(0xFF8E123E).withOpacity(0.12),
+                  ),
                   boxShadow: [
                     BoxShadow(
-                      color: const Color(0xFF8E123E).withOpacity(0.18),
-                      blurRadius: 14,
-                      offset: const Offset(0, 6),
+                      color: Colors.black.withOpacity(0.05),
+                      blurRadius: 16,
+                      offset: const Offset(0, 5),
                     ),
                   ],
                 ),
-                child: Material(
-                  color: Colors.transparent,
-                  child: InkWell(
-                    borderRadius: BorderRadius.circular(16.r),
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => PriceEstimatorScreen(),
+                child: InkWell(
+                  borderRadius: BorderRadius.circular(16.r),
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (_) => PriceEstimatorScreen()),
+                    );
+                  },
+                  child: Row(
+                    children: [
+                      /// ICON
+                      Container(
+                        width: 48.w,
+                        height: 48.w,
+                        decoration: BoxDecoration(
+                          color: const Color(0xFF8E123E).withOpacity(0.08),
+                          borderRadius: BorderRadius.circular(14.r),
                         ),
-                      );
-                    },
-                    child: Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 18.w),
-                      child: Row(
-                        children: [
-                          Container(
-                            width: 42.w,
-                            height: 42.h,
-                            decoration: BoxDecoration(
-                              color: Colors.white.withOpacity(.15),
-                              shape: BoxShape.circle,
+                        child: Stack(
+                          alignment: Alignment.center,
+                          children: [
+                            Icon(
+                              Icons.home_work_outlined,
+                              color: const Color(0xFF8E123E),
+                              size: 25.sp,
                             ),
-                            child: Icon(
-                              Icons.auto_awesome,
-                              color: Colors.white,
-                              size: 22.sp,
+
+                            Positioned(
+                              top: 7.h,
+                              right: 7.w,
+                              child: Icon(
+                                Icons.auto_awesome,
+                                size: 11.sp,
+                                color: const Color(0xFF8E123E),
+                              ),
                             ),
-                          ),
-                          SizedBox(width: 14.w),
-                          Expanded(
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              crossAxisAlignment: CrossAxisAlignment.start,
+                          ],
+                        ),
+                      ),
+
+                      SizedBox(width: 14.w),
+
+                      /// TEXT
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(
                               children: [
-                                Text(
-                                  "AI Price Estimator".tr,
-                                  style: TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 16.sp,
-                                    fontWeight: FontWeight.w700,
+                                Flexible(
+                                  child: Text(
+                                    "AI Price Estimator".tr,
+                                    style: TextStyle(
+                                      fontSize: 15.sp,
+                                      fontWeight: FontWeight.w700,
+                                      color: const Color(0xFF222222),
+                                    ),
                                   ),
                                 ),
-                                SizedBox(height: 2.h),
-                                Text(
-                                  "Estimate your property's market value instantly"
-                                      .tr,
-                                  maxLines: 1,
-                                  overflow: TextOverflow.ellipsis,
-                                  style: TextStyle(
-                                    color: Colors.white.withOpacity(.9),
-                                    fontSize: 11.sp,
-                                  ),
-                                ),
+
+                                SizedBox(width: 7.w),
                               ],
                             ),
-                          ),
-                          Icon(
-                            Icons.arrow_forward_ios_rounded,
-                            color: Colors.white,
-                            size: 18.sp,
-                          ),
-                        ],
+
+                            SizedBox(height: 5.h),
+
+                            Text(
+                              "Get an instant estimate of your property's market value"
+                                  .tr,
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
+                              style: TextStyle(
+                                fontSize: 11.sp,
+                                height: 1.35,
+                                color: Colors.grey.shade600,
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
-                    ),
+
+                      SizedBox(width: 10.w),
+
+                      /// ARROW
+                      Container(
+                        width: 32.w,
+                        height: 32.w,
+                        decoration: BoxDecoration(
+                          color: const Color(0xFF8E123E),
+                          borderRadius: BorderRadius.circular(10.r),
+                        ),
+                        child: Icon(
+                          Icons.arrow_forward_rounded,
+                          color: Colors.white,
+                          size: 17.sp,
+                        ),
+                      ),
+                    ],
                   ),
                 ),
               ),
@@ -262,12 +295,14 @@ class _HomeScreenState extends State<HomeScreen> {
               _buildFeaturedPropertiesSection(),
               InvestmentBanner(),
 
-              SectionHeader(title: "Featured Agents".tr),
+              SectionHeader(title: "Featured Dealers".tr),
 
               SizedBox(
-                height: 240.h,
+                height: 165.h,
                 child: ListView.separated(
                   scrollDirection: Axis.horizontal,
+                  physics: const BouncingScrollPhysics(),
+                  clipBehavior: Clip.none,
                   itemCount: 3,
                   separatorBuilder: (_, __) => SizedBox(width: 12.w),
                   itemBuilder: (context, index) {
@@ -276,24 +311,18 @@ class _HomeScreenState extends State<HomeScreen> {
                         "image": "assets/images/agent1.png",
                         "name": "Ahmed Al-Mansoori",
                         "designation": "Senior Property Consultant",
-                        "rating": "4.8",
-                        "reviews": "120",
                         "phone": "+974 55 123 456",
                       },
                       {
                         "image": "assets/images/agent2.png",
                         "name": "Fatima Al-Kuwari",
                         "designation": "Property Consultant",
-                        "rating": "4.7",
-                        "reviews": "98",
                         "phone": "+974 55 987 654",
                       },
                       {
                         "image": "assets/images/agent3.png",
                         "name": "Mohammed Khalid",
                         "designation": "Real Estate Advisor",
-                        "rating": "4.9",
-                        "reviews": "150",
                         "phone": "+974 55 456 789",
                       },
                     ];
@@ -304,17 +333,15 @@ class _HomeScreenState extends State<HomeScreen> {
                       image: agent["image"]!,
                       name: agent["name"]!,
                       designation: agent["designation"]!,
-                      rating: agent["rating"]!,
-                      reviews: agent["reviews"]!,
                       phone: agent["phone"]!,
                     );
                   },
                 ),
               ),
               BoostPropertyBanner(),
-              SectionHeader(title: "Explore Qatar".tr),
-              ExploreQatarSection(),
 
+              // SectionHeader(title: "Explore Qatar".tr),
+              //ExploreQatarSection(),
               const WhyChooseCard(),
             ],
           ),

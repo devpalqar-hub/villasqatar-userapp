@@ -15,28 +15,23 @@ import 'package:villas_qatar/modules/wishlist/service/wishlist_controller.dart';
 
 class PropertiesSection extends StatelessWidget {
   final PropertySearchController controller;
+
   const PropertiesSection({super.key, required this.controller});
 
   @override
   Widget build(BuildContext context) {
-    final WishlistController wishlistController = Get.put(WishlistController());
+    // Make sure WishlistController exists
+    if (!Get.isRegistered<WishlistController>()) {
+      Get.put(WishlistController());
+    }
+
     return GetBuilder<PropertySearchController>(
       builder: (controller) {
-        if (controller.isLoading) {
-          return const Center(child: CircularProgressIndicator());
-        }
-
-        if (controller.properties.isEmpty) {
-          return const Center(
-            child: Padding(
-              padding: EdgeInsets.symmetric(vertical: 40),
-              child: Text("No Properties Found"),
-            ),
-          );
-        }
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            /// PROPERTIES HEADER
+            /// Always visible
             Row(
               children: [
                 Text(
@@ -51,17 +46,94 @@ class PropertiesSection extends StatelessWidget {
             ),
 
             SizedBox(height: 14.h),
-            ListView.builder(
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              itemCount: controller.properties.length,
-              itemBuilder: (_, index) {
-                return PropertyCard(property: controller.properties[index]);
-              },
-            ),
+
+            /// LOADING
+            if (controller.isLoading)
+              Padding(
+                padding: EdgeInsets.symmetric(vertical: 45.h),
+                child: Center(
+                  child: SizedBox(
+                    width: 24.w,
+                    height: 24.w,
+                    child: CircularProgressIndicator(
+                      strokeWidth: 2,
+                      color: AppColors.primary,
+                    ),
+                  ),
+                ),
+              )
+            /// NO PROPERTIES FOUND
+            else if (controller.properties.isEmpty)
+              _buildEmptyState()
+            /// PROPERTY LIST
+            else
+              ListView.builder(
+                shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
+                itemCount: controller.properties.length,
+                itemBuilder: (_, index) {
+                  return PropertyCard(property: controller.properties[index]);
+                },
+              ),
           ],
         );
       },
+    );
+  }
+
+  Widget _buildEmptyState() {
+    return Container(
+      width: double.infinity,
+      padding: EdgeInsets.symmetric(vertical: 38.h, horizontal: 20.w),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(12.r),
+        border: Border.all(color: const Color(0xffEEEEEE)),
+      ),
+      child: Column(
+        children: [
+          /// ICON
+          Container(
+            width: 58.w,
+            height: 58.w,
+            decoration: BoxDecoration(
+              color: AppColors.primary.withOpacity(.08),
+              shape: BoxShape.circle,
+            ),
+            child: Icon(
+              Icons.home_work_outlined,
+              color: AppColors.primary,
+              size: 27.sp,
+            ),
+          ),
+
+          SizedBox(height: 14.h),
+
+          /// TITLE
+          Text(
+            "No Properties Found".tr,
+            textAlign: TextAlign.center,
+            style: AppTextStyles.title18.copyWith(
+              fontSize: 14.sp,
+              fontWeight: FontWeight.w600,
+              color: const Color(0xff202124),
+            ),
+          ),
+
+          SizedBox(height: 6.h),
+
+          /// SUBTITLE
+          Text(
+            "Try changing your search or filters".tr,
+            textAlign: TextAlign.center,
+            style: AppTextStyles.body13.copyWith(
+              fontSize: 11.sp,
+              color: const Color(0xff777777),
+              height: 1.4,
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

@@ -2,15 +2,19 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
-import 'package:share_plus/share_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:villas_qatar/modules/propertylist/model/myproperty_model.dart';
 import 'package:villas_qatar/modules/wishlist/service/wishlist_controller.dart';
 
 class HeroImageCard extends StatefulWidget {
   final Property property;
+  final bool isMyProperty;
 
-  const HeroImageCard({super.key, required this.property});
+  const HeroImageCard({
+    super.key,
+    required this.property,
+    this.isMyProperty = false,
+  });
 
   @override
   State<HeroImageCard> createState() => _HeroImageCardState();
@@ -301,60 +305,66 @@ class _HeroImageCardState extends State<HeroImageCard> {
                           }),
                           SizedBox(width: 10.w),
 
-                          GetBuilder<WishlistController>(
-                            init: wishlistController,
-                            builder: (controller) {
-                              final propertyId = widget.property.id;
+                          /// FAVORITE
+                          /// Do not show for user's own property
+                          if (!widget.isMyProperty) ...[
+                            SizedBox(width: 10.w),
 
-                              final isWishlisted = controller.isWishlisted(
-                                propertyId,
-                              );
+                            GetBuilder<WishlistController>(
+                              init: wishlistController,
+                              builder: (controller) {
+                                final propertyId = widget.property.id;
 
-                              final isLoading = controller.isPropertyLoading(
-                                propertyId,
-                              );
+                                final isWishlisted = controller.isWishlisted(
+                                  propertyId,
+                                );
 
-                              return GestureDetector(
-                                behavior: HitTestBehavior.opaque,
-                                onTap: isLoading
-                                    ? null
-                                    : () async {
-                                        await controller.toggleWishlist(
-                                          propertyId,
-                                        );
-                                      },
-                                child: Container(
-                                  width: 30.w,
-                                  height: 30.w,
-                                  alignment: Alignment.center,
-                                  decoration: BoxDecoration(
-                                    color: Colors.white,
-                                    shape: BoxShape.circle,
-                                    border: Border.all(
-                                      color: Colors.white.withOpacity(.20),
+                                final isLoading = controller.isPropertyLoading(
+                                  propertyId,
+                                );
+
+                                return GestureDetector(
+                                  behavior: HitTestBehavior.opaque,
+                                  onTap: isLoading
+                                      ? null
+                                      : () async {
+                                          await controller.toggleWishlist(
+                                            propertyId,
+                                          );
+                                        },
+                                  child: Container(
+                                    width: 30.w,
+                                    height: 30.w,
+                                    alignment: Alignment.center,
+                                    decoration: BoxDecoration(
+                                      color: Colors.white,
+                                      shape: BoxShape.circle,
+                                      border: Border.all(
+                                        color: Colors.white.withOpacity(.20),
+                                      ),
                                     ),
+                                    child: isLoading
+                                        ? SizedBox(
+                                            width: 14.w,
+                                            height: 14.w,
+                                            child:
+                                                const CircularProgressIndicator(
+                                                  strokeWidth: 1.5,
+                                                  color: Color(0xff8E123E),
+                                                ),
+                                          )
+                                        : Icon(
+                                            isWishlisted
+                                                ? Icons.favorite
+                                                : Icons.favorite_border,
+                                            color: const Color(0xff8E123E),
+                                            size: 16.sp,
+                                          ),
                                   ),
-                                  child: isLoading
-                                      ? SizedBox(
-                                          width: 14.w,
-                                          height: 14.w,
-                                          child:
-                                              const CircularProgressIndicator(
-                                                strokeWidth: 1.5,
-                                                color: Color(0xff8E123E),
-                                              ),
-                                        )
-                                      : Icon(
-                                          isWishlisted
-                                              ? Icons.favorite
-                                              : Icons.favorite_border,
-                                          color: const Color(0xff8E123E),
-                                          size: 16.sp,
-                                        ),
-                                ),
-                              );
-                            },
-                          ),
+                                );
+                              },
+                            ),
+                          ],
                         ],
                       ),
                     ],

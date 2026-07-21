@@ -1,10 +1,10 @@
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:villas_qatar/Core/network/api_endpoints.dart';
 import 'package:villas_qatar/Core/network/api_handler.dart';
 import 'package:villas_qatar/modules/propertylist/model/myproperty_model.dart';
 
 class PropertySearchController extends GetxController {
-  
   bool isLoading = false;
   bool isLoadingMore = false;
   bool hasMore = true;
@@ -17,7 +17,7 @@ class PropertySearchController extends GetxController {
   List<Property> properties = [];
   Meta? meta;
 
-  // Search & Filters
+  final TextEditingController searchTextController = TextEditingController();
   String search = "";
   String type = "";
   String purpose = "";
@@ -40,7 +40,6 @@ class PropertySearchController extends GetxController {
     super.onInit();
     fetchProperties();
   }
-  
 
   Future<void> fetchProperties({bool loadMore = false}) async {
     if (loadMore) {
@@ -126,34 +125,65 @@ class PropertySearchController extends GetxController {
       update();
     }
   }
-  
-  
+
   Future<void> refreshProperties() async {
-    await fetchProperties();
+  search = "";
+  searchTextController.clear();
+
+  purpose = "";
+  type = "";
+  furnishingStatus = "";
+  nearbyTag = "";
+
+  minPrice = null;
+  maxPrice = null;
+  minBedrooms = null;
+  minBathrooms = null;
+  minArea = null;
+  maxArea = null;
+
+  page = 1;
+  hasMore = true;
+
+
+
+  update();
+
+  await fetchProperties();
+}
+
+  void searchProperty(String value) {
+    final query = value.trim();
+
+    if (query.isEmpty) return;
+
+    search = query;
+    searchTextController.text = query;
+
+    fetchProperties();
   }
 
- 
-  
-  void searchProperty(String value) {
-  search = value.trim();
-  fetchProperties();
-}
+  void applyInitialSearch(String? value) {
+    final query = value?.trim() ?? "";
 
-bool _initialSearchApplied = false;
+    if (query.isEmpty) return;
 
-void applyInitialSearch(String? value) {
-  if (_initialSearchApplied) return;
+    /// Store API search
+    search = query;
 
-  final query = value?.trim() ?? "";
+    /// Show same text inside SearchFilterCard
+    searchTextController.text = query;
 
-  if (query.isEmpty) return;
+    /// Keep cursor at end
+    searchTextController.selection = TextSelection.fromPosition(
+      TextPosition(offset: searchTextController.text.length),
+    );
 
-  _initialSearchApplied = true;
+    update();
 
-  search = query;
-
-  fetchProperties();
-}
+    /// Search API
+    fetchProperties();
+  }
 
   void applyFilters({
     String? search,
@@ -217,27 +247,51 @@ void applyInitialSearch(String? value) {
   }
 
   Future<void> fetchPropertyDetails(String propertyId) async {
-  try {
-    isDetailsLoading = true;
-    detailsError = "";
+    try {
+      isDetailsLoading = true;
+      detailsError = "";
+      selectedProperty = null;
+      update();
+
+      final response = await ApiHandler.get(
+        "${ApiEndpoints.propertyList}/$propertyId",
+      );
+
+      selectedProperty = Property.fromJson(response);
+    } catch (e) {
+      detailsError = e.toString();
+    } finally {
+      isDetailsLoading = false;
+      update();
+    }
+  }
+
+  void clearPropertyDetails() {
     selectedProperty = null;
-    update();
-
-    final response = await ApiHandler.get(
-      "${ApiEndpoints.propertyList}/$propertyId",
-    );
-
-    selectedProperty = Property.fromJson(response);
-  } catch (e) {
-    detailsError = e.toString();
-  } finally {
-    isDetailsLoading = false;
+    detailsError = "";
     update();
   }
-}
-void clearPropertyDetails() {
-  selectedProperty = null;
-  detailsError = "";
+
+  @override
+  void onClose() {
+    searchTextController.dispose();
+    super.onClose();
+  }
+
+void applyInitialPurpose(String? value) {
+  final selectedPurpose =
+      value?.trim().toUpperCase() ?? "";
+
+  if (selectedPurpose != "SALE" &&
+      selectedPurpose != "RENT") {
+    return;
+  }
+
+  purpose = selectedPurpose;
+
   update();
+
+  fetchProperties();
 }
+
 }

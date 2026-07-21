@@ -292,11 +292,6 @@ class _ConversationTile extends StatelessWidget {
                         ),
 
                         SizedBox(height: 5.h),
-
-                        // ====================================
-                        // PROPERTY TYPE / PURPOSE
-                        // ====================================
-
                         Row(
                           children: [
                             if (propertyType.isNotEmpty)
@@ -307,20 +302,10 @@ class _ConversationTile extends StatelessWidget {
                             if (propertyType.isNotEmpty &&
                                 purpose.isNotEmpty)
                               SizedBox(width: 5.w),
-
-                            // if (purpose.isNotEmpty)
-                            //   _smallTag(
-                            //     purpose,
-                            //   ),
                           ],
                         ),
 
                         const Spacer(),
-
-                        // ====================================
-                        // LAST MESSAGE
-                        // ====================================
-
                         Row(
                           children: [
                             Icon(
@@ -347,11 +332,6 @@ class _ConversationTile extends StatelessWidget {
                         ),
 
                         SizedBox(height: 5.h),
-
-                        // ====================================
-                        // SELLER
-                        // ====================================
-
                         Row(
                           children: [
                             Container(
@@ -411,10 +391,6 @@ class _ConversationTile extends StatelessWidget {
     );
   }
 
-  // ============================================================
-  // SMALL PROPERTY TAG
-  // ============================================================
-
   Widget _smallTag(String text) {
     return Container(
       padding: EdgeInsets.symmetric(
@@ -438,9 +414,6 @@ class _ConversationTile extends StatelessWidget {
     );
   }
 
-  // ============================================================
-  // IMAGE PLACEHOLDER
-  // ============================================================
 
   Widget _placeholder() {
     return Container(
@@ -455,13 +428,6 @@ class _ConversationTile extends StatelessWidget {
       ),
     );
   }
-
-  // ============================================================
-  // FORMAT API ENUM
-  // Example:
-  // FOR_RENT -> For Rent
-  // APARTMENT -> Apartment
-  // ============================================================
 
   String _formatLabel(String value) {
     if (value.trim().isEmpty) return "";
@@ -478,9 +444,6 @@ class _ConversationTile extends StatelessWidget {
         .join(" ");
   }
 
-  // ============================================================
-  // TIME
-  // ============================================================
 String _formatTime(DateTime date) {
   final DateTime now = DateTime.now();
 

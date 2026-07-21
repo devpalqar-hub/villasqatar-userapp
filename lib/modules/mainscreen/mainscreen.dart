@@ -12,6 +12,7 @@ import 'package:villas_qatar/modules/settings/view/setting_screen.dart';
 
 class MainScreen extends StatefulWidget {
   final int initialIndex;
+  
 
   final String? initialSearch;
   final String? initialType;
@@ -36,24 +37,83 @@ class _MainScreenState extends State<MainScreen> {
 
   late final List<Widget> pages;
 
-  @override
-  void initState() {
-    super.initState();
 
-    currentIndex = widget.initialIndex;
+ @override
+void initState() {
+  super.initState();
 
-    pages = [
-      HomeScreen(
-        onSearch: _handleHomeSearch,
-        onCategorySelected: _handleCategorySearch,
-      ),
-      SearchScreen(),
-      MyPropertiesScreen(),
-      ChatListScreen(),
+  /// Select requested bottom navigation tab
+  currentIndex = widget.initialIndex;
 
-      const SettingsScreen(),
-    ];
+  /// Get or create ONE search controller
+  final controller =
+      Get.isRegistered<PropertySearchController>()
+          ? Get.find<PropertySearchController>()
+          : Get.put(PropertySearchController());
+
+  /// Apply initial SEARCH if provided
+  if (widget.initialSearch != null &&
+      widget.initialSearch!.trim().isNotEmpty) {
+    controller.search =
+        widget.initialSearch!.trim();
+
+    controller.searchTextController.text =
+        widget.initialSearch!.trim();
   }
+
+  /// Apply initial PROPERTY TYPE if provided
+  if (widget.initialType != null &&
+      widget.initialType!.trim().isNotEmpty) {
+    controller.type =
+        widget.initialType!.trim();
+  }
+
+  /// Apply initial BUY / RENT
+  if (widget.initialPurpose != null &&
+      widget.initialPurpose!.trim().isNotEmpty) {
+    controller.purpose =
+        widget.initialPurpose!
+            .trim()
+            .toUpperCase();
+  }
+
+  /// Apply initial category if needed
+  if (widget.initialCategory != null &&
+      widget.initialCategory!.trim().isNotEmpty) {
+    controller.type =
+        widget.initialCategory!.trim();
+  }
+
+  /// Create pages AFTER controller values are set
+  pages = [
+     HomeScreen(
+    onSearch: _handleHomeSearch,
+
+    onCategorySelected:
+        _handleCategorySearch,
+
+    onPurposeSelected:
+        _handlePurposeSearch,
+  ),
+
+    SearchScreen(),
+
+    MyPropertiesScreen(),
+
+    ChatListScreen(),
+
+    const SettingsScreen(),
+  ];
+
+  /// If MainScreen was opened directly on Search,
+  /// fetch using the initial filters.
+  if (widget.initialIndex == 1) {
+    WidgetsBinding.instance
+        .addPostFrameCallback((_) {
+      controller.fetchProperties();
+    });
+  }
+}
 
   @override
   Widget build(BuildContext context) {
@@ -125,4 +185,40 @@ class _MainScreenState extends State<MainScreen> {
       currentIndex = 1;
     });
   }
+
+void _handlePurposeSearch(String purpose) {
+  debugPrint(
+    "PURPOSE CLICKED: $purpose",
+  );
+
+  final controller =
+      Get.isRegistered<PropertySearchController>()
+          ? Get.find<PropertySearchController>()
+          : Get.put(
+              PropertySearchController(),
+            );
+
+  /// Clear previous property-name search
+  controller.search = "";
+  controller.searchTextController.clear();
+
+  /// Clear previous category
+  controller.type = "";
+
+  /// Set BUY or RENT
+  /// BUY  = SALE
+  /// RENT = RENT
+  controller.purpose = purpose;
+
+  /// Rebuild SearchFilterCard
+  controller.update();
+
+  /// Fetch filtered properties
+  controller.fetchProperties();
+
+  /// Switch EXISTING MainScreen to Search tab
+  setState(() {
+    currentIndex = 1;
+  });
+}
 }

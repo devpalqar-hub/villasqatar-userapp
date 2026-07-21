@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
 import 'package:villas_qatar/Core/network/api_endpoints.dart';
 import 'package:villas_qatar/Core/network/api_handler.dart';
@@ -10,6 +11,7 @@ class VisitController extends GetxController {
 
   bool isOwnerVisitsLoading = false;
   bool isVisitorVisitsLoading = false;
+  bool isRejecting = false;
 
   dynamic scheduledVisit;
 
@@ -23,11 +25,6 @@ class VisitController extends GetxController {
     fetchOwnerVisits();
     fetchVisitorVisits();
   }
-
-  // =========================================================
-  // SCHEDULE VISIT
-  // POST /api/visits/{propertyId}
-  // =========================================================
 
   Future<bool> scheduleVisit({
     required String propertyId,
@@ -51,9 +48,6 @@ class VisitController extends GetxController {
         ApiEndpoints.scheduleVisit(propertyId),
         body: body,
       );
-
-      debugPrint("Schedule Visit Response: $response");
-
       scheduledVisit = response;
 
       // Refresh visitor list after booking
@@ -82,11 +76,6 @@ class VisitController extends GetxController {
     }
   }
 
-  // =========================================================
-  // ACCEPT VISIT
-  // POST /api/visits/{visitId}/accept
-  // =========================================================
-
   Future<bool> acceptVisit({required String visitId}) async {
     try {
       isAccepting = true;
@@ -97,12 +86,13 @@ class VisitController extends GetxController {
       );
       await fetchOwnerVisits(showLoading: false);
 
-      Get.snackbar(
-        "Success",
-        "Visit accepted successfully",
-        snackPosition: SnackPosition.BOTTOM,
+      Fluttertoast.showToast(
+        msg: "Visit scheduled successfully",
+        toastLength: Toast.LENGTH_SHORT,
+        gravity: ToastGravity.BOTTOM,
+        backgroundColor: Colors.green.shade700,
+        textColor: Colors.white,
       );
-
       return true;
     } catch (e) {
       debugPrint("Accept Visit Error: $e");
@@ -127,12 +117,7 @@ class VisitController extends GetxController {
         update();
       }
 
-      debugPrint("========== FETCH OWNER VISITS ==========");
-
       final response = await ApiHandler.get(ApiEndpoints.visitsAsOwner);
-
-      debugPrint("Owner Visits Response: $response");
-
       if (response is List) {
         ownerVisits = response
             .whereType<Map<String, dynamic>>()
@@ -187,6 +172,65 @@ class VisitController extends GetxController {
       visitorVisits = [];
     } finally {
       isVisitorVisitsLoading = false;
+      update();
+    }
+  }
+
+  Future<bool> rejectVisit({required String visitId}) async {
+    final String id = visitId.trim();
+
+    if (id.isEmpty) {
+      debugPrint("Reject Visit: Visit ID is empty");
+
+      Get.rawSnackbar(
+        message: "Visit ID is missing",
+        snackPosition: SnackPosition.BOTTOM,
+        backgroundColor: Colors.red,
+        margin: const EdgeInsets.all(16),
+        borderRadius: 10,
+        duration: const Duration(seconds: 2),
+      );
+
+      return false;
+    }
+
+    try {
+      isRejecting = true;
+      update();
+      final response = await ApiHandler.patch(
+        ApiEndpoints.closeVisit(id),
+        body: {},
+      );
+      /// Update local visit
+      if (response is Map<String, dynamic>) {
+        final updatedVisit = VisitModel.fromJson(response);
+
+        final int index = ownerVisits.indexWhere((visit) => visit.id == id);
+
+        if (index != -1) {
+          ownerVisits[index] = updatedVisit;
+        }
+
+        update();
+      }
+
+      /// Get latest visits from server
+      await fetchOwnerVisits(showLoading: false);
+      return true;
+    } catch (e) {
+      Get.rawSnackbar(
+        message: e.toString().replaceFirst("Exception: ", ""),
+        snackPosition: SnackPosition.BOTTOM,
+        backgroundColor: Colors.red.shade700,
+
+        margin: const EdgeInsets.all(16),
+        borderRadius: 10,
+        duration: const Duration(seconds: 3),
+      );
+
+      return false;
+    } finally {
+      isRejecting = false;
       update();
     }
   }

@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:get/get.dart';
 
 import 'package:villas_qatar/Core/network/api_endpoints.dart';
@@ -38,6 +39,9 @@ class MyPropertyController extends GetxController {
   int page = 1;
   final int limit = 12;
   bool hasMore = true;
+  bool isMarkingAsSold = false;
+  String markAsSoldError = "";
+ 
 
   Future<void> fetchProperties({bool loadMore = false}) async {
     if (loadMore) {
@@ -200,5 +204,53 @@ class MyPropertyController extends GetxController {
     this.sortOrder = sortOrder;
 
     fetchProperties();
+  }
+
+  Future<bool> markAsSold(String propertyId) async {
+    final String id = propertyId.trim();
+
+    if (id.isEmpty) {
+      markAsSoldError = "Property ID is missing";
+      update();
+      return false;
+    }
+
+    try {
+      isMarkingAsSold = true;
+      markAsSoldError = "";
+      update();
+
+      debugPrint("MARK AS SOLD PROPERTY ID: $id");
+
+      final response = await ApiHandler.post(
+        ApiEndpoints.markPropertyAsSold(id),
+      );
+
+      debugPrint("MARK AS SOLD RESPONSE: $response");
+
+      /// API returns updated property
+      final Property updatedProperty = Property.fromJson(response);
+
+      /// Find property in My Properties list
+      final int index = properties.indexWhere((property) => property.id == id);
+
+      /// Replace it with updated SOLD property
+      if (index != -1) {
+        properties[index] = updatedProperty;
+      }
+
+      update();
+
+      return true;
+    } catch (e) {
+      markAsSoldError = e.toString().replaceFirst("Exception: ", "");
+
+      debugPrint("MARK AS SOLD ERROR: $e");
+
+      return false;
+    } finally {
+      isMarkingAsSold = false;
+      update();
+    }
   }
 }

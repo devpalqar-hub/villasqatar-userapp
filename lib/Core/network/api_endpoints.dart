@@ -49,4 +49,9 @@ class ApiEndpoints {
 
   static const String featuredPlans = "/api/featured-plans";
   static const String featuredProperties = "/api/featured";
+  static String markPropertyAsSold(String propertyId) {
+    return "/api/listings/$propertyId/sold";
+  }
+
+  static String closeVisit(String visitId) => "/api/visits/$visitId/close";
 }

@@ -144,10 +144,23 @@ class ChatStartScreen extends StatelessWidget {
               ),
             ),
 
-            /// Suggestions
-            QuickReplySection(
-              onTap: (text) {
-                controller.messageController.text = text;
+            /// QUICK REPLIES
+            /// Show only when conversation has NOT started yet
+            GetBuilder<ChatController>(
+              builder: (chatController) {
+                if (chatController.messages.isNotEmpty) {
+                  return const SizedBox.shrink();
+                }
+
+                return QuickReplySection(
+                  onTap: (text) {
+                    chatController.messageController.text = text;
+
+                    /// Move cursor to end
+                    chatController.messageController.selection =
+                        TextSelection.collapsed(offset: text.length);
+                  },
+                );
               },
             ),
 
