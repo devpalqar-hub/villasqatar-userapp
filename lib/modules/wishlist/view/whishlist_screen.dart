@@ -119,7 +119,7 @@ class _WishlistScreenState extends State<WishlistScreen> {
                           SizedBox(height: 3.h),
 
                           Text(
-                            "${controller.wishlistProperties.length} properties saved",
+                            "${controller.wishlistProperties.length} properties saved.tr",
                             style: TextStyle(
                               fontSize: 10.5.sp,
                               fontWeight: FontWeight.w400,

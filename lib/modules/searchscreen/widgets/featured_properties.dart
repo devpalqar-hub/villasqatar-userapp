@@ -4,8 +4,8 @@ import 'package:get/get.dart';
 
 import 'package:villas_qatar/Core/constants/app_colors.dart';
 import 'package:villas_qatar/Core/theme/app_textstyles.dart';
-import 'package:villas_qatar/modules/Plans/model/featured_property_model.dart';
-import 'package:villas_qatar/modules/Plans/services/featured_properties_controller.dart';
+import 'package:villas_qatar/modules/PlansandFeatures/model/featured_property_model.dart';
+import 'package:villas_qatar/modules/PlansandFeatures/services/featured_properties_controller.dart';
 import 'package:villas_qatar/modules/propertydetailscreen/propertydetailscreen.dart';
 
 class FeaturedProperties extends StatefulWidget {

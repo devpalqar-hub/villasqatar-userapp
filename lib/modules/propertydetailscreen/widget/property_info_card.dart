@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:get/get_utils/src/extensions/internacionalization.dart';
 import 'package:villas_qatar/modules/propertylist/model/myproperty_model.dart';
 
 class PropertyInfoCard extends StatefulWidget {
@@ -58,7 +59,7 @@ class _PropertyInfoCardState extends State<PropertyInfoCard> {
                   ),
                   SizedBox(width: 4.w),
                   Text(
-                    property.contactVerified ? "Verified" : "Not Verified",
+                    property.contactVerified ? "Verified".tr : "Not Verified".tr,
                     style: TextStyle(
                       color: property.contactVerified
                           ? Colors.green

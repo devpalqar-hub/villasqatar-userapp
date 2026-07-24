@@ -7,6 +7,7 @@ import 'package:get/get_core/get_core.dart';
 import 'package:get/get_instance/src/extension_instance.dart';
 import 'package:get/get_navigation/src/extension_navigation.dart';
 import 'package:get/get_state_manager/src/simple/get_state.dart';
+import 'package:get/get_utils/src/extensions/internacionalization.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:villas_qatar/Core/constants/app_colors.dart';
 import 'package:villas_qatar/Core/widgets/primary_button.dart';
@@ -27,38 +28,19 @@ class _ListYourPropertyScreenState extends State<ListYourPropertyScreen> {
   final descriptionCtrl = TextEditingController();
   String currency = 'QAR';
 
-  final furnishingLabels = [
-    "Furnished",
-    "Semi Furnished",
-    "Unfurnished",
-    "Ready to Move",
-  ];
 
-  final constructionLabels = ["Under Construction", "New Property", "Resale"];
-
-  final roomLabels = [
-    "Servant Room",
-    "Study Room",
-    "Store Room",
-    "Laundry Room",
-    "Private Garden",
-    "Rooftop",
-    "Sea View",
-    "Maid Room",
-    "Smart Home",
-  ];
 
   String? zoneArea;
   String city = 'Doha';
   String country = 'Qatar';
   String propertyPosition = 'Residential'; // 'Residential' | 'Commercial'
 
-  final List<String> stepLabels = const [
-    'Basic Info',
-    'Details',
-    'Features',
-    'Location',
-    'Media',
+  final List<String> stepLabels =  [
+    'Basic Info'.tr,
+    'Details'.tr,
+    'Features'.tr,
+    'Location'.tr,
+    'Media'.tr,
   ];
 
   @override
@@ -139,9 +121,9 @@ class _ListYourPropertyScreenState extends State<ListYourPropertyScreen> {
                     Get.offAll(() => const MainScreen(initialIndex: 2));
                   },
           ),
-          const Expanded(
+          Expanded(
             child: Text(
-              'List Your Property',
+              'List Your Property'.tr,
               textAlign: TextAlign.center,
               style: TextStyle(
                 fontSize: 18,
@@ -244,23 +226,23 @@ class _ListYourPropertyScreenState extends State<ListYourPropertyScreen> {
       children: [
         _sectionHeader(
           icon: Icons.person_outline,
-          title: 'Property Owner Details',
-          subtitle: 'Enter your details to get started',
+          title: 'Property Owner Details'.tr,
+          subtitle: 'Enter your details to get started'.tr,
         ),
 
         const SizedBox(height: 20),
 
-        _fieldLabel('Full Name', required: true),
+        _fieldLabel('Full Name'.tr, required: true),
         const SizedBox(height: 8),
 
         _AppTextField(
           controller: controller.fullNameController,
-          hint: 'Enter your full name',
+          hint: 'Enter your full name'.tr,
           prefixIcon: Icons.person_outline,
         ),
 
         const SizedBox(height: 18),
-        _fieldLabel('Contact Number', required: true),
+        _fieldLabel('Contact Number'.tr, required: true),
         const SizedBox(height: 8),
 
         Row(
@@ -269,11 +251,11 @@ class _ListYourPropertyScreenState extends State<ListYourPropertyScreen> {
               value: controller.countryCode,
               onChanged: controller.setCountryCode,
             ),
-            const SizedBox(width: 10),
+          SizedBox(width: 10),
             Expanded(
               child: _AppTextField(
                 controller: controller.phoneController,
-                hint: 'Enter mobile number',
+                hint: 'Enter mobile number'.tr,
                 keyboardType: TextInputType.phone,
                 enabled: !controller.whatsappVerified,
               ),
@@ -290,19 +272,19 @@ class _ListYourPropertyScreenState extends State<ListYourPropertyScreen> {
 
           SizedBox(
             width: double.infinity,
-            child: PrimaryButton(title: "Send OTP", onTap: controller.sendOtp),
+            child: PrimaryButton(title: "Send OTP".tr, onTap: controller.sendOtp),
           ),
         ],
         if (controller.showOtpField && !controller.whatsappVerified) ...[
           const SizedBox(height: 18),
 
-          _fieldLabel("Verification Code", required: true),
+          _fieldLabel("Verification Code".tr, required: true),
 
           const SizedBox(height: 8),
 
           _AppTextField(
             controller: controller.otpController,
-            hint: "Enter 6-digit OTP",
+            hint: "Enter 6-digit OTP".tr,
             keyboardType: TextInputType.number,
             prefixIcon: Icons.lock_outline,
           ),
@@ -312,7 +294,7 @@ class _ListYourPropertyScreenState extends State<ListYourPropertyScreen> {
           SizedBox(
             width: double.infinity,
             child: PrimaryButton(
-              title: "Verify OTP",
+              title: "Verify OTP".tr,
               onTap: controller.verifyOtp,
             ),
           ),
@@ -321,31 +303,31 @@ class _ListYourPropertyScreenState extends State<ListYourPropertyScreen> {
             alignment: Alignment.centerRight,
             child: TextButton(
               onPressed: controller.sendOtp,
-              child: const Text("Resend OTP"),
+              child:  Text("Resend OTP".tr),
             ),
           ),
         ],
 
         const SizedBox(height: 18),
 
-        _fieldLabel('Email Address'),
+        _fieldLabel('Email Address'.tr),
         const SizedBox(height: 8),
 
         _AppTextField(
           controller: controller.emailController,
-          hint: 'Enter your email address',
+          hint: 'Enter your email address'.tr,
           prefixIcon: Icons.email_outlined,
           keyboardType: TextInputType.emailAddress,
         ),
 
         const SizedBox(height: 18),
 
-        _fieldLabel('Short Description', required: true),
+        _fieldLabel('Short Description'.tr, required: true),
         const SizedBox(height: 8),
 
         _AppTextField(
           controller: controller.descriptionController,
-          hint: 'Write a short description about your property',
+          hint: 'Write a short description about your property'.tr,
           prefixIcon: Icons.description_outlined,
           maxLines: 4,
           maxLength: 250,
@@ -373,8 +355,8 @@ class _ListYourPropertyScreenState extends State<ListYourPropertyScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text(
-                  "WhatsApp Verification",
+                 Text(
+                  "WhatsApp Verification".tr,
                   style: TextStyle(
                     color: AppColors.greenText,
                     fontWeight: FontWeight.w700,
@@ -386,8 +368,8 @@ class _ListYourPropertyScreenState extends State<ListYourPropertyScreen> {
 
                 Text(
                   controller.whatsappVerified
-                      ? "Your contact number is verified"
-                      : "Your contact number is not verified",
+                      ? "Your contact number is verified".tr
+                      : "Your contact number is not verified".tr,
                   style: const TextStyle(
                     color: AppColors.greenText,
                     fontSize: 12,
@@ -417,32 +399,32 @@ class _ListYourPropertyScreenState extends State<ListYourPropertyScreen> {
       children: [
         _sectionHeader(
           icon: Icons.home_outlined,
-          title: 'Property Details',
-          subtitle: 'Tell us about your property',
+          title: 'Property Details'.tr,
+          subtitle: 'Tell us about your property'.tr,
         ),
 
         const SizedBox(height: 20),
 
-        _fieldLabel('Property Name', required: true),
+        _fieldLabel('Property Name'.tr, required: true),
         const SizedBox(height: 8),
 
         _AppTextField(
           controller: controller.propertyNameController,
-          hint: 'Enter property name',
+          hint: 'Enter property name'.tr,
         ),
 
         const SizedBox(height: 18),
 
-        _fieldLabel('Property Type', required: true),
+        _fieldLabel('Property Type'.tr, required: true),
         const SizedBox(height: 8),
 
         _AppDropdownField(
           value: controller.propertyType.isEmpty
               ? null
               : controller.propertyType,
-          hint: 'Select property type',
+          hint: 'Select property type'.tr,
           icon: Icons.apartment_outlined,
-          items: const ["Apartment", "Villa", "Townhouse", "Studio", "Office"],
+          items:  ["Apartment".tr, "Villa".tr, "Townhouse".tr, "Studio".tr, "Office".tr],
           onChanged: (v) {
             if (v != null) {
               controller.setPropertyType(v);
@@ -458,12 +440,12 @@ class _ListYourPropertyScreenState extends State<ListYourPropertyScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  _fieldLabel("Bedrooms", required: true),
+                  _fieldLabel("Bedrooms".tr, required: true),
                   const SizedBox(height: 8),
 
                   _AppTextField(
                     controller: controller.bedroomsController,
-                    hint: "e.g. 4",
+                    hint: "e.g. 4".tr,
                     keyboardType: TextInputType.number,
                     prefixIcon: Icons.bed_outlined,
                   ),
@@ -477,12 +459,12 @@ class _ListYourPropertyScreenState extends State<ListYourPropertyScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  _fieldLabel("Bathrooms", required: true),
+                  _fieldLabel("Bathrooms".tr, required: true),
                   const SizedBox(height: 8),
 
                   _AppTextField(
                     controller: controller.bathroomsController,
-                    hint: "e.g. 3",
+                    hint: "e.g. 3".tr,
                     keyboardType: TextInputType.number,
                     prefixIcon: Icons.bathtub_outlined,
                   ),
@@ -500,12 +482,12 @@ class _ListYourPropertyScreenState extends State<ListYourPropertyScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  _fieldLabel("Living Rooms"),
+                  _fieldLabel("Living Rooms".tr),
                   const SizedBox(height: 8),
 
                   _AppTextField(
                     controller: controller.livingRoomsController,
-                    hint: "e.g. 2",
+                    hint: "e.g. 2".tr,
                     keyboardType: TextInputType.number,
                     prefixIcon: Icons.weekend_outlined,
                   ),
@@ -519,12 +501,12 @@ class _ListYourPropertyScreenState extends State<ListYourPropertyScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  _fieldLabel("Parking Spaces"),
+                  _fieldLabel("Parking Spaces".tr),
                   const SizedBox(height: 8),
 
                   _AppTextField(
                     controller: controller.parkingSpacesController,
-                    hint: "e.g. 2",
+                    hint: "e.g. 2".tr,
                     keyboardType: TextInputType.number,
                     prefixIcon: Icons.local_parking_outlined,
                   ),
@@ -536,14 +518,14 @@ class _ListYourPropertyScreenState extends State<ListYourPropertyScreen> {
 
         const SizedBox(height: 18),
 
-        _fieldLabel("Property For", required: true),
+        _fieldLabel("Property For".tr, required: true),
         const SizedBox(height: 8),
 
         _buildSaleRentToggle(),
 
         const SizedBox(height: 18),
 
-        _fieldLabel("Price", required: true),
+        _fieldLabel("Price".tr, required: true),
         const SizedBox(height: 8),
 
         Row(
@@ -562,7 +544,7 @@ class _ListYourPropertyScreenState extends State<ListYourPropertyScreen> {
             Expanded(
               child: _AppTextField(
                 controller: controller.priceController,
-                hint: "Enter price",
+                hint: "Enter price".tr,
                 keyboardType: TextInputType.number,
               ),
             ),
@@ -571,24 +553,24 @@ class _ListYourPropertyScreenState extends State<ListYourPropertyScreen> {
 
         const SizedBox(height: 18),
 
-        _fieldLabel("Area (sqm)", required: true),
+        _fieldLabel("Area (sqm)".tr, required: true),
         const SizedBox(height: 8),
 
         _AppTextField(
-          controller: controller.areaController,
-          hint: "Enter property area",
+          controller:  controller.areaNameController,
+          hint: "Enter property area".tr,
           keyboardType: TextInputType.number,
           prefixIcon: Icons.square_foot_outlined,
         ),
 
         const SizedBox(height: 18),
 
-        _fieldLabel("Year Built"),
+        _fieldLabel("Year Built".tr),
         const SizedBox(height: 8),
 
         _AppTextField(
           controller: controller.yearBuiltController,
-          hint: "e.g. 2024",
+          hint: "e.g. 2024".tr,
           keyboardType: TextInputType.number,
           prefixIcon: Icons.calendar_today_outlined,
         ),
@@ -601,12 +583,12 @@ class _ListYourPropertyScreenState extends State<ListYourPropertyScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  _fieldLabel("Floor Number"),
+                  _fieldLabel("Floor Number".tr),
                   const SizedBox(height: 8),
 
                   _AppTextField(
                     controller: controller.floorNumberController,
-                    hint: "e.g. 5",
+                    hint: "e.g. 5".tr,
                     keyboardType: TextInputType.number,
                     prefixIcon: Icons.layers_outlined,
                   ),
@@ -620,12 +602,12 @@ class _ListYourPropertyScreenState extends State<ListYourPropertyScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  _fieldLabel("Total Floors"),
+                  _fieldLabel("Total Floors".tr),
                   const SizedBox(height: 8),
 
                   _AppTextField(
                     controller: controller.totalFloorsController,
-                    hint: "e.g. 20",
+                    hint: "e.g. 20".tr,
                     keyboardType: TextInputType.number,
                     prefixIcon: Icons.apartment_outlined,
                   ),
@@ -643,10 +625,10 @@ class _ListYourPropertyScreenState extends State<ListYourPropertyScreen> {
       children: [
         Expanded(
           child: _ToggleButton(
-            label: "Sale",
+            label: "Sale".tr,
             icon: Icons.sell_outlined,
-            selected: controller.propertyPurpose == "SALE",
-            onTap: () => controller.setPropertyPurpose("SALE"),
+            selected: controller.propertyPurpose == "SALE".tr,
+            onTap: () => controller.setPropertyPurpose("SALE".tr),
             radius: const BorderRadius.only(
               topLeft: Radius.circular(10),
               bottomLeft: Radius.circular(10),
@@ -656,10 +638,10 @@ class _ListYourPropertyScreenState extends State<ListYourPropertyScreen> {
 
         Expanded(
           child: _ToggleButton(
-            label: "Rent",
+            label: "Rent".tr,
             icon: Icons.key_outlined,
-            selected: controller.propertyPurpose == "RENT",
-            onTap: () => controller.setPropertyPurpose("RENT"),
+            selected: controller.propertyPurpose == "RENT".tr,
+            onTap: () => controller.setPropertyPurpose("RENT".tr),
             radius: const BorderRadius.only(
               topRight: Radius.circular(10),
               bottomRight: Radius.circular(10),
@@ -680,8 +662,8 @@ class _ListYourPropertyScreenState extends State<ListYourPropertyScreen> {
       children: [
         _sectionHeader(
           icon: Icons.widgets_outlined,
-          title: "Features & Amenities",
-          subtitle: "Select the amenities and nearby facilities",
+          title: "Features & Amenities".tr,
+          subtitle: "Select the amenities and nearby facilities".tr,
         ),
 
         const SizedBox(height: 20),
@@ -699,12 +681,12 @@ class _ListYourPropertyScreenState extends State<ListYourPropertyScreen> {
         const SizedBox(height: 22),
 
         Row(
-          children: const [
+          children:  [
             Icon(Icons.tune_outlined, size: 18, color: AppColors.primary),
             SizedBox(width: 8),
             Expanded(
               child: Text(
-                "Other Features",
+                "Other Features".tr,
                 style: TextStyle(fontWeight: FontWeight.w700, fontSize: 14),
               ),
             ),
@@ -713,23 +695,23 @@ class _ListYourPropertyScreenState extends State<ListYourPropertyScreen> {
 
         const SizedBox(height: 4),
 
-        const Padding(
+       Padding(
           padding: EdgeInsets.only(left: 26),
           child: Text(
-            "Add any additional features not listed above",
+            "Add any additional features not listed above".tr,
             style: TextStyle(color: AppColors.hintGrey, fontSize: 12),
           ),
         ),
 
         const SizedBox(height: 16),
 
-        _fieldLabel("Other (Please specify)"),
+        _fieldLabel("Other (Please specify)".tr),
 
         const SizedBox(height: 8),
 
         _AppTextField(
           controller: controller.otherFeatureController,
-          hint: "Enter other features",
+          hint: "Enter other features".tr,
           prefixIcon: Icons.edit_note_outlined,
         ),
       ],
@@ -748,9 +730,9 @@ class _ListYourPropertyScreenState extends State<ListYourPropertyScreen> {
               size: 18,
             ),
             const SizedBox(width: 8),
-            const Expanded(
+             Expanded(
               child: Text(
-                "Furnishing",
+                "Furnishing".tr,
                 style: TextStyle(fontWeight: FontWeight.w700, fontSize: 14),
               ),
             ),
@@ -777,9 +759,9 @@ class _ListYourPropertyScreenState extends State<ListYourPropertyScreen> {
               size: 18,
             ),
             const SizedBox(width: 8),
-            const Expanded(
+           Expanded(
               child: Text(
-                "Amenities",
+                "Amenities".tr,
                 style: TextStyle(fontWeight: FontWeight.w700, fontSize: 14),
               ),
             ),
@@ -806,9 +788,9 @@ class _ListYourPropertyScreenState extends State<ListYourPropertyScreen> {
               size: 18,
             ),
             const SizedBox(width: 8),
-            const Expanded(
+          Expanded(
               child: Text(
-                "Nearby Tags",
+                "Nearby Tags".tr,
                 style: TextStyle(fontWeight: FontWeight.w700, fontSize: 14),
               ),
             ),
@@ -832,13 +814,13 @@ class _ListYourPropertyScreenState extends State<ListYourPropertyScreen> {
           border: Border.all(color: AppColors.primary),
           borderRadius: BorderRadius.circular(8.r),
         ),
-        child: const Row(
+        child:  Row(
           mainAxisSize: MainAxisSize.min,
           children: [
             Icon(Icons.add, size: 16, color: AppColors.primary),
             SizedBox(width: 4),
             Text(
-              "Add",
+              "Add".tr,
               style: TextStyle(
                 color: AppColors.primary,
                 fontWeight: FontWeight.w600,
@@ -850,45 +832,82 @@ class _ListYourPropertyScreenState extends State<ListYourPropertyScreen> {
       ),
     );
   }
-
-  Widget _buildSelectedAmenities() {
-    if (controller.selectedAmenities.isEmpty) {
-      return const Padding(
-        padding: EdgeInsets.only(left: 26),
-        child: Text(
-          "No amenities selected",
-          style: TextStyle(color: AppColors.hintGrey, fontSize: 12),
+Widget _buildSelectedAmenities() {
+  if (controller.selectedAmenities.isEmpty) {
+    return  Padding(
+      padding: EdgeInsets.only(left: 26),
+      child: Text(
+        "No amenities selected".tr,
+        style: TextStyle(
+          color: AppColors.hintGrey,
+          fontSize: 12,
         ),
-      );
-    }
-
-    return Padding(
-      padding: const EdgeInsets.only(left: 26),
-      child: Wrap(
-        spacing: 8,
-        runSpacing: 8,
-        children: controller.selectedAmenities.map((item) {
-          return Container(
-            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-            decoration: BoxDecoration(
-              color: AppColors.pinkChipBg,
-              borderRadius: BorderRadius.circular(8),
-              border: Border.all(color: AppColors.primary.withOpacity(.2)),
-            ),
-            child: Text(
-              item,
-              style: const TextStyle(
-                color: AppColors.primary,
-                fontSize: 11,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-          );
-        }).toList(),
       ),
     );
   }
 
+  final selectedItems = controller.amenities
+      .where(
+        (item) => controller.selectedAmenities
+            .contains(item.id),
+      )
+      .toList();
+
+  return Padding(
+    padding: const EdgeInsets.only(left: 26),
+    child: Wrap(
+      spacing: 8,
+      runSpacing: 8,
+      children: selectedItems.map((item) {
+        return Container(
+          padding: const EdgeInsets.symmetric(
+            horizontal: 10,
+            vertical: 6,
+          ),
+          decoration: BoxDecoration(
+            color: AppColors.pinkChipBg,
+            borderRadius: BorderRadius.circular(8),
+            border: Border.all(
+              color:
+                  AppColors.primary.withOpacity(.2),
+            ),
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              if (item.image != null &&
+                  item.image!.isNotEmpty) ...[
+                ClipRRect(
+                  borderRadius:
+                      BorderRadius.circular(4),
+                  child: Image.network(
+                    item.image!,
+                    width: 18,
+                    height: 18,
+                    fit: BoxFit.cover,
+                    errorBuilder:
+                        (_, __, ___) =>
+                            const SizedBox.shrink(),
+                  ),
+                ),
+                const SizedBox(width: 5),
+              ],
+
+              Text(
+                item.title,
+                style: const TextStyle(
+                  color: AppColors.primary,
+                  fontSize: 11,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ],
+          ),
+        );
+      }).toList(),
+    ),
+  );
+}
   Widget _chipRow(List<String> labels, Set<String> selectedSet) {
     return Wrap(
       spacing: 10,
@@ -910,397 +929,526 @@ class _ListYourPropertyScreenState extends State<ListYourPropertyScreen> {
       }).toList(),
     );
   }
-
-  void _showAmenitiesBottomSheet() {
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      backgroundColor: Colors.white,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+void _showAmenitiesBottomSheet() {
+  showModalBottomSheet(
+    context: context,
+    isScrollControlled: true,
+    backgroundColor: Colors.white,
+    shape: const RoundedRectangleBorder(
+      borderRadius: BorderRadius.vertical(
+        top: Radius.circular(24),
       ),
-      builder: (_) {
-        return StatefulBuilder(
-          builder: (context, sheetState) {
-            return SafeArea(
-              child: SizedBox(
-                height: MediaQuery.of(context).size.height * .65,
-                child: Padding(
-                  padding: const EdgeInsets.fromLTRB(20, 12, 20, 20),
-                  child: Column(
-                    children: [
-                      /// Handle
-                      Container(
-                        width: 42,
-                        height: 4,
-                        decoration: BoxDecoration(
-                          color: Colors.grey.shade300,
-                          borderRadius: BorderRadius.circular(20),
-                        ),
-                      ),
-
-                      const SizedBox(height: 18),
-
-                      Row(
-                        children: [
-                          const Expanded(
-                            child: Text(
-                              "Select Amenities",
-                              style: TextStyle(
-                                fontSize: 18,
-                                fontWeight: FontWeight.w700,
-                              ),
-                            ),
-                          ),
-                          IconButton(
-                            onPressed: () => Navigator.pop(context),
-                            icon: const Icon(Icons.close_rounded),
-                          ),
-                        ],
-                      ),
-
-                      const SizedBox(height: 4),
-
-                      const Align(
-                        alignment: Alignment.centerLeft,
-                        child: Text(
-                          "Choose the amenities available in your property.",
-                          style: TextStyle(
-                            color: AppColors.hintGrey,
-                            fontSize: 12,
-                          ),
-                        ),
-                      ),
-
-                      const SizedBox(height: 18),
-
-                      Expanded(
-                        child: GridView.builder(
-                          itemCount: controller.amenities.length,
-                          gridDelegate:
-                              const SliverGridDelegateWithFixedCrossAxisCount(
-                                crossAxisCount: 5,
-                                crossAxisSpacing: 8,
-                                mainAxisSpacing: 8,
-                                mainAxisExtent: 72,
-                              ),
-                          itemBuilder: (_, index) {
-                            final amenity = controller.amenities[index];
-
-                            return _AmenityTile(
-                              label: amenity,
-                              selected: controller.selectedAmenities.contains(
-                                amenity,
-                              ),
-                              onTap: () {
-                                sheetState(() {
-                                  controller.toggleAmenity(amenity);
-                                });
-                              },
-                            );
-                          },
-                        ),
-                      ),
-
-                      const SizedBox(height: 12),
-
-                      SizedBox(
-                        width: double.infinity,
-                        height: 48,
-                        child: ElevatedButton(
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: AppColors.primary,
-                            elevation: 0,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(14),
-                            ),
-                          ),
-                          onPressed: () {
-                            setState(() {});
-                            Navigator.pop(context);
-                          },
-                          child: const Text(
-                            "Done",
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            );
-          },
-        );
-      },
-    );
-  }
-
-  Widget _buildSelectedNearbyTags() {
-    if (controller.selectedNearbyTags.isEmpty) {
-      return const Padding(
-        padding: EdgeInsets.only(left: 26),
-        child: Text(
-          "No nearby tags selected",
-          style: TextStyle(color: AppColors.hintGrey, fontSize: 12),
-        ),
-      );
-    }
-
-    return Padding(
-      padding: const EdgeInsets.only(left: 26),
-      child: Wrap(
-        spacing: 8,
-        runSpacing: 8,
-        children: controller.selectedNearbyTags.map((item) {
-          return Container(
-            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-            decoration: BoxDecoration(
-              color: AppColors.pinkChipBg,
-              borderRadius: BorderRadius.circular(8),
-              border: Border.all(color: AppColors.primary.withOpacity(.25)),
-            ),
-            child: Text(
-              item.replaceAll("_", " "),
-              style: const TextStyle(
-                color: AppColors.primary,
-                fontSize: 11,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-          );
-        }).toList(),
-      ),
-    );
-  }
-
-  Widget _buildSelectedFurnishing() {
-    if (controller.selectedFurnishing.isEmpty) {
-      return const Padding(
-        padding: EdgeInsets.only(left: 26),
-        child: Text(
-          "No furnishing option selected",
-          style: TextStyle(color: AppColors.hintGrey, fontSize: 12),
-        ),
-      );
-    }
-
-    return Padding(
-      padding: const EdgeInsets.only(left: 26),
-      child: Wrap(
-        spacing: 8,
-        runSpacing: 8,
-        children: controller.selectedFurnishing.map((item) {
-          return Container(
-            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-            decoration: BoxDecoration(
-              color: AppColors.pinkChipBg,
-              borderRadius: BorderRadius.circular(8),
-              border: Border.all(color: AppColors.primary.withOpacity(.25)),
-            ),
-            child: Text(
-              item,
-              style: const TextStyle(
-                color: AppColors.primary,
-                fontWeight: FontWeight.w600,
-                fontSize: 11,
-              ),
-            ),
-          );
-        }).toList(),
-      ),
-    );
-  }
-
-  void _showFurnishingBottomSheet() {
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      backgroundColor: Colors.white,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
-      ),
-      builder: (_) {
-        return StatefulBuilder(
-          builder: (context, sheetState) {
-            return SafeArea(
+    ),
+    builder: (_) {
+      return StatefulBuilder(
+        builder: (context, sheetState) {
+          return SafeArea(
+            child: SizedBox(
+              height:
+                  MediaQuery.of(context).size.height *
+                  .65,
               child: Padding(
-                padding: const EdgeInsets.fromLTRB(20, 16, 20, 20),
+                padding: const EdgeInsets.fromLTRB(
+                  20,
+                  12,
+                  20,
+                  20,
+                ),
                 child: Column(
-                  mainAxisSize: MainAxisSize.min,
                   children: [
                     Container(
                       width: 42,
                       height: 4,
                       decoration: BoxDecoration(
                         color: Colors.grey.shade300,
-                        borderRadius: BorderRadius.circular(20),
+                        borderRadius:
+                            BorderRadius.circular(20),
                       ),
                     ),
 
                     const SizedBox(height: 18),
 
-                    const Text(
-                      "Furnishing",
-                      style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.w700,
+                    Row(
+                      children: [
+                        Expanded(
+                          child: Text(
+                            "Select Amenities".tr,
+                            style: TextStyle(
+                              fontSize: 18,
+                              fontWeight:
+                                  FontWeight.w700,
+                            ),
+                          ),
+                        ),
+                        IconButton(
+                          onPressed: () =>
+                              Navigator.pop(context),
+                          icon: const Icon(
+                            Icons.close_rounded,
+                          ),
+                        ),
+                      ],
+                    ),
+
+                    const SizedBox(height: 4),
+
+                  Align(
+                      alignment: Alignment.centerLeft,
+                      child: Text(
+                        "Choose the amenities available in your property.".tr,
+                        style: TextStyle(
+                          color: AppColors.hintGrey,
+                          fontSize: 12,
+                        ),
                       ),
                     ),
 
-                    ...controller.furnishingOptions.map((item) {
-                      final selected = controller.selectedFurnishing.contains(
-                        item,
-                      );
+                    const SizedBox(height: 18),
 
-                      return ListTile(
-                        contentPadding: EdgeInsets.zero,
-                        leading: Icon(
-                          selected
-                              ? Icons.radio_button_checked
-                              : Icons.radio_button_off,
-                          color: AppColors.primary,
+                    Expanded(
+                      child: GridView.builder(
+                        itemCount:
+                            controller.amenities.length,
+                        gridDelegate:
+                            const SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: 3,
+                          crossAxisSpacing: 10,
+                          mainAxisSpacing: 10,
+                          mainAxisExtent: 105,
                         ),
-                        title: Text(item),
-                        onTap: () {
-                          sheetState(() {
-                            controller.selectedFurnishing.clear();
-                            controller.selectedFurnishing.add(item);
-                          });
+                        itemBuilder: (_, index) {
+                          final amenity =
+                              controller.amenities[index];
+
+                          final selected = controller
+                              .selectedAmenities
+                              .contains(amenity.id);
+
+                          return _AmenityTile(
+                            label: amenity.title,
+                            image: amenity.image,
+                            selected: selected,
+                            onTap: () {
+                              sheetState(() {
+                                controller.toggleAmenity(
+                                  amenity.id,
+                                );
+                              });
+                            },
+                          );
                         },
-                      );
-                    }),
+                      ),
+                    ),
 
                     const SizedBox(height: 12),
-                    PrimaryButton(
-                      title: "Done",
-                      onTap: () {
-                        controller.update();
-                        Navigator.pop(context);
-                      },
+
+                    SizedBox(
+                      width: double.infinity,
+                      height: 48,
+                      child: ElevatedButton(
+                        style:
+                            ElevatedButton.styleFrom(
+                          backgroundColor:
+                              AppColors.primary,
+                          elevation: 0,
+                          shape: RoundedRectangleBorder(
+                            borderRadius:
+                                BorderRadius.circular(
+                                  14,
+                                ),
+                          ),
+                        ),
+                        onPressed: () {
+                          controller.update();
+                          Navigator.pop(context);
+                        },
+                        child: Text(
+                          "Done".tr,
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontWeight:
+                                FontWeight.w600,
+                          ),
+                        ),
+                      ),
                     ),
                   ],
                 ),
               ),
-            );
-          },
-        );
-      },
+            ),
+          );
+        },
+      );
+    },
+  );
+}
+Widget _buildSelectedNearbyTags() {
+  if (controller.selectedNearbyTags.isEmpty) {
+    return  Padding(
+      padding: EdgeInsets.only(left: 26),
+      child: Text(
+        "No nearby tags selected".tr,
+        style: TextStyle(
+          color: AppColors.hintGrey,
+          fontSize: 12,
+        ),
+      ),
     );
   }
 
-  void _showNearbyTagsBottomSheet() {
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      backgroundColor: Colors.white,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
-      ),
-      builder: (_) {
-        return StatefulBuilder(
-          builder: (context, sheetState) {
-            return SafeArea(
-              child: SizedBox(
-                height: MediaQuery.of(context).size.height * .65,
-                child: Padding(
-                  padding: const EdgeInsets.fromLTRB(20, 12, 20, 20),
-                  child: Column(
-                    children: [
-                      Container(
-                        width: 42,
-                        height: 4,
-                        decoration: BoxDecoration(
-                          color: Colors.grey.shade300,
-                          borderRadius: BorderRadius.circular(20),
-                        ),
-                      ),
+  final selectedItems = controller.nearbyTags
+      .where(
+        (item) => controller.selectedNearbyTags
+            .contains(item.id),
+      )
+      .toList();
 
-                      const SizedBox(height: 18),
-
-                      Row(
-                        children: [
-                          const Expanded(
-                            child: Text(
-                              "Nearby Tags",
-                              style: TextStyle(
-                                fontSize: 18,
-                                fontWeight: FontWeight.w700,
-                              ),
-                            ),
-                          ),
-                          IconButton(
-                            onPressed: () => Navigator.pop(context),
-                            icon: const Icon(Icons.close),
-                          ),
-                        ],
-                      ),
-
-                      const SizedBox(height: 15),
-
-                      Expanded(
-                        child: GridView.builder(
-                          itemCount: controller.nearbyTags.length,
-                          gridDelegate:
-                              const SliverGridDelegateWithFixedCrossAxisCount(
-                                crossAxisCount: 4,
-                                crossAxisSpacing: 8,
-                                mainAxisSpacing: 8,
-                                mainAxisExtent: 72,
-                              ),
-                          itemBuilder: (_, index) {
-                            final tag = controller.nearbyTags[index];
-
-                            return _AmenityTile(
-                              label: tag.replaceAll("_", " "),
-                              selected: controller.selectedNearbyTags.contains(
-                                tag,
-                              ),
-                              onTap: () {
-                                sheetState(() {
-                                  controller.toggleNearbyTag(tag);
-                                });
-                              },
-                            );
-                          },
-                        ),
-                      ),
-
-                      const SizedBox(height: 12),
-
-                      SizedBox(
-                        width: double.infinity,
-                        height: 48,
-                        child: ElevatedButton(
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: AppColors.primary,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(14),
-                            ),
-                          ),
-                          onPressed: () {
-                            controller.update();
-                            Navigator.pop(context);
-                          },
-                          child: const Text(
-                            "Done",
-                            style: TextStyle(color: Colors.white),
-                          ),
-                        ),
-                      ),
-                    ],
+  return Padding(
+    padding: const EdgeInsets.only(left: 26),
+    child: Wrap(
+      spacing: 8,
+      runSpacing: 8,
+      children: selectedItems.map((item) {
+        return Container(
+          padding: const EdgeInsets.symmetric(
+            horizontal: 10,
+            vertical: 6,
+          ),
+          decoration: BoxDecoration(
+            color: AppColors.pinkChipBg,
+            borderRadius: BorderRadius.circular(8),
+            border: Border.all(
+              color:
+                  AppColors.primary.withOpacity(.25),
+            ),
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              if (item.image != null &&
+                  item.image!.isNotEmpty) ...[
+                ClipRRect(
+                  borderRadius:
+                      BorderRadius.circular(4),
+                  child: Image.network(
+                    item.image!,
+                    width: 18,
+                    height: 18,
+                    fit: BoxFit.cover,
+                    errorBuilder:
+                        (_, __, ___) =>
+                            const SizedBox.shrink(),
                   ),
                 ),
+                const SizedBox(width: 5),
+              ],
+
+              Text(
+                item.title,
+                style: const TextStyle(
+                  color: AppColors.primary,
+                  fontSize: 11,
+                  fontWeight: FontWeight.w600,
+                ),
               ),
-            );
-          },
+            ],
+          ),
         );
-      },
+      }).toList(),
+    ),
+  );
+}
+
+Widget _buildSelectedFurnishing() {
+  if (controller.selectedFurnishing.isEmpty) {
+    return  Padding(
+      padding: EdgeInsets.only(left: 26),
+      child: Text(
+        "No furnishing option selected".tr,
+        style: TextStyle(
+          color: AppColors.hintGrey,
+          fontSize: 12,
+        ),
+      ),
     );
   }
+
+  final selectedItems = controller
+      .furnishingOptions
+      .where(
+        (item) => controller.selectedFurnishing
+            .contains(item.id),
+      )
+      .toList();
+
+  return Padding(
+    padding: const EdgeInsets.only(left: 26),
+    child: Wrap(
+      spacing: 8,
+      runSpacing: 8,
+      children: selectedItems.map((item) {
+        return Container(
+          padding: const EdgeInsets.symmetric(
+            horizontal: 10,
+            vertical: 6,
+          ),
+          decoration: BoxDecoration(
+            color: AppColors.pinkChipBg,
+            borderRadius: BorderRadius.circular(8),
+            border: Border.all(
+              color:
+                  AppColors.primary.withOpacity(.25),
+            ),
+          ),
+          child: Text(
+            item.title,
+            style: const TextStyle(
+              color: AppColors.primary,
+              fontWeight: FontWeight.w600,
+              fontSize: 11,
+            ),
+          ),
+        );
+      }).toList(),
+    ),
+  );
+}
+
+void _showFurnishingBottomSheet() {
+  showModalBottomSheet(
+    context: context,
+    isScrollControlled: true,
+    backgroundColor: Colors.white,
+    shape: const RoundedRectangleBorder(
+      borderRadius: BorderRadius.vertical(
+        top: Radius.circular(24),
+      ),
+    ),
+    builder: (_) {
+      return StatefulBuilder(
+        builder: (context, sheetState) {
+          return SafeArea(
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(
+                20,
+                16,
+                20,
+                20,
+              ),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Container(
+                    width: 42,
+                    height: 4,
+                    decoration: BoxDecoration(
+                      color: Colors.grey.shade300,
+                      borderRadius:
+                          BorderRadius.circular(20),
+                    ),
+                  ),
+
+                  const SizedBox(height: 18),
+
+                  const Text(
+                    "Furnishing",
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+
+                  const SizedBox(height: 10),
+
+                  ...controller.furnishingOptions
+                      .map((item) {
+                    final selected = controller
+                        .selectedFurnishing
+                        .contains(item.id);
+
+                    return ListTile(
+                      contentPadding: EdgeInsets.zero,
+                      leading: Icon(
+                        selected
+                            ? Icons
+                                  .radio_button_checked
+                            : Icons
+                                  .radio_button_off,
+                        color: AppColors.primary,
+                      ),
+                      title: Text(
+                        item.title,
+                        style: const TextStyle(
+                          fontWeight:
+                              FontWeight.w500,
+                        ),
+                      ),
+                      onTap: () {
+                        sheetState(() {
+                          controller
+                              .toggleFurnishing(
+                            item.id,
+                          );
+                        });
+                      },
+                    );
+                  }),
+
+                  const SizedBox(height: 12),
+
+                  PrimaryButton(
+                    title: "Done",
+                    onTap: () {
+                      controller.update();
+                      Navigator.pop(context);
+                    },
+                  ),
+                ],
+              ),
+            ),
+          );
+        },
+      );
+    },
+  );
+}
+void _showNearbyTagsBottomSheet() {
+  showModalBottomSheet(
+    context: context,
+    isScrollControlled: true,
+    backgroundColor: Colors.white,
+    shape: const RoundedRectangleBorder(
+      borderRadius: BorderRadius.vertical(
+        top: Radius.circular(24),
+      ),
+    ),
+    builder: (_) {
+      return StatefulBuilder(
+        builder: (context, sheetState) {
+          return SafeArea(
+            child: SizedBox(
+              height:
+                  MediaQuery.of(context).size.height *
+                  .65,
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(
+                  20,
+                  12,
+                  20,
+                  20,
+                ),
+                child: Column(
+                  children: [
+                    Container(
+                      width: 42,
+                      height: 4,
+                      decoration: BoxDecoration(
+                        color: Colors.grey.shade300,
+                        borderRadius:
+                            BorderRadius.circular(20),
+                      ),
+                    ),
+
+                    const SizedBox(height: 18),
+
+                    Row(
+                      children: [
+                    Expanded(
+                          child: Text(
+                            "Nearby Tags".tr,
+                            style: TextStyle(
+                              fontSize: 18,
+                              fontWeight:
+                                  FontWeight.w700,
+                            ),
+                          ),
+                        ),
+                        IconButton(
+                          onPressed: () =>
+                              Navigator.pop(context),
+                          icon:
+                              const Icon(Icons.close),
+                        ),
+                      ],
+                    ),
+
+                    const SizedBox(height: 15),
+
+                    Expanded(
+                      child: GridView.builder(
+                        itemCount:
+                            controller.nearbyTags.length,
+                        gridDelegate:
+                            const SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: 3,
+                          crossAxisSpacing: 10,
+                          mainAxisSpacing: 10,
+                          mainAxisExtent: 105,
+                        ),
+                        itemBuilder: (_, index) {
+                          final tag =
+                              controller.nearbyTags[index];
+
+                          final selected = controller
+                              .selectedNearbyTags
+                              .contains(tag.id);
+
+                          return _AmenityTile(
+                            label: tag.title,
+                            image: tag.image,
+                            selected: selected,
+                            onTap: () {
+                              sheetState(() {
+                                controller
+                                    .toggleNearbyTag(
+                                  tag.id,
+                                );
+                              });
+                            },
+                          );
+                        },
+                      ),
+                    ),
+
+                    const SizedBox(height: 12),
+
+                    SizedBox(
+                      width: double.infinity,
+                      height: 48,
+                      child: ElevatedButton(
+                        style:
+                            ElevatedButton.styleFrom(
+                          backgroundColor:
+                              AppColors.primary,
+                          shape: RoundedRectangleBorder(
+                            borderRadius:
+                                BorderRadius.circular(
+                                  14,
+                                ),
+                          ),
+                        ),
+                        onPressed: () {
+                          controller.update();
+                          Navigator.pop(context);
+                        },
+                        child:  Text(
+                          "Done".tr,
+                          style: TextStyle(
+                            color: Colors.white,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          );
+        },
+      );
+    },
+  );
+}
 
   // ---------------------------------------------------------
   // STEP 4 — LOCATION DETAILS
@@ -1312,71 +1460,64 @@ class _ListYourPropertyScreenState extends State<ListYourPropertyScreen> {
       children: [
         _sectionHeader(
           icon: Icons.location_on_outlined,
-          title: "Property Location",
-          subtitle: "Tell buyers where your property is located",
+          title: "Property Location".tr,
+          subtitle: "Tell buyers where your property is located".tr,
         ),
 
         const SizedBox(height: 20),
 
-        _fieldLabel("Address Line 1", required: true),
+        _fieldLabel("Address Line 1".tr, required: true),
         const SizedBox(height: 8),
 
         _AppTextField(
           controller: controller.addressController,
-          hint: "Enter address",
+          hint: "Enter address".tr,
           prefixIcon: Icons.location_on_outlined,
         ),
 
         const SizedBox(height: 18),
 
-        _fieldLabel("Address Line 2"),
+        _fieldLabel("Address Line 2".tr),
         const SizedBox(height: 8),
 
         _AppTextField(
           controller: controller.streetController,
-          hint: "Apartment / Building / Street",
+          hint: "Apartment / Building / Street".tr,
           prefixIcon: Icons.home_work_outlined,
         ),
 
         const SizedBox(height: 18),
 
-        _fieldLabel("Area", required: true),
+        _fieldLabel("Area".tr, required: true),
         const SizedBox(height: 8),
 
-        _AppDropdownField(
-          value: controller.areaNameController.text.isEmpty
-              ? null
-              : controller.areaNameController.text,
-          hint: "Select Area",
-          icon: Icons.map_outlined,
-          items: controller.areaSuggestions,
-          onChanged: (value) {
-            if (value != null) {
-              controller.areaNameController.text = value;
-              controller.update();
-            }
-          },
+        _AppTextField(
+          controller: controller.areaController,
+          hint: "Name of  Area".tr,
+          prefixIcon: Icons.map_outlined,
+        
+         
         ),
 
         const SizedBox(height: 18),
 
-        _fieldLabel("Municipality / City", required: true),
+        _fieldLabel("Municipality / City".tr, required: true),
         const SizedBox(height: 8),
 
         _AppTextField(
           controller: controller.cityController,
-          hint: "Enter municipality",
+          hint: "Enter municipality".tr,
           prefixIcon: Icons.location_city_outlined,
         ),
 
         const SizedBox(height: 18),
 
-        _fieldLabel("Landmark"),
+        _fieldLabel("Landmark".tr),
         const SizedBox(height: 8),
 
         _AppTextField(
           controller: controller.landmarkController,
-          hint: "Nearby landmark",
+          hint: "Nearby landmark".tr,
           prefixIcon: Icons.place_outlined,
         ),
 
@@ -1388,13 +1529,13 @@ class _ListYourPropertyScreenState extends State<ListYourPropertyScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  _fieldLabel("Latitude"),
+                  _fieldLabel("Latitude".tr),
 
                   const SizedBox(height: 8),
 
                   _AppTextField(
                     controller: controller.latitudeController,
-                    hint: "Latitude",
+                    hint: "Latitude".tr,
                     keyboardType: const TextInputType.numberWithOptions(
                       decimal: true,
                     ),
@@ -1412,13 +1553,13 @@ class _ListYourPropertyScreenState extends State<ListYourPropertyScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  _fieldLabel("Longitude"),
+                  _fieldLabel("Longitude".tr),
 
                   const SizedBox(height: 8),
 
                   _AppTextField(
                     controller: controller.longitudeController,
-                    hint: "Longitude",
+                    hint: "Longitude".tr,
                     keyboardType: const TextInputType.numberWithOptions(
                       decimal: true,
                     ),
@@ -1443,12 +1584,12 @@ class _ListYourPropertyScreenState extends State<ListYourPropertyScreen> {
             border: Border.all(color: AppColors.fieldBorder),
           ),
           child: Row(
-            children: const [
+            children:[
               Icon(Icons.map_outlined, color: AppColors.primary),
               SizedBox(width: 10),
               Expanded(
                 child: Text(
-                  "Google Map integration can be added here for selecting the exact location.",
+                  "Google Map integration can be added here for selecting the exact location.".tr,
                   style: TextStyle(fontSize: 12, color: AppColors.labelGrey),
                 ),
               ),
@@ -1473,8 +1614,8 @@ class _ListYourPropertyScreenState extends State<ListYourPropertyScreen> {
       children: [
         _sectionHeader(
           icon: Icons.camera_alt_outlined,
-          title: "Photos & Videos",
-          subtitle: "Add high quality photos and videos to attract more buyers",
+          title: "Photos & Videos".tr,
+          subtitle: "Add high quality photos and videos to attract more buyers".tr,
         ),
 
         const SizedBox(height: 20),
@@ -1482,12 +1623,12 @@ class _ListYourPropertyScreenState extends State<ListYourPropertyScreen> {
         //=========================================================
         // PHOTOS
         //=========================================================
-        _fieldLabel("Property Photos", required: true),
+        _fieldLabel("Property Photos".tr, required: true),
 
-        const Padding(
+      Padding(
           padding: EdgeInsets.only(top: 2, bottom: 12),
           child: Text(
-            "Upload clear and attractive photos (Max 20 photos)",
+            "Upload clear and attractive photos (Max 20 photos)".tr,
             style: TextStyle(color: AppColors.hintGrey, fontSize: 12),
           ),
         ),
@@ -1524,10 +1665,10 @@ class _ListYourPropertyScreenState extends State<ListYourPropertyScreen> {
 
         GestureDetector(
           onTap: _pickImages,
-          child: const _DashedUploadBox(
+          child: _DashedUploadBox(
             icon: Icons.add_photo_alternate_outlined,
-            title: "Add Photos",
-            subtitle: "JPG, PNG up to 10MB each",
+            title: "Add Photos".tr,
+            subtitle: "JPG, PNG up to 10MB each".tr,
             filled: true,
           ),
         ),
@@ -1575,23 +1716,23 @@ class _ListYourPropertyScreenState extends State<ListYourPropertyScreen> {
         //=========================================================
         // DOCUMENTS
         //=========================================================
-        _fieldLabel("Additional Documents"),
+        // _fieldLabel("Additional Documents"),
 
-        const Padding(
-          padding: EdgeInsets.only(top: 2, bottom: 4),
-          child: Text(
-            "(Optional)",
-            style: TextStyle(color: AppColors.hintGrey, fontSize: 11),
-          ),
-        ),
+        // const Padding(
+        //   padding: EdgeInsets.only(top: 2, bottom: 4),
+        //   child: Text(
+        //     "(Optional)",
+        //     style: TextStyle(color: AppColors.hintGrey, fontSize: 11),
+        //   ),
+        // ),
 
-        const Padding(
-          padding: EdgeInsets.only(bottom: 12),
-          child: Text(
-            "Upload floor plans, brochures or other documents",
-            style: TextStyle(color: AppColors.hintGrey, fontSize: 12),
-          ),
-        ),
+        // const Padding(
+        //   padding: EdgeInsets.only(bottom: 12),
+        //   child: Text(
+        //     "Upload floor plans, brochures or other documents",
+        //     style: TextStyle(color: AppColors.hintGrey, fontSize: 12),
+        //   ),
+        // ),
 
         // GestureDetector(
         //   onTap: _pickDocument,
@@ -1708,7 +1849,7 @@ class _ListYourPropertyScreenState extends State<ListYourPropertyScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Tip: Properties with photos get 10x more interest!',
+                  'Tip: Properties with photos get 10x more interest!'.tr,
                   style: TextStyle(
                     fontWeight: FontWeight.w600,
                     fontSize: 10.5,
@@ -1717,7 +1858,7 @@ class _ListYourPropertyScreenState extends State<ListYourPropertyScreen> {
                 ),
                 SizedBox(height: 2.h),
                 Text(
-                  'Make sure to add high quality photos and videos',
+                  'Make sure to add high quality photos and videos'.tr,
                   style: TextStyle(fontSize: 10.sp, color: Colors.black),
                 ),
               ],
@@ -1796,59 +1937,98 @@ class _ListYourPropertyScreenState extends State<ListYourPropertyScreen> {
       ),
     );
   }
+Widget _buildBottomButton() {
+  final bool isLastStep =
+      controller.currentStep ==
+      controller.steps.length - 1;
 
-  Widget _buildBottomButton() {
-    final isLastStep = controller.currentStep == controller.steps.length - 1;
+  return SizedBox(
+    width: double.infinity,
+    height: 54,
+    child: ElevatedButton(
+      // Prevent multiple submissions
+      onPressed: controller.isSubmitting
+          ? null
+          : () async {
+              // ==========================================
+              // NORMAL NEXT STEP
+              // ==========================================
 
-    return SizedBox(
-      width: double.infinity,
-      height: 54,
-      child: ElevatedButton(
-        onPressed: () async {
-          if (isLastStep) {
-            await controller.addProperty();
-          } else {
-            controller.nextStep();
-          }
-        },
-        style: ElevatedButton.styleFrom(
-          backgroundColor: AppColors.primary,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(14),
-          ),
-          elevation: 0,
+              if (!isLastStep) {
+                controller.nextStep();
+                return;
+              }
+
+              // ==========================================
+              // FINAL STEP - ADD PROPERTY
+              // ==========================================
+
+              final bool success =
+                  await controller.addProperty();
+
+              if (!success) {
+                return;
+              }
+
+              // ==========================================
+              // CLOSE ADD PROPERTY SCREEN
+              //
+              // true tells My Properties:
+              // "A new property was added"
+              // ==========================================
+
+              Get.back(result: true);
+            },
+
+      style: ElevatedButton.styleFrom(
+        backgroundColor: AppColors.primary,
+        disabledBackgroundColor:
+            AppColors.primary.withOpacity(.7),
+        shape: RoundedRectangleBorder(
+          borderRadius:
+              BorderRadius.circular(14),
         ),
-        child: controller.isSubmitting
-            ? const SizedBox(
-                width: 22,
-                height: 22,
-                child: CircularProgressIndicator(
-                  color: Colors.white,
-                  strokeWidth: 2,
-                ),
-              )
-            : Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text(
-                    isLastStep ? 'Review & Publish' : 'Save & Continue',
-                    style: const TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w700,
-                      color: Colors.white,
-                    ),
-                  ),
-                  const SizedBox(width: 8),
-                  const Icon(
-                    Icons.arrow_forward,
-                    size: 18,
+        elevation: 0,
+      ),
+
+      child: controller.isSubmitting
+          ? const SizedBox(
+              width: 22,
+              height: 22,
+              child:
+                  CircularProgressIndicator(
+                color: Colors.white,
+                strokeWidth: 2,
+              ),
+            )
+          : Row(
+              mainAxisAlignment:
+                  MainAxisAlignment.center,
+              children: [
+                Text(
+                  isLastStep
+                      ? 'Review & Publish'.tr
+                      : 'Save & Continue'.tr,
+                  style: const TextStyle(
+                    fontSize: 16,
+                    fontWeight:
+                        FontWeight.w700,
                     color: Colors.white,
                   ),
-                ],
-              ),
-      ),
-    );
-  }
+                ),
+
+                const SizedBox(width: 8),
+
+                const Icon(
+                  Icons.arrow_forward,
+                  size: 18,
+                  color: Colors.white,
+                ),
+              ],
+            ),
+    ),
+  );
+}
 }
 
 // =================================================================
@@ -2216,86 +2396,91 @@ class _ToggleButton extends StatelessWidget {
 // =================================================================
 class _AmenityTile extends StatelessWidget {
   final String label;
+  final String? image;
   final bool selected;
   final VoidCallback onTap;
 
   const _AmenityTile({
-    super.key,
     required this.label,
+    this.image,
     required this.selected,
     required this.onTap,
   });
-
-  IconData _icon() {
-    return Icons.widgets_outlined;
-  }
 
   @override
   Widget build(BuildContext context) {
     return InkWell(
       onTap: onTap,
-      borderRadius: BorderRadius.circular(10),
+      borderRadius: BorderRadius.circular(12),
       child: Container(
-        width: 80,
-        height: 72,
+        padding: const EdgeInsets.all(8),
         decoration: BoxDecoration(
-          color: selected ? AppColors.pinkChipBg : Colors.white,
-          borderRadius: BorderRadius.circular(10),
+          color: selected
+              ? AppColors.pinkChipBg
+              : Colors.white,
+          borderRadius: BorderRadius.circular(12),
           border: Border.all(
-            color: selected ? AppColors.primary : AppColors.fieldBorder,
+            color: selected
+                ? AppColors.primary
+                : AppColors.fieldBorder,
+            width: selected ? 1.5 : 1,
           ),
         ),
-        child: Stack(
+        child: Column(
+          mainAxisAlignment:
+              MainAxisAlignment.center,
           children: [
-            Center(
-              child: Padding(
-                padding: const EdgeInsets.all(6),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Icon(
-                      _icon(),
-                      size: 20,
-                      color: selected ? AppColors.primary : AppColors.labelGrey,
-                    ),
-                    const SizedBox(height: 6),
-                    SizedBox(
-                      height: 24,
-                      child: Text(
-                        label,
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
-                        textAlign: TextAlign.center,
-                        style: TextStyle(
-                          fontSize: 9,
-                          fontWeight: FontWeight.w600,
-                          color: selected
-                              ? AppColors.primary
-                              : AppColors.labelGrey,
-                        ),
-                      ),
-                    ),
-                  ],
+            if (image != null &&
+                image!.trim().isNotEmpty)
+              ClipRRect(
+                borderRadius:
+                    BorderRadius.circular(8),
+                child: Image.network(
+                  image!,
+                  width: 36,
+                  height: 36,
+                  fit: BoxFit.cover,
+
+                  errorBuilder:
+                      (context, error, stackTrace) {
+                    return const Icon(
+                      Icons.home_outlined,
+                      size: 30,
+                      color: AppColors.primary,
+                    );
+                  },
                 ),
+              )
+            else
+              const Icon(
+                Icons.home_outlined,
+                size: 30,
+                color: AppColors.primary,
+              ),
+
+            const SizedBox(height: 7),
+
+            Text(
+              label,
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontSize: 11,
+                fontWeight: selected
+                    ? FontWeight.w700
+                    : FontWeight.w500,
+                color: selected
+                    ? AppColors.primary
+                    : Colors.black87,
               ),
             ),
-            if (selected)
-              const Positioned(
-                top: 5,
-                right: 5,
-                child: Icon(
-                  Icons.check_circle,
-                  color: AppColors.primary,
-                  size: 16,
-                ),
-              ),
           ],
         ),
       ),
     );
   }
 }
-
 // =================================================================
 // FEATURE CHIP (Step 3 "Other Features" checkbox chip)
 // =================================================================

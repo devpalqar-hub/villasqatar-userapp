@@ -49,9 +49,20 @@ class ApiEndpoints {
 
   static const String featuredPlans = "/api/featured-plans";
   static const String featuredProperties = "/api/featured";
+  static const String myfeaturedProperties = "/api/featured/my";
   static String markPropertyAsSold(String propertyId) {
     return "/api/listings/$propertyId/sold";
   }
 
   static String closeVisit(String visitId) => "/api/visits/$visitId/close";
+  static const String myfeaturedPlans = '/api/featured-plans';
+
+  static const String supportTickets = "/api/support/tickets";
+  static const String estimatePrice = "/api/listings/estimate-price";
+
+  static const String banners = "/api/banners";
+
+  static String featuredBanners({bool isFeatured = true}) {
+    return "/api/banners?isFeatured=$isFeatured";
+  }
 }

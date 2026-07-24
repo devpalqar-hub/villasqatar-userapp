@@ -2,11 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:get/get_utils/src/extensions/internacionalization.dart';
-import 'package:villas_qatar/modules/Plans/model/featured_property_model.dart';
-import 'package:villas_qatar/modules/Plans/services/featured_properties_controller.dart';
+import 'package:url_launcher/url_launcher.dart';
+import 'package:villas_qatar/modules/PlansandFeatures/model/featured_property_model.dart';
+import 'package:villas_qatar/modules/PlansandFeatures/services/featured_properties_controller.dart';
+import 'package:villas_qatar/modules/home/service/banner_controller.dart';
 import 'package:villas_qatar/modules/home/widgets/agent_card.dart';
 import 'package:villas_qatar/modules/home/widgets/boost_property_banner.dart';
 import 'package:villas_qatar/modules/home/widgets/category_card.dart';
+import 'package:villas_qatar/modules/home/widgets/estimator_card.dart';
 import 'package:villas_qatar/modules/home/widgets/hero_banner.dart';
 import 'package:villas_qatar/modules/home/widgets/home_header.dart';
 import 'package:villas_qatar/modules/home/widgets/location_card.dart';
@@ -35,7 +38,7 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   late final FeaturedPropertiesController featuredController;
-
+  late final BannerController bannerController;
   final ScrollController featuredScrollController = ScrollController();
 
   @override
@@ -46,7 +49,10 @@ class _HomeScreenState extends State<HomeScreen> {
         ? Get.find<FeaturedPropertiesController>()
         : Get.put(FeaturedPropertiesController(), permanent: true);
 
-    /// Fetch HOME_PAGE featured properties.
+    bannerController = Get.isRegistered<BannerController>()
+        ? Get.find<BannerController>()
+        : Get.put(BannerController(), permanent: true);
+
     WidgetsBinding.instance.addPostFrameCallback((_) {
       featuredController.fetchFeaturedProperties(
         location: FeaturedLocation.homePage,
@@ -54,7 +60,6 @@ class _HomeScreenState extends State<HomeScreen> {
       );
     });
 
-    /// Listen for horizontal pagination.
     featuredScrollController.addListener(_onFeaturedScroll);
   }
 
@@ -64,9 +69,6 @@ class _HomeScreenState extends State<HomeScreen> {
     }
 
     final position = featuredScrollController.position;
-
-    /// Fetch next page when user gets close
-    /// to the end of horizontal list.
     if (position.pixels >= position.maxScrollExtent - 150) {
       featuredController.loadMore(
         location: FeaturedLocation.homePage,
@@ -117,125 +119,126 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
               ),
 
-              /// AI PRICE ESTIMATOR - PREMIUM CARD
-              Container(
-                width: double.infinity,
-                padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 14.h),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(16.r),
-                  border: Border.all(
-                    color: const Color(0xFF8E123E).withOpacity(0.12),
-                  ),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withOpacity(0.05),
-                      blurRadius: 16,
-                      offset: const Offset(0, 5),
-                    ),
-                  ],
-                ),
-                child: InkWell(
-                  borderRadius: BorderRadius.circular(16.r),
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (_) => PriceEstimatorScreen()),
-                    );
-                  },
-                  child: Row(
-                    children: [
-                      /// ICON
-                      Container(
-                        width: 48.w,
-                        height: 48.w,
-                        decoration: BoxDecoration(
-                          color: const Color(0xFF8E123E).withOpacity(0.08),
-                          borderRadius: BorderRadius.circular(14.r),
-                        ),
-                        child: Stack(
-                          alignment: Alignment.center,
-                          children: [
-                            Icon(
-                              Icons.home_work_outlined,
-                              color: const Color(0xFF8E123E),
-                              size: 25.sp,
-                            ),
+              // /// AI PRICE ESTIMATOR - PREMIUM CARD
+              // Container(
+              //   width: double.infinity,
+              //   padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 14.h),
+              //   decoration: BoxDecoration(
+              //     color: Colors.white,
+              //     borderRadius: BorderRadius.circular(16.r),
+              //     border: Border.all(
+              //       color: const Color(0xFF8E123E).withOpacity(0.12),
+              //     ),
+              //     boxShadow: [
+              //       BoxShadow(
+              //         color: Colors.black.withOpacity(0.05),
+              //         blurRadius: 16,
+              //         offset: const Offset(0, 5),
+              //       ),
+              //     ],
+              //   ),
+              //   child: InkWell(
+              //     borderRadius: BorderRadius.circular(16.r),
+              //     onTap: () {
+              //       Navigator.push(
+              //         context,
+              //         MaterialPageRoute(builder: (_) => PriceEstimatorScreen()),
+              //       );
+              //     },
+              //     child: Row(
+              //       children: [
+              //         /// ICON
+              //         Container(
+              //           width: 48.w,
+              //           height: 48.w,
+              //           decoration: BoxDecoration(
+              //             color: const Color(0xFF8E123E).withOpacity(0.08),
+              //             borderRadius: BorderRadius.circular(14.r),
+              //           ),
+              //           child: Stack(
+              //             alignment: Alignment.center,
+              //             children: [
+              //               Icon(
+              //                 Icons.home_work_outlined,
+              //                 color: const Color(0xFF8E123E),
+              //                 size: 25.sp,
+              //               ),
 
-                            Positioned(
-                              top: 7.h,
-                              right: 7.w,
-                              child: Icon(
-                                Icons.auto_awesome,
-                                size: 11.sp,
-                                color: const Color(0xFF8E123E),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
+              //               Positioned(
+              //                 top: 7.h,
+              //                 right: 7.w,
+              //                 child: Icon(
+              //                   Icons.auto_awesome,
+              //                   size: 11.sp,
+              //                   color: const Color(0xFF8E123E),
+              //                 ),
+              //               ),
+              //             ],
+              //           ),
+              //         ),
 
-                      SizedBox(width: 14.w),
+              //         SizedBox(width: 14.w),
 
-                      /// TEXT
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Row(
-                              children: [
-                                Flexible(
-                                  child: Text(
-                                    "AI Price Estimator".tr,
-                                    style: TextStyle(
-                                      fontSize: 15.sp,
-                                      fontWeight: FontWeight.w700,
-                                      color: const Color(0xFF222222),
-                                    ),
-                                  ),
-                                ),
+              //         /// TEXT
+              //         Expanded(
+              //           child: Column(
+              //             crossAxisAlignment: CrossAxisAlignment.start,
+              //             children: [
+              //               Row(
+              //                 children: [
+              //                   Flexible(
+              //                     child: Text(
+              //                       "AI Price Estimator".tr,
+              //                       style: TextStyle(
+              //                         fontSize: 15.sp,
+              //                         fontWeight: FontWeight.w700,
+              //                         color: const Color(0xFF222222),
+              //                       ),
+              //                     ),
+              //                   ),
 
-                                SizedBox(width: 7.w),
-                              ],
-                            ),
+              //                   SizedBox(width: 7.w),
+              //                 ],
+              //               ),
 
-                            SizedBox(height: 5.h),
+              //               SizedBox(height: 5.h),
 
-                            Text(
-                              "Get an instant estimate of your property's market value"
-                                  .tr,
-                              maxLines: 2,
-                              overflow: TextOverflow.ellipsis,
-                              style: TextStyle(
-                                fontSize: 11.sp,
-                                height: 1.35,
-                                color: Colors.grey.shade600,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
+              //               Text(
+              //                 "Get an instant estimate of your property's market value"
+              //                     .tr,
+              //                 maxLines: 2,
+              //                 overflow: TextOverflow.ellipsis,
+              //                 style: TextStyle(
+              //                   fontSize: 11.sp,
+              //                   height: 1.35,
+              //                   color: Colors.grey.shade600,
+              //                 ),
+              //               ),
+              //             ],
+              //           ),
+              //         ),
 
-                      SizedBox(width: 10.w),
+              //         SizedBox(width: 10.w),
 
-                      /// ARROW
-                      Container(
-                        width: 32.w,
-                        height: 32.w,
-                        decoration: BoxDecoration(
-                          color: const Color(0xFF8E123E),
-                          borderRadius: BorderRadius.circular(10.r),
-                        ),
-                        child: Icon(
-                          Icons.arrow_forward_rounded,
-                          color: Colors.white,
-                          size: 17.sp,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
+              //         /// ARROW
+              //         Container(
+              //           width: 32.w,
+              //           height: 32.w,
+              //           decoration: BoxDecoration(
+              //             color: const Color(0xFF8E123E),
+              //             borderRadius: BorderRadius.circular(10.r),
+              //           ),
+              //           child: Icon(
+              //             Icons.arrow_forward_rounded,
+              //             color: Colors.white,
+              //             size: 17.sp,
+              //           ),
+              //         ),
+              //       ],
+              //     ),
+              //   ),
+              // ),
+              EstimatorCard(),
               SectionHeader(title: "Property Categories".tr, showSeeAll: false),
 
               SizedBox(
@@ -293,8 +296,8 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
 
               _buildFeaturedPropertiesSection(),
-              InvestmentBanner(),
 
+              _buildBannersSection(),
               SectionHeader(title: "Featured Dealers".tr),
 
               SizedBox(
@@ -338,10 +341,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   },
                 ),
               ),
-              BoostPropertyBanner(),
 
-              // SectionHeader(title: "Explore Qatar".tr),
-              //ExploreQatarSection(),
               const WhyChooseCard(),
             ],
           ),
@@ -445,7 +445,7 @@ class _HomeScreenState extends State<HomeScreen> {
             SectionHeader(title: "Featured Properties".tr),
             SizedBox(height: 10.h),
             SizedBox(
-              height: 225.h,
+              height: 250.h,
 
               child: ListView.separated(
                 controller: featuredScrollController,
@@ -521,6 +521,156 @@ class _HomeScreenState extends State<HomeScreen> {
           ],
         );
       },
+    );
+  }
+}
+Widget _buildBannersSection() {
+  return GetBuilder<BannerController>(
+    builder: (controller) {
+      /// INITIAL LOADING
+      if (controller.isLoading &&
+          controller.banners.isEmpty) {
+        return Container(
+          width: double.infinity,
+          height: 250.h,
+          decoration: BoxDecoration(
+            color: Colors.grey.shade100,
+            borderRadius:
+                BorderRadius.circular(10.r),
+          ),
+          alignment: Alignment.center,
+          child: SizedBox(
+            width: 22.w,
+            height: 22.w,
+            child: const CircularProgressIndicator(
+              strokeWidth: 2,
+              color: Color(0xff8C1437),
+            ),
+          ),
+        );
+      }
+
+      /// NO BANNERS / ERROR
+      if (controller.banners.isEmpty) {
+        return const SizedBox.shrink();
+      }
+
+      final now = DateTime.now();
+
+      /// Only banners that are:
+      /// 1. Active
+      /// 2. Started
+      /// 3. Not expired
+      final banners = controller.banners.where(
+        (banner) {
+          if (!banner.isActive) {
+            return false;
+          }
+
+          if (banner.startDate != null &&
+              now.isBefore(banner.startDate!)) {
+            return false;
+          }
+
+          if (banner.endDate != null &&
+              now.isAfter(banner.endDate!)) {
+            return false;
+          }
+
+          return true;
+        },
+      ).toList();
+
+      /// Sort according to API position.
+      banners.sort(
+        (a, b) =>
+            a.position.compareTo(b.position),
+      );
+
+      if (banners.isEmpty) {
+        return const SizedBox.shrink();
+      }
+
+      /// ONE BANNER
+      if (banners.length == 1) {
+        final banner = banners.first;
+
+        return InvestmentBanner(
+          banner: banner,
+          onTap: () {
+            _handleBannerTap(
+              banner.linkUrl,
+            );
+          },
+        );
+      }
+
+      /// MULTIPLE BANNERS
+      return SizedBox(
+        height: 150.h,
+        child: PageView.builder(
+          itemCount: banners.length,
+          itemBuilder: (
+            context,
+            index,
+          ) {
+            final banner = banners[index];
+
+            return Padding(
+              padding: EdgeInsets.only(
+                right:
+                    index == banners.length - 1
+                        ? 0
+                        : 8.w,
+              ),
+              child: InvestmentBanner(
+                banner: banner,
+                onTap: () {
+                  _handleBannerTap(
+                    banner.linkUrl,
+                  );
+                },
+              ),
+            );
+          },
+        ),
+      );
+    },
+  );
+}
+
+Future<void> _handleBannerTap(
+  String linkUrl,
+) async {
+  if (linkUrl.trim().isEmpty) {
+    return;
+  }
+
+  final Uri? uri = Uri.tryParse(
+    linkUrl.trim(),
+  );
+
+  if (uri == null) {
+    debugPrint(
+      "Invalid banner URL: $linkUrl",
+    );
+    return;
+  }
+
+  try {
+    final bool launched = await launchUrl(
+      uri,
+      mode: LaunchMode.externalApplication,
+    );
+
+    if (!launched) {
+      debugPrint(
+        "Unable to open banner URL: $linkUrl",
+      );
+    }
+  } catch (e) {
+    debugPrint(
+      "Banner URL error: $e",
     );
   }
 }

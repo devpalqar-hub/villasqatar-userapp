@@ -73,7 +73,7 @@ class _MakeOfferBottomSheetState extends State<MakeOfferBottomSheet> {
               children: [
                 Expanded(
                   child: Text(
-                    "Make an Offer",
+                    "Make an Offer".tr,
                     style: TextStyle(
                       fontSize: 17.sp,
                       fontWeight: FontWeight.w700,
@@ -111,9 +111,9 @@ class _MakeOfferBottomSheetState extends State<MakeOfferBottomSheet> {
                   // SECTION 1
                   // ==================================
                   _sectionTitle(
-                    "Property Price",
+                    "Property Price".tr,
                     subtitle:
-                        "Review the listed price before making your offer",
+                        "Review the listed price before making your offer".tr,
                     step: "1",
                   ),
 
@@ -130,8 +130,8 @@ class _MakeOfferBottomSheetState extends State<MakeOfferBottomSheet> {
                   // SECTION 2
                   // ==================================
                   _sectionTitle(
-                    "Your Offer",
-                    subtitle: "Enter the amount you would like to offer",
+                    "Your Offer".tr,
+                    subtitle: "Enter the amount you would like to offer".tr,
                     step: "2",
                   ),
 
@@ -294,7 +294,7 @@ class _MakeOfferBottomSheetState extends State<MakeOfferBottomSheet> {
               borderRadius: BorderRadius.circular(7.r),
             ),
             child: Text(
-              "LISTED",
+              "LISTED".tr,
               style: TextStyle(
                 fontSize: 7.sp,
                 fontWeight: FontWeight.w700,
@@ -316,7 +316,7 @@ class _MakeOfferBottomSheetState extends State<MakeOfferBottomSheet> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          "Offer Amount",
+          "Offer Amount".tr,
           style: AppTextStyles.body13.copyWith(
             fontSize: 11.sp,
             fontWeight: FontWeight.w700,
@@ -347,7 +347,7 @@ class _MakeOfferBottomSheetState extends State<MakeOfferBottomSheet> {
                     color: const Color(0xff222222),
                   ),
                   decoration: InputDecoration(
-                    hintText: "Enter amount",
+                    hintText: "Enter amount".tr,
                     hintStyle: TextStyle(
                       fontSize: 11.sp,
                       color: const Color(0xff999999),
@@ -431,7 +431,7 @@ class _MakeOfferBottomSheetState extends State<MakeOfferBottomSheet> {
 
           Expanded(
             child: Text(
-              "Your offer will be sent directly to the property owner. You can continue the conversation through chat.",
+              "Your offer will be sent directly to the property owner. You can continue the conversation through chat.".tr,
               style: TextStyle(
                 fontSize: 9.5.sp,
                 height: 1.45,
@@ -483,7 +483,7 @@ class _MakeOfferBottomSheetState extends State<MakeOfferBottomSheet> {
                       SizedBox(width: 7.w),
 
                       Text(
-                        "Chat Seller",
+                        "Chat Seller".tr,
                         style: TextStyle(
                           fontSize: 10.5.sp,
                           fontWeight: FontWeight.w700,
@@ -517,7 +517,7 @@ class _MakeOfferBottomSheetState extends State<MakeOfferBottomSheet> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Text(
-                        "Send Offer",
+                        "Send Offer".tr,
                         style: TextStyle(
                           fontSize: 10.5.sp,
                           fontWeight: FontWeight.w700,
@@ -565,8 +565,8 @@ class _MakeOfferBottomSheetState extends State<MakeOfferBottomSheet> {
 
     if (offer.isEmpty) {
       Get.snackbar(
-        "Offer Required",
-        "Please enter your offer amount.",
+        "Offer Required".tr,
+        "Please enter your offer amount.".tr,
         snackPosition: SnackPosition.BOTTOM,
       );
 
@@ -577,8 +577,8 @@ class _MakeOfferBottomSheetState extends State<MakeOfferBottomSheet> {
 
     if (amount == null || amount <= 0) {
       Get.snackbar(
-        "Invalid Offer",
-        "Please enter a valid offer amount.",
+        "Invalid Offer".tr,
+        "Please enter a valid offer amount.".tr,
         snackPosition: SnackPosition.BOTTOM,
       );
 

@@ -86,7 +86,7 @@ class BottomActionCard extends StatelessWidget {
                         showMakeOfferBottomSheet(context, property);
                       },
                       label: Text(
-                        "Make an Offer",
+                        "Make an Offer".tr,
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                         softWrap: false,
@@ -119,7 +119,7 @@ class BottomActionCard extends StatelessWidget {
                       },
 
                       label: Text(
-                        "Schedule",
+                        "Schedule".tr,
                         style: TextStyle(
                           fontSize: 10.sp,
                           color: Colors.white,
@@ -202,7 +202,7 @@ void _showScheduleVisitSheet(
                     SizedBox(height: 18.h),
 
                     Text(
-                      "Schedule a Visit",
+                      "Schedule a Visit".tr,
                       style: TextStyle(
                         fontSize: 18.sp,
                         fontWeight: FontWeight.w700,
@@ -212,7 +212,7 @@ void _showScheduleVisitSheet(
                     SizedBox(height: 18.h),
 
                     Text(
-                      "Select Visit Date",
+                      "Select Visit Date".tr,
                       style: TextStyle(
                         fontSize: 13.sp,
                         fontWeight: FontWeight.w600,
@@ -305,7 +305,7 @@ void _showScheduleVisitSheet(
                     SizedBox(height: 22.h),
 
                     Text(
-                      "Available Time",
+                      "Available Time".tr,
                       style: TextStyle(
                         fontSize: 13.sp,
                         fontWeight: FontWeight.w600,
@@ -367,7 +367,7 @@ void _showScheduleVisitSheet(
                       maxLines: 3,
                       enabled: !isLoading,
                       decoration: InputDecoration(
-                        hintText: "Add a note (Optional)",
+                        hintText: "Add a note (Optional)".tr,
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(12.r),
                         ),
@@ -467,7 +467,7 @@ void _showScheduleVisitSheet(
                                 ),
                               )
                             : Text(
-                                "Book Visit",
+                                "Book Visit".tr,
                                 style: TextStyle(
                                   fontSize: 15.sp,
                                   fontWeight: FontWeight.w700,

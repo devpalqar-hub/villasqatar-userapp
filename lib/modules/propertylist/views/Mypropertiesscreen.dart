@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:get/get.dart';
 import 'package:get/get_core/src/get_main.dart';
 import 'package:get/get_instance/src/extension_instance.dart';
 import 'package:get/get_navigation/src/extension_navigation.dart';
@@ -14,8 +15,6 @@ import 'package:villas_qatar/modules/searchscreen/service/searchlist_screen.dart
 
 import 'add_listproperty.dart';
 
-final MyPropertyController controller = Get.put(MyPropertyController());
-
 class MyPropertiesScreen extends StatefulWidget {
   const MyPropertiesScreen({super.key});
 
@@ -23,17 +22,18 @@ class MyPropertiesScreen extends StatefulWidget {
   State<MyPropertiesScreen> createState() => _MyPropertiesScreenState();
 }
 
-@override
-State<MyPropertiesScreen> createState() => _MyPropertiesScreenState();
-
 class _MyPropertiesScreenState extends State<MyPropertiesScreen> {
+  final MyPropertyController controller =
+      Get.isRegistered<MyPropertyController>()
+      ? Get.find<MyPropertyController>()
+      : Get.put(MyPropertyController());
   final ScrollController scrollController = ScrollController();
 
   String activeFilter = "All";
 
   final searchCtrl = TextEditingController();
 
-  final List<String> filters = const ["All", "Active", "Draft", "Sold"];
+ 
 
   @override
   void initState() {
@@ -86,7 +86,7 @@ class _MyPropertiesScreenState extends State<MyPropertiesScreen> {
 
           /// FILTER
 
-          if (activeFilter != "All") {
+          if (activeFilter != "All".tr) {
             listings = listings.where((e) {
               return e.status.toLowerCase() == activeFilter.toLowerCase();
             }).toList();
@@ -187,8 +187,8 @@ class _MyPropertiesScreenState extends State<MyPropertiesScreen> {
 
         icon: const Icon(Icons.add, color: Colors.white),
 
-        label: const Text(
-          "List Property",
+        label:  Text(
+          "List Property".tr,
           style: TextStyle(fontWeight: FontWeight.w700, color: Colors.white),
         ),
       ),
@@ -208,9 +208,9 @@ class _MyPropertiesScreenState extends State<MyPropertiesScreen> {
             icon: const Icon(Icons.arrow_back, color: AppColors.primary),
             onPressed: () {},
           ),
-          const Expanded(
+           Expanded(
             child: Text(
-              'My Properties',
+              "My Properties".tr,
               textAlign: TextAlign.center,
               style: TextStyle(
                 fontSize: 18,
@@ -246,9 +246,9 @@ class _MyPropertiesScreenState extends State<MyPropertiesScreen> {
         child: TextField(
           controller: searchCtrl,
           onChanged: (_) => setState(() {}),
-          style: const TextStyle(fontSize: 12, color: Colors.black87),
-          decoration: const InputDecoration(
-            hintText: 'Search by property name or location',
+          style:  TextStyle(fontSize: 12, color: Colors.black87),
+          decoration:  InputDecoration(
+            hintText: 'Search by property name or location'.tr,
             hintStyle: TextStyle(color: AppColors.hintGrey, fontSize: 12),
             prefixIcon: Icon(Icons.search, color: AppColors.hintGrey, size: 18),
             border: InputBorder.none,
@@ -281,13 +281,13 @@ class _MyPropertiesScreenState extends State<MyPropertiesScreen> {
               ),
             ),
             const SizedBox(height: 16),
-            const Text(
-              'No properties found',
+             Text(
+              'No properties found'.tr,
               style: TextStyle(fontWeight: FontWeight.w700, fontSize: 15),
             ),
             const SizedBox(height: 6),
-            const Text(
-              'Try a different search or filter, or list a new property',
+             Text(
+              'Try a different search or filter, or list a new property'.tr,
               textAlign: TextAlign.center,
               style: TextStyle(color: AppColors.hintGrey, fontSize: 12.5),
             ),
@@ -571,7 +571,7 @@ class _ForTag extends StatelessWidget {
           ),
           const SizedBox(width: 3),
           Text(
-            isSale ? "For Sale" : "For Rent",
+            isSale ? "For Sale".tr : "For Rent".tr,
             style: const TextStyle(
               fontSize: 10.5,
               fontWeight: FontWeight.w700,

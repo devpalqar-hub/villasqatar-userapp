@@ -87,7 +87,7 @@ class _VisitListScreenState extends State<VisitListScreen> {
 
           Expanded(
             child: Text(
-              "My Visits",
+              "My Visits".tr,
               textAlign: TextAlign.center,
               style: TextStyle(
                 fontSize: 18.sp,
@@ -128,8 +128,8 @@ class _VisitListScreenState extends State<VisitListScreen> {
         ),
         child: Row(
           children: [
-            _tabButton(title: "Visit Requests", index: 0),
-            _tabButton(title: "My Visits", index: 1),
+            _tabButton(title: "Visit Requests".tr, index: 0),
+            _tabButton(title: "My Visits".tr, index: 1),
           ],
         ),
       ),
@@ -197,8 +197,8 @@ class _VisitListScreenState extends State<VisitListScreen> {
     if (controller.ownerVisits.isEmpty) {
       return _emptyView(
         icon: Icons.event_busy_outlined,
-        title: "No visit requests",
-        subtitle: "Visit requests for your properties will appear here.",
+        title: "No visit requests".tr,
+        subtitle: "Visit requests for your properties will appear here.".tr,
       );
     }
 
@@ -235,8 +235,8 @@ class _VisitListScreenState extends State<VisitListScreen> {
     if (controller.visitorVisits.isEmpty) {
       return _emptyView(
         icon: Icons.calendar_month_outlined,
-        title: "No scheduled visits",
-        subtitle: "Properties you schedule for a visit will appear here.",
+        title: "No scheduled visits".tr,
+        subtitle: "Properties you schedule for a visit will appear here.".tr,
       );
     }
 
@@ -278,17 +278,17 @@ class _VisitListScreenState extends State<VisitListScreen> {
 
     final String date = localDate != null
         ? DateFormat("dd MMM yyyy").format(localDate)
-        : "Date not available";
+        : "Date not available".tr;
 
     final String time = localDate != null
         ? DateFormat("hh:mm a").format(localDate)
         : "";
 
-    final bool isPending = visit.status.toUpperCase() == "PENDING";
+    final bool isPending = visit.status.toUpperCase() == "PENDING".tr;
 
     final String visitorName = visitor?.name?.trim().isNotEmpty == true
         ? visitor!.name!.trim()
-        : visitor?.phone ?? visitor?.email ?? "Visitor";
+        : visitor?.phone ?? visitor?.email ?? "Visitor".tr;
 
     return Container(
       padding: EdgeInsets.all(10.w),
@@ -328,7 +328,7 @@ class _VisitListScreenState extends State<VisitListScreen> {
                           child: Text(
                             listing?.propertyName?.trim().isNotEmpty == true
                                 ? listing!.propertyName
-                                : "Property",
+                                : "Property".tr,
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
                             style: TextStyle(
@@ -462,7 +462,7 @@ class _VisitListScreenState extends State<VisitListScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      "Requested by",
+                      "Requested by".tr,
                       style: TextStyle(
                         fontSize: 8.5.sp,
                         color: Colors.grey.shade500,
@@ -515,7 +515,7 @@ class _VisitListScreenState extends State<VisitListScreen> {
                             ),
                           )
                         : Text(
-                            "Accept",
+                            "Accept".tr,
                             style: TextStyle(
                               fontSize: 9.5.sp,
                               fontWeight: FontWeight.w700,
@@ -586,7 +586,7 @@ class _VisitListScreenState extends State<VisitListScreen> {
 
     final String date = localDate != null
         ? DateFormat("dd MMM yyyy").format(localDate)
-        : "Date not available";
+        : "Date not available".tr;
 
     final String time = localDate != null
         ? DateFormat("hh:mm a").format(localDate)
@@ -594,7 +594,7 @@ class _VisitListScreenState extends State<VisitListScreen> {
 
     final String ownerName = owner?.name?.trim().isNotEmpty == true
         ? owner!.name!.trim()
-        : owner?.phone ?? "Owner";
+        : owner?.phone ?? "Owner".tr;
 
     return Container(
       padding: EdgeInsets.all(10.w),
@@ -634,7 +634,7 @@ class _VisitListScreenState extends State<VisitListScreen> {
                           child: Text(
                             listing?.propertyName?.trim().isNotEmpty == true
                                 ? listing!.propertyName
-                                : "Property",
+                                : "Property".tr,
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
                             style: TextStyle(
@@ -768,7 +768,7 @@ class _VisitListScreenState extends State<VisitListScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      "Property owner",
+                      "Property owner".tr,
                       style: TextStyle(
                         fontSize: 8.5.sp,
                         color: Colors.grey.shade500,
@@ -809,7 +809,7 @@ class _VisitListScreenState extends State<VisitListScreen> {
                     SizedBox(width: 4.w),
 
                     Text(
-                      "Scheduled",
+                      "Scheduled".tr,
                       style: TextStyle(
                         fontSize: 8.5.sp,
                         fontWeight: FontWeight.w600,
@@ -961,7 +961,7 @@ class _VisitListScreenState extends State<VisitListScreen> {
 
   String _locationText(VisitListing? listing) {
     if (listing == null) {
-      return "Location not available";
+      return "Location not available".tr;
     }
 
     final parts = [
@@ -972,7 +972,7 @@ class _VisitListScreenState extends State<VisitListScreen> {
     if (parts.isEmpty) {
       return listing.addressLine1.isNotEmpty
           ? listing.addressLine1
-          : "Location not available";
+          : "Location not available".tr;
     }
 
     return parts.join(", ");
@@ -1051,7 +1051,7 @@ class _VisitListScreenState extends State<VisitListScreen> {
 
               /// TITLE
               Text(
-                "Visit Request",
+                "Visit Request".tr,
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   fontSize: 18.sp,
@@ -1065,8 +1065,8 @@ class _VisitListScreenState extends State<VisitListScreen> {
               /// DESCRIPTION
               Text(
                 dateTimeText.isEmpty
-                    ? "Would you like to accept or reject this visit request?"
-                    : "The visit is scheduled for $dateTimeText. Would you like to accept or reject this request?",
+                    ? "Would you like to accept or reject this visit request?".tr
+                    : "The visit is scheduled for $dateTimeText. Would you like to accept or reject this request?".tr,
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   fontSize: 12.sp,
@@ -1109,7 +1109,7 @@ class _VisitListScreenState extends State<VisitListScreen> {
                           ),
                         ),
                         child: Text(
-                          "Reject",
+                          "Reject".tr,
                           style: TextStyle(
                             fontSize: 12.sp,
                             fontWeight: FontWeight.w600,
@@ -1148,7 +1148,7 @@ class _VisitListScreenState extends State<VisitListScreen> {
                           ),
                         ),
                         child: Text(
-                          "Accept",
+                          "Accept".tr,
                           style: TextStyle(
                             fontSize: 12.sp,
                             fontWeight: FontWeight.w600,

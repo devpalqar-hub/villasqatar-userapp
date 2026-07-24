@@ -5,11 +5,19 @@ import 'package:villas_qatar/Core/network/api_handler.dart';
 import 'package:villas_qatar/modules/propertylist/model/myproperty_model.dart';
 
 class PropertySearchController extends GetxController {
+  // ============================================================
+  // LOADING
+  // ============================================================
+
   bool isLoading = false;
   bool isLoadingMore = false;
   bool hasMore = true;
 
-  String error = "";
+  String error = '';
+
+  // ============================================================
+  // PAGINATION
+  // ============================================================
 
   int page = 1;
   final int limit = 12;
@@ -17,175 +25,275 @@ class PropertySearchController extends GetxController {
   List<Property> properties = [];
   Meta? meta;
 
-  final TextEditingController searchTextController = TextEditingController();
-  String search = "";
-  String type = "";
-  String purpose = "";
-  String furnishingStatus = "";
-  String nearbyTag = "";
+  // ============================================================
+  // SEARCH
+  // ============================================================
+
+  final TextEditingController searchTextController =
+      TextEditingController();
+
+  String search = '';
+
+  // ============================================================
+  // FILTERS
+  // ============================================================
+
+  String type = '';
+  String purpose = '';
+  String furnishingStatus = '';
+  String nearbyTag = '';
 
   double? minPrice;
+  double? maxPrice;
+
   int? minBedrooms;
   int? minBathrooms;
+
   double? minArea;
-  double? maxPrice;
   double? maxArea;
+
   List<String> furnishingOptions = [];
   List<String> nearbyTags = [];
+
+  // ============================================================
+  // PROPERTY DETAILS
+  // ============================================================
+
   bool isDetailsLoading = false;
+
   Property? selectedProperty;
-  String detailsError = "";
+
+  String detailsError = '';
+
+  // ============================================================
+  // INIT
+  // ============================================================
+
   @override
   void onInit() {
     super.onInit();
+
     fetchProperties();
   }
 
-  Future<void> fetchProperties({bool loadMore = false}) async {
+  // ============================================================
+  // FETCH PROPERTIES
+  // ============================================================
+
+  Future<void> fetchProperties({
+    bool loadMore = false,
+  }) async {
     if (loadMore) {
-      if (isLoadingMore || !hasMore) return;
+      if (isLoadingMore || !hasMore) {
+        return;
+      }
+
       isLoadingMore = true;
     } else {
+      if (isLoading) {
+        return;
+      }
+
       isLoading = true;
+
       page = 1;
       hasMore = true;
-      error = "";
+
+      error = '';
+
       properties.clear();
     }
 
     update();
 
     try {
-      final query = <String, String>{
-        "page": page.toString(),
-        "limit": limit.toString(),
+      final Map<String, String> query = {
+        'page': page.toString(),
+        'limit': limit.toString(),
       };
 
-      if (search.isNotEmpty) {
-        query["search"] = search;
+      // Search
+      if (search.trim().isNotEmpty) {
+        query['search'] = search.trim();
       }
 
+      // Property type
       if (type.isNotEmpty) {
-        query["type"] = type;
+        query['type'] = type;
       }
 
+      // Purpose
       if (purpose.isNotEmpty) {
-        query["purpose"] = purpose;
+        query['purpose'] = purpose;
       }
 
+      // Furnishing
       if (furnishingStatus.isNotEmpty) {
-        query["furnishingStatus"] = furnishingStatus;
+        query['furnishingStatus'] =
+            furnishingStatus;
       }
 
+      // Nearby
       if (nearbyTag.isNotEmpty) {
-        query["nearbyTag"] = nearbyTag;
+        query['nearbyTag'] = nearbyTag;
       }
 
+      // Price
       if (minPrice != null) {
-        query["minPrice"] = minPrice!.toString();
+        query['minPrice'] =
+            minPrice!.toString();
       }
 
+      if (maxPrice != null) {
+        query['maxPrice'] =
+            maxPrice!.toString();
+      }
+
+      // Bedrooms
       if (minBedrooms != null) {
-        query["minBedrooms"] = minBedrooms.toString();
+        query['minBedrooms'] =
+            minBedrooms!.toString();
       }
 
+      // Bathrooms
       if (minBathrooms != null) {
-        query["minBathrooms"] = minBathrooms.toString();
+        query['minBathrooms'] =
+            minBathrooms!.toString();
       }
 
+      // Area
       if (minArea != null) {
-        query["minArea"] = minArea!.toString();
+        query['minArea'] =
+            minArea!.toString();
       }
 
-      final endpoint =
-          "${ApiEndpoints.propertyList}?${Uri(queryParameters: query).query}";
+      if (maxArea != null) {
+        query['maxArea'] =
+            maxArea!.toString();
+      }
 
-      final response = await ApiHandler.get(endpoint);
+      final String endpoint =
+          '${ApiEndpoints.propertyList}'
+          '?${Uri(queryParameters: query).query}';
 
-      final model = MyPropertyModel.fromJson(response);
+      debugPrint(
+        '========== PROPERTY SEARCH ==========',
+      );
+
+      debugPrint(
+        'ENDPOINT: $endpoint',
+      );
+
+      final response =
+          await ApiHandler.get(endpoint);
+
+      final MyPropertyModel model =
+          MyPropertyModel.fromJson(
+        response,
+      );
 
       if (loadMore) {
-        properties.addAll(model.data);
+        properties.addAll(
+          model.data,
+        );
       } else {
         properties = model.data;
       }
 
       meta = model.meta;
 
-      hasMore = page < model.meta.totalPages;
+      hasMore =
+          page < model.meta.totalPages;
 
       if (hasMore) {
         page++;
       }
     } catch (e) {
-      error = e.toString();
+      error = e
+          .toString()
+          .replaceFirst(
+            'Exception: ',
+            '',
+          );
+
+      debugPrint(
+        'PROPERTY SEARCH ERROR: $error',
+      );
     } finally {
       isLoading = false;
       isLoadingMore = false;
+
       update();
     }
   }
 
-  Future<void> refreshProperties() async {
-  search = "";
-  searchTextController.clear();
+  // ============================================================
+  // SEARCH PROPERTY
+  // ============================================================
 
-  purpose = "";
-  type = "";
-  furnishingStatus = "";
-  nearbyTag = "";
-
-  minPrice = null;
-  maxPrice = null;
-  minBedrooms = null;
-  minBathrooms = null;
-  minArea = null;
-  maxArea = null;
-
-  page = 1;
-  hasMore = true;
-
-
-
-  update();
-
-  await fetchProperties();
-}
-
-  void searchProperty(String value) {
-    final query = value.trim();
-
-    if (query.isEmpty) return;
+  Future<void> searchProperty(
+    String value,
+  ) async {
+    final String query =
+        value.trim();
 
     search = query;
-    searchTextController.text = query;
 
-    fetchProperties();
+    _setSearchText(query);
+
+    await fetchProperties();
   }
 
-  void applyInitialSearch(String? value) {
-    final query = value?.trim() ?? "";
+  // ============================================================
+  // INITIAL SEARCH
+  // ============================================================
 
-    if (query.isEmpty) return;
+  Future<void> applyInitialSearch(
+    String? value,
+  ) async {
+    final String query =
+        value?.trim() ?? '';
 
-    /// Store API search
+    if (query.isEmpty) {
+      return;
+    }
+
     search = query;
 
-    /// Show same text inside SearchFilterCard
-    searchTextController.text = query;
-
-    /// Keep cursor at end
-    searchTextController.selection = TextSelection.fromPosition(
-      TextPosition(offset: searchTextController.text.length),
-    );
+    _setSearchText(query);
 
     update();
 
-    /// Search API
-    fetchProperties();
+    await fetchProperties();
   }
 
-  void applyFilters({
+  // ============================================================
+  // INITIAL PURPOSE
+  // ============================================================
+
+  Future<void> applyInitialPurpose(
+    String? value,
+  ) async {
+    final String selectedPurpose =
+        value?.trim().toUpperCase() ?? '';
+
+    if (selectedPurpose != 'SALE' &&
+        selectedPurpose != 'RENT') {
+      return;
+    }
+
+    purpose = selectedPurpose;
+
+    update();
+
+    await fetchProperties();
+  }
+
+  // ============================================================
+  // APPLY FILTERS
+  // ============================================================
+
+  Future<void> applyFilters({
     String? search,
     String? type,
     String? purpose,
@@ -197,101 +305,216 @@ class PropertySearchController extends GetxController {
     int? minBathrooms,
     double? minArea,
     double? maxArea,
-  }) {
-    this.search = search ?? this.search;
-    this.type = type ?? this.type;
-    this.purpose = purpose ?? this.purpose;
-    this.furnishingStatus = furnishingStatus ?? this.furnishingStatus;
-    this.nearbyTag = nearbyTag ?? this.nearbyTag;
+  }) async {
+    if (search != null) {
+      this.search = search.trim();
+
+      _setSearchText(
+        this.search,
+      );
+    }
+
+    if (type != null) {
+      this.type = type;
+    }
+
+    if (purpose != null) {
+      this.purpose = purpose;
+    }
+
+    if (furnishingStatus != null) {
+      this.furnishingStatus =
+          furnishingStatus;
+    }
+
+    if (nearbyTag != null) {
+      this.nearbyTag = nearbyTag;
+    }
 
     this.minPrice = minPrice;
     this.maxPrice = maxPrice;
+
     this.minBedrooms = minBedrooms;
     this.minBathrooms = minBathrooms;
+
     this.minArea = minArea;
     this.maxArea = maxArea;
 
-    fetchProperties();
+    await fetchProperties();
   }
 
-  void resetSearch() {
-    search = "";
-    type = "";
-    purpose = "";
-    furnishingStatus = "";
-    nearbyTag = "";
+  // ============================================================
+  // RESET SEARCH + FILTERS
+  // ============================================================
+
+  Future<void> resetSearch() async {
+    _resetFilterValues();
+
+    _setSearchText('');
+
+    update();
+
+    await fetchProperties();
+  }
+
+  // ============================================================
+  // CLEAR FILTERS
+  // ============================================================
+
+  Future<void> clearFilters() async {
+    _resetFilterValues();
+
+    _setSearchText('');
+
+    update();
+
+    await fetchProperties();
+  }
+
+  // ============================================================
+  // REFRESH
+  // ============================================================
+
+  Future<void> refreshProperties() async {
+  search = '';
+
+  searchTextController.clear();
+
+  type = '';
+  purpose = '';
+  furnishingStatus = '';
+  nearbyTag = '';
+
+  minPrice = null;
+  maxPrice = null;
+
+  minBedrooms = null;
+  minBathrooms = null;
+
+  minArea = null;
+  maxArea = null;
+
+  page = 1;
+  hasMore = true;
+
+  update();
+
+  await fetchProperties();
+}
+
+  // ============================================================
+  // RESET FILTER VALUES
+  // ============================================================
+
+  void _resetFilterValues() {
+    search = '';
+
+    type = '';
+    purpose = '';
+    furnishingStatus = '';
+    nearbyTag = '';
 
     minPrice = null;
     maxPrice = null;
+
     minBedrooms = null;
     minBathrooms = null;
+
     minArea = null;
     maxArea = null;
-
-    update();
   }
 
-  void clearFilters() {
-    search = "";
-    type = "";
-    purpose = "";
-    furnishingStatus = "";
-    nearbyTag = "";
+  // ============================================================
+  // SAFE SEARCH TEXT UPDATE
+  // ============================================================
 
-    minPrice = null;
-    minBedrooms = null;
-    minBathrooms = null;
-    minArea = null;
-
-    fetchProperties();
+  void _setSearchText(
+    String value,
+  ) {
+    searchTextController.value =
+        TextEditingValue(
+      text: value,
+      selection: TextSelection.collapsed(
+        offset: value.length,
+      ),
+    );
   }
 
-  Future<void> fetchPropertyDetails(String propertyId) async {
+  // ============================================================
+  // PROPERTY DETAILS
+  // ============================================================
+
+  Future<void> fetchPropertyDetails(
+    String propertyId,
+  ) async {
     try {
       isDetailsLoading = true;
-      detailsError = "";
+
+      detailsError = '';
+
       selectedProperty = null;
+
       update();
 
-      final response = await ApiHandler.get(
-        "${ApiEndpoints.propertyList}/$propertyId",
+      final response =
+          await ApiHandler.get(
+        '${ApiEndpoints.propertyList}'
+        '/$propertyId',
       );
 
-      selectedProperty = Property.fromJson(response);
+      selectedProperty =
+          Property.fromJson(
+        response,
+      );
     } catch (e) {
-      detailsError = e.toString();
+      detailsError = e
+          .toString()
+          .replaceFirst(
+            'Exception: ',
+            '',
+          );
     } finally {
       isDetailsLoading = false;
+
       update();
     }
   }
 
+  // ============================================================
+  // CLEAR PROPERTY DETAILS
+  // ============================================================
+   Future<void> clearSearch() async {
+  search = '';
+
+  searchTextController.clear();
+
+  // Remove any selection/cursor position
+  searchTextController.selection =
+      const TextSelection.collapsed(
+    offset: 0,
+  );
+
+  update();
+
+  await fetchProperties();
+}
+
   void clearPropertyDetails() {
     selectedProperty = null;
-    detailsError = "";
+
+    detailsError = '';
+
     update();
   }
+
+  // ============================================================
+  // CLOSE
+  // ============================================================
 
   @override
   void onClose() {
     searchTextController.dispose();
+
     super.onClose();
   }
-
-void applyInitialPurpose(String? value) {
-  final selectedPurpose =
-      value?.trim().toUpperCase() ?? "";
-
-  if (selectedPurpose != "SALE" &&
-      selectedPurpose != "RENT") {
-    return;
-  }
-
-  purpose = selectedPurpose;
-
-  update();
-
-  fetchProperties();
-}
-
 }

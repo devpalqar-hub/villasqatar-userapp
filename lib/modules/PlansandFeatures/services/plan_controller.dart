@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:villas_qatar/Core/network/api_handler.dart';
 import 'package:villas_qatar/Core/network/api_endpoints.dart';
-import 'package:villas_qatar/modules/Plans/model/featured_palnmodel.dart';
+import 'package:villas_qatar/modules/PlansandFeatures/model/featured_palnmodel.dart';
 
 class FeaturedPlanController extends GetxController {
   bool isLoading = false;

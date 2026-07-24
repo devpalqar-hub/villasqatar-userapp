@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 
-import 'package:villas_qatar/modules/Plans/model/featured_palnmodel.dart';
-import 'package:villas_qatar/modules/Plans/services/plan_controller.dart';
+import 'package:villas_qatar/modules/PlansandFeatures/model/featured_palnmodel.dart';
+import 'package:villas_qatar/modules/PlansandFeatures/services/plan_controller.dart';
 import 'package:villas_qatar/modules/propertylist/model/myproperty_model.dart';
 import 'package:villas_qatar/modules/propertylist/service/myproperties_listcontroller.dart';
 import 'package:villas_qatar/modules/searchscreen/service/searchlist_screen.dart';

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:get/get_utils/src/extensions/internacionalization.dart';
 // import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:villas_qatar/Core/constants/app_colors.dart';
@@ -25,7 +26,7 @@ class PropertyLocationCard extends StatelessWidget {
         children: [
           /// Heading
           Text(
-            "Location",
+            "Location".tr,
             style: TextStyle(
               fontSize: 16.sp,
               fontWeight: FontWeight.w700,
@@ -153,7 +154,7 @@ class PropertyLocationCard extends StatelessWidget {
             height: 45.h,
             child: OutlinedButton.icon(
               style: OutlinedButton.styleFrom(
-                side: const BorderSide(color: Color(0xffA61E3D)),
+                side:  BorderSide(color: Color(0xffA61E3D)),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(14.r),
                 ),
@@ -170,13 +171,13 @@ class PropertyLocationCard extends StatelessWidget {
               },
               icon: Icon(
                 Icons.map_outlined,
-                color: const Color(0xffA61E3D),
+                color:  Color(0xffA61E3D),
                 size: 22.sp,
               ),
               label: Text(
-                "View on Maps",
+                "View on Maps".tr,
                 style: TextStyle(
-                  color: const Color(0xffA61E3D),
+                  color: Color(0xffA61E3D),
                   fontWeight: FontWeight.w700,
                   fontSize: 14.sp,
                 ),

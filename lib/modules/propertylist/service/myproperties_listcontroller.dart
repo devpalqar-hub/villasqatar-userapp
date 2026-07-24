@@ -9,6 +9,7 @@ class MyPropertyController extends GetxController {
   bool isLoading = false;
   bool isLoadingMore = false;
   String error = "";
+  
 
   List<Property> properties = [];
   String? purpose;
@@ -42,117 +43,224 @@ class MyPropertyController extends GetxController {
   bool isMarkingAsSold = false;
   String markAsSoldError = "";
  
+Future<void> fetchProperties({
+  bool loadMore = false,
+  bool showLoader = true,
+}) async {
+  // Prevent duplicate API calls
+  if (loadMore) {
+    if (isLoadingMore || !hasMore) {
+      return;
+    }
 
-  Future<void> fetchProperties({bool loadMore = false}) async {
-    if (loadMore) {
-      if (isLoadingMore || !hasMore) return;
-      isLoadingMore = true;
-    } else {
+    isLoadingMore = true;
+  } else {
+    if (isLoading) {
+      return;
+    }
+
+    if (showLoader) {
       isLoading = true;
-      page = 1;
-      hasMore = true;
-      properties.clear();
     }
 
-    update();
+    error = "";
 
-    try {
-      final query = <String, String>{"page": "$page", "limit": "$limit"};
+    page = 1;
+    hasMore = true;
 
-      if (purpose != null && purpose!.isNotEmpty) {
-        query["purpose"] = purpose!;
-      }
-
-      if (type != null && type!.isNotEmpty) {
-        query["type"] = type!;
-      }
-
-      if (minPrice != null) {
-        query["minPrice"] = minPrice!.toString();
-      }
-
-      if (maxPrice != null) {
-        query["maxPrice"] = maxPrice!.toString();
-      }
-
-      if (priceNegotiable != null) {
-        query["priceNegotiable"] = priceNegotiable.toString();
-      }
-
-      if (minBedrooms != null) {
-        query["minBedrooms"] = minBedrooms.toString();
-      }
-
-      if (maxBedrooms != null) {
-        query["maxBedrooms"] = maxBedrooms.toString();
-      }
-
-      if (minBathrooms != null) {
-        query["minBathrooms"] = minBathrooms.toString();
-      }
-
-      if (maxBathrooms != null) {
-        query["maxBathrooms"] = maxBathrooms.toString();
-      }
-
-      if (minArea != null) {
-        query["minArea"] = minArea.toString();
-      }
-
-      if (maxArea != null) {
-        query["maxArea"] = maxArea.toString();
-      }
-
-      if (furnishingStatus != null && furnishingStatus!.isNotEmpty) {
-        query["furnishingStatus"] = furnishingStatus!;
-      }
-
-      if (municipality != null && municipality!.isNotEmpty) {
-        query["municipality"] = municipality!;
-      }
-
-      if (areaName != null && areaName!.isNotEmpty) {
-        query["areaName"] = areaName!;
-      }
-
-      if (sortBy != null && sortBy!.isNotEmpty) {
-        query["sortBy"] = sortBy!;
-      }
-
-      if (sortOrder != null && sortOrder!.isNotEmpty) {
-        query["sortOrder"] = sortOrder!;
-      }
-
-      final uri = Uri.parse(
-        ApiEndpoints.mypropertyList,
-      ).replace(queryParameters: query);
-
-      final response = await ApiHandler.get(uri.toString());
-
-      final model = MyPropertyModel.fromJson(response);
-
-      print("Properties: ${model.data.length}");
-
-      if (loadMore) {
-        properties.addAll(model.data);
-      } else {
-        properties = model.data;
-      }
-
-      hasMore = page < model.meta.totalPages;
-
-      if (hasMore) {
-        page++;
-      }
-    } catch (e) {
-      error = e.toString();
-    }
-
-    isLoading = false;
-    isLoadingMore = false;
-    update();
+    // IMPORTANT:
+    // Do not clear here.
+    //
+    // Keep old properties visible while refreshing.
   }
 
+  update();
+
+  try {
+    final int requestedPage =
+        loadMore ? page : 1;
+
+    final query = <String, String>{
+      "page": requestedPage.toString(),
+      "limit": limit.toString(),
+    };
+
+    // ==========================================================
+    // FILTERS
+    // ==========================================================
+
+    if (purpose != null &&
+        purpose!.isNotEmpty) {
+      query["purpose"] = purpose!;
+    }
+
+    if (type != null &&
+        type!.isNotEmpty) {
+      query["type"] = type!;
+    }
+
+    if (minPrice != null) {
+      query["minPrice"] =
+          minPrice!.toString();
+    }
+
+    if (maxPrice != null) {
+      query["maxPrice"] =
+          maxPrice!.toString();
+    }
+
+    if (priceNegotiable != null) {
+      query["priceNegotiable"] =
+          priceNegotiable.toString();
+    }
+
+    if (minBedrooms != null) {
+      query["minBedrooms"] =
+          minBedrooms.toString();
+    }
+
+    if (maxBedrooms != null) {
+      query["maxBedrooms"] =
+          maxBedrooms.toString();
+    }
+
+    if (minBathrooms != null) {
+      query["minBathrooms"] =
+          minBathrooms.toString();
+    }
+
+    if (maxBathrooms != null) {
+      query["maxBathrooms"] =
+          maxBathrooms.toString();
+    }
+
+    if (minArea != null) {
+      query["minArea"] =
+          minArea.toString();
+    }
+
+    if (maxArea != null) {
+      query["maxArea"] =
+          maxArea.toString();
+    }
+
+    if (furnishingStatus != null &&
+        furnishingStatus!.isNotEmpty) {
+      query["furnishingStatus"] =
+          furnishingStatus!;
+    }
+
+    if (municipality != null &&
+        municipality!.isNotEmpty) {
+      query["municipality"] =
+          municipality!;
+    }
+
+    if (areaName != null &&
+        areaName!.isNotEmpty) {
+      query["areaName"] =
+          areaName!;
+    }
+
+    if (sortBy != null &&
+        sortBy!.isNotEmpty) {
+      query["sortBy"] = sortBy!;
+    }
+
+    if (sortOrder != null &&
+        sortOrder!.isNotEmpty) {
+      query["sortOrder"] =
+          sortOrder!;
+    }
+
+    // ==========================================================
+    // API
+    // ==========================================================
+
+    final uri = Uri.parse(
+      ApiEndpoints.mypropertyList,
+    ).replace(
+      queryParameters: query,
+    );
+
+    debugPrint(
+      "FETCH MY PROPERTIES: $uri",
+    );
+
+    final response =
+        await ApiHandler.get(
+      uri.toString(),
+    );
+
+    final model =
+        MyPropertyModel.fromJson(
+      response,
+    );
+
+    debugPrint(
+      "MY PROPERTIES RECEIVED: ${model.data.length}",
+    );
+
+    // ==========================================================
+    // UPDATE LIST
+    // ==========================================================
+
+    if (loadMore) {
+      final Set<String?> existingIds =
+          properties
+              .map((e) => e.id)
+              .toSet();
+
+      final newProperties =
+          model.data.where(
+        (property) {
+          return !existingIds.contains(
+            property.id,
+          );
+        },
+      ).toList();
+
+      properties.addAll(
+        newProperties,
+      );
+    } else {
+      // Replace only AFTER API succeeds.
+      properties = model.data;
+    }
+
+    // ==========================================================
+    // PAGINATION
+    // ==========================================================
+
+    hasMore =
+        requestedPage <
+        model.meta.totalPages;
+
+    page = requestedPage + 1;
+
+    error = "";
+  } catch (e, stackTrace) {
+    error = e
+        .toString()
+        .replaceFirst(
+          "Exception: ",
+          "",
+        );
+
+    debugPrint(
+      "FETCH MY PROPERTIES ERROR: $e",
+    );
+
+    debugPrint(
+      stackTrace.toString(),
+    );
+  } finally {
+    isLoading = false;
+    isLoadingMore = false;
+
+    update();
+  }
+}
   Future<void> refreshProperties() async {
     page = 1;
     hasMore = true;

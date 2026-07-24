@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:get/get_utils/src/extensions/internacionalization.dart';
 import 'package:intl/intl.dart';
 import 'package:villas_qatar/modules/propertylist/model/myproperty_model.dart';
 
@@ -13,57 +14,57 @@ class PropertyDetailsCard extends StatelessWidget {
     final details = [
       {
         "icon": Icons.square_foot_outlined,
-        "title": "Built-up Area",
+        "title": "Built-up Area".tr,
         "value": "${property.area} sqm",
       },
       {
         "icon": Icons.crop_square_outlined,
-        "title": "Floor",
+        "title": "Floor".tr,
         "value": "${property.floorNumber}/${property.totalFloors}",
       },
       {
         "icon": Icons.king_bed_outlined,
-        "title": "Bedrooms",
+        "title": "Bedrooms".tr,
         "value": property.bedrooms.toString(),
       },
       {
         "icon": Icons.bathtub_outlined,
-        "title": "Bathrooms",
+        "title": "Bathrooms".tr,
         "value": property.bathrooms.toString(),
       },
       {
         "icon": Icons.weekend_outlined,
-        "title": "Living Rooms",
+        "title": "Living Rooms".tr,
         "value": property.livingRooms.toString(),
       },
       {
         "icon": Icons.directions_car_outlined,
-        "title": "Parking",
+        "title": "Parking".tr,
         "value": property.parkingSpaces.toString(),
       },
       {
         "icon": Icons.chair_outlined,
-        "title": "Furnishing",
+        "title": "Furnishing".tr,
         "value": property.furnishingStatus,
       },
       {
         "icon": Icons.home_work_outlined,
-        "title": "Property Type",
+        "title": "Property Type".tr,
         "value": property.type,
       },
       {
         "icon": Icons.sell_outlined,
-        "title": "Purpose",
-        "value": property.purpose == "SALE" ? "For Sale" : "For Rent",
+        "title": "Purpose".tr,
+        "value": property.purpose == "SALE".tr ? "For Sale".tr : "For Rent".tr,
       },
       {
         "icon": Icons.calendar_today_outlined,
-        "title": "Year Built",
+        "title": "Year Built".tr,
         "value": property.yearBuilt?.toString() ?? "-",
       },
       {
         "icon": Icons.schedule_outlined,
-        "title": "Listed On",
+        "title": "Listed On".tr,
         "value": DateFormat("dd MMM yyyy").format(property.createdAt),
       },
     ];
@@ -80,7 +81,7 @@ class PropertyDetailsCard extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              "Property Details",
+              "Property Details".tr,
               style: TextStyle(
                 fontSize: 16.sp,
                 fontWeight: FontWeight.w700,

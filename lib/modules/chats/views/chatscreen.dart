@@ -12,10 +12,10 @@ class ChatScreen extends StatelessWidget {
 
   final ChatController controller = Get.find<ChatController>();
 
-  final List<String> quickReplies = const [
-    "Can we schedule a visit?",
-    "Is the price negotiable?",
-    "What is the payment plan?",
+  final List<String> quickReplies = [
+    "Can we schedule a visit?".tr,
+    "Is the price negotiable?".tr,
+    "What is the payment plan?".tr,
   ];
 
   @override
@@ -59,7 +59,7 @@ class ChatScreen extends StatelessWidget {
                     children: [
 
                       Text(
-                        seller?.name ?? "Seller",
+                        seller?.name ?? "Seller".tr,
                         style: TextStyle(
                           fontSize: 15.sp,
                           fontWeight: FontWeight.w600,
@@ -68,8 +68,8 @@ class ChatScreen extends StatelessWidget {
 
                       Text(
                         controller.isTyping
-                            ? "Typing..."
-                            : "Online",
+                            ? "Typing...".tr
+                            : "Online".tr,
                         style: TextStyle(
                           fontSize: 11.sp,
                           color: Colors.green,
@@ -98,9 +98,9 @@ class ChatScreen extends StatelessWidget {
 
               Expanded(
                 child: controller.messages.isEmpty
-                    ? const Center(
+                    ?  Center(
                         child: Text(
-                          "No Messages Yet",
+                          "No Messages Yet".tr,
                         ),
                       )
                     : ListView.separated(
@@ -277,7 +277,7 @@ class TextBubble extends StatelessWidget {
                     horizontal: 4.h,
                   ),
                   child: Text(
-                    DateFormat("hh:mm a")
+                    DateFormat("hh:mm a".tr)
                         .format(message.createdAt),
                     style: TextStyle(
                       color: AppColors.textSecondary,
@@ -432,7 +432,7 @@ class InputBar extends StatelessWidget {
                 },
 
                 decoration: InputDecoration(
-                  hintText: "Type a message...",
+                  hintText: "Type a message...".tr,
                   hintStyle: TextStyle(
                     color: AppColors.textSecondary,
                     fontSize: 13.sp,
@@ -503,7 +503,7 @@ class InputBar extends StatelessWidget {
               children: [
                 _AttachmentItem(
                   icon: Icons.photo,
-                  title: "Gallery",
+                  title: "Gallery".tr,
                   onTap: () {
                     Navigator.pop(context);
                     controller.pickImageFromGallery();
@@ -511,7 +511,7 @@ class InputBar extends StatelessWidget {
                 ),
                 _AttachmentItem(
                   icon: Icons.camera_alt,
-                  title: "Camera",
+                  title: "Camera".tr,
                   onTap: () {
                     Navigator.pop(context);
                     controller.pickImageFromCamera();
@@ -519,7 +519,7 @@ class InputBar extends StatelessWidget {
                 ),
                 _AttachmentItem(
                   icon: Icons.location_on,
-                  title: "Location",
+                  title: "Location".tr,
                   onTap: () {
                     Navigator.pop(context);
                     controller.sendLocation();

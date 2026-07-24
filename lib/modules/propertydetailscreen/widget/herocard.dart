@@ -5,19 +5,21 @@ import 'package:get/get.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:villas_qatar/modules/propertylist/model/myproperty_model.dart';
 import 'package:villas_qatar/modules/wishlist/service/wishlist_controller.dart';
-
 class HeroImageCard extends StatefulWidget {
   final Property property;
   final bool isMyProperty;
+  final VoidCallback? onReport;
 
   const HeroImageCard({
     super.key,
     required this.property,
     this.isMyProperty = false,
+    this.onReport,
   });
 
   @override
-  State<HeroImageCard> createState() => _HeroImageCardState();
+  State<HeroImageCard> createState() =>
+      _HeroImageCardState();
 }
 
 class _HeroImageCardState extends State<HeroImageCard> {
@@ -139,8 +141,8 @@ class _HeroImageCardState extends State<HeroImageCard> {
 
                             if (slug == null || slug.trim().isEmpty) {
                               Get.snackbar(
-                                "Unable to share",
-                                "Property link is not available",
+                                "Unable to share".tr,
+                                "Property link is not available".tr,
                               );
                               return;
                             }
@@ -186,7 +188,7 @@ class _HeroImageCardState extends State<HeroImageCard> {
                                       SizedBox(height: 20.h),
 
                                       Text(
-                                        "Share Property",
+                                        "Share Property".tr,
                                         style: TextStyle(
                                           fontSize: 18.sp,
                                           fontWeight: FontWeight.w700,
@@ -304,8 +306,72 @@ class _HeroImageCardState extends State<HeroImageCard> {
                             );
                           }),
                           SizedBox(width: 10.w),
+                           if (!widget.isMyProperty) ...[
+  SizedBox(width: 10.w),
 
-                          /// FAVORITE
+  PopupMenuButton<String>(
+    padding: EdgeInsets.zero,
+    offset: Offset(0, 38.h),
+    color: Colors.white,
+    elevation: 6,
+    surfaceTintColor: Colors.white,
+    shape: RoundedRectangleBorder(
+      borderRadius: BorderRadius.circular(12.r),
+    ),
+
+    onSelected: (value) {
+      if (value == 'report') {
+        widget.onReport?.call();
+      }
+    },
+
+    itemBuilder: (context) => [
+      PopupMenuItem<String>(
+        value: 'report',
+        height: 42.h,
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(
+              Icons.flag_outlined,
+              size: 18.sp,
+              color: const Color(0xFFD64545),
+            ),
+
+            SizedBox(width: 10.w),
+
+            Text(
+              "Report listing",
+              style: TextStyle(
+                fontSize: 12.sp,
+                fontWeight: FontWeight.w500,
+                color: const Color(0xFF333333),
+              ),
+            ),
+          ],
+        ),
+      ),
+    ],
+
+    child: Container(
+      width: 30.w,
+      height: 30.w,
+      alignment: Alignment.center,
+      decoration: BoxDecoration(
+        color: Colors.white,
+        shape: BoxShape.circle,
+        border: Border.all(
+          color: Colors.white.withOpacity(.20),
+        ),
+      ),
+      child: Icon(
+        Icons.more_vert_rounded,
+        color: Colors.black87,
+        size: 17.sp,
+      ),
+    ),
+  ),
+],
                           /// Do not show for user's own property
                           if (!widget.isMyProperty) ...[
                             SizedBox(width: 10.w),

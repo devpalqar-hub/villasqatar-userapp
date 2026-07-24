@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 
-import 'package:villas_qatar/modules/Plans/model/featured_palnmodel.dart';
-import 'package:villas_qatar/modules/Plans/services/plan_controller.dart';
+import 'package:villas_qatar/modules/PlansandFeatures/model/featured_palnmodel.dart';
+import 'package:villas_qatar/modules/PlansandFeatures/services/plan_controller.dart';
 
 class BoostPlanBottomSheet extends StatefulWidget {
   final String propertyId;
@@ -81,7 +81,7 @@ class _BoostPlanBottomSheetState extends State<BoostPlanBottomSheet> {
               children: [
                 Expanded(
                   child: Text(
-                    "Boost Property",
+                    "Boost Property".tr,
                     style: TextStyle(
                       fontSize: 17.sp,
                       fontWeight: FontWeight.w700,
@@ -117,8 +117,8 @@ class _BoostPlanBottomSheetState extends State<BoostPlanBottomSheet> {
                   // SECTION TITLE
                   // =============================================
                   _sectionTitle(
-                    "Choose Boost Plan",
-                    subtitle: "Select how you want to promote your listing",
+                    "Choose Boost Plan".tr,
+                    subtitle: "Select how you want to promote your listing".tr,
                     step: "1",
                   ),
 
@@ -140,7 +140,7 @@ class _BoostPlanBottomSheetState extends State<BoostPlanBottomSheet> {
                     child: GetBuilder<FeaturedPlanController>(
                       builder: (controller) {
                         if (controller.isLoading) {
-                          return _buildLoadingBox("Loading boost plans...");
+                          return _buildLoadingBox("Loading boost plans...".tr);
                         }
 
                         if (controller.error.isNotEmpty) {
@@ -257,7 +257,7 @@ class _BoostPlanBottomSheetState extends State<BoostPlanBottomSheet> {
         },
 
         decoration: InputDecoration(
-          hintText: "Search boost plans",
+          hintText: "Search boost plans".tr,
 
           hintStyle: TextStyle(
             fontSize: 10.5.sp,
@@ -324,7 +324,7 @@ class _BoostPlanBottomSheetState extends State<BoostPlanBottomSheet> {
             SizedBox(height: 10.h),
 
             Text(
-              "No plans found",
+              "No plans found".tr,
               style: TextStyle(
                 fontSize: 12.sp,
                 fontWeight: FontWeight.w700,
@@ -335,7 +335,7 @@ class _BoostPlanBottomSheetState extends State<BoostPlanBottomSheet> {
             SizedBox(height: 4.h),
 
             Text(
-              "Try searching with another keyword",
+              "Try searching with another keyword".tr,
               textAlign: TextAlign.center,
               style: TextStyle(
                 fontSize: 9.5.sp,
@@ -484,7 +484,7 @@ class _BoostPlanBottomSheetState extends State<BoostPlanBottomSheet> {
                               borderRadius: BorderRadius.circular(6.r),
                             ),
                             child: Text(
-                              "POPULAR",
+                              "POPULAR".tr,
                               style: TextStyle(
                                 fontSize: 6.5.sp,
                                 fontWeight: FontWeight.w700,
@@ -600,7 +600,7 @@ class _BoostPlanBottomSheetState extends State<BoostPlanBottomSheet> {
           SizedBox(width: 5.w),
 
           Text(
-            "Secure payment powered by Stripe",
+            "Secure payment powered by Stripe".tr,
             style: TextStyle(fontSize: 9.sp, color: const Color(0xff777777)),
           ),
         ],
@@ -688,7 +688,7 @@ class _BoostPlanBottomSheetState extends State<BoostPlanBottomSheet> {
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Text(
-                          "Continue",
+                          "Continue".tr,
                           style: TextStyle(
                             fontSize: 11.sp,
                             fontWeight: FontWeight.w700,
@@ -765,7 +765,7 @@ class _BoostPlanBottomSheetState extends State<BoostPlanBottomSheet> {
           SizedBox(height: 8.h),
 
           Text(
-            "Unable to load boost plans",
+            "Unable to load boost plans".tr,
             style: TextStyle(fontSize: 12.sp, fontWeight: FontWeight.w700),
           ),
 
@@ -783,7 +783,7 @@ class _BoostPlanBottomSheetState extends State<BoostPlanBottomSheet> {
             onPressed: () {
               controller.retry();
             },
-            child: const Text("Try Again"),
+            child:  Text("Try Again".tr),
           ),
         ],
       ),
@@ -810,14 +810,14 @@ class _BoostPlanBottomSheetState extends State<BoostPlanBottomSheet> {
           SizedBox(height: 8.h),
 
           Text(
-            "No boost plans available",
+            "No boost plans available".tr,
             style: TextStyle(fontSize: 12.sp, fontWeight: FontWeight.w600),
           ),
 
           SizedBox(height: 3.h),
 
           Text(
-            "Please check again later.",
+            "Please check again later.".tr,
             style: TextStyle(fontSize: 10.sp, color: Colors.grey),
           ),
         ],
@@ -835,8 +835,8 @@ class _BoostPlanBottomSheetState extends State<BoostPlanBottomSheet> {
 
     if (listingId.isEmpty) {
       Get.snackbar(
-        "Unable to Boost",
-        "Property ID is missing.",
+        "Unable to Boost".tr,
+        "Property ID is missing.".tr,
         snackPosition: SnackPosition.BOTTOM,
       );
 
@@ -866,7 +866,7 @@ class _BoostPlanBottomSheetState extends State<BoostPlanBottomSheet> {
     // }
 
     Get.snackbar(
-      "Ready for Payment",
+      "Ready for Payment".tr,
       "${plan.name} - ${plan.formattedPrice}",
       snackPosition: SnackPosition.BOTTOM,
     );

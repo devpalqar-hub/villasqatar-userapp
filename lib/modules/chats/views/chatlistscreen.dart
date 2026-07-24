@@ -38,8 +38,8 @@ class ChatListScreen extends StatelessWidget {
                 ),
                 child: TextField(
                   onChanged: controller.searchConversation,
-                  decoration: const InputDecoration(
-                    hintText: "Search by property or seller",
+                  decoration:  InputDecoration(
+                    hintText: "Search by property or seller".tr,
                     prefixIcon: Icon(Icons.search, color: AppColors.hintGrey),
                     border: InputBorder.none,
                     isDense: true,
@@ -57,7 +57,7 @@ class ChatListScreen extends StatelessWidget {
                     }
 
                     if (controller.filteredConversations.isEmpty) {
-                      return const Center(child: Text("No Conversations"));
+                      return  Center(child: Text("No Conversations".tr));
                     }
 
                     return RefreshIndicator(
@@ -129,7 +129,7 @@ class ChatListScreen extends StatelessWidget {
           ),
           Expanded(
             child: Text(
-              'My Chats',
+              'My Chats'.tr,
               textAlign: TextAlign.center,
               style: TextStyle(
                 fontSize: 18.sp,
@@ -139,7 +139,7 @@ class ChatListScreen extends StatelessWidget {
             ),
           ),
            IconButton(
-          tooltip: "My Visits",
+          tooltip: "My Visits".tr,
           icon: const Icon(
             Icons.calendar_month_outlined,
             color: AppColors.primary,
@@ -172,12 +172,12 @@ class _ConversationTile extends StatelessWidget {
     final String propertyName =
         conversation.listing.propertyName.trim().isNotEmpty
             ? conversation.listing.propertyName.trim()
-            : "Property";
+            : "Property".tr;
 
     final String sellerName =
         conversation.otherParticipant?.user.name?.trim().isNotEmpty == true
             ? conversation.otherParticipant!.user.name!.trim()
-            : "Seller";
+            : "Seller".tr;
 
     final String propertyType =
         conversation.listing.type.trim();
@@ -229,7 +229,7 @@ class _ConversationTile extends StatelessWidget {
                             fit: BoxFit.cover,
                             errorBuilder: (_, error, stackTrace) {
                               debugPrint(
-                                "Image Error: $error",
+                                "Image Error: $error".tr,
                               );
 
                               return _placeholder();
@@ -318,7 +318,7 @@ class _ConversationTile extends StatelessWidget {
 
                             Expanded(
                               child: Text(
-                                message?.content ?? "No messages yet",
+                                message?.content ?? "No messages yet".tr,
                                 maxLines: 1,
                                 overflow: TextOverflow.ellipsis,
                                 style: TextStyle(
@@ -352,7 +352,7 @@ class _ConversationTile extends StatelessWidget {
                             SizedBox(width: 5.w),
 
                             Text(
-                              "Chat with ",
+                              "Chat with ".tr,
                               style: TextStyle(
                                 fontSize: 9.sp,
                                 color: const Color(0xff999999),

@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
 
@@ -109,18 +110,11 @@ class ListPropertyController extends GetxController {
   //--------------------------------------------------
   // OPTIONS FROM API
   //--------------------------------------------------
+List<ListingOptionItem> amenities = [];
 
-  List<String> amenities = [];
+List<ListingOptionItem> nearbyTags = [];
 
-  List<String> nearbyTags = [];
-
-  List<String> furnishingOptions = [];
-
-  List<String> areaSuggestions = [];
-
-  //--------------------------------------------------
-  // SELECTED
-  //--------------------------------------------------
+List<FurnishingOption> furnishingOptions = [];
 
   final Set<String> selectedAmenities = {};
 
@@ -194,48 +188,8 @@ class ListPropertyController extends GetxController {
     whatsappVerified = value;
     update();
   }
-
-  //--------------------------------------------------
-  // AMENITIES
-  //--------------------------------------------------
-
-  void toggleAmenity(String value) {
-    if (selectedAmenities.contains(value)) {
-      selectedAmenities.remove(value);
-    } else {
-      selectedAmenities.add(value);
-    }
-
-    update();
-  }
-
-  //--------------------------------------------------
-  // NEARBY TAGS
-  //--------------------------------------------------
-
-  void toggleNearbyTag(String value) {
-    if (selectedNearbyTags.contains(value)) {
-      selectedNearbyTags.remove(value);
-    } else {
-      selectedNearbyTags.add(value);
-    }
-
-    update();
-  }
-
-  //--------------------------------------------------
-  // FURNISHING
-  //--------------------------------------------------
-
-  void toggleFurnishing(String value) {
-    if (selectedFurnishing.contains(value)) {
-      selectedFurnishing.remove(value);
-    } else {
-      selectedFurnishing.add(value);
-    }
-
-    update();
-  }
+  
+   
 
   //--------------------------------------------------
   // LOCATION
@@ -282,6 +236,36 @@ class ListPropertyController extends GetxController {
     );
   }
 
+
+void toggleAmenity(String id) {
+  if (selectedAmenities.contains(id)) {
+    selectedAmenities.remove(id);
+  } else {
+    selectedAmenities.add(id);
+  }
+
+  update();
+}
+void toggleNearbyTag(String id) {
+  if (selectedNearbyTags.contains(id)) {
+    selectedNearbyTags.remove(id);
+  } else {
+    selectedNearbyTags.add(id);
+  }
+
+  update();
+}
+void toggleFurnishing(String id) {
+  if (selectedFurnishing.contains(id)) {
+    selectedFurnishing.clear();
+  } else {
+    selectedFurnishing
+      ..clear()
+      ..add(id);
+  }
+
+  update();
+}
   //--------------------------------------------------
   // SUBMIT
   //--------------------------------------------------
@@ -374,47 +358,92 @@ class ListPropertyController extends GetxController {
   // API
   //--------------------------------------------------
   Future<void> fetchListingOptions() async {
+  try {
+    isLoading = true;
+    error = "";
+    update();
+
+    final response = await ApiHandler.get(
+      ApiEndpoints.listingOptions,
+    );
+
+    final model = ListingOptionsModel.fromJson(
+      Map<String, dynamic>.from(response),
+    );
+
+    amenities = model.amenities;
+    nearbyTags = model.nearbyTags;
+    furnishingOptions = model.furnishingOptions;
+
+    debugPrint(
+      "Amenities: ${amenities.map((e) => e.title).toList()}",
+    );
+
+    debugPrint(
+      "Nearby Tags: ${nearbyTags.map((e) => e.title).toList()}",
+    );
+
+    debugPrint(
+      "Furnishing: ${furnishingOptions.map((e) => e.title).toList()}",
+    );
+  } catch (e, stackTrace) {
+    error = e.toString().replaceFirst(
+      "Exception: ",
+      "",
+    );
+
+    debugPrint(
+      "FETCH LISTING OPTIONS ERROR: $e",
+    );
+
+    debugPrintStack(
+      stackTrace: stackTrace,
+    );
+  } finally {
+    isLoading = false;
+    update();
+  }
+}
+
+  Future<bool> addProperty() async {
+    if (isSubmitting) {
+      return false;
+    }
+
     try {
-      isLoading = true;
+      isSubmitting = true;
       error = "";
       update();
 
-      final response = await ApiHandler.get(ApiEndpoints.listingOptions);
+      // ==========================================================
+      // UPLOAD IMAGES
+      // ==========================================================
 
-      final model = ListingOptionsModel.fromJson(response);
-
-      amenities = model.amenities;
-      nearbyTags = model.nearbyTags;
-      furnishingOptions = model.furnishingOptions;
-      areaSuggestions = model.areaSuggestions;
-    } catch (e) {
-      error = e.toString();
-    } finally {
-      isLoading = false;
-      update();
-    }
-  }
-
-  Future<void> addProperty() async {
-    try {
-      isSubmitting = true;
-      update();
       final uploadedImageUrls = await uploadAllPropertyImages();
 
       debugPrint("========== UPLOADED IMAGES ==========");
+
       debugPrint(uploadedImageUrls.toString());
+
       if (images.isNotEmpty && uploadedImageUrls.length != images.length) {
         throw Exception("Some images could not be uploaded.");
       }
 
+      // ==========================================================
+      // REQUEST BODY
+      // ==========================================================
+
       final body = {
         "propertyName": propertyNameController.text.trim(),
+
         "description": descriptionController.text.trim(),
 
         "purpose": propertyPurpose,
+
         "type": propertyType.toUpperCase(),
 
         "latitude": latitude,
+
         "longitude": longitude,
 
         "bedrooms": int.tryParse(bedroomsController.text.trim()) ?? 0,
@@ -431,14 +460,12 @@ class ListPropertyController extends GetxController {
 
         "totalFloors": int.tryParse(totalFloorsController.text.trim()) ?? 0,
 
-        /// Optional
         "yearBuilt": null,
 
         "furnishingStatus": selectedFurnishing.isEmpty
             ? null
             : selectedFurnishing.first,
 
-        /// Optional custom properties
         "extraProperties": {},
 
         "price": double.tryParse(priceController.text.trim()) ?? 0,
@@ -464,23 +491,53 @@ class ListPropertyController extends GetxController {
         "nearbyTags": selectedNearbyTags.toList(),
 
         "otherFeatures": otherFeatureController.text.trim(),
+
         "photos": uploadedImageUrls,
       };
 
       debugPrint("========== ADD PROPERTY ==========");
-      debugPrint("PHOTOS: ${body["photos"]}");
 
-      await ApiHandler.post(ApiEndpoints.propertyAdd, body: body);
+      // ==========================================================
+      // CREATE PROPERTY
+      // ==========================================================
 
-      Get.snackbar(
-        "Success",
-        "Property listed successfully.",
-        snackPosition: SnackPosition.BOTTOM,
+      final response = await ApiHandler.post(
+        ApiEndpoints.propertyAdd,
+        body: body,
       );
 
-      clearForm();
-    } catch (e) {
-      Get.snackbar("Error", e.toString(), snackPosition: SnackPosition.BOTTOM);
+      debugPrint("ADD PROPERTY RESPONSE: $response");
+
+      // ==========================================================
+      // IMPORTANT:
+      // DO NOT CALL clearForm() HERE
+      //
+      // clearForm() changes currentStep back to 0 while this
+      // screen is still visible, causing Step 1 with empty/null
+      // values to briefly appear.
+      // ==========================================================
+
+      Fluttertoast.showToast(
+        msg: "Property listed successfully.",
+        toastLength: Toast.LENGTH_SHORT,
+        gravity: ToastGravity.BOTTOM,
+      );
+
+      return true;
+    } catch (e, stackTrace) {
+      debugPrint("ADD PROPERTY ERROR: $e");
+
+      debugPrint(stackTrace.toString());
+
+      error = e.toString().replaceFirst("Exception: ", "");
+
+      Fluttertoast.showToast(
+        msg: error,
+        toastLength: Toast.LENGTH_LONG,
+        gravity: ToastGravity.BOTTOM,
+      );
+
+      return false;
     } finally {
       isSubmitting = false;
       update();

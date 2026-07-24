@@ -1,6 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+import 'package:get/get.dart';
 import 'package:villas_qatar/Core/constants/app_colors.dart';
+import 'package:villas_qatar/modules/pricestimator/service/ai_price_estimator_controller.dart';
+import 'package:villas_qatar/modules/propertylist/model/listing_options_model.dart';
+
+import '../../propertylist/service/listproperty_controller.dart';
 
 class PriceEstimatorScreen extends StatefulWidget {
   const PriceEstimatorScreen({super.key});
@@ -12,28 +18,67 @@ class PriceEstimatorScreen extends StatefulWidget {
 class _PriceEstimatorScreenState extends State<PriceEstimatorScreen> {
   int _selectedType = 0;
   bool _advancedOpen = false;
+
+  final TextEditingController _locationController = TextEditingController();
+
+  final TextEditingController _areaController = TextEditingController();
+
   final TextEditingController _highlightsController = TextEditingController();
 
-  final List<_PropertyType> _types = const [
-    _PropertyType('Apartment', Icons.apartment),
-    _PropertyType('Villa / House', Icons.villa),
-    _PropertyType('Plot', Icons.crop_square),
-    _PropertyType('Commercial', Icons.store_mall_directory_outlined),
-  ];
+  // ============================================================
+  // SELECTED QUICK DETAILS
+  // ============================================================
 
-  final List<_QuickDetail> _details = const [
-    _QuickDetail('BHK', 'Select'),
-    _QuickDetail('Bathrooms', 'Select'),
-    _QuickDetail('Furnishing', 'Select'),
-    _QuickDetail('Floor', 'Any'),
-    _QuickDetail('Total Floors', 'Any'),
-    _QuickDetail('Age of Property', 'Any'),
-    _QuickDetail('Parking', 'Any'),
+  int? _selectedBhk;
+  int? _selectedBathrooms;
+
+  FurnishingOption? _selectedFurnishing;
+
+  int? _selectedFloor;
+  int? _selectedTotalFloors;
+
+  bool? _parkingAvailable;
+
+  // UI-only because current estimate API does not accept property age
+  String? _selectedPropertyAge;
+  final Set<String> _selectedAmenityIds = {};
+
+  // ============================================================
+  // PROPERTY TYPES
+  // ============================================================
+
+  final List<_PropertyType> _types = const [
+    _PropertyType('Apartment', Icons.apartment, apiValue: 'Apartment'),
+    _PropertyType('Villa / House', Icons.villa, apiValue: 'Villa'),
+    _PropertyType('Plot', Icons.crop_square, apiValue: 'Plot'),
+    _PropertyType(
+      'Commercial',
+      Icons.store_mall_directory_outlined,
+      apiValue: 'Commercial',
+    ),
   ];
 
   @override
+  void initState() {
+    super.initState();
+
+    /// Listing options controller
+    if (!Get.isRegistered<ListPropertyController>()) {
+      Get.put(ListPropertyController());
+    }
+
+    /// AI estimator controller
+    if (!Get.isRegistered<AiPriceEstimatorController>()) {
+      Get.put(AiPriceEstimatorController());
+    }
+  }
+
+  @override
   void dispose() {
+    _locationController.dispose();
+    _areaController.dispose();
     _highlightsController.dispose();
+
     super.dispose();
   }
 
@@ -114,19 +159,17 @@ class _PriceEstimatorScreenState extends State<PriceEstimatorScreen> {
                                       ),
                                       SizedBox(height: 4.h),
                                       TextField(
-                                        maxLines: 2,
-                                        minLines: 1,
+                                        controller: _locationController,
+                                        maxLines: 1,
                                         decoration: InputDecoration(
                                           hintText:
                                               "Enter city, locality or area",
-                                          hintMaxLines: 2,
                                           border: InputBorder.none,
                                           isDense: true,
                                           contentPadding: EdgeInsets.zero,
                                           hintStyle: TextStyle(
                                             color: const Color(0xFF8A8A99),
                                             fontSize: 10.sp,
-                                            height: 1.3,
                                           ),
                                         ),
                                       ),
@@ -169,7 +212,11 @@ class _PriceEstimatorScreenState extends State<PriceEstimatorScreen> {
                                       ),
                                       const SizedBox(height: 8),
                                       TextField(
-                                        keyboardType: TextInputType.number,
+                                        controller: _areaController,
+                                        keyboardType:
+                                            const TextInputType.numberWithOptions(
+                                              decimal: true,
+                                            ),
                                         decoration: InputDecoration(
                                           hintText: "e.g. 1200",
                                           suffixText: "sqft",
@@ -177,16 +224,11 @@ class _PriceEstimatorScreenState extends State<PriceEstimatorScreen> {
                                           isDense: true,
                                           contentPadding: EdgeInsets.zero,
                                           hintStyle: TextStyle(
-                                            color: Color(0xFF8A8A99),
+                                            color: const Color(0xFF8A8A99),
                                             fontSize: 12.sp,
                                           ),
                                           suffixStyle: TextStyle(
-                                            color: Color.fromARGB(
-                                              255,
-                                              44,
-                                              44,
-                                              150,
-                                            ),
+                                            color: const Color(0xff2C2C96),
                                             fontSize: 12.sp,
                                             fontWeight: FontWeight.w500,
                                           ),
@@ -205,11 +247,13 @@ class _PriceEstimatorScreenState extends State<PriceEstimatorScreen> {
                     _sectionLabel('Property Type'),
                     const SizedBox(height: 8),
                     _buildTypeGrid(),
-                    const SizedBox(height: 20),
+                   
+                    
+                    const SizedBox(height: 10),
                     Row(
                       children: const [
                         Text(
-                          'Quick Details',
+                          'Amenities',
                           style: TextStyle(
                             fontSize: 14,
                             fontWeight: FontWeight.w700,
@@ -226,14 +270,18 @@ class _PriceEstimatorScreenState extends State<PriceEstimatorScreen> {
                         ),
                       ],
                     ),
+
                     const SizedBox(height: 10),
-                    _buildDetailGrid(),
+
+                    _buildAmenities(),
+
+                    const SizedBox(height: 18),
+
                     const SizedBox(height: 18),
                     _sectionLabel('Share some highlights (Optional)'),
                     _buildHighlightsField(),
                     const SizedBox(height: 16),
-                    _buildAdvancedOptions(),
-                    const SizedBox(height: 24),
+                    
                     _buildCta(),
                     const SizedBox(height: 14),
                     _buildFooterNote(),
@@ -282,6 +330,203 @@ class _PriceEstimatorScreenState extends State<PriceEstimatorScreen> {
         ),
       ],
     );
+  }
+  
+  Widget _buildAmenities() {
+  return GetBuilder<ListPropertyController>(
+    builder: (controller) {
+      if (controller.isLoading &&
+          controller.amenities.isEmpty) {
+        return Container(
+          height: 58.h,
+          width: double.infinity,
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(10.r),
+            border: Border.all(
+              color: const Color(0xFFE9EAF3),
+            ),
+          ),
+          child: const Center(
+            child: SizedBox(
+              width: 20,
+              height: 20,
+              child: CircularProgressIndicator(
+                strokeWidth: 2,
+                color: AppColors.primary,
+              ),
+            ),
+          ),
+        );
+      }
+
+      final selectedItems = controller.amenities
+          .where(
+            (item) =>
+                _selectedAmenityIds.contains(item.id),
+          )
+          .toList();
+
+      return InkWell(
+        onTap: () {
+          if (controller.amenities.isEmpty) {
+            Fluttertoast.showToast(
+              msg: "Amenities are not available.",
+              gravity: ToastGravity.BOTTOM,
+            );
+            return;
+          }
+
+          _showAmenitiesSheet(
+            controller.amenities,
+          );
+        },
+        borderRadius: BorderRadius.circular(10.r),
+        child: Container(
+          width: double.infinity,
+          constraints: BoxConstraints(
+            minHeight: 58.h,
+          ),
+          padding: EdgeInsets.symmetric(
+            horizontal: 15.w,
+            vertical: 12.h,
+          ),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(10.r),
+            border: Border.all(
+              color: const Color(0xFFE9EAF3),
+            ),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(.025),
+                blurRadius: 8,
+                offset: const Offset(0, 2),
+              ),
+            ],
+          ),
+          child: Row(
+            children: [
+              Icon(
+                Icons.home_work_outlined,
+                size: 21.sp,
+                color: AppColors.primary,
+              ),
+
+              SizedBox(width: 12.w),
+
+              Expanded(
+                child: selectedItems.isEmpty
+                    ? Text(
+                        "Select amenities",
+                        style: TextStyle(
+                          fontSize: 12.sp,
+                          color:
+                              const Color(0xff8C91A6),
+                        ),
+                      )
+                    : Text(
+                        selectedItems
+                            .map((e) => e.title)
+                            .join(", "),
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(
+                          fontSize: 11.sp,
+                          color: AppColors.primary,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+              ),
+
+              if (_selectedAmenityIds.isNotEmpty) ...[
+                Container(
+                  padding: EdgeInsets.symmetric(
+                    horizontal: 8.w,
+                    vertical: 4.h,
+                  ),
+                  decoration: BoxDecoration(
+                    color: AppColors.primary
+                        .withOpacity(.08),
+                    borderRadius:
+                        BorderRadius.circular(20.r),
+                  ),
+                  child: Text(
+                    "${_selectedAmenityIds.length}",
+                    style: TextStyle(
+                      fontSize: 10.sp,
+                      fontWeight: FontWeight.w700,
+                      color: AppColors.primary,
+                    ),
+                  ),
+                ),
+                SizedBox(width: 6.w),
+              ],
+
+              Icon(
+                Icons.keyboard_arrow_down_rounded,
+                size: 24.sp,
+                color: const Color(0xff1E2344),
+              ),
+            ],
+          ),
+        ),
+      );
+    },
+  );
+}
+  IconData _amenityIcon(String amenity) {
+    final String value = amenity.toLowerCase().replaceAll('_', ' ');
+
+    if (value.contains('pool') || value.contains('swimming')) {
+      return Icons.pool_outlined;
+    }
+
+    if (value.contains('gym') || value.contains('fitness')) {
+      return Icons.fitness_center_outlined;
+    }
+
+    if (value.contains('parking') || value.contains('garage')) {
+      return Icons.local_parking_outlined;
+    }
+
+    if (value.contains('security') || value.contains('cctv')) {
+      return Icons.security_outlined;
+    }
+
+    if (value.contains('elevator') || value.contains('lift')) {
+      return Icons.elevator_outlined;
+    }
+
+    if (value.contains('garden')) {
+      return Icons.park_outlined;
+    }
+
+    if (value.contains('balcony')) {
+      return Icons.balcony_outlined;
+    }
+
+    if (value.contains('air') || value.contains('ac')) {
+      return Icons.ac_unit_outlined;
+    }
+
+    if (value.contains('wifi') || value.contains('internet')) {
+      return Icons.wifi_outlined;
+    }
+
+    if (value.contains('pet')) {
+      return Icons.pets_outlined;
+    }
+
+    if (value.contains('play')) {
+      return Icons.child_care_outlined;
+    }
+
+    if (value.contains('concierge')) {
+      return Icons.support_agent_outlined;
+    }
+
+    return Icons.check_circle_outline_rounded;
   }
 
   Widget _buildHero(BuildContext context) {
@@ -349,46 +594,399 @@ class _PriceEstimatorScreenState extends State<PriceEstimatorScreen> {
       ),
     );
   }
+  
+  
 
-  Widget _buildEstimateCard() {
-    return Container(
-      width: 190,
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-      decoration: BoxDecoration(
-        color: AppColors.surface,
-        borderRadius: BorderRadius.circular(10.r),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.15),
-            blurRadius: 14,
-            offset: const Offset(0, 6),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const Text(
-            'Estimated Price',
-            style: TextStyle(fontSize: 10.5, color: AppColors.textSecondary),
-          ),
-          const SizedBox(height: 2),
-          const Text(
-            'QAR 1,250,000',
-            style: TextStyle(
-              fontSize: 15,
-              fontWeight: FontWeight.w700,
-              color: AppColors.primary,
+  Future<void> _showAmenitiesSheet(
+  List<ListingOptionItem> amenities,
+) async {
+  final Set<String> tempSelected = {
+    ..._selectedAmenityIds,
+  };
+
+  await Get.bottomSheet(
+    StatefulBuilder(
+      builder: (sheetContext, setSheetState) {
+        return SafeArea(
+          top: false,
+          child: Container(
+            constraints: BoxConstraints(
+              maxHeight: Get.height * .70,
+            ),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.vertical(
+                top: Radius.circular(24.r),
+              ),
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                SizedBox(height: 10.h),
+
+                Container(
+                  width: 42.w,
+                  height: 4.h,
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFDADADA),
+                    borderRadius:
+                        BorderRadius.circular(10.r),
+                  ),
+                ),
+
+                Padding(
+                  padding: EdgeInsets.fromLTRB(
+                    20.w,
+                    16.h,
+                    10.w,
+                    10.h,
+                  ),
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment:
+                              CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              "Select Amenities",
+                              style: TextStyle(
+                                fontSize: 17.sp,
+                                fontWeight:
+                                    FontWeight.w700,
+                                color:
+                                    AppColors.textPrimary,
+                              ),
+                            ),
+                            SizedBox(height: 3.h),
+                            Text(
+                              "You can select multiple amenities",
+                              style: TextStyle(
+                                fontSize: 11.sp,
+                                color: AppColors
+                                    .textSecondary,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      IconButton(
+                        onPressed: Get.back,
+                        icon: Icon(
+                          Icons.close_rounded,
+                          color: Colors.grey.shade600,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+
+                Divider(
+                  height: 1,
+                  color: Colors.grey.shade200,
+                ),
+
+                Flexible(
+                  child: ListView.separated(
+                    shrinkWrap: true,
+                    padding:
+                        EdgeInsets.symmetric(vertical: 8.h),
+                    itemCount: amenities.length,
+                    separatorBuilder: (_, __) =>
+                        Divider(
+                      height: 1,
+                      indent: 20.w,
+                      endIndent: 20.w,
+                      color: Colors.grey.shade100,
+                    ),
+                    itemBuilder: (context, index) {
+                      final amenity = amenities[index];
+
+                      final bool selected =
+                          tempSelected.contains(
+                        amenity.id,
+                      );
+
+                      return InkWell(
+                        onTap: () {
+                          setSheetState(() {
+                            if (selected) {
+                              tempSelected.remove(
+                                amenity.id,
+                              );
+                            } else {
+                              tempSelected.add(
+                                amenity.id,
+                              );
+                            }
+                          });
+                        },
+                        child: Padding(
+                          padding:
+                              EdgeInsets.symmetric(
+                            horizontal: 20.w,
+                            vertical: 14.h,
+                          ),
+                          child: Row(
+                            children: [
+                              _buildAmenityImage(
+                                amenity,
+                                selected,
+                              ),
+
+                              SizedBox(width: 12.w),
+
+                              Expanded(
+                                child: Text(
+                                  amenity.title,
+                                  style: TextStyle(
+                                    fontSize: 13.sp,
+                                    fontWeight: selected
+                                        ? FontWeight.w600
+                                        : FontWeight.w400,
+                                    color: selected
+                                        ? AppColors.primary
+                                        : AppColors
+                                            .textPrimary,
+                                  ),
+                                ),
+                              ),
+
+                              AnimatedContainer(
+                                duration: const Duration(
+                                  milliseconds: 150,
+                                ),
+                                width: 22.w,
+                                height: 22.w,
+                                decoration: BoxDecoration(
+                                  color: selected
+                                      ? AppColors.primary
+                                      : Colors.white,
+                                  borderRadius:
+                                      BorderRadius.circular(
+                                    6.r,
+                                  ),
+                                  border: Border.all(
+                                    color: selected
+                                        ? AppColors.primary
+                                        : Colors.grey
+                                            .shade400,
+                                  ),
+                                ),
+                                child: selected
+                                    ? Icon(
+                                        Icons.check,
+                                        size: 15.sp,
+                                        color: Colors.white,
+                                      )
+                                    : null,
+                              ),
+                            ],
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+                ),
+
+                Divider(
+                  height: 1,
+                  color: Colors.grey.shade200,
+                ),
+
+                Padding(
+                  padding: EdgeInsets.fromLTRB(
+                    20.w,
+                    12.h,
+                    20.w,
+                    16.h,
+                  ),
+                  child: Row(
+                    children: [
+                      if (tempSelected.isNotEmpty)
+                        TextButton(
+                          onPressed: () {
+                            setSheetState(
+                              tempSelected.clear,
+                            );
+                          },
+                          child: Text(
+                            "Clear All",
+                            style: TextStyle(
+                              color: AppColors
+                                  .textSecondary,
+                              fontSize: 12.sp,
+                            ),
+                          ),
+                        ),
+
+                      const Spacer(),
+
+                      Text(
+                        "${tempSelected.length} selected",
+                        style: TextStyle(
+                          fontSize: 11.sp,
+                          color:
+                              AppColors.textSecondary,
+                        ),
+                      ),
+
+                      SizedBox(width: 12.w),
+
+                      ElevatedButton(
+                        onPressed: () {
+                          setState(() {
+                            _selectedAmenityIds
+                              ..clear()
+                              ..addAll(tempSelected);
+                          });
+
+                          Get.back();
+                        },
+                        style:
+                            ElevatedButton.styleFrom(
+                          backgroundColor:
+                              AppColors.primary,
+                          foregroundColor: Colors.white,
+                        ),
+                        child: const Text("Apply"),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
             ),
           ),
-          const SizedBox(height: 2),
-          const Text(
-            'Price Range 1.15M - 1.35M',
-            style: TextStyle(fontSize: 10, color: AppColors.textSecondary),
+        );
+      },
+    ),
+    isScrollControlled: true,
+    backgroundColor: Colors.transparent,
+  );
+}
+
+Widget _buildAmenityImage(
+  ListingOptionItem amenity,
+  bool selected,
+) {
+  final String? image = amenity.image;
+
+  return Container(
+    width: 36.w,
+    height: 36.w,
+    decoration: BoxDecoration(
+      color: selected
+          ? AppColors.primary.withOpacity(.08)
+          : const Color(0xFFF6F6F8),
+      borderRadius: BorderRadius.circular(9.r),
+    ),
+    clipBehavior: Clip.antiAlias,
+    child: image != null &&
+            image.trim().isNotEmpty &&
+            (image.startsWith('http://') ||
+                image.startsWith('https://'))
+        ? Image.network(
+            image,
+            fit: BoxFit.cover,
+            errorBuilder: (_, __, ___) {
+              return Icon(
+                _amenityIcon(amenity.title),
+                size: 18.sp,
+                color: selected
+                    ? AppColors.primary
+                    : const Color(0xff606477),
+              );
+            },
+          )
+        : Icon(
+            _amenityIcon(amenity.title),
+            size: 18.sp,
+            color: selected
+                ? AppColors.primary
+                : const Color(0xff606477),
           ),
-        ],
-      ),
+  );
+}
+
+  Widget _buildEstimateCard() {
+    return GetBuilder<AiPriceEstimatorController>(
+      builder: (controller) {
+        final result = controller.estimation;
+
+        return Container(
+          width: 190,
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+          decoration: BoxDecoration(
+            color: AppColors.surface,
+            borderRadius: BorderRadius.circular(10.r),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.15),
+                blurRadius: 14,
+                offset: const Offset(0, 6),
+              ),
+            ],
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Text(
+                'Estimated Price',
+                style: TextStyle(
+                  fontSize: 10.5,
+                  color: AppColors.textSecondary,
+                ),
+              ),
+
+              const SizedBox(height: 2),
+
+              Text(
+                result == null
+                    ? 'Get an estimate'
+                    : _formatQar(result.averagePrice),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: const TextStyle(
+                  fontSize: 15,
+                  fontWeight: FontWeight.w700,
+                  color: AppColors.primary,
+                ),
+              ),
+
+              const SizedBox(height: 2),
+
+              Text(
+                result == null
+                    ? 'Enter property details below'
+                    : '${_formatCompactQar(result.minPrice)} - ${_formatCompactQar(result.maxPrice)}',
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: const TextStyle(
+                  fontSize: 10,
+                  color: AppColors.textSecondary,
+                ),
+              ),
+            ],
+          ),
+        );
+      },
     );
+  }
+
+  String _formatCompactQar(double value) {
+    if (value >= 1000000) {
+      final double millions = value / 1000000;
+
+      return "QAR ${millions.toStringAsFixed(millions % 1 == 0 ? 0 : 2)}M";
+    }
+
+    if (value >= 1000) {
+      final double thousands = value / 1000;
+
+      return "QAR ${thousands.toStringAsFixed(thousands % 1 == 0 ? 0 : 1)}K";
+    }
+
+    return "QAR ${value.round()}";
   }
 
   Widget _sectionLabel(String text) {
@@ -478,80 +1076,223 @@ class _PriceEstimatorScreenState extends State<PriceEstimatorScreen> {
   }
 
   Widget _buildDetailGrid() {
-    return Column(
-      spacing: 10.h,
-      children: [
-        /// Row 1
-        Row(
-          children: [
-            Expanded(
-              child: _detailCard(
-                icon: Icons.bed_outlined,
-                title: "BHK",
-                value: "Select",
-              ),
+    return GetBuilder<ListPropertyController>(
+      builder: (listingController) {
+        if (listingController.isLoading &&
+            listingController.furnishingOptions.isEmpty) {
+          return const Center(
+            child: Padding(
+              padding: EdgeInsets.all(20),
+              child: CircularProgressIndicator(color: AppColors.primary),
             ),
-            const SizedBox(width: 12),
-            Expanded(
-              child: _detailCard(
-                icon: Icons.bathtub_outlined,
-                title: "Bathrooms",
-                value: "Select",
-              ),
+          );
+        }
+
+        return Column(
+          children: [
+            Row(
+              children: [
+                Expanded(
+                  child: _detailCard(
+                    icon: Icons.bed_outlined,
+                    title: "BHK",
+                    value: _selectedBhk?.toString() ?? "Select",
+                    onTap: () {
+                      _showOptionSheet<int>(
+                        title: "Select BHK",
+                        options: const [1, 2, 3, 4, 5, 6],
+                        labelBuilder: (value) => "$value BHK",
+                        selectedValue: _selectedBhk,
+                        onSelected: (value) {
+                          setState(() {
+                            _selectedBhk = value;
+                          });
+                        },
+                      );
+                    },
+                  ),
+                ),
+                SizedBox(width: 12.w),
+                Expanded(
+                  child: _detailCard(
+                    icon: Icons.bathtub_outlined,
+                    title: "Bathrooms",
+                    value: _selectedBathrooms?.toString() ?? "Select",
+                    onTap: () {
+                      _showOptionSheet<int>(
+                        title: "Select Bathrooms",
+                        options: const [1, 2, 3, 4, 5, 6],
+                        labelBuilder: (value) =>
+                            "$value Bathroom${value > 1 ? 's' : ''}",
+                        selectedValue: _selectedBathrooms,
+                        onSelected: (value) {
+                          setState(() {
+                            _selectedBathrooms = value;
+                          });
+                        },
+                      );
+                    },
+                  ),
+                ),
+              ],
+            ),
+
+            SizedBox(height: 10.h),
+
+            Row(
+              children: [
+                Expanded(
+                  child:_detailCard(
+  icon: Icons.chair_outlined,
+  title: "Furnishing",
+  value: _selectedFurnishing?.title ?? "Select",
+  onTap: () {
+    if (listingController
+        .furnishingOptions.isEmpty) {
+      Fluttertoast.showToast(
+        msg: "Furnishing options are not available.",
+        gravity: ToastGravity.BOTTOM,
+      );
+      return;
+    }
+
+    _showOptionSheet<FurnishingOption>(
+      title: "Select Furnishing",
+      options:
+          listingController.furnishingOptions,
+      labelBuilder: (item) => item.title,
+      selectedValue: _selectedFurnishing,
+      onSelected: (item) {
+        setState(() {
+          _selectedFurnishing = item;
+        });
+      },
+    );
+  },
+),
+                ),
+
+                SizedBox(width: 12.w),
+
+                Expanded(
+                  child: _detailCard(
+                    icon: Icons.layers_outlined,
+                    title: "Floor",
+                    value: _selectedFloor?.toString() ?? "Any",
+                    onTap: () {
+                      _showOptionSheet<int>(
+                        title: "Select Floor",
+                        options: List.generate(50, (index) => index),
+                        labelBuilder: (value) =>
+                            value == 0 ? "Ground Floor" : "Floor $value",
+                        selectedValue: _selectedFloor,
+                        onSelected: (value) {
+                          setState(() {
+                            _selectedFloor = value;
+
+                            if (_selectedTotalFloors != null &&
+                                value > _selectedTotalFloors!) {
+                              _selectedTotalFloors = value;
+                            }
+                          });
+                        },
+                      );
+                    },
+                  ),
+                ),
+              ],
+            ),
+
+            SizedBox(height: 10.h),
+
+            Row(
+              children: [
+                Expanded(
+                  child: _detailCard(
+                    icon: Icons.apartment_outlined,
+                    title: "Total Floors",
+                    value: _selectedTotalFloors?.toString() ?? "Any",
+                    onTap: () {
+                      _showOptionSheet<int>(
+                        title: "Select Total Floors",
+                        options: List.generate(50, (index) => index + 1),
+                        labelBuilder: (value) =>
+                            "$value Floor${value > 1 ? 's' : ''}",
+                        selectedValue: _selectedTotalFloors,
+                        onSelected: (value) {
+                          setState(() {
+                            _selectedTotalFloors = value;
+
+                            if (_selectedFloor != null &&
+                                _selectedFloor! > value) {
+                              _selectedFloor = value;
+                            }
+                          });
+                        },
+                      );
+                    },
+                  ),
+                ),
+
+                SizedBox(width: 12.w),
+
+                Expanded(
+                  child: _detailCard(
+                    icon: Icons.calendar_today_outlined,
+                    title: "Age of Property",
+                    value: _selectedPropertyAge ?? "Any",
+                    onTap: () {
+                      _showOptionSheet<String>(
+                        title: "Select Property Age",
+                        options: const [
+                          "New / Under 1 Year",
+                          "1 - 5 Years",
+                          "5 - 10 Years",
+                          "10+ Years",
+                        ],
+                        labelBuilder: (value) => value,
+                        selectedValue: _selectedPropertyAge,
+                        onSelected: (value) {
+                          setState(() {
+                            _selectedPropertyAge = value;
+                          });
+                        },
+                      );
+                    },
+                  ),
+                ),
+              ],
+            ),
+
+            SizedBox(height: 10.h),
+
+            _detailCard(
+              icon: Icons.directions_car_outlined,
+              title: "Parking",
+              value: _parkingAvailable == null
+                  ? "Any"
+                  : _parkingAvailable!
+                  ? "Available"
+                  : "Not Available",
+              fullWidth: true,
+              onTap: () {
+                _showOptionSheet<bool>(
+                  title: "Select Parking Availability",
+                  options: const [true, false],
+                  labelBuilder: (value) =>
+                      value ? "Available" : "Not Available",
+                  selectedValue: _parkingAvailable,
+                  onSelected: (value) {
+                    setState(() {
+                      _parkingAvailable = value;
+                    });
+                  },
+                );
+              },
             ),
           ],
-        ),
-
-        /// Row 2
-        Row(
-          children: [
-            Expanded(
-              child: _detailCard(
-                icon: Icons.chair_outlined,
-                title: "Furnishing",
-                value: "Select",
-              ),
-            ),
-            const SizedBox(width: 12),
-            Expanded(
-              child: _detailCard(
-                icon: Icons.layers_outlined,
-                title: "Floor",
-                value: "Any",
-              ),
-            ),
-          ],
-        ),
-
-        /// Row 3
-        Row(
-          children: [
-            Expanded(
-              child: _detailCard(
-                icon: Icons.apartment_outlined,
-                title: "Total Floors",
-                value: "Any",
-              ),
-            ),
-            const SizedBox(width: 12),
-            Expanded(
-              child: _detailCard(
-                icon: Icons.calendar_today_outlined,
-                title: "Age of Property",
-                value: "Any",
-              ),
-            ),
-          ],
-        ),
-
-        /// Row 4
-        _detailCard(
-          icon: Icons.directions_car_outlined,
-          title: "Parking",
-          value: "Any",
-          fullWidth: true,
-        ),
-      ],
+        );
+      },
     );
   }
 
@@ -559,64 +1300,78 @@ class _PriceEstimatorScreenState extends State<PriceEstimatorScreen> {
     required IconData icon,
     required String title,
     required String value,
+    required VoidCallback onTap,
     bool fullWidth = false,
   }) {
-    return Container(
-      width: fullWidth ? double.infinity : null,
-      height: 74,
-      padding: const EdgeInsets.symmetric(horizontal: 16),
-      decoration: BoxDecoration(
-        color: Colors.white,
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: onTap,
         borderRadius: BorderRadius.circular(10.r),
-        border: Border.all(color: const Color(0xFFE9EAF3)),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(.03),
-            blurRadius: 12,
-            offset: const Offset(0, 3),
+        child: Container(
+          width: fullWidth ? double.infinity : null,
+          height: 74.h,
+          padding: EdgeInsets.symmetric(horizontal: 16.w),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(10.r),
+            border: Border.all(color: const Color(0xFFE9EAF3)),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(.03),
+                blurRadius: 12,
+                offset: const Offset(0, 3),
+              ),
+            ],
           ),
-        ],
-      ),
-      child: Row(
-        children: [
-          Icon(icon, size: 20.sp, color: const Color(0xff1E2344)),
+          child: Row(
+            children: [
+              Icon(icon, size: 20.sp, color: const Color(0xff1E2344)),
 
-          SizedBox(width: 10.w),
-          Expanded(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  title,
-                  maxLines: 1,
-                  softWrap: false,
-                  overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(
-                    fontSize: 10,
-                    fontWeight: FontWeight.w700,
-                    color: Color(0xff1E2344),
-                  ),
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  value,
-                  style: const TextStyle(
-                    fontSize: 12,
-                    color: Color(0xff8C91A6),
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-              ],
-            ),
-          ),
+              SizedBox(width: 10.w),
 
-          const Icon(
-            Icons.keyboard_arrow_down_rounded,
-            size: 24,
-            color: Color(0xff1E2344),
+              Expanded(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      title,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(
+                        fontSize: 10.sp,
+                        fontWeight: FontWeight.w700,
+                        color: const Color(0xff1E2344),
+                      ),
+                    ),
+
+                    SizedBox(height: 4.h),
+
+                    Text(
+                      value,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(
+                        fontSize: 11.sp,
+                        color: value == "Select" || value == "Any"
+                            ? const Color(0xff8C91A6)
+                            : AppColors.primary,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+
+              Icon(
+                Icons.keyboard_arrow_down_rounded,
+                size: 24.sp,
+                color: const Color(0xff1E2344),
+              ),
+            ],
           ),
-        ],
+        ),
       ),
     );
   }
@@ -662,105 +1417,356 @@ class _PriceEstimatorScreenState extends State<PriceEstimatorScreen> {
       ),
     );
   }
-
-  Widget _buildAdvancedOptions() {
-    return Container(
-      decoration: BoxDecoration(
-        color: AppColors.surface,
-        borderRadius: BorderRadius.circular(12.r),
-        border: Border.all(color: AppColors.divider),
-      ),
-      child: Theme(
-        data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
-        child: ExpansionTile(
-          onExpansionChanged: (v) => setState(() => _advancedOpen = v),
-          tilePadding: EdgeInsets.symmetric(horizontal: 14.w),
-          title: Text(
-            'Advanced Options',
-            style: TextStyle(
-              fontSize: 13.sp,
-              fontWeight: FontWeight.w600,
-              color: AppColors.textPrimary,
-            ),
-          ),
-          subtitle: Text(
-            'Add more details for a more accurate estimate',
-            style: TextStyle(fontSize: 11.sp, color: AppColors.textSecondary),
-          ),
-          trailing: Icon(
-            _advancedOpen ? Icons.keyboard_arrow_up : Icons.keyboard_arrow_down,
-            color: AppColors.primary,
-          ),
-          children: [
-            Padding(
-              padding: const EdgeInsets.fromLTRB(14, 0, 14, 14),
-              child: Column(
-                children: [
-                  _textField(
-                    hint: 'View (e.g. Sea, City, Garden)',
-                    icon: Icons.visibility_outlined,
-                  ),
-                  SizedBox(height: 10.h),
-                  _textField(
-                    hint: 'Amenities (e.g. Pool, Gym)',
-                    icon: Icons.pool_outlined,
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
   Widget _buildCta() {
-    return InkWell(
-      onTap: () {},
-      borderRadius: BorderRadius.circular(14.r),
-      child: Container(
-        width: double.infinity,
-        padding: EdgeInsets.symmetric(vertical: 16.h),
-        decoration: BoxDecoration(
-          gradient: AppColors.buttonGradient,
+    return GetBuilder<AiPriceEstimatorController>(
+      builder: (controller) {
+        return InkWell(
+          onTap: controller.isLoading ? null : () => _estimatePrice(controller),
           borderRadius: BorderRadius.circular(14.r),
-          boxShadow: [
-            BoxShadow(
-              color: AppColors.primary.withOpacity(0.35),
-              blurRadius: 14.r,
-              offset: const Offset(0, 6),
-            ),
-          ],
-        ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(Icons.auto_awesome, color: Colors.white, size: 18.sp),
-            SizedBox(width: 8.w),
-            Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'Get AI Estimate',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontWeight: FontWeight.w700,
-                    fontSize: 14.5.sp,
-                  ),
-                ),
-                Text(
-                  'View estimated price & range',
-                  style: TextStyle(color: Colors.white70, fontSize: 10.5.sp),
+          child: Container(
+            width: double.infinity,
+            padding: EdgeInsets.symmetric(vertical: 16.h),
+            decoration: BoxDecoration(
+              gradient: AppColors.buttonGradient,
+              borderRadius: BorderRadius.circular(14.r),
+              boxShadow: [
+                BoxShadow(
+                  color: AppColors.primary.withOpacity(0.35),
+                  blurRadius: 14.r,
+                  offset: const Offset(0, 6),
                 ),
               ],
             ),
-            SizedBox(width: 10.w),
-            const Icon(Icons.arrow_forward, color: Colors.white, size: 18),
-          ],
+            child: controller.isLoading
+                ? Center(
+                    child: SizedBox(
+                      width: 22.w,
+                      height: 22.w,
+                      child: const CircularProgressIndicator(
+                        strokeWidth: 2,
+                        color: Colors.white,
+                      ),
+                    ),
+                  )
+                : Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(
+                        Icons.auto_awesome,
+                        color: Colors.white,
+                        size: 18.sp,
+                      ),
+
+                      SizedBox(width: 8.w),
+
+                      Column(
+                        mainAxisSize: MainAxisSize.min,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Get AI Estimate',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.w700,
+                              fontSize: 14.5.sp,
+                            ),
+                          ),
+                          Text(
+                            'View estimated price & range',
+                            style: TextStyle(
+                              color: Colors.white70,
+                              fontSize: 10.5.sp,
+                            ),
+                          ),
+                        ],
+                      ),
+
+                      SizedBox(width: 10.w),
+
+                      const Icon(
+                        Icons.arrow_forward,
+                        color: Colors.white,
+                        size: 18,
+                      ),
+                    ],
+                  ),
+          ),
+        );
+      },
+    );
+  }
+
+  Future<void> _estimatePrice(AiPriceEstimatorController controller) async {
+    final String areaName = _locationController.text.trim();
+
+    final double? areaSqft = double.tryParse(_areaController.text.trim());
+    final List<String> highlightParts = [];
+
+    final listingController =
+    Get.find<ListPropertyController>();
+
+final selectedAmenityTitles =
+    listingController.amenities
+        .where(
+          (item) =>
+              _selectedAmenityIds.contains(item.id),
+        )
+        .map((item) => item.title)
+        .toList();
+
+if (selectedAmenityTitles.isNotEmpty) {
+  highlightParts.add(
+    selectedAmenityTitles.join(', '),
+  );
+}
+
+    if (_highlightsController.text.trim().isNotEmpty) {
+      highlightParts.add(_highlightsController.text.trim());
+    }
+
+    final String combinedHighlights = highlightParts.join(', ');
+
+    // ============================================================
+    // VALIDATION
+    // ============================================================
+
+    if (areaName.isEmpty) {
+      Fluttertoast.showToast(
+        msg: "Please enter the property location.",
+        gravity: ToastGravity.BOTTOM,
+      );
+      return;
+    }
+
+    if (areaSqft == null || areaSqft <= 0) {
+      Fluttertoast.showToast(
+        msg: "Please enter a valid property area.",
+        gravity: ToastGravity.BOTTOM,
+      );
+      return;
+    }
+
+    if (_selectedBhk == null) {
+      Fluttertoast.showToast(
+        msg: "Please select BHK.",
+        gravity: ToastGravity.BOTTOM,
+      );
+      return;
+    }
+
+    if (_selectedBathrooms == null) {
+      Fluttertoast.showToast(
+        msg: "Please select bathrooms.",
+        gravity: ToastGravity.BOTTOM,
+      );
+      return;
+    }
+
+    if (_selectedFurnishing == null) {
+      Fluttertoast.showToast(
+        msg: "Please select furnishing status.",
+        gravity: ToastGravity.BOTTOM,
+      );
+      return;
+    }
+
+    // ============================================================
+    // API CALL
+    // ============================================================
+
+    final bool success = await controller.estimatePrice(
+      areaName: areaName,
+      areaSqft: areaSqft,
+
+      /// API-safe value instead of UI label
+      propertyType: _types[_selectedType].apiValue,
+
+      bhk: _selectedBhk!,
+      bathrooms: _selectedBathrooms!,
+
+      furnishingStatus: _selectedFurnishing!.title,
+
+      floorAbove: _selectedFloor ?? 0,
+
+      totalFloors: _selectedTotalFloors ?? 0,
+
+      parkingAvailable: _parkingAvailable ?? false,
+
+      highlights: combinedHighlights,
+    );
+
+    if (!mounted) {
+      return;
+    }
+
+    if (success) {
+      _showEstimateResult(controller);
+    } else {
+      Fluttertoast.showToast(
+        msg: controller.error.isNotEmpty
+            ? controller.error
+            : "Unable to estimate price.",
+        toastLength: Toast.LENGTH_LONG,
+        gravity: ToastGravity.BOTTOM,
+      );
+    }
+  }
+
+  void _showEstimateResult(AiPriceEstimatorController controller) {
+    final result = controller.estimation;
+
+    if (result == null) {
+      return;
+    }
+
+    Get.bottomSheet(
+      SafeArea(
+        top: false,
+        child: Container(
+          padding: EdgeInsets.fromLTRB(20.w, 12.h, 20.w, 24.h),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.vertical(top: Radius.circular(24.r)),
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                width: 42.w,
+                height: 4.h,
+                decoration: BoxDecoration(
+                  color: const Color(0xFFDADADA),
+                  borderRadius: BorderRadius.circular(10.r),
+                ),
+              ),
+
+              SizedBox(height: 20.h),
+
+              Container(
+                width: 54.w,
+                height: 54.w,
+                decoration: BoxDecoration(
+                  color: AppColors.primary.withOpacity(.08),
+                  shape: BoxShape.circle,
+                ),
+                child: Icon(
+                  Icons.auto_awesome_rounded,
+                  color: AppColors.primary,
+                  size: 26.sp,
+                ),
+              ),
+
+              SizedBox(height: 14.h),
+
+              Text(
+                "AI Estimated Value",
+                style: TextStyle(
+                  fontSize: 13.sp,
+                  color: AppColors.textSecondary,
+                ),
+              ),
+
+              SizedBox(height: 5.h),
+
+              Text(
+                _formatQar(result.averagePrice),
+                style: TextStyle(
+                  fontSize: 25.sp,
+                  fontWeight: FontWeight.w800,
+                  color: AppColors.primary,
+                ),
+              ),
+
+              SizedBox(height: 20.h),
+
+              Container(
+                padding: EdgeInsets.all(16.w),
+                decoration: BoxDecoration(
+                  color: AppColors.background,
+                  borderRadius: BorderRadius.circular(14.r),
+                  border: Border.all(color: AppColors.divider),
+                ),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: _priceResultItem(
+                        "Minimum",
+                        _formatQar(result.minPrice),
+                      ),
+                    ),
+
+                    Container(width: 1, height: 40.h, color: AppColors.divider),
+
+                    Expanded(
+                      child: _priceResultItem(
+                        "Maximum",
+                        _formatQar(result.maxPrice),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+
+              SizedBox(height: 20.h),
+
+              SizedBox(
+                width: double.infinity,
+                height: 48.h,
+                child: ElevatedButton(
+                  onPressed: Get.back,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppColors.primary,
+                    foregroundColor: Colors.white,
+                    elevation: 0,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12.r),
+                    ),
+                  ),
+                  child: const Text(
+                    "Done",
+                    style: TextStyle(fontWeight: FontWeight.w700),
+                  ),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
     );
+  }
+
+  Widget _priceResultItem(String title, String price) {
+    return Column(
+      children: [
+        Text(
+          title,
+          style: TextStyle(fontSize: 11.sp, color: AppColors.textSecondary),
+        ),
+        SizedBox(height: 5.h),
+        Text(
+          price,
+          textAlign: TextAlign.center,
+          style: TextStyle(
+            fontSize: 13.sp,
+            fontWeight: FontWeight.w700,
+            color: AppColors.textPrimary,
+          ),
+        ),
+      ],
+    );
+  }
+
+  String _formatQar(double value) {
+    final String digits = value.round().toString();
+
+    final String formatted = digits.replaceAllMapped(
+      RegExp(r'\B(?=(\d{3})+(?!\d))'),
+      (match) => ',',
+    );
+
+    return "QAR $formatted";
   }
 
   Widget _buildFooterNote() {
@@ -778,14 +1784,151 @@ class _PriceEstimatorScreenState extends State<PriceEstimatorScreen> {
   }
 }
 
+Future<void> _showOptionSheet<T>({
+  required String title,
+  required List<T> options,
+  required String Function(T value) labelBuilder,
+  required T? selectedValue,
+  required ValueChanged<T> onSelected,
+}) async {
+  await Get.bottomSheet(
+    SafeArea(
+      top: false,
+      child: Container(
+        constraints: BoxConstraints(maxHeight: Get.height * .65),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.vertical(top: Radius.circular(24.r)),
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            SizedBox(height: 10.h),
+
+            Container(
+              width: 42.w,
+              height: 4.h,
+              decoration: BoxDecoration(
+                color: const Color(0xFFDADADA),
+                borderRadius: BorderRadius.circular(10.r),
+              ),
+            ),
+
+            Padding(
+              padding: EdgeInsets.fromLTRB(20.w, 18.h, 10.w, 12.h),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: Text(
+                      title,
+                      style: TextStyle(
+                        fontSize: 17.sp,
+                        fontWeight: FontWeight.w700,
+                        color: AppColors.textPrimary,
+                      ),
+                    ),
+                  ),
+
+                  IconButton(
+                    onPressed: () => Get.back(),
+                    icon: Icon(
+                      Icons.close_rounded,
+                      color: Colors.grey.shade600,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+
+            Divider(height: 1, color: Colors.grey.shade200),
+
+            Flexible(
+              child: ListView.separated(
+                shrinkWrap: true,
+                padding: EdgeInsets.symmetric(vertical: 8.h),
+                itemCount: options.length,
+                separatorBuilder: (_, __) => Divider(
+                  height: 1,
+                  indent: 20.w,
+                  endIndent: 20.w,
+                  color: Colors.grey.shade100,
+                ),
+                itemBuilder: (itemContext, index) {
+                  final T value = options[index];
+
+                  final bool selected = value == selectedValue;
+
+                  return InkWell(
+                    onTap: () {
+                      onSelected(value);
+
+                      Get.back();
+                    },
+                    child: Padding(
+                      padding: EdgeInsets.symmetric(
+                        horizontal: 20.w,
+                        vertical: 15.h,
+                      ),
+                      child: Row(
+                        children: [
+                          Expanded(
+                            child: Text(
+                              labelBuilder(value),
+                              style: TextStyle(
+                                fontSize: 13.sp,
+                                fontWeight: selected
+                                    ? FontWeight.w600
+                                    : FontWeight.w400,
+                                color: selected
+                                    ? AppColors.primary
+                                    : AppColors.textPrimary,
+                              ),
+                            ),
+                          ),
+
+                          Icon(
+                            selected
+                                ? Icons.radio_button_checked
+                                : Icons.radio_button_off,
+                            color: selected
+                                ? AppColors.primary
+                                : Colors.grey.shade400,
+                            size: 20.sp,
+                          ),
+                        ],
+                      ),
+                    ),
+                  );
+                },
+              ),
+            ),
+
+            SizedBox(height: 10.h),
+          ],
+        ),
+      ),
+    ),
+    isScrollControlled: true,
+    backgroundColor: Colors.transparent,
+  );
+}
+
+String _formatOption(String value) {
+  return value
+      .replaceAll("_", " ")
+      .split(" ")
+      .map(
+        (word) => word.isEmpty
+            ? word
+            : "${word[0].toUpperCase()}${word.substring(1).toLowerCase()}",
+      )
+      .join(" ");
+}
+
 class _PropertyType {
   final String label;
   final IconData icon;
-  const _PropertyType(this.label, this.icon);
-}
+  final String apiValue;
 
-class _QuickDetail {
-  final String label;
-  final String value;
-  const _QuickDetail(this.label, this.value);
+  const _PropertyType(this.label, this.icon, {required this.apiValue});
 }

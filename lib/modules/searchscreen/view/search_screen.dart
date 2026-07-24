@@ -156,7 +156,7 @@ class SearchScreen extends StatelessWidget {
                                       SizedBox(height: 12.h),
 
                                       Text(
-                                        "Buy, rent and discover the best properties around you"
+                                        "Buy ,rent and discover the best properties around you"
                                             .tr,
 
                                         style: AppTextStyles.body14.copyWith(

@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/route_manager.dart';
 import 'package:villas_qatar/Core/constants/app_colors.dart';
-import 'package:villas_qatar/modules/Plans/views/boost_plan_screen.dart';
+import 'package:villas_qatar/modules/PlansandFeatures/views/boost_plan_screen.dart';
 
 class BoostPropertyBanner extends StatelessWidget {
   const BoostPropertyBanner({super.key});

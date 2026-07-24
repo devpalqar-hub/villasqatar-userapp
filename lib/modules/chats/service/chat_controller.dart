@@ -69,6 +69,23 @@ class ChatController extends GetxController {
   Timer? typingTimer;
   ConversationModel? selectedConversation;
 
+  String get otherUserId {
+  final participantIds =
+      conversation?.conversation.participantIds ?? [];
+
+  if (participantIds.isEmpty) {
+    return "";
+  }
+
+  try {
+    return participantIds.firstWhere(
+      (id) => id.toString() != myUserId,
+    ).toString();
+  } catch (_) {
+    return "";
+  }
+}
+
   @override
   void onInit() {
     super.onInit();
@@ -194,19 +211,35 @@ class ChatController extends GetxController {
   ///---------------------------------------------------
   /// JOIN CONVERSATION
   ///---------------------------------------------------
-  void joinConversation() {
-    final payload = conversationId.isNotEmpty
-        ? {"conversationId": conversationId}
-        : {"listingId": listingId};
-
+   void joinConversation() {
+  if (listingId.trim().isEmpty) {
     debugPrint("");
-    debugPrint("════════ SOCKET EMIT ════════════");
-    debugPrint("EVENT : join_conversation");
-    debugPrint("DATA  : $payload");
-    debugPrint("═════════════════════════════════");
-
-    socket.emit("join_conversation", payload);
+    debugPrint("❌ CANNOT JOIN CONVERSATION");
+    debugPrint("listingId is empty");
+    debugPrint("Conversation ID: $conversationId");
+    return;
   }
+
+  final Map<String, dynamic> payload = {
+    "listingId": listingId.trim(),
+
+    if (conversationId.trim().isNotEmpty)
+      "conversationId": conversationId.trim(),
+  };
+
+  debugPrint("");
+  debugPrint("════════ SOCKET EMIT ════════════");
+  debugPrint("EVENT : join_conversation");
+  debugPrint("CONVERSATION ID : $conversationId");
+  debugPrint("LISTING ID      : $listingId");
+  debugPrint("DATA            : $payload");
+  debugPrint("═════════════════════════════════");
+
+  socket.emit(
+    "join_conversation",
+    payload,
+  );
+}
 
   void setConversation(ConversationModel conversation) {
     selectedConversation = conversation;
@@ -351,7 +384,7 @@ class ChatController extends GetxController {
   ///---------------------------------------------------
   /// PLACEHOLDERS
   ///---------------------------------------------------
-
+  
   Future<void> loadMessages() async {
     if (conversationId.isEmpty) return;
 
