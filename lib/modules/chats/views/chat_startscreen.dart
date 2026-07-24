@@ -197,7 +197,7 @@ class ChatStartScreen extends StatelessWidget {
             fit: BoxFit.cover,
             errorBuilder: (_, error, __) {
               return Text(
-                "Image unavailable",
+                "Image unavailable".tr,
                 style: TextStyle(color: textColor),
               );
             },
@@ -285,7 +285,7 @@ class ChatStartScreen extends StatelessWidget {
                               ),
                               SizedBox(width: 4.w),
                               Text(
-                                "Location",
+                                "Location".tr,
                                 style: TextStyle(
                                   fontSize: 11.sp,
                                   fontWeight: FontWeight.w600,
@@ -369,7 +369,7 @@ class ChatStartScreen extends StatelessWidget {
               Text(
                 property?.createdBy.name.isNotEmpty == true
                     ? property!.createdBy.name
-                    : "Seller",
+                    : "Seller".tr,
                 style: TextStyle(fontSize: 15.sp, fontWeight: FontWeight.w600),
               ),
               Text(
@@ -434,7 +434,7 @@ class ChatStartScreen extends StatelessWidget {
                   ),
                   SizedBox(width: 10.w),
                   Text(
-                    "Report User",
+                    "Report User".tr,
                     style: TextStyle(
                       fontSize: 13.sp,
                       fontWeight: FontWeight.w500,
@@ -532,13 +532,13 @@ class _ReportUserBottomSheetState
   String? _selectedReason;
   bool _isSubmitting = false;
 
-  final List<String> _reasons = const [
-    "Fake profile",
-    "Fraud or scam",
-    "Inappropriate behavior",
-    "Spam or unwanted messages",
-    "Misleading information",
-    "Other",
+  final List<String> _reasons =  [
+    "Fake profile".tr,
+    "Fraud or scam".tr,
+    "Inappropriate behavior".tr,
+    "Spam or unwanted messages".tr,
+    "Misleading information".tr,
+    "Other".tr,
   ];
 
   @override
@@ -569,7 +569,7 @@ class _ReportUserBottomSheetState
   Future<void> _submitReport() async {
     if (_selectedReason == null) {
       Fluttertoast.showToast(
-        msg: "Please select a reason",
+        msg: "Please select a reason".tr,
         toastLength: Toast.LENGTH_SHORT,
         gravity: ToastGravity.BOTTOM,
       );
@@ -626,7 +626,7 @@ class _ReportUserBottomSheetState
       WidgetsBinding.instance.addPostFrameCallback(
         (_) {
           Fluttertoast.showToast(
-            msg: "Report submitted successfully",
+            msg: "Report submitted successfully".toLowerCase(),
             toastLength: Toast.LENGTH_SHORT,
             gravity: ToastGravity.BOTTOM,
           );
@@ -643,7 +643,7 @@ class _ReportUserBottomSheetState
     Fluttertoast.showToast(
       msg: support.createError.isNotEmpty
           ? support.createError
-          : "Unable to submit report",
+          : "Unable to submit report".tr,
       toastLength: Toast.LENGTH_SHORT,
       gravity: ToastGravity.BOTTOM,
     );
@@ -704,7 +704,7 @@ Widget build(BuildContext context) {
               children: [
                 Expanded(
                   child: Text(
-                    "Report User",
+                    "Report User".tr,
                     style: TextStyle(
                       fontSize: 18.sp,
                       fontWeight: FontWeight.w700,
@@ -737,7 +737,7 @@ Widget build(BuildContext context) {
             SizedBox(height: 6.h),
 
             Text(
-              "Tell us why you're reporting this user.",
+              "Tell us why you're reporting this user.".tr,
               style: TextStyle(
                 fontSize: 12.sp,
                 height: 1.4,
@@ -752,7 +752,7 @@ Widget build(BuildContext context) {
             // ==================================================
 
             Text(
-              "Reason for Report",
+              "Reason for Report".tr,
               style: TextStyle(
                 fontSize: 13.sp,
                 fontWeight: FontWeight.w600,
@@ -861,7 +861,7 @@ Column(
             Row(
               children: [
                 Text(
-                  "Additional Details",
+                  "Additional Details".tr,
                   style: TextStyle(
                     fontSize: 13.sp,
                     fontWeight: FontWeight.w600,
@@ -872,7 +872,7 @@ Column(
                 SizedBox(width: 5.w),
 
                 Text(
-                  "(Optional)",
+                  "(Optional)".tr,
                   style: TextStyle(
                     fontSize: 11.sp,
                     color: Colors.grey.shade500,
@@ -894,7 +894,7 @@ Column(
                 color: Colors.black87,
               ),
               decoration: InputDecoration(
-                hintText: "Describe the issue",
+                hintText: "Describe the issue".tr,
                 hintStyle: TextStyle(
                   fontSize: 12.sp,
                   color: Colors.grey.shade500,
@@ -963,7 +963,7 @@ Column(
 
                   Expanded(
                     child: Text(
-                      "Your report will be reviewed by our support team.",
+                      "Your report will be reviewed by our support team.".tr,
                       style: TextStyle(
                         fontSize: 11.sp,
                         height: 1.4,
@@ -1018,7 +1018,7 @@ Column(
                         ),
                       )
                     : Text(
-                        "Submit Report",
+                        "Submit Report".tr,
                         style: TextStyle(
                           fontSize: 15.sp,
                           fontWeight: FontWeight.w700,

@@ -151,7 +151,7 @@ class _PriceEstimatorScreenState extends State<PriceEstimatorScreen> {
                                         CrossAxisAlignment.start,
                                     children: [
                                       Text(
-                                        "Location",
+                                        "Location".tr,
                                         style: TextStyle(
                                           fontSize: 13,
                                           fontWeight: FontWeight.w600,
@@ -163,7 +163,7 @@ class _PriceEstimatorScreenState extends State<PriceEstimatorScreen> {
                                         maxLines: 1,
                                         decoration: InputDecoration(
                                           hintText:
-                                              "Enter city, locality or area",
+                                              "Enter city, locality or area".tr,
                                           border: InputBorder.none,
                                           isDense: true,
                                           contentPadding: EdgeInsets.zero,
@@ -203,8 +203,8 @@ class _PriceEstimatorScreenState extends State<PriceEstimatorScreen> {
                                     crossAxisAlignment:
                                         CrossAxisAlignment.start,
                                     children: [
-                                      const Text(
-                                        "Area (sqft)",
+                                  Text(
+                                        "Area (sqm)".tr,
                                         style: TextStyle(
                                           fontSize: 13,
                                           fontWeight: FontWeight.w600,
@@ -219,7 +219,7 @@ class _PriceEstimatorScreenState extends State<PriceEstimatorScreen> {
                                             ),
                                         decoration: InputDecoration(
                                           hintText: "e.g. 1200",
-                                          suffixText: "sqft",
+                                          suffixText: "sqm".tr,
                                           border: InputBorder.none,
                                           isDense: true,
                                           contentPadding: EdgeInsets.zero,
@@ -244,16 +244,16 @@ class _PriceEstimatorScreenState extends State<PriceEstimatorScreen> {
                       ),
                     ),
                     SizedBox(height: 12.h),
-                    _sectionLabel('Property Type'),
+                    _sectionLabel('Property Type'.tr),
                     const SizedBox(height: 8),
                     _buildTypeGrid(),
                    
                     
                     const SizedBox(height: 10),
                     Row(
-                      children: const [
+                      children:  [
                         Text(
-                          'Amenities',
+                          'Amenities'.tr,
                           style: TextStyle(
                             fontSize: 14,
                             fontWeight: FontWeight.w700,
@@ -262,7 +262,7 @@ class _PriceEstimatorScreenState extends State<PriceEstimatorScreen> {
                         ),
                         SizedBox(width: 6),
                         Text(
-                          '(Optional)',
+                          '(Optional)'.tr,
                           style: TextStyle(
                             fontSize: 12.5,
                             color: AppColors.textSecondary,
@@ -278,7 +278,7 @@ class _PriceEstimatorScreenState extends State<PriceEstimatorScreen> {
                     const SizedBox(height: 18),
 
                     const SizedBox(height: 18),
-                    _sectionLabel('Share some highlights (Optional)'),
+                    _sectionLabel('Share some highlights (Optional)'.tr),
                     _buildHighlightsField(),
                     const SizedBox(height: 16),
                     
@@ -313,8 +313,8 @@ class _PriceEstimatorScreenState extends State<PriceEstimatorScreen> {
             size: 16,
           ),
           const SizedBox(width: 6),
-          const Text(
-            'AI Price Estimator',
+      Text(
+            'AI Price Estimator'.tr,
             style: TextStyle(
               color: AppColors.textPrimary,
               fontSize: 15,
@@ -371,7 +371,7 @@ class _PriceEstimatorScreenState extends State<PriceEstimatorScreen> {
         onTap: () {
           if (controller.amenities.isEmpty) {
             Fluttertoast.showToast(
-              msg: "Amenities are not available.",
+              msg: "Amenities are not available.".tr,
               gravity: ToastGravity.BOTTOM,
             );
             return;
@@ -418,7 +418,7 @@ class _PriceEstimatorScreenState extends State<PriceEstimatorScreen> {
               Expanded(
                 child: selectedItems.isEmpty
                     ? Text(
-                        "Select amenities",
+                        "Select amenities".tr,
                         style: TextStyle(
                           fontSize: 12.sp,
                           color:
@@ -550,8 +550,8 @@ class _PriceEstimatorScreenState extends State<PriceEstimatorScreen> {
                   children: [
                     const SizedBox(height: 10),
 
-                    const Text(
-                      'Estimate Smarter',
+                     Text(
+                      'Estimate Smarter'.tr,
                       style: TextStyle(
                         color: Colors.black,
                         fontSize: 21,
@@ -559,18 +559,17 @@ class _PriceEstimatorScreenState extends State<PriceEstimatorScreen> {
                       ),
                     ),
 
-                    const Text(
-                      'Price Better.',
+                     Text(
+                      'Price Better.'.tr,
                       style: TextStyle(
                         color: AppColors.primary,
                         fontSize: 21,
                         fontWeight: FontWeight.w700,
                       ),
                     ),
-
-                    const SizedBox(height: 8),
+ SizedBox(height: 8),
                     Text(
-                      'Get an AI-powered estimate of your\n property value in seconds.',
+                      'Get an AI-powered estimate of your\n property value in seconds.'.tr,
                       maxLines: 2,
                       style: TextStyle(
                         color: Colors.black.withOpacity(0.85),
@@ -649,7 +648,7 @@ class _PriceEstimatorScreenState extends State<PriceEstimatorScreen> {
                               CrossAxisAlignment.start,
                           children: [
                             Text(
-                              "Select Amenities",
+                              "Select Amenities".tr,
                               style: TextStyle(
                                 fontSize: 17.sp,
                                 fontWeight:
@@ -660,7 +659,7 @@ class _PriceEstimatorScreenState extends State<PriceEstimatorScreen> {
                             ),
                             SizedBox(height: 3.h),
                             Text(
-                              "You can select multiple amenities",
+                              "You can select multiple amenities".tr,
                               style: TextStyle(
                                 fontSize: 11.sp,
                                 color: AppColors
@@ -849,7 +848,7 @@ class _PriceEstimatorScreenState extends State<PriceEstimatorScreen> {
                               AppColors.primary,
                           foregroundColor: Colors.white,
                         ),
-                        child: const Text("Apply"),
+                        child: Text("Apply".tr),
                       ),
                     ],
                   ),
@@ -942,7 +941,7 @@ Widget _buildAmenityImage(
 
               Text(
                 result == null
-                    ? 'Get an estimate'
+                    ? 'Get an estimate'.tr
                     : _formatQar(result.averagePrice),
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
@@ -957,7 +956,7 @@ Widget _buildAmenityImage(
 
               Text(
                 result == null
-                    ? 'Enter property details below'
+                    ? 'Enter property details below'.tr
                     : '${_formatCompactQar(result.minPrice)} - ${_formatCompactQar(result.maxPrice)}',
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
@@ -1095,8 +1094,8 @@ Widget _buildAmenityImage(
                 Expanded(
                   child: _detailCard(
                     icon: Icons.bed_outlined,
-                    title: "BHK",
-                    value: _selectedBhk?.toString() ?? "Select",
+                    title: "BHK".tr,
+                    value: _selectedBhk?.toString() ?? "Select".tr,
                     onTap: () {
                       _showOptionSheet<int>(
                         title: "Select BHK",
@@ -1116,11 +1115,11 @@ Widget _buildAmenityImage(
                 Expanded(
                   child: _detailCard(
                     icon: Icons.bathtub_outlined,
-                    title: "Bathrooms",
-                    value: _selectedBathrooms?.toString() ?? "Select",
+                    title: "Bathrooms".tr,
+                    value: _selectedBathrooms?.toString() ?? "Select".tr,
                     onTap: () {
                       _showOptionSheet<int>(
-                        title: "Select Bathrooms",
+                        title: "Select Bathrooms".tr,
                         options: const [1, 2, 3, 4, 5, 6],
                         labelBuilder: (value) =>
                             "$value Bathroom${value > 1 ? 's' : ''}",
@@ -1144,20 +1143,20 @@ Widget _buildAmenityImage(
                 Expanded(
                   child:_detailCard(
   icon: Icons.chair_outlined,
-  title: "Furnishing",
-  value: _selectedFurnishing?.title ?? "Select",
+  title: "Furnishing".tr,
+  value: _selectedFurnishing?.title ?? "Select".tr,
   onTap: () {
     if (listingController
         .furnishingOptions.isEmpty) {
       Fluttertoast.showToast(
-        msg: "Furnishing options are not available.",
+        msg: "Furnishing options are not available.".tr,
         gravity: ToastGravity.BOTTOM,
       );
       return;
     }
 
     _showOptionSheet<FurnishingOption>(
-      title: "Select Furnishing",
+      title: "Select Furnishing".tr,
       options:
           listingController.furnishingOptions,
       labelBuilder: (item) => item.title,
@@ -1177,14 +1176,14 @@ Widget _buildAmenityImage(
                 Expanded(
                   child: _detailCard(
                     icon: Icons.layers_outlined,
-                    title: "Floor",
-                    value: _selectedFloor?.toString() ?? "Any",
+                    title: "Floor".tr,
+                    value: _selectedFloor?.toString() ?? "Any".tr,
                     onTap: () {
                       _showOptionSheet<int>(
-                        title: "Select Floor",
+                        title: "Select Floor".tr,
                         options: List.generate(50, (index) => index),
                         labelBuilder: (value) =>
-                            value == 0 ? "Ground Floor" : "Floor $value",
+                            value == 0 ? "Ground Floor".tr: "Floor $value",
                         selectedValue: _selectedFloor,
                         onSelected: (value) {
                           setState(() {
@@ -1210,11 +1209,11 @@ Widget _buildAmenityImage(
                 Expanded(
                   child: _detailCard(
                     icon: Icons.apartment_outlined,
-                    title: "Total Floors",
-                    value: _selectedTotalFloors?.toString() ?? "Any",
+                    title: "Total Floors".tr,
+                    value: _selectedTotalFloors?.toString() ?? "Any".tr,
                     onTap: () {
                       _showOptionSheet<int>(
-                        title: "Select Total Floors",
+                        title: "Select Total Floors".tr,
                         options: List.generate(50, (index) => index + 1),
                         labelBuilder: (value) =>
                             "$value Floor${value > 1 ? 's' : ''}",
@@ -1239,16 +1238,16 @@ Widget _buildAmenityImage(
                 Expanded(
                   child: _detailCard(
                     icon: Icons.calendar_today_outlined,
-                    title: "Age of Property",
-                    value: _selectedPropertyAge ?? "Any",
+                    title: "Age of Property".tr,
+                    value: _selectedPropertyAge ?? "Any".tr,
                     onTap: () {
                       _showOptionSheet<String>(
-                        title: "Select Property Age",
-                        options: const [
-                          "New / Under 1 Year",
-                          "1 - 5 Years",
-                          "5 - 10 Years",
-                          "10+ Years",
+                        title: "Select Property Age".tr,
+                        options:  [
+                          "New / Under 1 Year".tr,
+                          "1 - 5 Years".tr,
+                          "5 - 10 Years".tr,
+                          "10+ Years".tr,
                         ],
                         labelBuilder: (value) => value,
                         selectedValue: _selectedPropertyAge,
@@ -1268,19 +1267,19 @@ Widget _buildAmenityImage(
 
             _detailCard(
               icon: Icons.directions_car_outlined,
-              title: "Parking",
+              title: "Parking".tr,
               value: _parkingAvailable == null
-                  ? "Any"
+                  ? "Any".tr
                   : _parkingAvailable!
-                  ? "Available"
-                  : "Not Available",
+                  ? "Available".tr
+                  : "Not Available".tr,
               fullWidth: true,
               onTap: () {
                 _showOptionSheet<bool>(
-                  title: "Select Parking Availability",
+                  title: "Select Parking Availability".tr,
                   options: const [true, false],
                   labelBuilder: (value) =>
-                      value ? "Available" : "Not Available",
+                      value ? "Available".tr : "Not Available".tr,
                   selectedValue: _parkingAvailable,
                   onSelected: (value) {
                     setState(() {
@@ -1354,7 +1353,7 @@ Widget _buildAmenityImage(
                       overflow: TextOverflow.ellipsis,
                       style: TextStyle(
                         fontSize: 11.sp,
-                        color: value == "Select" || value == "Any"
+                        color: value == "Select" || value == "Any".tr
                             ? const Color(0xff8C91A6)
                             : AppColors.primary,
                         fontWeight: FontWeight.w500,
@@ -1392,8 +1391,8 @@ Widget _buildAmenityImage(
             maxLength: 100,
             maxLines: 2,
             onChanged: (_) => setState(() {}),
-            decoration: const InputDecoration(
-              hintText: 'e.g. Sea view, Near metro, Gated community...',
+            decoration: InputDecoration(
+              hintText: 'e.g. Sea view, Near metro, Gated community...'.tr,
               hintStyle: TextStyle(
                 color: AppColors.textSecondary,
                 fontSize: 12.5,
@@ -1464,7 +1463,7 @@ Widget _buildAmenityImage(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            'Get AI Estimate',
+                            'Get AI Estimate'.tr,
                             style: TextStyle(
                               color: Colors.white,
                               fontWeight: FontWeight.w700,
@@ -1472,7 +1471,7 @@ Widget _buildAmenityImage(
                             ),
                           ),
                           Text(
-                            'View estimated price & range',
+                            'View estimated price & range'.tr,
                             style: TextStyle(
                               color: Colors.white70,
                               fontSize: 10.5.sp,
@@ -1532,7 +1531,7 @@ if (selectedAmenityTitles.isNotEmpty) {
 
     if (areaName.isEmpty) {
       Fluttertoast.showToast(
-        msg: "Please enter the property location.",
+        msg: "Please enter the property location.".tr,
         gravity: ToastGravity.BOTTOM,
       );
       return;
@@ -1540,7 +1539,7 @@ if (selectedAmenityTitles.isNotEmpty) {
 
     if (areaSqft == null || areaSqft <= 0) {
       Fluttertoast.showToast(
-        msg: "Please enter a valid property area.",
+        msg: "Please enter a valid property area.".tr,
         gravity: ToastGravity.BOTTOM,
       );
       return;
@@ -1548,7 +1547,7 @@ if (selectedAmenityTitles.isNotEmpty) {
 
     if (_selectedBhk == null) {
       Fluttertoast.showToast(
-        msg: "Please select BHK.",
+        msg: "Please select BHK.".tr,
         gravity: ToastGravity.BOTTOM,
       );
       return;
@@ -1556,7 +1555,7 @@ if (selectedAmenityTitles.isNotEmpty) {
 
     if (_selectedBathrooms == null) {
       Fluttertoast.showToast(
-        msg: "Please select bathrooms.",
+        msg: "Please select bathrooms.".tr,
         gravity: ToastGravity.BOTTOM,
       );
       return;
@@ -1564,7 +1563,7 @@ if (selectedAmenityTitles.isNotEmpty) {
 
     if (_selectedFurnishing == null) {
       Fluttertoast.showToast(
-        msg: "Please select furnishing status.",
+        msg: "Please select furnishing status.".tr,
         gravity: ToastGravity.BOTTOM,
       );
       return;
@@ -1605,7 +1604,7 @@ if (selectedAmenityTitles.isNotEmpty) {
       Fluttertoast.showToast(
         msg: controller.error.isNotEmpty
             ? controller.error
-            : "Unable to estimate price.",
+            : "Unable to estimate price.".tr,
         toastLength: Toast.LENGTH_LONG,
         gravity: ToastGravity.BOTTOM,
       );
@@ -1659,7 +1658,7 @@ if (selectedAmenityTitles.isNotEmpty) {
               SizedBox(height: 14.h),
 
               Text(
-                "AI Estimated Value",
+                "AI Estimated Value".tr,
                 style: TextStyle(
                   fontSize: 13.sp,
                   color: AppColors.textSecondary,
@@ -1690,7 +1689,7 @@ if (selectedAmenityTitles.isNotEmpty) {
                   children: [
                     Expanded(
                       child: _priceResultItem(
-                        "Minimum",
+                        "Minimum".tr,
                         _formatQar(result.minPrice),
                       ),
                     ),
@@ -1699,7 +1698,7 @@ if (selectedAmenityTitles.isNotEmpty) {
 
                     Expanded(
                       child: _priceResultItem(
-                        "Maximum",
+                        "Maximum".tr,
                         _formatQar(result.maxPrice),
                       ),
                     ),
@@ -1722,8 +1721,8 @@ if (selectedAmenityTitles.isNotEmpty) {
                       borderRadius: BorderRadius.circular(12.r),
                     ),
                   ),
-                  child: const Text(
-                    "Done",
+                  child:  Text(
+                    "Done".tr,
                     style: TextStyle(fontWeight: FontWeight.w700),
                   ),
                 ),
@@ -1776,7 +1775,7 @@ if (selectedAmenityTitles.isNotEmpty) {
         Icon(Icons.lock_outline, size: 13.sp, color: AppColors.textSecondary),
         SizedBox(width: 6.w),
         Text(
-          'Your information is secure and private',
+          'Your information is secure and private'.tr,
           style: TextStyle(fontSize: 11.sp, color: AppColors.textSecondary),
         ),
       ],

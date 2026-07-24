@@ -266,7 +266,7 @@ class _MyTicketScreenState extends State<MyTicketScreen> {
 
                         Text(
                           "${ticket.repliesCount} "
-                          "${ticket.repliesCount == 1 ? 'Reply' : 'Replies'}",
+                          "${ticket.repliesCount == 1 ? 'Reply'.tr : 'Replies'.tr}",
                           style: TextStyle(
                             fontSize: 10.sp,
                             color: Colors.grey.shade600,
@@ -355,22 +355,21 @@ class _MyTicketScreenState extends State<MyTicketScreen> {
   String _categoryLabel(String category) {
     switch (category) {
       case "GENERAL":
-        return "General Support";
+        return "General Support".tr;
 
       case "PAYMENT":
-        return "Payment Issue";
+        return "Payment Issue".tr;
 
       case "REPORT_USER":
-        return "Reported User";
+        return "Reported User".tr;
 
       case "REPORT_LISTING":
-        return "Reported Listing";
+        return "Reported Listing".tr;
 
       default:
         return category;
     }
   }
-
   IconData _categoryIcon(String category) {
     switch (category) {
       case "PAYMENT":
@@ -420,14 +419,14 @@ class _MyTicketScreenState extends State<MyTicketScreen> {
             SizedBox(height: 18.h),
 
             Text(
-              "No Support Tickets",
+              "No Support Tickets".tr,
               style: TextStyle(fontSize: 16.sp, fontWeight: FontWeight.w700),
             ),
 
             SizedBox(height: 7.h),
 
             Text(
-              "Your submitted support requests will appear here.",
+              "Your submitted support requests will appear here.".tr,
               textAlign: TextAlign.center,
               style: TextStyle(
                 fontSize: 11.sp,
@@ -483,7 +482,7 @@ class _MyTicketScreenState extends State<MyTicketScreen> {
                 elevation: 0,
               ),
 
-              child: const Text("Retry"),
+              child:  Text("Retry".tr),
             ),
           ],
         ),

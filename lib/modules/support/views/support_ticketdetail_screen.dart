@@ -281,7 +281,7 @@ class _SupportTicketDetailsScreenState
       ),
 
       child: Text(
-        ticket.message.isNotEmpty ? ticket.message : "No description provided.",
+        ticket.message.isNotEmpty ? ticket.message : "No description provided.".tr,
 
         style: TextStyle(
           fontSize: 12.sp,
@@ -298,8 +298,8 @@ class _SupportTicketDetailsScreenState
     final String authorName = reply.author?.name?.trim().isNotEmpty == true
         ? reply.author!.name!
         : reply.isAdmin
-        ? "Support Team"
-        : "User";
+        ? "Support Team".tr
+        : "User".tr;
 
     final String? email = reply.author?.email?.trim().isNotEmpty == true
         ? reply.author!.email
@@ -372,7 +372,7 @@ class _SupportTicketDetailsScreenState
                               borderRadius: BorderRadius.circular(10.r),
                             ),
                             child: Text(
-                              "Support",
+                              "Support".tr,
                               style: TextStyle(
                                 fontSize: 8.sp,
                                 fontWeight: FontWeight.w600,
@@ -470,7 +470,7 @@ class _SupportTicketDetailsScreenState
           SizedBox(height: 10.h),
 
           Text(
-            "No replies yet",
+            "No replies yet".tr,
 
             style: TextStyle(fontSize: 12.sp, fontWeight: FontWeight.w600),
           ),
@@ -478,7 +478,7 @@ class _SupportTicketDetailsScreenState
           SizedBox(height: 5.h),
 
           Text(
-            "Our support team will respond here.",
+            "Our support team will respond here.".tr,
 
             textAlign: TextAlign.center,
 
@@ -546,16 +546,16 @@ class _SupportTicketDetailsScreenState
   String _categoryLabel(String category) {
     switch (category) {
       case "GENERAL":
-        return "General Support";
+        return "General Support".tr;
 
       case "PAYMENT":
-        return "Payment Issue";
+        return "Payment Issue".tr;
 
       case "REPORT_USER":
-        return "Reported User";
+        return "Reported User".tr;
 
       case "REPORT_LISTING":
-        return "Reported Listing";
+        return "Reported Listing".tr;
 
       default:
         return category;
@@ -594,7 +594,7 @@ class _SupportTicketDetailsScreenState
                 foregroundColor: Colors.white,
               ),
 
-              child: const Text("Retry"),
+              child: Text("Retry".tr),
             ),
           ],
         ),
@@ -606,16 +606,16 @@ class _SupportTicketDetailsScreenState
 String _categoryLabel(String category) {
   switch (category.toUpperCase()) {
     case "GENERAL":
-      return "General Support";
+      return "General Support".tr;
 
     case "PAYMENT":
-      return "Payment Issue";
+      return "Payment Issue".tr;
 
     case "REPORT_USER":
-      return "Reported User";
+      return "Reported User".tr;
 
     case "REPORT_LISTING":
-      return "Reported Listing";
+      return "Reported Listing".tr;
 
     default:
       return category
@@ -644,7 +644,7 @@ Widget _ticketInformationCard(SupportTicketDetails ticket) {
       children: [
         _detailRow(
           icon: Icons.confirmation_number_outlined,
-          label: "Ticket ID",
+          label: "Ticket ID.tr",
           value: ticket.id,
         ),
 
@@ -652,7 +652,7 @@ Widget _ticketInformationCard(SupportTicketDetails ticket) {
 
         _detailRow(
           icon: Icons.category_outlined,
-          label: "Category",
+          label: "Category".tr,
           value: _categoryLabel(ticket.category),
         ),
 
@@ -660,7 +660,7 @@ Widget _ticketInformationCard(SupportTicketDetails ticket) {
 
         _detailRow(
           icon: Icons.info_outline_rounded,
-          label: "Status",
+          label: "Status".tr,
           value: ticket.status.replaceAll("_", " "),
         ),
 
@@ -669,7 +669,7 @@ Widget _ticketInformationCard(SupportTicketDetails ticket) {
           _divider(),
           _detailRow(
             icon: Icons.home_work_outlined,
-            label: "Listing ID",
+            label: "Listing ID".tr,
             value: ticket.listingId!,
           ),
         ],
@@ -679,7 +679,7 @@ Widget _ticketInformationCard(SupportTicketDetails ticket) {
           _divider(),
           _detailRow(
             icon: Icons.person_off_outlined,
-            label: "Reported User ID",
+            label: "Reported User ID".tr,
             value: ticket.reportedUserId!,
           ),
         ],
@@ -697,7 +697,7 @@ Widget _ticketInformationCard(SupportTicketDetails ticket) {
 
         _detailRow(
           icon: Icons.calendar_today_outlined,
-          label: "Created",
+          label: "Created".tr,
           value: _formatDateTime(ticket.createdAt),
         ),
 
@@ -705,7 +705,7 @@ Widget _ticketInformationCard(SupportTicketDetails ticket) {
 
         _detailRow(
           icon: Icons.update_rounded,
-          label: "Last Updated",
+          label: "Last Updated".tr,
           value: _formatDateTime(ticket.updatedAt),
         ),
       ],
@@ -818,7 +818,7 @@ Widget _assignedToCard(SupportTicketDetails ticket) {
 
   final String name = assigned.name?.trim().isNotEmpty == true
       ? assigned.name!
-      : "Support Agent";
+      : "Support Agent".tr;
 
   return Container(
     width: double.infinity,
@@ -884,12 +884,12 @@ Widget _submitterCard(SupportTicketDetails ticket) {
   final submitter = ticket.submitter;
 
   if (submitter == null) {
-    return _emptyInfoCard("Submitter information is not available.");
+    return _emptyInfoCard("Submitter information is not available.".tr);
   }
 
   final String name = submitter.name?.trim().isNotEmpty == true
       ? submitter.name!
-      : "User";
+      : "User".tr;
 
   return Container(
     width: double.infinity,
@@ -945,7 +945,7 @@ Widget _submitterCard(SupportTicketDetails ticket) {
 
         SizedBox(height: 14.h),
 
-        _smallInfoRow("User ID", submitter.id),
+        _smallInfoRow("User ID".tr, submitter.id),
 
         if (submitter.email?.trim().isNotEmpty == true) ...[
           SizedBox(height: 9.h),

@@ -66,7 +66,7 @@ class _SupportScreenState extends State<SupportScreen> {
 
   actions: [
     IconButton(
-      tooltip: "My Tickets",
+      tooltip: "My Tickets".tr,
       onPressed: () {
         Get.to(
           () => const MyTicketScreen(),
@@ -98,7 +98,7 @@ class _SupportScreenState extends State<SupportScreen> {
 
                 SizedBox(height: 26.h),
 
-                _sectionLabel("What can we help you with?"),
+                _sectionLabel("What can we help you with?".tr),
 
                 SizedBox(height: 12.h),
 
@@ -107,8 +107,8 @@ class _SupportScreenState extends State<SupportScreen> {
                 // =================================================
                 _categoryTile(
                   icon: Icons.help_outline_rounded,
-                  title: "General Support",
-                  subtitle: "Questions, account help or any general issue.",
+                  title: "General Support".tr,
+                  subtitle: "Questions, account help or any general issue.".tr,
                   category: SupportCategory.general,
                 ),
 
@@ -119,15 +119,15 @@ class _SupportScreenState extends State<SupportScreen> {
                 // =================================================
                 _categoryTile(
                   icon: Icons.account_balance_wallet_outlined,
-                  title: "Payment Issue",
+                  title: "Payment Issue".tr,
                   subtitle:
-                      "Payment, billing, transaction or subscription issues.",
+                      "Payment, billing, transaction or subscription issues.".tr,
                   category: SupportCategory.payment,
                 ),
 
                 SizedBox(height: 26.h),
 
-                _sectionLabel("Tell us about the issue"),
+                _sectionLabel("Tell us about the issue".tr),
 
                 SizedBox(height: 12.h),
 
@@ -174,8 +174,8 @@ class _SupportScreenState extends State<SupportScreen> {
                         ),
                         decoration: _inputDecoration(
                           hint: selectedCategory == SupportCategory.payment
-                              ? "e.g. Payment failed"
-                              : "Briefly describe your issue",
+                              ? "e.g. Payment failed".tr
+                              : "Briefly describe your issue".tr,
                           icon: Icons.title_rounded,
                         ),
                       ),
@@ -183,7 +183,7 @@ class _SupportScreenState extends State<SupportScreen> {
                       SizedBox(height: 18.h),
 
                       Text(
-                        "Description",
+                        "Description".tr,
                         style: TextStyle(
                           fontSize: 12.sp,
                           fontWeight: FontWeight.w600,
@@ -204,8 +204,8 @@ class _SupportScreenState extends State<SupportScreen> {
                         ),
                         decoration: _inputDecoration(
                           hint: selectedCategory == SupportCategory.payment
-                              ? "Explain the payment issue, transaction details, or what went wrong..."
-                              : "Tell us what happened and how we can help...",
+                              ? "Explain the payment issue, transaction details, or what went wrong...".tr
+                              : "Tell us what happened and how we can help...".tr,
                         ),
                       ),
                     ],
@@ -240,7 +240,7 @@ class _SupportScreenState extends State<SupportScreen> {
 
                       Expanded(
                         child: Text(
-                          "Please provide enough details so our support team can understand and resolve your issue.",
+                          "Please provide enough details so our support team can understand and resolve your issue.".tr,
                           style: TextStyle(
                             fontSize: 10.5.sp,
                             height: 1.5,
@@ -290,7 +290,7 @@ class _SupportScreenState extends State<SupportScreen> {
                               Icon(Icons.send_rounded, size: 17.sp),
                               SizedBox(width: 8.w),
                               Text(
-                                "Submit Request",
+                                "Submit Request".tr,
                                 style: TextStyle(
                                   fontSize: 13.sp,
                                   fontWeight: FontWeight.w600,
@@ -351,7 +351,7 @@ class _SupportScreenState extends State<SupportScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  "How can we help?",
+                  "How can we help?".tr,
                   style: TextStyle(
                     fontSize: 16.sp,
                     fontWeight: FontWeight.w700,
@@ -362,7 +362,7 @@ class _SupportScreenState extends State<SupportScreen> {
                 SizedBox(height: 5.h),
 
                 Text(
-                  "Send us your issue and our support team will assist you.",
+                  "Send us your issue and our support team will assist you.".tr,
                   style: TextStyle(
                     fontSize: 10.5.sp,
                     height: 1.45,
@@ -537,7 +537,7 @@ class _SupportScreenState extends State<SupportScreen> {
 
     if (subject.isEmpty) {
       Fluttertoast.showToast(
-        msg: "Please enter a subject for your request.",
+        msg: "Please enter a subject for your request.".tr,
         toastLength: Toast.LENGTH_SHORT,
         gravity: ToastGravity.BOTTOM,
       );
@@ -550,7 +550,7 @@ class _SupportScreenState extends State<SupportScreen> {
 
     if (message.isEmpty) {
       Fluttertoast.showToast(
-        msg: "Please describe the issue.",
+        msg: "Please describe the issue.".tr,
         toastLength: Toast.LENGTH_SHORT,
         gravity: ToastGravity.BOTTOM,
       );
@@ -575,7 +575,7 @@ class _SupportScreenState extends State<SupportScreen> {
 
     if (currentUserId.isEmpty) {
       Fluttertoast.showToast(
-        msg: "Unable to identify the logged-in user.",
+        msg: "Unable to identify the logged-in user.".tr,
         toastLength: Toast.LENGTH_SHORT,
         gravity: ToastGravity.BOTTOM,
       );
@@ -608,7 +608,7 @@ class _SupportScreenState extends State<SupportScreen> {
       });
 
       Fluttertoast.showToast(
-        msg: "Your support request has been submitted successfully.",
+        msg: "Your support request has been submitted successfully.".tr,
         toastLength: Toast.LENGTH_SHORT,
         gravity: ToastGravity.BOTTOM,
       );
@@ -620,7 +620,7 @@ class _SupportScreenState extends State<SupportScreen> {
       Fluttertoast.showToast(
         msg: supportController.createError.isNotEmpty
             ? supportController.createError
-            : "Unable to submit. Please try again.",
+            : "Unable to submit. Please try again.".tr,
         toastLength: Toast.LENGTH_SHORT,
         gravity: ToastGravity.BOTTOM,
       );

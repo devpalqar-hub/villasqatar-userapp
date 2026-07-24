@@ -479,4 +479,321 @@ const Map<String, String> enUS = {
 "Purpose": "Purpose",
 
 "Mark as Sold": "Mark as Sold",
+"Make an Offer": "Make an Offer",
+"Property Price": "Property Price",
+"Review the listed price before making your offer":
+    "Review the listed price before making your offer",
+"Your Offer": "Your Offer",
+"Enter the amount you would like to offer":
+    "Enter the amount you would like to offer",
+"Listed Price": "Listed Price",
+"Schedule": "Schedule",
+"Send Offer": "Send Offer",
+"Chat Seller": "Chat Seller",
+"Offer Amount": "Offer Amount",
+
+"Schedule a Visit": "Schedule a Visit",
+"Select Visit Date": "Select Visit Date",
+"Available Time": "Available Time",
+"Add a note (Optional)": "Add a note (Optional)",
+"Book Visit": "Book Visit",
+
+
+"Choose Boost Plan": "Choose Boost Plan",
+"Select how you want to promote your listing":
+    "Select how you want to promote your listing",
+
+"Search boost plans": "Search boost plans",
+
+"Loading boost plans...": "Loading boost plans...",
+
+"No plans found": "No plans found",
+"Try searching with another keyword":
+    "Try searching with another keyword",
+
+"POPULAR": "POPULAR",
+
+"Secure payment powered by Stripe":
+    "Secure payment powered by Stripe",
+
+"Total": "Total",
+
+
+"Unable to load boost plans":
+    "Unable to load boost plans",
+
+"Try Again": "Try Again",
+
+"No boost plans available":
+    "No boost plans available",
+
+"Please check again later.":
+    "Please check again later.",
+
+"Unable to Boost": "Unable to Boost",
+"Property ID is missing.":
+    "Property ID is missing.",
+
+"Ready for Payment": "Ready for Payment",
+
+"Requested by": "Requested by",
+// ================= SETTINGS SCREEN =================
+// Account
+"Account": "Account",
+
+"My Featured Properties": "My Featured Properties",
+
+// Preferences
+"Preferences": "Preferences",
+
+"Notifications": "Notifications",
+
+// Support
+"Support": "Support",
+"Help Center": "Help Center",
+"Contact Us": "Contact Us",
+"About": "About",
+
+// Profile
+"View Profile": "View Profile",
+
+
+"Are you sure you want to logout from your account?":
+    "Are you sure you want to logout from your account?",
+
+"My Tickets": "My Tickets",
+
+"How can we help?": "How can we help?",
+"Send us your issue and our support team will assist you.":
+    "Send us your issue and our support team will assist you.",
+
+"What can we help you with?":
+    "What can we help you with?",
+
+// ================= SUPPORT CATEGORIES =================
+
+"General Support": "General Support",
+"Questions, account help or any general issue.":
+    "Questions, account help or any general issue.",
+
+"Payment Issue": "Payment Issue",
+"Payment, billing, transaction or subscription issues.":
+    "Payment, billing, transaction or subscription issues.",
+
+// ================= ISSUE FORM =================
+
+"Tell us about the issue": "Tell us about the issue",
+
+"Subject": "Subject",
+"e.g. Payment failed": "e.g. Payment failed",
+"Briefly describe your issue":
+    "Briefly describe your issue",
+
+"Description": "Description",
+
+"Explain the payment issue, transaction details, or what went wrong...":
+    "Explain the payment issue, transaction details, or what went wrong...",
+
+"Tell us what happened and how we can help...":
+    "Tell us what happened and how we can help...",
+
+"Please provide enough details so our support team can understand and resolve your issue.":
+    "Please provide enough details so our support team can understand and resolve your issue.",
+
+"Submit Request": "Submit Request",
+
+// ================= VALIDATION / MESSAGES =================
+
+"Please enter a subject for your request.":
+    "Please enter a subject for your request.",
+
+"Please describe the issue.":
+    "Please describe the issue.",
+
+"Unable to identify the logged-in user.":
+    "Unable to identify the logged-in user.",
+
+"Your support request has been submitted successfully.":
+    "Your support request has been submitted successfully.",
+
+"Unable to submit. Please try again.":
+    "Unable to submit. Please try again.",
+
+// ================= SUPPORT TICKET DETAILS =================
+
+"Ticket Details": "Ticket Details",
+
+"Ticket Information": "Ticket Information",
+"Submitted By": "Submitted By",
+"Assigned To": "Assigned To",
+"Your Request": "Your Request",
+"Support Replies": "Support Replies",
+
+"Reply": "Reply",
+"Replies": "Replies",
+
+// ================= TICKET INFORMATION =================
+
+"Ticket ID": "Ticket ID",
+"Category": "Category",
+"Status": "Status",
+"Listing ID": "Listing ID",
+"Reported User ID": "Reported User ID",
+"Reference ID": "Reference ID",
+"Created": "Created",
+"Last Updated": "Last Updated",
+
+// ================= CATEGORIES =================
+
+
+"Reported User": "Reported User",
+"Reported Listing": "Reported Listing",
+
+// ================= STATUS =================
+
+"OPEN": "OPEN",
+"IN PROGRESS": "IN PROGRESS",
+"RESOLVED": "RESOLVED",
+"CLOSED": "CLOSED",
+
+// ================= REPLIES / USERS =================
+
+"Support Team": "Support Team",
+
+"Support Agent": "Support Agent",
+"User": "User",
+
+"No replies yet": "No replies yet",
+"Our support team will respond here.":
+    "Our support team will respond here.",
+
+"No description provided.":
+    "No description provided.",
+
+// ================= USER INFORMATION =================
+
+"User ID": "User ID",
+"Email": "Email",
+
+"Submitter information is not available.":
+    "Submitter information is not available.",
+
+"Not available": "Not available",
+
+// ================= ACTIONS =================
+
+"Retry": "Retry",
+
+"Open": "Open",
+"In Progress": "In Progress",
+"Resolved": "Resolved",
+"Closed": "Closed",
+
+// Empty state
+"No Support Tickets": "No Support Tickets",
+"Your submitted support requests will appear here.":
+    "Your submitted support requests will appear here.",
+"Search featured properties": "Search featured properties",
+"Manage your currently featured properties":
+    "Manage your currently featured properties",
+// ================= AI PRICE ESTIMATOR =================
+
+"AI Price Estimator": "AI Price Estimator",
+
+"Estimate Smarter": "Estimate Smarter",
+"Price Better.": "Price Better.",
+"Get an AI-powered estimate of your\n property value in seconds.":
+    "Get an AI-powered estimate of your\n property value in seconds.",
+
+
+"Enter city, locality or area": "Enter city, locality or area",
+"Area (sqft)": "Area (sqft)",
+"e.g. 1200": "e.g. 1200",
+"sqft": "sqft",
+
+
+"Villa / House": "Villa / House",
+"Plot": "Plot",
+
+"Select amenities": "Select amenities",
+
+"You can select multiple amenities":
+    "You can select multiple amenities",
+"Amenities are not available.":
+    "Amenities are not available.",
+"Clear All": "Clear All",
+"selected": "selected",
+"Apply": "Apply",
+
+// Highlights
+"Share some highlights (Optional)":
+    "Share some highlights (Optional)",
+"e.g. Sea view, Near metro, Gated community...":
+    "e.g. Sea view, Near metro, Gated community...",
+
+// Estimate Card
+"Estimated Price": "Estimated Price",
+"Get an estimate": "Get an estimate",
+"Enter property details below":
+    "Enter property details below",
+
+// Property Details
+"BHK": "BHK",
+"Select": "Select",
+"Select BHK": "Select BHK",
+
+"Select Bathrooms": "Select Bathrooms",
+"Bathroom": "Bathroom",
+
+"Select Furnishing": "Select Furnishing",
+"Furnishing options are not available.":
+    "Furnishing options are not available.",
+"Select Floor": "Select Floor",
+"Ground Floor": "Ground Floor",
+
+"Select Total Floors": "Select Total Floors",
+
+"Age of Property": "Age of Property",
+"Select Property Age": "Select Property Age",
+"New / Under 1 Year": "New / Under 1 Year",
+"1 - 5 Years": "1 - 5 Years",
+"5 - 10 Years": "5 - 10 Years",
+"10+ Years": "10+ Years",
+
+"Any": "Any",
+
+
+"Select Parking Availability":
+    "Select Parking Availability",
+"Available": "Available",
+"Not Available": "Not Available",
+
+// CTA
+"Get AI Estimate": "Get AI Estimate",
+"View estimated price & range":
+    "View estimated price & range",
+
+// Validation
+"Please enter the property location.":
+    "Please enter the property location.",
+"Please enter a valid property area.":
+    "Please enter a valid property area.",
+"Please select BHK.":
+    "Please select BHK.",
+"Please select bathrooms.":
+    "Please select bathrooms.",
+"Please select furnishing status.":
+    "Please select furnishing status.",
+"Unable to estimate price.":
+    "Unable to estimate price.",
+
+// Result
+"AI Estimated Value": "AI Estimated Value",
+"Minimum": "Minimum",
+"Maximum": "Maximum",
+
+
+// Footer
+"Your information is secure and private":
+    "Your information is secure and private",
 };

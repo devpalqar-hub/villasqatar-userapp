@@ -1,194 +1,312 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get_utils/src/extensions/internacionalization.dart';
+import 'package:villas_qatar/Core/constants/app_colors.dart';
 import 'package:villas_qatar/modules/propertylist/model/myproperty_model.dart';
 
-class PropertyInfoCard extends StatefulWidget {
+class PropertyInfoCard extends StatelessWidget {
   final Property property;
 
-  const PropertyInfoCard({super.key, required this.property});
+  const PropertyInfoCard({
+    super.key,
+    required this.property,
+  });
 
-  @override
-  State<PropertyInfoCard> createState() => _PropertyInfoCardState();
-}
+  static const Color primary = Color(0xFFA60F46);
+  static const Color textDark = Color(0xFF1F2937);
+  static const Color greyText = Color(0xFF777777);
+  static const Color borderColor = Color(0xFFE7E7E7);
 
-class _PropertyInfoCardState extends State<PropertyInfoCard> {
-  int selectedChip = 0;
   @override
   Widget build(BuildContext context) {
-    final property = widget.property;
-    return Container(
-      width: double.infinity,
+    final String propertyType = property.type
+        .replaceAll("_", " ")
+        .toLowerCase()
+        .split(" ")
+        .where((e) => e.isNotEmpty)
+        .map((e) => e[0].toUpperCase() + e.substring(1))
+        .join(" ");
 
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          SizedBox(height: 10.h),
-          Text(
-            property.propertyName,
-            style: TextStyle(
-              fontSize: 15.sp,
-              fontWeight: FontWeight.bold,
-              color: const Color(0xff222222),
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        SizedBox(height: 10.h),
+
+        // =========================================================
+        // FOR SALE PILL
+        // =========================================================
+        Container(
+          padding: EdgeInsets.symmetric(
+            horizontal: 12.w,
+            vertical: 2.h,
+          ),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(20.r),
+            border: Border.all(
+              color: primary.withOpacity(.65),
+              width: 1,
             ),
           ),
+          child: Text(
+            "For Sale".tr,
+            style: TextStyle(
+              fontSize: 10.sp,
+              fontWeight: FontWeight.w500,
+              color: AppColors.primary
+            ),
+          ),
+        ),
 
-          SizedBox(height: 10.h),
-          Row(
-            children: [
-              Icon(Icons.location_on_rounded, color: Colors.grey, size: 14.sp),
+        SizedBox(height: 10.h),
 
-              SizedBox(width: 10.w),
+        // =========================================================
+        // PROPERTY TITLE
+        // =========================================================
+        Text(
+          property.propertyName,
+          maxLines: 2,
+          overflow: TextOverflow.ellipsis,
+          style: TextStyle(
+            fontSize: 16.sp,
+            height: 1.15,
+            fontWeight: FontWeight.w600,
+            color: textDark,
+            letterSpacing: -.25,
+          ),
+        ),
 
-              Text(
+        SizedBox(height: 8.h),
+
+        // =========================================================
+        // LOCATION + VERIFIED
+        // =========================================================
+        Row(
+          children: [
+            Icon(
+              Icons.location_on_rounded,
+              size: 18.sp,
+              color: const Color(0xFF888888),
+            ),
+
+            SizedBox(width: 8.w),
+
+            Expanded(
+              child: Text(
                 "${property.areaName}, ${property.municipality}, ${property.country}",
-                style: TextStyle(fontSize: 12.sp, color: Colors.grey.shade700),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: TextStyle(
+                  fontSize: 11.sp,
+                  fontWeight: FontWeight.w400,
+                  color: const Color.fromARGB(255, 110, 109, 109),
+                ),
               ),
+            ),
 
-              SizedBox(width: 18.w),
-              Row(
+            SizedBox(width: 5.w),
+
+            Container(
+              padding: EdgeInsets.symmetric(
+                horizontal: 10.w,
+                vertical: 6.h,
+              ),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(30.r),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(.06),
+                    blurRadius: 14,
+                    offset: const Offset(0, 4),
+                  ),
+                ],
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
                 children: [
                   Icon(
                     property.contactVerified
-                        ? Icons.verified
+                        ? Icons.verified_rounded
                         : Icons.verified_outlined,
+                    size: 14.sp,
                     color: property.contactVerified
                         ? Colors.green
-                        : Colors.grey,
-                    size: 15,
+                        : primary,
                   ),
-                  SizedBox(width: 4.w),
+
+                  SizedBox(width: 5.w),
+
                   Text(
-                    property.contactVerified ? "Verified".tr : "Not Verified".tr,
+                    property.contactVerified
+                        ? "Verified".tr
+                        : "Not Verified".tr,
                     style: TextStyle(
+                      fontSize: 10.sp,
+                      fontWeight: FontWeight.w500,
                       color: property.contactVerified
                           ? Colors.green
-                          : Colors.grey,
-                      fontWeight: FontWeight.w600,
-                      fontSize: 12.sp,
+                          : primary,
                     ),
                   ),
                 ],
               ),
+            ),
+          ],
+        ),
+
+        SizedBox(height: 12.h),
+
+        // =========================================================
+        // PROPERTY INFORMATION CARD
+        // =========================================================
+        Container(
+          width: double.infinity,
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(12.r),
+            border: Border.all(
+              color: borderColor,
+              width: 1,
+            ),
+          ),
+          child: Column(
+            children: [
+              // ================= FIRST ROW =================
+              SizedBox(
+                height: 43.h,
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: Center(
+                        child: Text(
+                          "ID #${_shortId(property.id)}",
+                          maxLines: 1,
+                          style: TextStyle(
+                            fontSize: 11.sp,
+                            fontWeight: FontWeight.w600,
+                            color: primary,
+                          ),
+                        ),
+                      ),
+                    ),
+
+                    _verticalDivider(),
+
+                    Expanded(
+                      child: _infoItem(
+                        icon: Icons.near_me_outlined,
+                        text: "1.2 km away",
+                      ),
+                    ),
+
+                    _verticalDivider(),
+
+                    Expanded(
+                      child: _infoItem(
+                        icon: Icons.square_foot_outlined,
+                        text: "${property.area} sqm",
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+
+              Divider(
+                height: 1,
+                thickness: 1,
+                color: borderColor,
+              ),
+
+              // ================= SECOND ROW =================
+              SizedBox(
+                height: 43.h,
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: _infoItem(
+                        icon: Icons.bed_outlined,
+                        text: "${property.bedrooms} Beds",
+                      ),
+                    ),
+
+                    _verticalDivider(),
+
+                    Expanded(
+                      child: _infoItem(
+                        icon: Icons.bathtub_outlined,
+                        text: "${property.bathrooms} Baths",
+                      ),
+                    ),
+
+                    _verticalDivider(),
+
+                    Expanded(
+                      child: _infoItem(
+                        icon: Icons.home_work_outlined,
+                        text: propertyType,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
             ],
           ),
-
-          SizedBox(height: 8.h),
-          IntrinsicHeight(
-            child: Row(
-              children: [
-                Text(
-                  "ID #${property.id.substring(0, 8).toUpperCase()}",
-                  style: TextStyle(
-                    fontWeight: FontWeight.w600,
-                    fontSize: 13.sp,
-                    color: Colors.blue.shade800,
-                  ),
-                ),
-                SizedBox(width: 10.w),
-                VerticalDivider(
-                  thickness: 1,
-                  width: 1,
-                  color: Colors.grey.shade400,
-                ),
-                SizedBox(width: 10.w),
-
-                Text(
-                  "1.2 km away",
-                  style: TextStyle(
-                    color: Colors.grey.shade600,
-                    fontSize: 13.sp,
-                  ),
-                ),
-                SizedBox(width: 10.w),
-                _featureItem(
-                  Icons.square_foot_outlined,
-                  "${property.area} sqm",
-                ),
-              ],
-            ),
-          ),
-
-          SizedBox(height: 8.h),
-
-          Container(
-            child: Row(
-              children: [
-                _featureItem(Icons.bed_outlined, "${property.bedrooms} Beds"),
-                SizedBox(width: 6.w),
-                _featureItem(
-                  Icons.bathtub_outlined,
-                  "${property.bathrooms} Baths",
-                ),
-                SizedBox(width: 6.w),
-
-                SizedBox(width: 20.w),
-                _featureItem(
-                  Icons.home_work_outlined,
-                  property.type
-                      .replaceAll("_", " ")
-                      .toLowerCase()
-                      .split(" ")
-                      .map((e) => e[0].toUpperCase() + e.substring(1))
-                      .join(" "),
-                ),
-              ],
-            ),
-          ),
-
-          /// Status Chips
-        ],
-      ),
+        ),
+      ],
     );
   }
 
-  Widget _featureItem(IconData icon, String text) {
-    return Expanded(
+  String _shortId(dynamic id) {
+    final value = id?.toString() ?? "";
+
+    if (value.isEmpty) {
+      return "-";
+    }
+
+    return value.length > 8
+        ? value.substring(0, 8).toUpperCase()
+        : value.toUpperCase();
+  }
+
+  Widget _verticalDivider() {
+    return Container(
+      width: 1,
+      height: 26.h,
+      color: const Color(0xFFE3E3E3),
+    );
+  }
+
+  Widget _infoItem({
+    required IconData icon,
+    required String text,
+  }) {
+    return Padding(
+      padding: EdgeInsets.symmetric(horizontal: 8.w),
       child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(icon, size: 18.sp, color: Colors.grey),
-          SizedBox(width: 6.w),
-          Text(
-            text,
-            style: TextStyle(
-              fontSize: 13.sp,
-              fontWeight: FontWeight.w600,
-              color: Colors.grey,
+          Icon(
+            icon,
+            size: 18.sp,
+            color: const Color(0xFF858585),
+          ),
+
+          SizedBox(width: 7.w),
+
+          Flexible(
+            child: Text(
+              text,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(
+                fontSize: 11.5.sp,
+                fontWeight: FontWeight.w400,
+                color: greyText,
+              ),
             ),
           ),
         ],
-      ),
-    );
-  }
-
-  Widget _chip({required String text, required int index}) {
-    final bool isSelected = selectedChip == index;
-
-    return GestureDetector(
-      onTap: () {
-        setState(() {
-          selectedChip = index;
-        });
-      },
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 200),
-        padding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 6.h),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(8.r),
-          border: Border.all(
-            color: isSelected ? const Color(0xff8E123E) : Colors.grey.shade300,
-            width: isSelected ? 1.5 : 1,
-          ),
-        ),
-        child: Text(
-          text,
-          style: TextStyle(
-            color: isSelected ? Colors.black : Colors.black,
-            fontWeight: FontWeight.w500,
-            fontSize: 8.sp,
-          ),
-        ),
       ),
     );
   }

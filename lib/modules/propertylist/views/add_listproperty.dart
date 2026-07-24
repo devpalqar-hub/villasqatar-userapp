@@ -1493,7 +1493,7 @@ void _showNearbyTagsBottomSheet() {
 
         _AppTextField(
           controller: controller.areaController,
-          hint: "Name of  Area".tr,
+          hint: "Name of Area".tr,
           prefixIcon: Icons.map_outlined,
         
          

@@ -129,8 +129,8 @@ class _MyFeaturedPropertiesScreenState
                           ),
                           decoration: InputDecoration(
                             hintText:
-                                'Search featured properties'
-                                    .tr,
+                                'Search featured properties'.tr,
+                               
                             hintStyle: TextStyle(
                               fontSize: 13.sp,
                               color:
@@ -225,8 +225,8 @@ class _MyFeaturedPropertiesScreenState
                                         .start,
                                 children: [
                                   Text(
-                                    'Featured Properties'
-                                        .tr,
+                                    'Featured Properties'.tr,
+                                       
                                     style: TextStyle(
                                       fontSize: 16.sp,
                                       fontWeight:
@@ -241,8 +241,8 @@ class _MyFeaturedPropertiesScreenState
                                   SizedBox(height: 3.h),
 
                                   Text(
-                                    'Manage your currently featured properties'
-                                        .tr,
+                                    'Manage your currently featured properties'.tr,
+                                        
                                     style: TextStyle(
                                       fontSize: 11.5.sp,
                                       color: Colors
@@ -274,7 +274,7 @@ class _MyFeaturedPropertiesScreenState
                                 ),
                                 child: Text(
                                   '${properties.length} '
-                                  '${properties.length == 1 ? 'Property' : 'Properties'}',
+                                  '${properties.length == 1 ? 'Property'.tr : 'Properties'.tr}',
                                   style: TextStyle(
                                     fontSize: 10.5.sp,
                                     fontWeight:

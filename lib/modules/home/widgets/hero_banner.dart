@@ -40,29 +40,29 @@ class _HomeBannerState extends State<HomeBanner> {
     return Container(
       height: 200.h,
       child: ClipRRect(
-        borderRadius: BorderRadius.circular(20.r),
+        
         child: Stack(
           children: [
             /// Background Image
             Positioned.fill(
-              child: Image.asset("assets/auth_bg 1.png", fit: BoxFit.cover),
+              child: Image.asset("assets/auth_bg1.png", fit: BoxFit.cover),
             ),
 
             /// White Gradient
             Positioned.fill(
               child: Container(
                 decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    begin: Alignment.centerLeft,
-                    end: Alignment.centerRight,
-                    colors: [
-                      Colors.white,
-                      Colors.white.withOpacity(.75),
-                      Colors.white.withOpacity(.75),
-                      Colors.white.withOpacity(.25),
-                    ],
-                    stops: const [0, .45, .75, 1],
-                  ),
+                  // gradient: LinearGradient(
+                  //   begin: Alignment.centerLeft,
+                  //   end: Alignment.centerRight,
+                  //   // colors: [
+                  //   //   Colors.white,
+                  //   //   Colors.white.withOpacity(.75),
+                  //   //   Colors.white.withOpacity(.75),
+                  //   //   Colors.white.withOpacity(.25),
+                  //   // ],
+                  //   stops: const [0, .45, .75, 1],
+                  // ),
                 ),
               ),
             ),

@@ -266,7 +266,7 @@ class _MakeOfferBottomSheetState extends State<MakeOfferBottomSheet> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  "Listed Price",
+                  "Listed Price".tr,
                   style: TextStyle(
                     fontSize: 9.5.sp,
                     color: const Color(0xff777777),
