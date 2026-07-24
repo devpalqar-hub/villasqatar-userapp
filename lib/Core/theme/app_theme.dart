@@ -4,9 +4,6 @@ import 'package:get/get.dart';
 import 'package:villas_qatar/Core/constants/app_colors.dart';
 import 'package:villas_qatar/Core/theme/app_fonts.dart';
 
-
-
-
 class AppTheme {
   static ThemeData get lightTheme {
     final fontFamily = Get.locale?.languageCode == 'ar'
@@ -17,9 +14,7 @@ class AppTheme {
       useMaterial3: true,
       scaffoldBackgroundColor: AppColors.background,
 
-      colorScheme: ColorScheme.fromSeed(
-        seedColor: AppColors.primary,
-      ),
+      colorScheme: ColorScheme.fromSeed(seedColor: AppColors.primary),
 
       fontFamily: fontFamily,
 

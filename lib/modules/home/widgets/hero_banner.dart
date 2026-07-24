@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
+import 'package:villas_qatar/core/constants/app_colors.dart';
 import 'package:villas_qatar/modules/searchscreen/view/search_screen.dart';
 
 class HomeBanner extends StatefulWidget {
@@ -15,18 +16,19 @@ class _HomeBannerState extends State<HomeBanner> {
   final TextEditingController searchController = TextEditingController();
 
   void _searchProperty() {
-  final propertyName = searchController.text.trim();
+    final propertyName = searchController.text.trim();
 
-  if (propertyName.isEmpty) return;
+    if (propertyName.isEmpty) return;
 
-  FocusScope.of(context).unfocus();
+    FocusScope.of(context).unfocus();
 
-  // Pass search value first
-  widget.onSearch(propertyName);
+    // Pass search value first
+    widget.onSearch(propertyName);
 
-  // Then clear TextField
-  searchController.clear();
-}
+    // Then clear TextField
+    searchController.clear();
+  }
+
   @override
   void dispose() {
     searchController.dispose();
@@ -36,7 +38,7 @@ class _HomeBannerState extends State<HomeBanner> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: 230.h,
+      height: 200.h,
       child: ClipRRect(
         borderRadius: BorderRadius.circular(20.r),
         child: Stack(
@@ -71,44 +73,48 @@ class _HomeBannerState extends State<HomeBanner> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    "Find your".tr,
-                    style: TextStyle(
-                      fontSize: 22.sp,
-                      fontWeight: FontWeight.w600,
-                      color: Colors.black,
-                    ),
-                  ),
+                  Row(
+                    children: [
+                      Text(
+                        "Find your".tr + " dream villa".tr,
+                        style: TextStyle(
+                          fontSize: 20.sp,
+                          fontWeight: FontWeight.w600,
+                          color: Colors.black,
+                        ),
+                      ),
 
-                  Text(
-                    "dream villa".tr,
-                    style: TextStyle(
-                      fontSize: 22.sp,
-                      fontWeight: FontWeight.w700,
-                      color: const Color(0xffA61E3D),
-                    ),
+                      // Text(
+                      //   ,
+                      //   style: TextStyle(
+                      //     fontSize: 22.sp,
+                      //     fontWeight: FontWeight.w700,
+                      //     color: const Color(0xffA61E3D),
+                      //   ),
+                      // ),
+                    ],
                   ),
 
                   Text(
                     "in Qatar".tr,
                     style: TextStyle(
-                      fontSize: 22.sp,
+                      fontSize: 25.sp,
                       fontWeight: FontWeight.w700,
-                      color: Colors.black,
+                      color: AppColors.primary,
                     ),
                   ),
 
                   SizedBox(height: 6.h),
 
                   SizedBox(
-                    width: 220.w,
+                    width: 240.w,
                     child: Text(
                       "Discover premium villas and properties in the best locations across Qatar"
                           .tr,
                       style: TextStyle(
                         fontSize: 11.sp,
-                        color: Colors.grey.shade700,
-                        height: 1.4,
+                        color: Colors.black.withOpacity(.9),
+                        // height: 1.4,
                       ),
                     ),
                   ),
@@ -116,6 +122,25 @@ class _HomeBannerState extends State<HomeBanner> {
                   const Spacer(),
 
                   /// Search Bar
+                  ///
+                  // Container(
+                  //   child: Row(children: [],),
+                  // )
+                  SizedBox(height: 20),
+
+                  // Row(
+                  //   children: [
+                  //     SizedBox(width: 20),
+                  //     Container(
+                  //       width: 80.w,
+                  //       height: 30.w,
+                  //       decoration: BoxDecoration(
+                  //         borderRadius: BorderRadius.circular(10),
+                  //         color: AppColors.primary,
+                  //       ),
+                  //     ),
+                  //   ],
+                  // ),
                   Padding(
                     padding: EdgeInsets.only(right: 14.w),
                     child: Container(

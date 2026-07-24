@@ -97,7 +97,7 @@ class _HomeScreenState extends State<HomeScreen> {
             children: [
               HomeHeader(),
               HomeBanner(onSearch: widget.onSearch),
-              QuickActionsCard(onPurposeSelected: widget.onPurposeSelected),
+              // QuickActionsCard(onPurposeSelected: widget.onPurposeSelected),
               SectionHeader(title: "Near You".tr),
 
               SizedBox(
@@ -524,19 +524,18 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 }
+
 Widget _buildBannersSection() {
   return GetBuilder<BannerController>(
     builder: (controller) {
       /// INITIAL LOADING
-      if (controller.isLoading &&
-          controller.banners.isEmpty) {
+      if (controller.isLoading && controller.banners.isEmpty) {
         return Container(
           width: double.infinity,
           height: 250.h,
           decoration: BoxDecoration(
             color: Colors.grey.shade100,
-            borderRadius:
-                BorderRadius.circular(10.r),
+            borderRadius: BorderRadius.circular(10.r),
           ),
           alignment: Alignment.center,
           child: SizedBox(
@@ -561,31 +560,24 @@ Widget _buildBannersSection() {
       /// 1. Active
       /// 2. Started
       /// 3. Not expired
-      final banners = controller.banners.where(
-        (banner) {
-          if (!banner.isActive) {
-            return false;
-          }
+      final banners = controller.banners.where((banner) {
+        if (!banner.isActive) {
+          return false;
+        }
 
-          if (banner.startDate != null &&
-              now.isBefore(banner.startDate!)) {
-            return false;
-          }
+        if (banner.startDate != null && now.isBefore(banner.startDate!)) {
+          return false;
+        }
 
-          if (banner.endDate != null &&
-              now.isAfter(banner.endDate!)) {
-            return false;
-          }
+        if (banner.endDate != null && now.isAfter(banner.endDate!)) {
+          return false;
+        }
 
-          return true;
-        },
-      ).toList();
+        return true;
+      }).toList();
 
       /// Sort according to API position.
-      banners.sort(
-        (a, b) =>
-            a.position.compareTo(b.position),
-      );
+      banners.sort((a, b) => a.position.compareTo(b.position));
 
       if (banners.isEmpty) {
         return const SizedBox.shrink();
@@ -598,9 +590,7 @@ Widget _buildBannersSection() {
         return InvestmentBanner(
           banner: banner,
           onTap: () {
-            _handleBannerTap(
-              banner.linkUrl,
-            );
+            _handleBannerTap(banner.linkUrl);
           },
         );
       }
@@ -610,25 +600,17 @@ Widget _buildBannersSection() {
         height: 150.h,
         child: PageView.builder(
           itemCount: banners.length,
-          itemBuilder: (
-            context,
-            index,
-          ) {
+          itemBuilder: (context, index) {
             final banner = banners[index];
 
             return Padding(
               padding: EdgeInsets.only(
-                right:
-                    index == banners.length - 1
-                        ? 0
-                        : 8.w,
+                right: index == banners.length - 1 ? 0 : 8.w,
               ),
               child: InvestmentBanner(
                 banner: banner,
                 onTap: () {
-                  _handleBannerTap(
-                    banner.linkUrl,
-                  );
+                  _handleBannerTap(banner.linkUrl);
                 },
               ),
             );
@@ -639,21 +621,15 @@ Widget _buildBannersSection() {
   );
 }
 
-Future<void> _handleBannerTap(
-  String linkUrl,
-) async {
+Future<void> _handleBannerTap(String linkUrl) async {
   if (linkUrl.trim().isEmpty) {
     return;
   }
 
-  final Uri? uri = Uri.tryParse(
-    linkUrl.trim(),
-  );
+  final Uri? uri = Uri.tryParse(linkUrl.trim());
 
   if (uri == null) {
-    debugPrint(
-      "Invalid banner URL: $linkUrl",
-    );
+    debugPrint("Invalid banner URL: $linkUrl");
     return;
   }
 
@@ -664,13 +640,9 @@ Future<void> _handleBannerTap(
     );
 
     if (!launched) {
-      debugPrint(
-        "Unable to open banner URL: $linkUrl",
-      );
+      debugPrint("Unable to open banner URL: $linkUrl");
     }
   } catch (e) {
-    debugPrint(
-      "Banner URL error: $e",
-    );
+    debugPrint("Banner URL error: $e");
   }
 }
