@@ -51,9 +51,11 @@ class _SplashScreenState extends State<SplashScreen> {
             child: Column(
               children: [
                 /// Logo
+                ///
+           
                 Center(
                   child: Image.asset(
-                    'assets/logo.png',
+                    'assets/Logo/homeLogo.png',
                     width: 150.w,
                     fit: BoxFit.contain,
                   ),

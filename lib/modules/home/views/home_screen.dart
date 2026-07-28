@@ -1,10 +1,14 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:get/get_utils/src/extensions/internacionalization.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:villas_qatar/Core/constants/app_colors.dart';
+import 'package:villas_qatar/Core/theme/app_textstyles.dart';
 import 'package:villas_qatar/modules/PlansandFeatures/model/featured_property_model.dart';
 import 'package:villas_qatar/modules/PlansandFeatures/services/featured_properties_controller.dart';
+import 'package:villas_qatar/modules/home/service/UtilsController.dart';
 import 'package:villas_qatar/modules/home/service/banner_controller.dart';
 import 'package:villas_qatar/modules/home/widgets/agent_card.dart';
 import 'package:villas_qatar/modules/home/widgets/boost_property_banner.dart';
@@ -40,6 +44,7 @@ class _HomeScreenState extends State<HomeScreen> {
   late final FeaturedPropertiesController featuredController;
   late final BannerController bannerController;
   final ScrollController featuredScrollController = ScrollController();
+  final Utilscontroller utilscontroller = Get.put(Utilscontroller());
 
   @override
   void initState() {
@@ -89,18 +94,147 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        backgroundColor: Colors.white,
+        leading: Container(),
+        leadingWidth: 10.w,
+        title: Image.asset(
+          'assets/Logo/logo.png',
+          width: 140.w,
+          fit: BoxFit.contain,
+        ),
+        actions: [
+          InkWell(
+            borderRadius: BorderRadius.circular(20.r),
+            onTap: () {},
+            child: Container(
+              height: 30.h,
+              padding: EdgeInsets.symmetric(horizontal: 8.w),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(20.r),
+                border: Border.all(color: Colors.grey.shade300),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.09),
+                    blurRadius: 10,
+                    offset: const Offset(0, 3),
+                  ),
+                ],
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(
+                    Icons.location_on_outlined,
+                    color: AppColors.primary,
+                    size: 14.sp,
+                  ),
+                  SizedBox(width: 6.w),
+                  Text(
+                    "Doha".tr,
+                    style: AppTextStyles.body13.copyWith(
+                      color: AppColors.textPrimary,
+                    ),
+                  ),
+                  SizedBox(width: 2.w),
+                  Icon(
+                    Icons.keyboard_arrow_down,
+                    size: 16.sp,
+                    color: AppColors.textPrimary,
+                  ),
+                ],
+              ),
+            ),
+          ),
+          SizedBox(width: 10.w),
+          Icon(
+            CupertinoIcons.bell_solid,
+            color: AppColors.primary.withOpacity(.9),
+          ),
+          SizedBox(width: 10.w),
+        ],
+      ),
       body: SafeArea(
         child: SingleChildScrollView(
-          padding: EdgeInsets.symmetric(horizontal: 24.w),
+          //  padding: EdgeInsets.symmetric(horizontal: 24.w),
           child: Column(
             spacing: 12.h,
             children: [
-              HomeHeader(),
-              HomeBanner(onSearch: widget.onSearch),
-              // QuickActionsCard(onPurposeSelected: widget.onPurposeSelected),
-              SectionHeader(title: "Near You".tr),
+              //SizedBox(height: 20),
+              // HomeHeader(),
+              HomeBanner(onSearch: (propertyName, type) {}),
 
-              SizedBox(
+              // QuickActionsCard(onPurposeSelected: widget.onPurposeSelected),
+              Padding(
+                padding: EdgeInsets.symmetric(horizontal: 16.w),
+                child: SectionHeader(title: "Browse by Category".tr),
+              ),
+
+              GetBuilder<Utilscontroller>(
+                builder: (__) {
+                  return Row(
+                    spacing: 5.w,
+                    children: [
+                      SizedBox(width: 16.w),
+                      for (var data in utilscontroller.listingTypes)
+                        Container(
+                          padding: EdgeInsets.all(5.w),
+                          height: 100.h,
+                          width: 100.h,
+
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black.withOpacity(.02),
+                                spreadRadius: .1,
+                                blurRadius: 10,
+                              ),
+                            ],
+                          ),
+                          child: Column(
+                            children: [
+                              Image.network(
+                                data.image ?? "",
+                                width: 60.w,
+                                height: 60.w,
+                              ),
+                              Text(
+                                data.title.tr,
+                                style: TextStyle(
+                                  fontFamily: "Rubik",
+                                  fontSize: 13.sp,
+                                  fontWeight: FontWeight.w400,
+                                ),
+                              ),
+                              Text(
+                                data.title.tr,
+                                style: TextStyle(
+                                  fontFamily: "Rubik",
+                                  fontSize: 10.sp,
+                                  fontWeight: FontWeight.w400,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                    ],
+                  );
+                },
+              ),
+
+              Padding(
+                padding: EdgeInsets.symmetric(horizontal: 16.w),
+                child: Row(children: [Container()]),
+              ),
+              Padding(
+                padding: EdgeInsets.symmetric(horizontal: 16.w),
+                child: SectionHeader(title: "Near You".tr),
+              ),
+
+              Container(
+                padding: EdgeInsets.symmetric(horizontal: 16.w),
                 height: 100.h,
                 child: ListView(
                   scrollDirection: Axis.horizontal,

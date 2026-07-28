@@ -14,48 +14,15 @@ class HomeHeader extends StatelessWidget {
       padding: EdgeInsets.only(top: 0.h),
       child: Row(
         children: [
-          Icon(Icons.menu, color: AppColors.primary, size: 24.sp),
-          SizedBox(width: 40.w),
+          // Icon(Icons.menu, color: AppColors.primary, size: 24.sp),
+          SizedBox(width: 10.w),
 
-          Image.asset('assets/logo.png', width: 60.w, fit: BoxFit.contain),
-          Spacer(),
-          Container(
-            height: 30.h,
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(20.r),
-              border: Border.all(color: Colors.grey.shade300),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withOpacity(0.09),
-                  blurRadius: 10,
-                  spreadRadius: 0,
-                  offset: const Offset(0, 3),
-                ),
-              ],
-            ),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                SizedBox(width: 8.w),
-                Icon(
-                  Icons.location_on_outlined,
-                  color: AppColors.primary,
-                  size: 14.sp,
-                ),
-                SizedBox(width: 8.w),
-                Text(
-                  'Doha, Qatar'.tr,
-                  style: AppTextStyles.body13.copyWith(
-                    color: AppColors.textPrimary,
-                  ),
-                ),
-                SizedBox(width: 4.w),
-                Icon(Icons.keyboard_arrow_down, size: 16.sp),
-                SizedBox(width: 4.w),
-              ],
-            ),
+          Image.asset(
+            'assets/Logo/logo.png',
+            width: 120.w,
+            fit: BoxFit.contain,
           ),
+          Spacer(),
 
           SizedBox(width: 8.w),
 

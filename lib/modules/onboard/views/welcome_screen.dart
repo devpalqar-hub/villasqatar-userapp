@@ -30,30 +30,29 @@ class WelcomeScreen extends StatelessWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      SizedBox(height: 20.h),
+                      SizedBox(height: 60.h),
 
                       /// Logo
-                      Image.asset('assets/logo.png', width: 120.w),
+                      Image.asset('assets/Logo/homeLogo.png', width: 180.w),
 
                       SizedBox(height: 10.h),
 
                       /// Heading
-                      Text(
-                        'Find your dream villa'.tr,
-                        style: AppTextStyles.title18.copyWith(
-                          color: const Color(0xFF222222),
-                          fontSize: 21.sp,
-                        ),
-                      ),
+                      // Text(
+                      //   'Find your dream villa'.tr,
+                      //   style: AppTextStyles.title18.copyWith(
+                      //     color: const Color(0xFF222222),
+                      //     fontSize: 21.sp,
+                      //   ),
+                      // ),
 
-                      Text(
-                        'in Qatar'.tr,
-                        style: AppTextStyles.title18.copyWith(
-                          color: AppColors.primary,
-                          fontSize: 21.sp,
-                        ),
-                      ),
-
+                      // Text(
+                      //   'in Qatar'.tr,
+                      //   style: AppTextStyles.title18.copyWith(
+                      //     color: AppColors.primary,
+                      //     fontSize: 21.sp,
+                      //   ),
+                      // ),
                       SizedBox(height: 10.h),
 
                       Container(

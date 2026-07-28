@@ -33,6 +33,8 @@ class OtpScreen extends StatelessWidget {
     return GetBuilder<AuthController>(
       builder: (controller) {
         return Scaffold(
+          resizeToAvoidBottomInset: false,
+
           body: AuthBackground(
             child: SafeArea(
               child: Padding(
@@ -51,7 +53,7 @@ class OtpScreen extends StatelessWidget {
                       ),
                     ),
 
-                    SizedBox(height: 80.h),
+                    SizedBox(height: 40.h),
 
                     /// Title
                     RichText(
@@ -82,12 +84,12 @@ class OtpScreen extends StatelessWidget {
                       'Enter the 6-digit code sent to\n${controller.phoneNumber}'
                           .tr,
                       style: AppTextStyles.body13.copyWith(
-                        fontSize: 12.sp,
+                        fontSize: 14.sp,
                         color: AppColors.textSecondary,
                       ),
                     ),
 
-                    SizedBox(height: 35.h),
+                    SizedBox(height: 20.h),
 
                     /// OTP Boxes
                     Pinput(
@@ -121,7 +123,8 @@ class OtpScreen extends StatelessWidget {
                     SizedBox(height: 24.h),
 
                     /// Timer
-                    Center(
+                    Container(
+                      alignment: Alignment.centerLeft,
                       child: Text(
                         'Resend OTP in 00:25'.tr,
                         style: AppTextStyles.body13.copyWith(
