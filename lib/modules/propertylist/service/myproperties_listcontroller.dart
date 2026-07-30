@@ -314,6 +314,7 @@ Future<void> fetchProperties({
     fetchProperties();
   }
 
+
   Future<bool> markAsSold(String propertyId) async {
     final String id = propertyId.trim();
 

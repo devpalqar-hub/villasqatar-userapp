@@ -56,7 +56,7 @@ class Listing {
   final String id;
   final String propertyName;
   final String description;
-  final String type;
+  final ListingType? type;
   final String purpose;
 
   final double latitude;
@@ -110,7 +110,7 @@ class Listing {
     required this.id,
     required this.propertyName,
     required this.description,
-    required this.type,
+    this.type,
     required this.purpose,
     required this.latitude,
     required this.longitude,
@@ -152,7 +152,9 @@ class Listing {
       id: json["id"] ?? "",
       propertyName: json["propertyName"] ?? "",
       description: json["description"] ?? "",
-      type: json["type"] ?? "",
+      type: json["type"] == null
+    ? null
+    : ListingType.fromJson(json["type"]),
       purpose: json["purpose"] ?? "",
 
       latitude: (json["latitude"] ?? 0).toDouble(),
@@ -218,6 +220,38 @@ String get image => photos.isNotEmpty ? photos.first.url : "";
   
   
 }
+
+
+class ListingType {
+  final String id;
+  final String title;
+  final String image;
+  final DateTime? createdAt;
+  final DateTime? updatedAt;
+
+  ListingType({
+    required this.id,
+    required this.title,
+    required this.image,
+    this.createdAt,
+    this.updatedAt,
+  });
+
+  factory ListingType.fromJson(Map<String, dynamic> json) {
+    return ListingType(
+      id: json["id"] ?? "",
+      title: json["title"] ?? "",
+      image: json["image"] ?? "",
+      createdAt: json["createdAt"] != null
+          ? DateTime.parse(json["createdAt"])
+          : null,
+      updatedAt: json["updatedAt"] != null
+          ? DateTime.parse(json["updatedAt"])
+          : null,
+    );
+  }
+}
+
 
 class ListingPhoto {
   final String url;

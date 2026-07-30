@@ -281,23 +281,23 @@ class FeaturedListing {
     );
   }
 
-  /// First valid property image.
-  ///
-  /// Your API currently has one bad URL:
-  /// "[object Object]"
-  /// so we intentionally ignore invalid values.
   String get imageUrl {
-    for (final photo in photos) {
-      final url = photo.url.trim();
+  if (photos.isEmpty) return '';
 
-      if (url.startsWith('http://') ||
-          url.startsWith('https://')) {
-        return url;
-      }
+  final sortedPhotos = List<FeaturedPhoto>.from(photos)
+    ..sort((a, b) => a.sortOrder.compareTo(b.sortOrder));
+
+  for (final photo in sortedPhotos) {
+    final url = photo.url.trim();
+
+    if (url.startsWith('http://') ||
+        url.startsWith('https://')) {
+      return url;
     }
-
-    return '';
   }
+
+  return '';
+}
 
   String get formattedPrice {
     if (price == price.roundToDouble()) {

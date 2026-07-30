@@ -18,49 +18,50 @@ class Property {
   final String propertyName;
   final String description;
   final String purpose;
-  final String type;
+
+  final ListingType type;
+  final Furnishing furnishing;
+  final Municipality municipality;
 
   final double latitude;
   final double longitude;
 
   final int bedrooms;
   final int bathrooms;
-
   final double area;
-  final double price;
 
-  final String furnishingStatus;
+  final int livingRooms;
+  final int parkingSpaces;
+  final int floorNumber;
+  final int totalFloors;
+  final int? yearBuilt;
+
+  final double price;
+  final bool priceNegotiable;
 
   final String addressLine1;
   final String addressLine2;
   final String areaName;
-  final String municipality;
   final String country;
 
   final String contactPhone;
   final String contactWhatsapp;
+  final bool contactVerified;
 
-  final List<String> amenities;
-  final List<String> nearbyTags;
+  final List<Amenity> amenities;
+  final List<NearbyTag> nearbyTags;
 
   final String otherFeatures;
-
   final String status;
 
   final DateTime createdAt;
   final DateTime updatedAt;
 
   final CreatedBy createdBy;
-
   final List<Photo> photos;
-  final int livingRooms;
-  final int parkingSpaces;
-  final int floorNumber;
-  final int totalFloors;
-  final int? yearBuilt;
-  final bool contactVerified;
+
   final bool isWishlisted;
-  final DateTime? wishlistedAt;
+  final bool isFeatured;
 
   Property({
     required this.id,
@@ -69,20 +70,27 @@ class Property {
     required this.description,
     required this.purpose,
     required this.type,
+    required this.furnishing,
+    required this.municipality,
     required this.latitude,
     required this.longitude,
     required this.bedrooms,
     required this.bathrooms,
     required this.area,
+    required this.livingRooms,
+    required this.parkingSpaces,
+    required this.floorNumber,
+    required this.totalFloors,
+    required this.yearBuilt,
     required this.price,
-    required this.furnishingStatus,
+    required this.priceNegotiable,
     required this.addressLine1,
     required this.addressLine2,
     required this.areaName,
-    required this.municipality,
     required this.country,
     required this.contactPhone,
     required this.contactWhatsapp,
+    required this.contactVerified,
     required this.amenities,
     required this.nearbyTags,
     required this.otherFeatures,
@@ -91,61 +99,171 @@ class Property {
     required this.updatedAt,
     required this.createdBy,
     required this.photos,
-    required this.livingRooms,
-    required this.parkingSpaces,
-    required this.floorNumber,
-    required this.totalFloors,
-    required this.yearBuilt,
-    required this.contactVerified,
     required this.isWishlisted,
-    this.wishlistedAt,
+    required this.isFeatured,
   });
 
   factory Property.fromJson(Map<String, dynamic> json) {
     return Property(
       id: json["id"] ?? "",
-      slug:json["slug"]?? "",
+      slug: json["slug"] ?? "",
       propertyName: json["propertyName"] ?? "",
       description: json["description"] ?? "",
       purpose: json["purpose"] ?? "",
-      type: json["type"] ?? "",
+
+      type: ListingType.fromJson(json["type"] ?? {}),
+      furnishing: Furnishing.fromJson(json["furnishing"] ?? {}),
+      municipality: Municipality.fromJson(json["municipality"] ?? {}),
+
       latitude: (json["latitude"] ?? 0).toDouble(),
       longitude: (json["longitude"] ?? 0).toDouble(),
+
       bedrooms: json["bedrooms"] ?? 0,
       bathrooms: json["bathrooms"] ?? 0,
       area: (json["area"] ?? 0).toDouble(),
-      price: (json["price"] ?? 0).toDouble(),
-      furnishingStatus: json["furnishingStatus"] ?? "",
-      addressLine1: json["addressLine1"] ?? "",
-      addressLine2: json["addressLine2"] ?? "",
-      areaName: json["areaName"] ?? "",
-      municipality: json["municipality"] ?? "",
-      country: json["country"] ?? "",
-      contactPhone: json["contactPhone"] ?? "",
-      contactWhatsapp: json["contactWhatsapp"] ?? "",
-      amenities: List<String>.from(json["amenities"] ?? []),
-      nearbyTags: List<String>.from(json["nearbyTags"] ?? []),
-      otherFeatures: json["otherFeatures"] ?? "",
-      status: json["status"] ?? "",
-      createdAt: DateTime.parse(json["createdAt"]),
-      updatedAt: DateTime.parse(json["updatedAt"]),
-      createdBy: CreatedBy.fromJson(json["createdBy"]),
-      photos: (json["photos"] as List).map((e) => Photo.fromJson(e)).toList(),
+
       livingRooms: json["livingRooms"] ?? 0,
       parkingSpaces: json["parkingSpaces"] ?? 0,
       floorNumber: json["floorNumber"] ?? 0,
       totalFloors: json["totalFloors"] ?? 0,
       yearBuilt: json["yearBuilt"],
-      contactVerified: json["contactVerified"] ?? false,
-      isWishlisted: json["isWishlisted"] ?? false,
 
-      wishlistedAt: json["wishlistedAt"] != null
-          ? DateTime.tryParse(json["wishlistedAt"].toString())
-          : null,
+      price: (json["price"] ?? 0).toDouble(),
+      priceNegotiable: json["priceNegotiable"] ?? false,
+
+      addressLine1: json["addressLine1"] ?? "",
+      addressLine2: json["addressLine2"] ?? "",
+      areaName: json["areaName"] ?? "",
+      country: json["country"] ?? "",
+
+      contactPhone: json["contactPhone"] ?? "",
+      contactWhatsapp: json["contactWhatsapp"] ?? "",
+      contactVerified: json["contactVerified"] ?? false,
+
+      amenities: (json["amenities"] as List? ?? [])
+          .map((e) => Amenity.fromJson(e))
+          .toList(),
+
+      nearbyTags: (json["nearbyTags"] as List? ?? [])
+          .map((e) => NearbyTag.fromJson(e))
+          .toList(),
+
+      otherFeatures: json["otherFeatures"] ?? "",
+      status: json["status"] ?? "",
+
+      createdAt: DateTime.parse(json["createdAt"]),
+      updatedAt: DateTime.parse(json["updatedAt"]),
+
+      createdBy: CreatedBy.fromJson(json["createdBy"] ?? {}),
+
+      photos: (json["photos"] as List? ?? [])
+          .map((e) => Photo.fromJson(e))
+          .toList(),
+
+      isWishlisted: json["isWishlisted"] ?? false,
+      isFeatured: json["isFeatured"] ?? false,
+    );
+  }
+  List<Photo> get sortedPhotos {
+  final list = List<Photo>.from(photos);
+  list.sort((a, b) => a.sortOrder.compareTo(b.sortOrder));
+  return list;
+}
+}
+
+class ListingType {
+  final String id;
+  final String title;
+
+  ListingType({
+    required this.id,
+    required this.title,
+  });
+
+  factory ListingType.fromJson(Map<String, dynamic> json) {
+    return ListingType(
+      id: json["id"] ?? "",
+      title: json["title"] ?? "",
     );
   }
 }
+class Furnishing {
+  final String id;
+  final String title;
 
+  Furnishing({
+    required this.id,
+    required this.title,
+  });
+
+  factory Furnishing.fromJson(Map<String, dynamic> json) {
+    return Furnishing(
+      id: json["id"] ?? "",
+      title: json["title"] ?? "",
+    );
+  }
+}class Municipality {
+  final String id;
+  final String name;
+  final String image;
+  final double latitude;
+  final double longitude;
+
+  Municipality({
+    required this.id,
+    required this.name,
+    required this.image,
+    required this.latitude,
+    required this.longitude,
+  });
+
+  factory Municipality.fromJson(Map<String, dynamic> json) {
+    return Municipality(
+      id: json["id"] ?? "",
+      name: json["name"] ?? "",
+      image: json["image"] ?? "",
+      latitude: (json["latitude"] ?? 0).toDouble(),
+      longitude: (json["longitude"] ?? 0).toDouble(),
+    );
+  }
+}class Amenity {
+  final String id;
+  final String title;
+  final String? image;
+
+  Amenity({
+    required this.id,
+    required this.title,
+    this.image,
+  });
+
+  factory Amenity.fromJson(Map<String, dynamic> json) {
+    return Amenity(
+      id: json["id"] ?? "",
+      title: json["title"] ?? "",
+      image: json["image"],
+    );
+  }
+}
+class NearbyTag {
+  final String id;
+  final String title;
+  final String? image;
+
+  NearbyTag({
+    required this.id,
+    required this.title,
+    this.image,
+  });
+
+  factory NearbyTag.fromJson(Map<String, dynamic> json) {
+    return NearbyTag(
+      id: json["id"] ?? "",
+      title: json["title"] ?? "",
+      image: json["image"],
+    );
+  }
+}
 class CreatedBy {
   final String id;
   final String name;
@@ -193,7 +311,10 @@ class Photo {
       sortOrder: json["sortOrder"] ?? 0,
     );
   }
+
+  
 }
+
 
 class Meta {
   final int total;

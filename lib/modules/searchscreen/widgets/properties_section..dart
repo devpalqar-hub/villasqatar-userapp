@@ -144,6 +144,7 @@ class PropertyCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+      final photos = property.sortedPhotos;
     return InkWell(
       borderRadius: BorderRadius.circular(10.r),
       onTap: () async {
@@ -182,27 +183,29 @@ class PropertyCard extends StatelessWidget {
                   borderRadius: BorderRadius.vertical(
                     top: Radius.circular(8.r),
                   ),
-                  child: property.photos.isNotEmpty
-                      ? Image.network(
-                          property.photos.first.url,
-                          width: double.infinity,
-                          height: 150.h,
-                          fit: BoxFit.cover,
-                          errorBuilder: (_, __, ___) {
-                            return Image.asset(
-                              "assets/villa.jpg",
-                              width: double.infinity,
-                              height: 150.h,
-                              fit: BoxFit.cover,
-                            );
-                          },
-                        )
-                      : Image.asset(
-                          "assets/villa.jpg",
-                          width: double.infinity,
-                          height: 150.h,
-                          fit: BoxFit.cover,
-                        ),
+              
+                        
+child: photos.isNotEmpty
+    ? Image.network(
+        photos.first.url,
+        width: double.infinity,
+        height: 150.h,
+        fit: BoxFit.cover,
+        errorBuilder: (_, __, ___) {
+          return Image.asset(
+            "assets/villa.jpg",
+            width: double.infinity,
+            height: 150.h,
+            fit: BoxFit.cover,
+          );
+        },
+      )
+    : Image.asset(
+        "assets/villa.jpg",
+        width: double.infinity,
+        height: 150.h,
+        fit: BoxFit.cover,
+      ),
                 ),
 
                 // Positioned(
@@ -319,7 +322,7 @@ class PropertyCard extends StatelessWidget {
                         ),
                         SizedBox(width: 4.w),
                         Text(
-                          property.photos.length.toString(),
+                      property.sortedPhotos.length.toString(),
                           style: TextStyle(
                             color: Colors.white,
                             fontSize: 11.sp,

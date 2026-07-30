@@ -85,7 +85,7 @@ class _WishlistScreenState extends State<WishlistScreen> {
 
             return property.propertyName.toLowerCase().contains(query) ||
                 property.areaName.toLowerCase().contains(query) ||
-                property.municipality.toLowerCase().contains(query);
+                property.municipality.name.toLowerCase().contains(query.toLowerCase());
           }).toList();
 
           return RefreshIndicator(

@@ -9,6 +9,7 @@ import 'package:villas_qatar/Core/network/api_endpoints.dart';
 import 'package:villas_qatar/Core/network/api_handler.dart';
 import 'package:villas_qatar/Core/services/storage_service.dart';
 import 'package:villas_qatar/modules/propertylist/model/listing_options_model.dart';
+import 'package:villas_qatar/modules/propertylist/model/myproperty_model.dart';
 import 'package:villas_qatar/modules/propertylist/model/upload_property_model.dart';
 
 class ListPropertyController extends GetxController {
@@ -18,14 +19,19 @@ class ListPropertyController extends GetxController {
 
   int currentStep = 0;
 
-  final List<String> steps = [
-    "Basic Info",
-    "Details",
-    "Features",
-    "Location",
-    "Media",
-  ];
+final List<String> steps = [
+  "Basic Info",
+  "Details",
+  "Features",
+  "Location",
+  "Media",
+  "Review",
+];
 
+ListPropertyController() {
+  debugPrint("CONTROLLER CREATED");
+  debugPrint("Steps = ${steps.length}");
+}
   //--------------------------------------------------
   // LOADING
   //--------------------------------------------------
@@ -52,6 +58,9 @@ class ListPropertyController extends GetxController {
   String countryCode = "+974";
 
   bool whatsappVerified = true;
+  String selectedTypeId = "";
+  String selectedMunicipalityId = "";
+  bool priceNegotiable = false;
 
   //--------------------------------------------------
   // PROPERTY
@@ -110,11 +119,11 @@ class ListPropertyController extends GetxController {
   //--------------------------------------------------
   // OPTIONS FROM API
   //--------------------------------------------------
-List<ListingOptionItem> amenities = [];
+  List<ListingOptionItem> amenities = [];
 
-List<ListingOptionItem> nearbyTags = [];
+  List<ListingOptionItem> nearbyTags = [];
 
-List<FurnishingOption> furnishingOptions = [];
+  List<FurnishingOption> furnishingOptions = [];
 
   final Set<String> selectedAmenities = {};
 
@@ -127,6 +136,7 @@ List<FurnishingOption> furnishingOptions = [];
   //--------------------------------------------------
 
   final List<String> images = [];
+  final List<Photo> existingPhotos = [];
 
   String video = "";
 
@@ -136,13 +146,25 @@ List<FurnishingOption> furnishingOptions = [];
   //--------------------------------------------------
   // STEP NAVIGATION
   //--------------------------------------------------
+  String coverImage = "";
+
+  void removeCoverImage() {
+    coverImage = "";
+    update();
+  }
 
   void nextStep() {
-    if (currentStep < steps.length - 1) {
-      currentStep++;
-      update();
-    }
+  debugPrint("Current Step Before: $currentStep");
+  debugPrint("Steps Length: ${steps.length}");
+
+  if (currentStep < steps.length - 1) {
+    currentStep++;
+    debugPrint("Current Step After: $currentStep");
+    update();
+  } else {
+    debugPrint("Already last step");
   }
+}
 
   void previousStep() {
     if (currentStep > 0) {
@@ -188,8 +210,6 @@ List<FurnishingOption> furnishingOptions = [];
     whatsappVerified = value;
     update();
   }
-  
-   
 
   //--------------------------------------------------
   // LOCATION
@@ -236,36 +256,37 @@ List<FurnishingOption> furnishingOptions = [];
     );
   }
 
+  void toggleAmenity(String id) {
+    if (selectedAmenities.contains(id)) {
+      selectedAmenities.remove(id);
+    } else {
+      selectedAmenities.add(id);
+    }
 
-void toggleAmenity(String id) {
-  if (selectedAmenities.contains(id)) {
-    selectedAmenities.remove(id);
-  } else {
-    selectedAmenities.add(id);
+    update();
   }
 
-  update();
-}
-void toggleNearbyTag(String id) {
-  if (selectedNearbyTags.contains(id)) {
-    selectedNearbyTags.remove(id);
-  } else {
-    selectedNearbyTags.add(id);
+  void toggleNearbyTag(String id) {
+    if (selectedNearbyTags.contains(id)) {
+      selectedNearbyTags.remove(id);
+    } else {
+      selectedNearbyTags.add(id);
+    }
+
+    update();
   }
 
-  update();
-}
-void toggleFurnishing(String id) {
-  if (selectedFurnishing.contains(id)) {
-    selectedFurnishing.clear();
-  } else {
-    selectedFurnishing
-      ..clear()
-      ..add(id);
-  }
+  void toggleFurnishing(String id) {
+    if (selectedFurnishing.contains(id)) {
+      selectedFurnishing.clear();
+    } else {
+      selectedFurnishing
+        ..clear()
+        ..add(id);
+    }
 
-  update();
-}
+    update();
+  }
   //--------------------------------------------------
   // SUBMIT
   //--------------------------------------------------
@@ -305,7 +326,8 @@ void toggleFurnishing(String id) {
     selectedFurnishing.clear();
 
     images.clear();
-
+    coverImage = "";
+    existingPhotos.clear();
     video = "";
 
     currentStep = 0;
@@ -358,52 +380,39 @@ void toggleFurnishing(String id) {
   // API
   //--------------------------------------------------
   Future<void> fetchListingOptions() async {
-  try {
-    isLoading = true;
-    error = "";
-    update();
+    try {
+      isLoading = true;
+      error = "";
+      update();
 
-    final response = await ApiHandler.get(
-      ApiEndpoints.listingOptions,
-    );
+      final response = await ApiHandler.get(ApiEndpoints.listingOptions);
 
-    final model = ListingOptionsModel.fromJson(
-      Map<String, dynamic>.from(response),
-    );
+      final model = ListingOptionsModel.fromJson(
+        Map<String, dynamic>.from(response),
+      );
 
-    amenities = model.amenities;
-    nearbyTags = model.nearbyTags;
-    furnishingOptions = model.furnishingOptions;
+      amenities = model.amenities;
+      nearbyTags = model.nearbyTags;
+      furnishingOptions = model.furnishingOptions;
 
-    debugPrint(
-      "Amenities: ${amenities.map((e) => e.title).toList()}",
-    );
+      debugPrint("Amenities: ${amenities.map((e) => e.title).toList()}");
 
-    debugPrint(
-      "Nearby Tags: ${nearbyTags.map((e) => e.title).toList()}",
-    );
+      debugPrint("Nearby Tags: ${nearbyTags.map((e) => e.title).toList()}");
 
-    debugPrint(
-      "Furnishing: ${furnishingOptions.map((e) => e.title).toList()}",
-    );
-  } catch (e, stackTrace) {
-    error = e.toString().replaceFirst(
-      "Exception: ",
-      "",
-    );
+      debugPrint(
+        "Furnishing: ${furnishingOptions.map((e) => e.title).toList()}",
+      );
+    } catch (e, stackTrace) {
+      error = e.toString().replaceFirst("Exception: ", "");
 
-    debugPrint(
-      "FETCH LISTING OPTIONS ERROR: $e",
-    );
+      debugPrint("FETCH LISTING OPTIONS ERROR: $e");
 
-    debugPrintStack(
-      stackTrace: stackTrace,
-    );
-  } finally {
-    isLoading = false;
-    update();
+      debugPrintStack(stackTrace: stackTrace);
+    } finally {
+      isLoading = false;
+      update();
+    }
   }
-}
 
   Future<bool> addProperty() async {
     if (isSubmitting) {
@@ -415,79 +424,55 @@ void toggleFurnishing(String id) {
       error = "";
       update();
 
-      // ==========================================================
-      // UPLOAD IMAGES
-      // ==========================================================
-
       final uploadedImageUrls = await uploadAllPropertyImages();
 
-      debugPrint("========== UPLOADED IMAGES ==========");
+      final expectedImageCount =
+          images.length + (coverImage.isNotEmpty ? 1 : 0);
 
-      debugPrint(uploadedImageUrls.toString());
-
-      if (images.isNotEmpty && uploadedImageUrls.length != images.length) {
+      if (uploadedImageUrls.length != expectedImageCount) {
         throw Exception("Some images could not be uploaded.");
       }
-
-      // ==========================================================
-      // REQUEST BODY
-      // ==========================================================
-
       final body = {
         "propertyName": propertyNameController.text.trim(),
-
         "description": descriptionController.text.trim(),
-
         "purpose": propertyPurpose,
-
-        "type": propertyType.toUpperCase(),
-
+        "typeId": selectedTypeId.toString(),
         "latitude": latitude,
-
         "longitude": longitude,
-
         "bedrooms": int.tryParse(bedroomsController.text.trim()) ?? 0,
-
         "bathrooms": int.tryParse(bathroomsController.text.trim()) ?? 0,
-
-        "area": double.tryParse(areaController.text.trim()) ?? 0,
+        "area": double.tryParse(areaController.text.trim()) ?? 0.0,
 
         "livingRooms": int.tryParse(livingRoomsController.text.trim()) ?? 0,
-
         "parkingSpaces": int.tryParse(parkingSpacesController.text.trim()) ?? 0,
-
         "floorNumber": int.tryParse(floorNumberController.text.trim()) ?? 0,
-
         "totalFloors": int.tryParse(totalFloorsController.text.trim()) ?? 0,
-
-        "yearBuilt": null,
-
-        "furnishingStatus": selectedFurnishing.isEmpty
+        "yearBuilt": yearBuiltController.text.trim().isEmpty
             ? null
-            : selectedFurnishing.first,
+            : int.tryParse(yearBuiltController.text.trim()),
+
+        // String ID
+        "furnishingId": selectedFurnishing.isEmpty
+            ? null
+            : selectedFurnishing.first.toString(),
 
         "extraProperties": {},
 
-        "price": double.tryParse(priceController.text.trim()) ?? 0,
-
-        "priceNegotiable": false,
+        "price": num.tryParse(priceController.text.trim()) ?? 0,
+        "priceNegotiable": priceNegotiable,
 
         "addressLine1": addressController.text.trim(),
-
         "addressLine2": streetController.text.trim(),
-
         "areaName": areaNameController.text.trim(),
 
-        "municipality": cityController.text.trim(),
+        // String ID
+        "municipalityId": selectedMunicipalityId.toString(),
 
         "contactPhone": "$countryCode${phoneController.text.trim()}",
-
         "contactWhatsapp": "$countryCode${phoneController.text.trim()}",
-
         "contactVerified": whatsappVerified,
 
         "amenities": selectedAmenities.toList(),
-
         "nearbyTags": selectedNearbyTags.toList(),
 
         "otherFeatures": otherFeatureController.text.trim(),
@@ -495,10 +480,18 @@ void toggleFurnishing(String id) {
         "photos": uploadedImageUrls,
       };
 
-      debugPrint("========== ADD PROPERTY ==========");
+      // ==========================================================
+      // LOG REQUEST
+      // ==========================================================
+
+      debugPrint("==============================================");
+      debugPrint("POST URL : ${ApiHandler.baseUrl}${ApiEndpoints.propertyAdd}");
+      debugPrint("REQUEST BODY");
+      debugPrint(const JsonEncoder.withIndent('  ').convert(body));
+      debugPrint("==============================================");
 
       // ==========================================================
-      // CREATE PROPERTY
+      // API CALL
       // ==========================================================
 
       final response = await ApiHandler.post(
@@ -506,16 +499,19 @@ void toggleFurnishing(String id) {
         body: body,
       );
 
-      debugPrint("ADD PROPERTY RESPONSE: $response");
+      // ==========================================================
+      // LOG RESPONSE
+      // ==========================================================
 
-      // ==========================================================
-      // IMPORTANT:
-      // DO NOT CALL clearForm() HERE
-      //
-      // clearForm() changes currentStep back to 0 while this
-      // screen is still visible, causing Step 1 with empty/null
-      // values to briefly appear.
-      // ==========================================================
+      debugPrint("============== RESPONSE ==============");
+
+      if (response is Map || response is List) {
+        debugPrint(const JsonEncoder.withIndent('  ').convert(response));
+      } else {
+        debugPrint(response.toString());
+      }
+
+      debugPrint("======================================");
 
       Fluttertoast.showToast(
         msg: "Property listed successfully.",
@@ -525,9 +521,10 @@ void toggleFurnishing(String id) {
 
       return true;
     } catch (e, stackTrace) {
-      debugPrint("ADD PROPERTY ERROR: $e");
-
+      debugPrint("============== ERROR ==============");
+      debugPrint(e.toString());
       debugPrint(stackTrace.toString());
+      debugPrint("===================================");
 
       error = e.toString().replaceFirst("Exception: ", "");
 
@@ -596,23 +593,147 @@ void toggleFurnishing(String id) {
   Future<List<Map<String, dynamic>>> uploadAllPropertyImages() async {
     final List<Map<String, dynamic>> photos = [];
 
-    for (int i = 0; i < images.length; i++) {
-      final imageFile = File(images[i]);
+    /// -------------------------------
+    /// Upload Cover Image (sortOrder = 0)
+    /// -------------------------------
+    if (coverImage.isNotEmpty) {
+      final coverUrl = await uploadPropertyImage(File(coverImage));
 
-      final imageUrl = await uploadPropertyImage(imageFile);
+      if (coverUrl == null || coverUrl.isEmpty) {
+        throw Exception("Failed to upload cover image");
+      }
+
+      photos.add({"url": coverUrl, "sortOrder": 0, "caption": ""});
+
+      debugPrint("COVER IMAGE UPLOADED: $coverUrl");
+    }
+
+    /// -------------------------------
+    /// Upload Gallery Images
+    /// -------------------------------
+    for (int i = 0; i < images.length; i++) {
+      final imageUrl = await uploadPropertyImage(File(images[i]));
 
       if (imageUrl == null || imageUrl.isEmpty) {
         throw Exception("Failed to upload image ${i + 1}");
       }
 
-      photos.add({"url": imageUrl, "sortOrder": i, "caption": ""});
+      photos.add({"url": imageUrl, "sortOrder": i + 1, "caption": ""});
 
       debugPrint("IMAGE ${i + 1}/${images.length} UPLOADED: $imageUrl");
     }
 
     return photos;
   }
+Future<bool> updateProperty(String listingId) async {
+  if (isSubmitting) return false;
 
+  try {
+    isSubmitting = true;
+    error = "";
+    update();
+
+   List<Map<String, dynamic>> photoList = existingPhotos
+    .map<Map<String, dynamic>>(
+      (e) => <String, dynamic>{
+        "url": e.url,
+        "sortOrder": e.sortOrder,
+        "caption": e.caption,
+      },
+    )
+    .toList();
+
+    // Upload newly selected images and append them
+    if (images.isNotEmpty || coverImage.isNotEmpty) {
+      final newPhotos = await uploadAllPropertyImages();
+
+      int sortOrder = photoList.length;
+    
+    for (final photo in newPhotos) {
+  photoList.add(
+    <String, dynamic>{
+      "url": photo["url"],
+      "sortOrder": sortOrder++,
+      "caption": photo["caption"] ?? "",
+    },
+  );
+}
+    }
+
+    final body = {
+      "propertyName": propertyNameController.text.trim(),
+      "description": descriptionController.text.trim(),
+      "purpose": propertyPurpose,
+      "typeId": selectedTypeId,
+
+      "latitude": latitude,
+      "longitude": longitude,
+
+      "bedrooms": int.tryParse(bedroomsController.text.trim()) ?? 0,
+      "bathrooms": int.tryParse(bathroomsController.text.trim()) ?? 0,
+      "area": double.tryParse(areaController.text.trim()) ?? 0,
+
+      "livingRooms":
+          int.tryParse(livingRoomsController.text.trim()) ?? 0,
+      "parkingSpaces":
+          int.tryParse(parkingSpacesController.text.trim()) ?? 0,
+      "floorNumber":
+          int.tryParse(floorNumberController.text.trim()) ?? 0,
+      "totalFloors":
+          int.tryParse(totalFloorsController.text.trim()) ?? 0,
+
+      "yearBuilt": yearBuiltController.text.trim().isEmpty
+          ? null
+          : int.tryParse(yearBuiltController.text.trim()),
+
+      "furnishingId":
+          selectedFurnishing.isEmpty ? null : selectedFurnishing.first,
+
+      "extraProperties": {},
+
+      "price": num.tryParse(priceController.text.trim()) ?? 0,
+      "priceNegotiable": priceNegotiable,
+
+      "addressLine1": addressController.text.trim(),
+      "addressLine2": streetController.text.trim(),
+      "areaName": areaNameController.text.trim(),
+      "municipalityId": selectedMunicipalityId,
+
+      "contactPhone": "$countryCode${phoneController.text.trim()}",
+      "contactWhatsapp": "$countryCode${phoneController.text.trim()}",
+
+      "amenities": selectedAmenities.toList(),
+      "nearbyTags": selectedNearbyTags.toList(),
+
+      "otherFeatures": otherFeatureController.text.trim(),
+
+      // Existing + newly uploaded photos
+      "photos": photoList,
+    };
+
+    debugPrint(const JsonEncoder.withIndent("  ").convert(body));
+
+    await ApiHandler.patch(
+      "/api/listings/$listingId",
+      body: body,
+    );
+
+    Fluttertoast.showToast(
+      msg: "Property updated successfully.",
+    );
+
+    return true;
+  } catch (e) {
+    error = e.toString();
+
+    Fluttertoast.showToast(msg: error);
+
+    return false;
+  } finally {
+    isSubmitting = false;
+    update();
+  }
+}
   Future<void> verifyOtp() async {
     // Verify OTP API
 
@@ -621,4 +742,72 @@ void toggleFurnishing(String id) {
 
     update();
   }
+
+
+  void loadProperty(Property property) {
+  // Step 1
+  fullNameController.text = property.createdBy.name;
+  phoneController.text = property.contactPhone;
+  emailController.text = property.createdBy.email;
+  descriptionController.text = property.description;
+
+  // Step 2
+  propertyNameController.text = property.propertyName;
+
+  propertyType = property.type.title;
+  selectedTypeId = property.type.id;
+
+  propertyPurpose = property.purpose;
+
+  bedroomsController.text = property.bedrooms.toString();
+  bathroomsController.text = property.bathrooms.toString();
+  livingRoomsController.text = property.livingRooms.toString();
+  parkingSpacesController.text = property.parkingSpaces.toString();
+
+  areaController.text = property.area.toString();
+  priceController.text = property.price.toString();
+
+  yearBuiltController.text =
+      property.yearBuilt?.toString() ?? "";
+
+  floorNumberController.text =
+      property.floorNumber.toString();
+
+  totalFloorsController.text =
+      property.totalFloors.toString();
+
+  // Step 3
+  selectedFurnishing.clear();
+  selectedFurnishing.add(property.furnishing.id);
+
+  selectedAmenities
+    ..clear()
+    ..addAll(property.amenities.map((e) => e.id));
+
+  selectedNearbyTags
+    ..clear()
+    ..addAll(property.nearbyTags.map((e) => e.id));
+
+  otherFeatureController.text = property.otherFeatures;
+
+  // Step 4
+  addressController.text = property.addressLine1;
+  streetController.text = property.addressLine2;
+  areaNameController.text = property.areaName;
+
+  cityController.text = property.municipality.name;
+  selectedMunicipalityId = property.municipality.id;
+
+  latitudeController.text = property.latitude.toString();
+  longitudeController.text = property.longitude.toString();
+
+  latitude = property.latitude;
+  longitude = property.longitude;
+
+  priceNegotiable = property.priceNegotiable;
+  existingPhotos
+  ..clear()
+  ..addAll(property.sortedPhotos);
+  update();
+}
 }

@@ -6,9 +6,9 @@ import 'package:villas_qatar/Core/constants/app_colors.dart';
 import 'package:villas_qatar/modules/chats/models/chat_lsit_model.dart';
 import 'package:villas_qatar/modules/chats/service/chat_list_controller.dart';
 import 'package:villas_qatar/modules/chats/views/chat_startscreen.dart';
+import 'package:villas_qatar/modules/sellerpropertyscreen/views/seller_property_screen.dart';
 import 'package:villas_qatar/modules/visits/view/visit_list_screen.dart';
 import '../service/chat_controller.dart';
-
 
 class ChatListScreen extends StatelessWidget {
   ChatListScreen({super.key});
@@ -38,7 +38,7 @@ class ChatListScreen extends StatelessWidget {
                 ),
                 child: TextField(
                   onChanged: controller.searchConversation,
-                  decoration:  InputDecoration(
+                  decoration: InputDecoration(
                     hintText: "Search by property or seller".tr,
                     prefixIcon: Icon(Icons.search, color: AppColors.hintGrey),
                     border: InputBorder.none,
@@ -57,7 +57,7 @@ class ChatListScreen extends StatelessWidget {
                     }
 
                     if (controller.filteredConversations.isEmpty) {
-                      return  Center(child: Text("No Conversations".tr));
+                      return Center(child: Text("No Conversations".tr));
                     }
 
                     return RefreshIndicator(
@@ -138,21 +138,22 @@ class ChatListScreen extends StatelessWidget {
               ),
             ),
           ),
-           IconButton(
-          tooltip: "My Visits".tr,
-          icon: const Icon(
-            Icons.calendar_month_outlined,
-            color: AppColors.primary,
+          IconButton(
+            tooltip: "My Visits".tr,
+            icon: const Icon(
+              Icons.calendar_month_outlined,
+              color: AppColors.primary,
+            ),
+            onPressed: () {
+              Get.to(() => const VisitListScreen());
+            },
           ),
-          onPressed: () {
-            Get.to(() => const VisitListScreen());
-          },
-        ),
         ],
       ),
     );
   }
 }
+
 class _ConversationTile extends StatelessWidget {
   final ChatListModel conversation;
   final Participant participant;
@@ -171,25 +172,20 @@ class _ConversationTile extends StatelessWidget {
 
     final String propertyName =
         conversation.listing.propertyName.trim().isNotEmpty
-            ? conversation.listing.propertyName.trim()
-            : "Property".tr;
+        ? conversation.listing.propertyName.trim()
+        : "Property".tr;
 
     final String sellerName =
         conversation.otherParticipant?.user.name?.trim().isNotEmpty == true
-            ? conversation.otherParticipant!.user.name!.trim()
-            : "Seller".tr;
+        ? conversation.otherParticipant!.user.name!.trim()
+        : "Seller".tr;
 
-    final String propertyType =
-        conversation.listing.type.trim();
+    final String propertyType = conversation.listing.type?.title.trim() ?? "";
 
-    final String purpose =
-        conversation.listing.purpose.trim();
+    final String purpose = conversation.listing.purpose.trim();
 
     return Padding(
-      padding: EdgeInsets.symmetric(
-        horizontal: 4.w,
-        vertical: 5.h,
-      ),
+      padding: EdgeInsets.symmetric(horizontal: 4.w, vertical: 5.h),
       child: Material(
         color: Colors.white,
         borderRadius: BorderRadius.circular(14.r),
@@ -200,9 +196,7 @@ class _ConversationTile extends StatelessWidget {
             padding: EdgeInsets.all(11.w),
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(14.r),
-              border: Border.all(
-                color: const Color(0xffECECEC),
-              ),
+              border: Border.all(color: const Color(0xffECECEC)),
               boxShadow: [
                 BoxShadow(
                   color: Colors.black.withOpacity(.025),
@@ -217,7 +211,6 @@ class _ConversationTile extends StatelessWidget {
                 // ============================================
                 // PROPERTY IMAGE
                 // ============================================
-
                 ClipRRect(
                   borderRadius: BorderRadius.circular(11.r),
                   child: SizedBox(
@@ -228,9 +221,7 @@ class _ConversationTile extends StatelessWidget {
                             conversation.listing.image,
                             fit: BoxFit.cover,
                             errorBuilder: (_, error, stackTrace) {
-                              debugPrint(
-                                "Image Error: $error".tr,
-                              );
+                              debugPrint("Image Error: $error".tr);
 
                               return _placeholder();
                             },
@@ -244,7 +235,6 @@ class _ConversationTile extends StatelessWidget {
                 // ============================================
                 // DETAILS
                 // ============================================
-
                 Expanded(
                   child: SizedBox(
                     height: 76.h,
@@ -255,7 +245,6 @@ class _ConversationTile extends StatelessWidget {
                         // PROPERTY NAME + TIME
                         // PROPERTY NAME IS PRIMARY
                         // ====================================
-
                         Row(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
@@ -278,9 +267,7 @@ class _ConversationTile extends StatelessWidget {
                             Padding(
                               padding: EdgeInsets.only(top: 1.h),
                               child: Text(
-                                _formatTime(
-                                  conversation.updatedAt,
-                                ),
+                                _formatTime(conversation.updatedAt),
                                 style: TextStyle(
                                   fontSize: 9.sp,
                                   fontWeight: FontWeight.w500,
@@ -295,12 +282,9 @@ class _ConversationTile extends StatelessWidget {
                         Row(
                           children: [
                             if (propertyType.isNotEmpty)
-                              _smallTag(
-                                propertyType,
-                              ),
+                              _smallTag(propertyType),
 
-                            if (propertyType.isNotEmpty &&
-                                purpose.isNotEmpty)
+                            if (propertyType.isNotEmpty && purpose.isNotEmpty)
                               SizedBox(width: 5.w),
                           ],
                         ),
@@ -360,14 +344,29 @@ class _ConversationTile extends StatelessWidget {
                             ),
 
                             Expanded(
-                              child: Text(
-                                sellerName,
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
-                                style: TextStyle(
-                                  fontSize: 9.5.sp,
-                                  fontWeight: FontWeight.w600,
-                                  color: AppColors.primary,
+                              child: GestureDetector(
+                                behavior: HitTestBehavior.opaque,
+                                onTap: () {
+                                  Get.to(
+                                    () => SellerPropertiesScreen(
+                                      sellerId: conversation
+                                          .otherParticipant!
+                                          .user
+                                          .id,
+                                      sellerName: sellerName,
+                                    ),
+                                  );
+                                },
+                                child: Text(
+                                  sellerName,
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: TextStyle(
+                                    fontSize: 9.5.sp,
+                                    fontWeight: FontWeight.w700,
+                                    color: AppColors.primary,
+                                    decoration: TextDecoration.underline,
+                                  ),
                                 ),
                               ),
                             ),
@@ -393,10 +392,7 @@ class _ConversationTile extends StatelessWidget {
 
   Widget _smallTag(String text) {
     return Container(
-      padding: EdgeInsets.symmetric(
-        horizontal: 7.w,
-        vertical: 2.5.h,
-      ),
+      padding: EdgeInsets.symmetric(horizontal: 7.w, vertical: 2.5.h),
       decoration: BoxDecoration(
         color: AppColors.primary.withOpacity(.06),
         borderRadius: BorderRadius.circular(5.r),
@@ -413,7 +409,6 @@ class _ConversationTile extends StatelessWidget {
       ),
     );
   }
-
 
   Widget _placeholder() {
     return Container(
@@ -437,51 +432,40 @@ class _ConversationTile extends StatelessWidget {
         .toLowerCase()
         .split(" ")
         .where((word) => word.isNotEmpty)
-        .map(
-          (word) =>
-              "${word[0].toUpperCase()}${word.substring(1)}",
-        )
+        .map((word) => "${word[0].toUpperCase()}${word.substring(1)}")
         .join(" ");
   }
 
-String _formatTime(DateTime date) {
-  final DateTime now = DateTime.now();
+  String _formatTime(DateTime date) {
+    final DateTime now = DateTime.now();
 
-  final DateTime today = DateTime(
-    now.year,
-    now.month,
-    now.day,
-  );
+    final DateTime today = DateTime(now.year, now.month, now.day);
 
-  final DateTime messageDate = DateTime(
-    date.year,
-    date.month,
-    date.day,
-  );
+    final DateTime messageDate = DateTime(date.year, date.month, date.day);
 
-  final int difference =
-      today.difference(messageDate).inDays;
+    final int difference = today.difference(messageDate).inDays;
 
-  // Today
-  if (difference == 0) {
-    return DateFormat('hh:mm a').format(date);
+    // Today
+    if (difference == 0) {
+      return DateFormat('hh:mm a').format(date);
+    }
+
+    // Yesterday
+    if (difference == 1) {
+      return 'Yesterday';
+    }
+
+    // Within last 7 days
+    if (difference > 1 && difference < 7) {
+      return DateFormat('EEE').format(date);
+    }
+
+    // Same year -> 21 Jul
+    if (date.year == now.year) {
+      return DateFormat('dd MMM').format(date);
+    }
+
+    // Older year -> 21 Jul 2025
+    return DateFormat('dd MMM yyyy').format(date);
   }
-
-  // Yesterday
-  if (difference == 1) {
-    return 'Yesterday';
-  }
-
-  // Within last 7 days
-  if (difference > 1 && difference < 7) {
-    return DateFormat('EEE').format(date);
-  }
-
-  // Same year -> 21 Jul
-  if (date.year == now.year) {
-    return DateFormat('dd MMM').format(date);
-  }
-
-  // Older year -> 21 Jul 2025
-  return DateFormat('dd MMM yyyy').format(date);
-}}
+}

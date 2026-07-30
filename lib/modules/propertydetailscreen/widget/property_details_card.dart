@@ -42,16 +42,16 @@ class PropertyDetailsCard extends StatelessWidget {
         "title": "Parking".tr,
         "value": property.parkingSpaces.toString(),
       },
-      {
-        "icon": Icons.chair_outlined,
-        "title": "Furnishing".tr,
-        "value": property.furnishingStatus,
-      },
-      {
-        "icon": Icons.home_work_outlined,
-        "title": "Property Type".tr,
-        "value": property.type,
-      },
+     {
+  "icon": Icons.chair_outlined,
+  "title": "Furnishing".tr,
+  "value": property.furnishing.title,
+},
+    {
+  "icon": Icons.home_work_outlined,
+  "title": "Property Type".tr,
+  "value": property.type.title,
+},
       {
         "icon": Icons.sell_outlined,
         "title": "Purpose".tr,

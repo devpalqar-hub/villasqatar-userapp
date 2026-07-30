@@ -213,15 +213,19 @@ class WishlistPropertyCard extends StatelessWidget {
     );
   }
 
-  String _locationText() {
-    final parts = [
-      property.areaName,
-      property.municipality,
-    ].where((value) => value.trim().isNotEmpty).toList();
+String _locationText() {
+  final parts = <String>[];
 
-    return parts.isEmpty ? "Qatar" : parts.join(", ");
+  if (property.areaName.trim().isNotEmpty) {
+    parts.add(property.areaName);
   }
 
+  if (property.municipality.name.trim().isNotEmpty) {
+    parts.add(property.municipality.name);
+  }
+
+  return parts.isEmpty ? "Qatar" : parts.join(", ");
+}
   String _formatPrice(num value) {
     final text = value.toStringAsFixed(0);
 

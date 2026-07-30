@@ -61,15 +61,14 @@ class Conversation {
     };
   }
 }
-
 class ListingModel {
   final String id;
   final String propertyName;
-  final String type;
+  final ListingType type;
   final String purpose;
   final num price;
   final String areaName;
-  final String municipality;
+  final Municipality municipality;
   final int bedrooms;
   final int bathrooms;
   final num area;
@@ -101,11 +100,11 @@ class ListingModel {
     return ListingModel(
       id: json["id"] ?? "",
       propertyName: json["propertyName"] ?? "",
-      type: json["type"] ?? "",
+      type: ListingType.fromJson(json["type"] ?? {}),
       purpose: json["purpose"] ?? "",
       price: json["price"] ?? 0,
       areaName: json["areaName"] ?? "",
-      municipality: json["municipality"] ?? "",
+      municipality: Municipality.fromJson(json["municipality"] ?? {}),
       bedrooms: json["bedrooms"] ?? 0,
       bathrooms: json["bathrooms"] ?? 0,
       area: json["area"] ?? 0,
@@ -123,11 +122,11 @@ class ListingModel {
     return {
       "id": id,
       "propertyName": propertyName,
-      "type": type,
+      "type": type.toJson(),
       "purpose": purpose,
       "price": price,
       "areaName": areaName,
-      "municipality": municipality,
+      "municipality": municipality.toJson(),
       "bedrooms": bedrooms,
       "bathrooms": bathrooms,
       "area": area,
@@ -140,6 +139,49 @@ class ListingModel {
   }
 }
 
+class ListingType {
+  final String id;
+  final String title;
+
+  ListingType({
+    required this.id,
+    required this.title,
+  });
+
+  factory ListingType.fromJson(Map<String, dynamic> json) {
+    return ListingType(
+      id: json["id"] ?? "",
+      title: json["title"] ?? "",
+    );
+  }
+
+  Map<String, dynamic> toJson() => {
+        "id": id,
+        "title": title,
+      };
+}
+
+class Municipality {
+  final String id;
+  final String name;
+
+  Municipality({
+    required this.id,
+    required this.name,
+  });
+
+  factory Municipality.fromJson(Map<String, dynamic> json) {
+    return Municipality(
+      id: json["id"] ?? "",
+      name: json["name"] ?? "",
+    );
+  }
+
+  Map<String, dynamic> toJson() => {
+        "id": id,
+        "name": name,
+      };
+}
 class PhotoModel {
   final String url;
   final String caption;

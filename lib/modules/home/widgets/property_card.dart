@@ -577,7 +577,7 @@ class PropertyCard extends StatelessWidget {
           'http://',
         );
 
-    /// NETWORK IMAGE
+  
     if (validNetworkImage) {
       return Image.network(
         cleanImage,

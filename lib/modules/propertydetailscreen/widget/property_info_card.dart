@@ -19,14 +19,13 @@ class PropertyInfoCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final String propertyType = property.type
-        .replaceAll("_", " ")
-        .toLowerCase()
-        .split(" ")
-        .where((e) => e.isNotEmpty)
-        .map((e) => e[0].toUpperCase() + e.substring(1))
-        .join(" ");
-
+   final String propertyType = property.type.title
+    .replaceAll("_", " ")
+    .toLowerCase()
+    .split(" ")
+    .where((e) => e.isNotEmpty)
+    .map((e) => e[0].toUpperCase() + e.substring(1))
+    .join(" ");
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -93,7 +92,7 @@ class PropertyInfoCard extends StatelessWidget {
 
             Expanded(
               child: Text(
-                "${property.areaName}, ${property.municipality}, ${property.country}",
+               "${property.areaName}, ${property.municipality.name}, ${property.country}",
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
                 style: TextStyle(

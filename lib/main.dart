@@ -4,6 +4,7 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:villas_qatar/Core/services/storage_service.dart';
+import 'package:villas_qatar/modules/home/service/global_location_controller.dart';
 import 'package:villas_qatar/modules/onboard/views/splash_screen.dart';
 
 // ADD YOUR DEEP LINK SERVICE IMPORT
@@ -17,7 +18,7 @@ Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   await StorageService.init();
-
+   Get.put(GlobalLocationController(), permanent: true);
   runApp(
     DevicePreview(
       enabled: false,

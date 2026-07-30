@@ -50,7 +50,7 @@ class _HeroImageCardState extends State<HeroImageCard> {
 
   @override
 Widget build(BuildContext context) {
-  final images = widget.property.photos;
+  final images = widget.property.sortedPhotos;
 
   return SizedBox(
     width: double.infinity,

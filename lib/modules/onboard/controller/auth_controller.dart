@@ -198,34 +198,52 @@ class AuthController extends GetxController {
 
   //----------Comlete profile -------------
   /// ---------------- COMPLETE PROFILE ----------------
-  Future<bool> completeProfile() async {
-    try {
-      _setLoading(true);
+ Future<bool> completeProfile() async {
+  try {
+    _setLoading(true);
 
-      final response = await ApiHandler.post(
-        ApiEndpoints.completeProfile,
-        headers: {"Authorization": "Bearer $accessToken"},
-        body: {
-          "name": nameController.text.trim(),
-          "email": emailController.text.trim(),
-          "phone": phoneNumber,
-        },
-      );
+    final body = {
+      "name": nameController.text.trim(),
+      "email": emailController.text.trim(),
+      "phone": phoneNumber,
+    };
 
-      if (response["profile"] != null) {
-        profile = Map<String, dynamic>.from(response["profile"]);
-        await StorageService.saveProfile(profile!);
-      }
+    debugPrint("========== COMPLETE PROFILE ==========");
+    debugPrint("URL: ${ApiHandler.baseUrl}${ApiEndpoints.completeProfile}");
+    debugPrint("METHOD: POST");
+    debugPrint("HEADERS:");
+    debugPrint({
+      "Authorization": "Bearer $accessToken",
+    }.toString());
+    debugPrint("BODY:");
+    debugPrint(body.toString());
 
-      return true;
-    } catch (e) {
-      debugPrint("Complete Profile Error: $e");
-      return false;
-    } finally {
-      _setLoading(false);
+    final response = await ApiHandler.post(
+      ApiEndpoints.completeProfile,
+      headers: {
+        "Authorization": "Bearer $accessToken",
+      },
+      body: body,
+    );
+
+    debugPrint("========== RESPONSE ==========");
+    debugPrint(response.toString());
+
+    if (response["profile"] != null) {
+      profile = Map<String, dynamic>.from(response["profile"]);
+      await StorageService.saveProfile(profile!);
     }
-  }
 
+    return true;
+  } catch (e, stackTrace) {
+    debugPrint("========== COMPLETE PROFILE ERROR ==========");
+    debugPrint(e.toString());
+    debugPrint(stackTrace.toString());
+    return false;
+  } finally {
+    _setLoading(false);
+  }
+}
   Future<void> _saveUserSession(Map<String, dynamic> response) async {
     isNewUser = response["isNew"] ?? false;
     accessToken = response["access_token"];

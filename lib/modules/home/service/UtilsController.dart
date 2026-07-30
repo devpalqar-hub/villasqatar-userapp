@@ -1,8 +1,10 @@
 import 'dart:convert';
 
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:villas_qatar/Core/network/api_handler.dart';
 import 'package:villas_qatar/modules/home/model/ListingOptions.dart';
+import 'package:villas_qatar/modules/home/service/global_location_controller.dart';
 
 class Utilscontroller extends GetxController {
   /// Plain (non-Rx) state — call update() after mutating and wrap the
@@ -56,4 +58,5 @@ class Utilscontroller extends GetxController {
   /// Convenience: look up an OptionItem title by id (e.g. selected amenity ids).
   String? amenityTitleById(String id) =>
       amenities.firstWhereOrNull((a) => a.id == id)?.title;
+
 }

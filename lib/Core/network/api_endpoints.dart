@@ -65,4 +65,7 @@ class ApiEndpoints {
   static String featuredBanners({bool isFeatured = true}) {
     return "/api/banners?isFeatured=$isFeatured";
   }
+
+  static const String geocode = "/api/listings/geocode";
+  static const String reverseGeocode = "/api/listings/reverse-geocode";
 }

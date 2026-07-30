@@ -114,7 +114,7 @@ class _PropertyDetailsScreenState extends State<PropertyDetailsScreen> {
               ),
             ),
 
-            body:  Center(child: Text("Property not found".tr)),
+            body: Center(child: Text("Property not found".tr)),
           );
         }
 
@@ -155,294 +155,355 @@ class _PropertyDetailsScreenState extends State<PropertyDetailsScreen> {
                           _showReportListingSheet(property);
                         },
                       ),
-                      if (isMyProperty)
-                        Padding(
-                          padding: EdgeInsets.fromLTRB(16.w, 12.h, 16.w, 4.h),
-                          child: SizedBox(
-                            width: double.infinity,
-                            height: 48.h,
-                            child: ElevatedButton(
-                              onPressed: () {
-                                _onBoostProperty(property);
-                              },
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: AppColors.primary,
-                                foregroundColor: Colors.white,
-                                elevation: 0,
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(10.r),
-                                ),
-                              ),
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Icon(
-                                    Icons.rocket_launch_outlined,
-                                    size: 19.sp,
-                                  ),
-                                  SizedBox(width: 8.w),
-                                  Text(
-                                    "Boost Property".tr,
-                                    style: TextStyle(
-                                      fontSize: 14.sp,
-                                      fontWeight: FontWeight.w600,
-                                    ),
-                                  ),
-                                ],
-                              ),
+                     
+                      Transform.translate(
+                        offset: Offset(0, -12.h),
+                        child: Container(
+                          width: double.infinity,
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.only(
+                              topLeft: Radius.circular(12.r),
+                              topRight: Radius.circular(12.r),
                             ),
                           ),
-                        ),
-                      Padding(
-                        padding: EdgeInsets.symmetric(horizontal: 16.w),
+                          child: Padding(
+                            padding: EdgeInsets.fromLTRB(16.w, 10.h, 16.w, 0),
+                            child: Column(
+                              children: [
 
-                        child: Column(
-                          children: [
-                            // ================================
-                            // PROPERTY INFO
-                            // ================================
-                            PropertyInfoCard(property: property),
+                                 SizedBox(
+  height: 64.h,
+  child: ListView.separated(
+    scrollDirection: Axis.horizontal,
+    itemCount: property.photos.length,
+    separatorBuilder: (_, __) => SizedBox(width: 8.w),
+    itemBuilder: (context, index) {
+      final photo = property.photos[index];
 
-                            SizedBox(height: 10.h),
+      return ClipRRect(
+        borderRadius: BorderRadius.circular(10.r),
+        child: Container(
+          width: 64.w,
+          height: 64.w,
+          decoration: BoxDecoration(
+            border: Border.all(
+              color: Colors.grey.shade300,
+            ),
+            borderRadius: BorderRadius.circular(10.r),
+          ),
+          child: Image.network(
+            photo.url,
+            fit: BoxFit.cover,
+          ),
+        ),
+      );
+    },
+  ),
+),
+                                PropertyInfoCard(property: property),
 
-                            // ================================
-                            // OVERVIEW
-                            // ================================
-                            OverviewCard(property: property),
-
-                            SizedBox(height: 12.h),
-
-                            // ================================
-                            // LOCATION
-                            // ================================
-                            PropertyLocationCard(property: property),
-
-                            SizedBox(height: 12.h),
-
-                            // ================================
-                            // PROPERTY DETAILS
-                            // ================================
-                            PropertyDetailsCard(property: property),
-
-                            SizedBox(height: 12.h),
-                            AgentContactCard(property: property),
-
-                            SizedBox(height: 12.h),
-                            GetBuilder<FeaturedPropertiesController>(
-                              builder: (featuredController) {
-                                final List<FeaturedProperty>
-                                featuredProperties = featuredController
-                                    .getProperties(
-                                      FeaturedLocation.propertyDetailPage,
-                                    );
-
-                                final bool isLoading = featuredController
-                                    .isLoading(
-                                      FeaturedLocation.propertyDetailPage,
-                                    );
-
-                                final bool isLoadingMore = featuredController
-                                    .isLoadingMore(
-                                      FeaturedLocation.propertyDetailPage,
-                                    );
-
-                                final bool hasMore = featuredController.hasMore(
-                                  FeaturedLocation.propertyDetailPage,
-                                );
-
-                                final String error = featuredController
-                                    .getError(
-                                      FeaturedLocation.propertyDetailPage,
-                                    );
-
-                                if (isLoading && featuredProperties.isEmpty) {
-                                  return SizedBox(
-                                    height: 250.h,
-
-                                    child: const Center(
-                                      child: CircularProgressIndicator(),
+                                SizedBox(height: 5.h),
+                                if (isMyProperty)
+                                  Padding(
+                                    padding: EdgeInsets.fromLTRB(
+                                      0.w,
+                                      12.h,
+                                      0.w,
+                                      4.h,
                                     ),
-                                  );
-                                }
-                                if (error.isNotEmpty &&
-                                    featuredProperties.isEmpty) {
-                                  return SizedBox(
-                                    height: 150.h,
-
-                                    child: Center(
-                                      child: Column(
-                                        mainAxisSize: MainAxisSize.min,
-
-                                        children: [
-                                          Text(
-                                            "Unable to load featured properties".tr,
-
-                                            textAlign: TextAlign.center,
-
-                                            style: TextStyle(
-                                              fontSize: 12.sp,
-
-                                              color: Colors.grey,
+                                    child: SizedBox(
+                                      width: double.infinity,
+                                      height: 40.h,
+                                      child: ElevatedButton(
+                                        onPressed: () {
+                                          _onBoostProperty(property);
+                                        },
+                                        style: ElevatedButton.styleFrom(
+                                          backgroundColor: AppColors.primary,
+                                          foregroundColor: Colors.white,
+                                          elevation: 0,
+                                          shape: RoundedRectangleBorder(
+                                            borderRadius: BorderRadius.circular(
+                                              10.r,
                                             ),
                                           ),
+                                        ),
+                                        child: Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.center,
+                                          children: [
+                                            Icon(
+                                              Icons.rocket_launch_outlined,
+                                              size: 19.sp,
+                                            ),
+                                            SizedBox(width: 8.w),
+                                            Text(
+                                              "Boost Property".tr,
+                                              style: TextStyle(
+                                                fontSize: 14.sp,
+                                                fontWeight: FontWeight.w600,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                SizedBox(height: 12.h),
+                                OverviewCard(property: property),
 
-                                          SizedBox(height: 8.h),
+                                SizedBox(height: 12.h),
 
-                                          TextButton(
-                                            onPressed: () {
-                                              featuredController
-                                                  .refreshFeatured(
-                                                    location: FeaturedLocation
-                                                        .propertyDetailPage,
+                                // ================================
+                                // LOCATION
+                                // ================================
+                                PropertyLocationCard(property: property),
 
-                                                    limit: 5,
-                                                  );
+                                SizedBox(height: 12.h),
+
+                                // ================================
+                                // PROPERTY DETAILS
+                                // ================================
+                                PropertyDetailsCard(property: property),
+
+                                SizedBox(height: 12.h),
+                                AgentContactCard(property: property),
+
+                                SizedBox(height: 12.h),
+                                GetBuilder<FeaturedPropertiesController>(
+                                  builder: (featuredController) {
+                                    final List<FeaturedProperty>
+                                    featuredProperties = featuredController
+                                        .getProperties(
+                                          FeaturedLocation.propertyDetailPage,
+                                        );
+
+                                    final bool isLoading = featuredController
+                                        .isLoading(
+                                          FeaturedLocation.propertyDetailPage,
+                                        );
+
+                                    final bool isLoadingMore =
+                                        featuredController.isLoadingMore(
+                                          FeaturedLocation.propertyDetailPage,
+                                        );
+
+                                    final bool hasMore = featuredController
+                                        .hasMore(
+                                          FeaturedLocation.propertyDetailPage,
+                                        );
+
+                                    final String error = featuredController
+                                        .getError(
+                                          FeaturedLocation.propertyDetailPage,
+                                        );
+
+                                    if (isLoading &&
+                                        featuredProperties.isEmpty) {
+                                      return SizedBox(
+                                        height: 250.h,
+
+                                        child: const Center(
+                                          child: CircularProgressIndicator(),
+                                        ),
+                                      );
+                                    }
+                                    if (error.isNotEmpty &&
+                                        featuredProperties.isEmpty) {
+                                      return SizedBox(
+                                        height: 150.h,
+
+                                        child: Center(
+                                          child: Column(
+                                            mainAxisSize: MainAxisSize.min,
+
+                                            children: [
+                                              Text(
+                                                "Unable to load featured properties"
+                                                    .tr,
+
+                                                textAlign: TextAlign.center,
+
+                                                style: TextStyle(
+                                                  fontSize: 12.sp,
+
+                                                  color: Colors.grey,
+                                                ),
+                                              ),
+
+                                              SizedBox(height: 8.h),
+
+                                              TextButton(
+                                                onPressed: () {
+                                                  featuredController
+                                                      .refreshFeatured(
+                                                        location: FeaturedLocation
+                                                            .propertyDetailPage,
+
+                                                        limit: 5,
+                                                      );
+                                                },
+
+                                                child: Text("Retry".tr),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      );
+                                    }
+                                    if (featuredProperties.isEmpty) {
+                                      return const SizedBox.shrink();
+                                    }
+                                    final String currentPropertyId =
+                                        propertyId?.trim() ?? '';
+
+                                    final List<FeaturedProperty>
+                                    displayProperties = featuredProperties
+                                        .where((featured) {
+                                          return featured.listing.id !=
+                                              currentPropertyId;
+                                        })
+                                        .toList();
+
+                                    if (displayProperties.isEmpty &&
+                                        !isLoadingMore) {
+                                      return const SizedBox.shrink();
+                                    }
+                                    return Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+
+                                      children: [
+                                        Text(
+                                          "Featured Properties".tr,
+
+                                          style: TextStyle(
+                                            fontSize: 18.sp,
+
+                                            fontWeight: FontWeight.w600,
+
+                                            color: Colors.black,
+                                          ),
+                                        ),
+
+                                        SizedBox(height: 12.h),
+
+                                        SizedBox(
+                                          height: 250.h,
+
+                                          child: ListView.separated(
+                                            controller:
+                                                featuredScrollController,
+
+                                            scrollDirection: Axis.horizontal,
+
+                                            physics:
+                                                const BouncingScrollPhysics(),
+
+                                            itemCount:
+                                                displayProperties.length +
+                                                (isLoadingMore ? 1 : 0),
+
+                                            separatorBuilder: (context, index) {
+                                              return SizedBox(width: 8.w);
                                             },
 
-                                            child:  Text("Retry".tr),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                  );
-                                }
-                                if (featuredProperties.isEmpty) {
-                                  return const SizedBox.shrink();
-                                }
-                                final String currentPropertyId =
-                                    propertyId?.trim() ?? '';
+                                            itemBuilder: (context, index) {
+                                              if (index >=
+                                                  displayProperties.length) {
+                                                return SizedBox(
+                                                  width: 70.w,
 
-                                final List<FeaturedProperty> displayProperties =
-                                    featuredProperties.where((featured) {
-                                      return featured.listing.id !=
-                                          currentPropertyId;
-                                    }).toList();
-
-                                if (displayProperties.isEmpty &&
-                                    !isLoadingMore) {
-                                  return const SizedBox.shrink();
-                                }
-                                return Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-
-                                  children: [
-                                    Text(
-                                      "Featured Properties".tr,
-
-                                      style: TextStyle(
-                                        fontSize: 18.sp,
-
-                                        fontWeight: FontWeight.w600,
-
-                                        color: Colors.black,
-                                      ),
-                                    ),
-
-                                    SizedBox(height: 12.h),
-
-                                    SizedBox(
-                                      height: 250.h,
-
-                                      child: ListView.separated(
-                                        controller: featuredScrollController,
-
-                                        scrollDirection: Axis.horizontal,
-
-                                        physics: const BouncingScrollPhysics(),
-
-                                        itemCount:
-                                            displayProperties.length +
-                                            (isLoadingMore ? 1 : 0),
-
-                                        separatorBuilder: (context, index) {
-                                          return SizedBox(width: 8.w);
-                                        },
-
-                                        itemBuilder: (context, index) {
-                                          if (index >=
-                                              displayProperties.length) {
-                                            return SizedBox(
-                                              width: 70.w,
-
-                                              child: const Center(
-                                                child:
-                                                    CircularProgressIndicator(),
-                                              ),
-                                            );
-                                          }
-
-                                          final FeaturedProperty featured =
-                                              displayProperties[index];
-
-                                          final FeaturedListing listing =
-                                              featured.listing;
-
-                                          // ====================
-                                          // PROPERTY CARD
-                                          // ====================
-
-                                          return GestureDetector(
-                                            behavior: HitTestBehavior.opaque,
-
-                                            onTap: () async {
-                                              final String selectedPropertyId =
-                                                  listing.id.toString().trim();
-
-                                              if (selectedPropertyId.isEmpty) {
-                                                debugPrint(
-                                                  "FEATURED PROPERTY ID IS EMPTY".tr,
+                                                  child: const Center(
+                                                    child:
+                                                        CircularProgressIndicator(),
+                                                  ),
                                                 );
-                                                return;
                                               }
 
-                                             
+                                              final FeaturedProperty featured =
+                                                  displayProperties[index];
 
-                                              /// Update current property ID
-                                              propertyId = selectedPropertyId;
+                                              final FeaturedListing listing =
+                                                  featured.listing;
 
-                                              /// Fetch corresponding property details
-                                              await controller
-                                                  .fetchPropertyDetails(
-                                                    selectedPropertyId,
-                                                  );
+                                              // ====================
+                                              // PROPERTY CARD
+                                              // ====================
 
-                                              /// Refresh featured list so currently opened
-                                              /// property is removed from featured section
-                                              await featuredController
-                                                  .refreshFeatured(
-                                                    location: FeaturedLocation
-                                                        .propertyDetailPage,
-                                                    limit: 5,
-                                                  );
+                                              return GestureDetector(
+                                                behavior:
+                                                    HitTestBehavior.opaque,
+
+                                                onTap: () async {
+                                                  final String
+                                                  selectedPropertyId = listing
+                                                      .id
+                                                      .toString()
+                                                      .trim();
+
+                                                  if (selectedPropertyId
+                                                      .isEmpty) {
+                                                    debugPrint(
+                                                      "FEATURED PROPERTY ID IS EMPTY"
+                                                          .tr,
+                                                    );
+                                                    return;
+                                                  }
+
+                                                  /// Update current property ID
+                                                  propertyId =
+                                                      selectedPropertyId;
+
+                                                  /// Fetch corresponding property details
+                                                  await controller
+                                                      .fetchPropertyDetails(
+                                                        selectedPropertyId,
+                                                      );
+
+                                                  /// Refresh featured list so currently opened
+                                                  /// property is removed from featured section
+                                                  await featuredController
+                                                      .refreshFeatured(
+                                                        location: FeaturedLocation
+                                                            .propertyDetailPage,
+                                                        limit: 5,
+                                                      );
+                                                },
+
+                                                child: PropertyCard(
+                                                  propertyId: listing.id,
+                                                  slug: listing.slug,
+                                                  image: listing.imageUrl,
+                                                  title: listing.propertyName,
+                                                  location:
+                                                      listing.formattedLocation,
+                                                  distance: '',
+                                                  price: listing.formattedPrice,
+                                                  sqm: listing.area.toString(),
+                                                  area: listing.area,
+                                                  beds: listing.bedrooms
+                                                      .toString(),
+                                                  bathrooms: listing.bathrooms,
+                                                  verified:
+                                                      listing.contactVerified,
+                                                  isFeatured:
+                                                      listing.isFeatured,
+                                                ),
+                                              );
                                             },
+                                          ),
+                                        ),
+                                      ],
+                                    );
+                                  },
+                                ),
 
-                                            child: PropertyCard(
-                                              propertyId: listing.id,
-                                              slug: listing.slug,
-                                              image: listing.imageUrl,
-                                              title: listing.propertyName,
-                                              location:
-                                                  listing.formattedLocation,
-                                              distance: '',
-                                              price: listing.formattedPrice,
-                                              sqm: listing.area.toString(),
-                                              area: listing.area,
-                                              beds: listing.bedrooms.toString(),
-                                              bathrooms: listing.bathrooms,
-                                              verified: listing.contactVerified,
-                                              isFeatured: listing.isFeatured,
-                                            ),
-                                          );
-                                        },
-                                      ),
-                                    ),
-                                  ],
-                                );
-                              },
+                                SizedBox(height: 20.h),
+                              ],
                             ),
-
-                            SizedBox(height: 20.h),
-                          ],
+                          ),
                         ),
                       ),
                     ],
@@ -635,7 +696,8 @@ class _PropertyDetailsScreenState extends State<PropertyDetailsScreen> {
 
                     Expanded(
                       child: Text(
-                        "This property will be updated as sold and will no longer be available as an active listing.".tr,
+                        "This property will be updated as sold and will no longer be available as an active listing."
+                            .tr,
                         style: TextStyle(
                           fontSize: 10.sp,
                           color: const Color(0xFF666666),
@@ -824,370 +886,242 @@ class _PropertyDetailsScreenState extends State<PropertyDetailsScreen> {
     }
   }
 
-Future<void> _showReportListingSheet(
-  Property property,
-) async {
-  final String listingId =
-      property.id?.toString().trim() ?? '';
+  Future<void> _showReportListingSheet(Property property) async {
+    final String listingId = property.id?.toString().trim() ?? '';
 
-  /// CURRENT LOGGED-IN USER ID
-  final String reportedUserId =
-      StorageService.getUserId().trim();
+    /// CURRENT LOGGED-IN USER ID
+    final String reportedUserId = StorageService.getUserId().trim();
 
-  debugPrint("========== REPORT LISTING ==========");
-  debugPrint("LISTING ID: $listingId");
-  debugPrint("REPORTED USER ID: $reportedUserId");
+    debugPrint("========== REPORT LISTING ==========");
+    debugPrint("LISTING ID: $listingId");
+    debugPrint("REPORTED USER ID: $reportedUserId");
 
-  if (listingId.isEmpty) {
-    Get.snackbar(
-      "Unable to report",
-      "Property information is not available.",
-      snackPosition: SnackPosition.BOTTOM,
-    );
-    return;
-  }
+    if (listingId.isEmpty) {
+      Get.snackbar(
+        "Unable to report",
+        "Property information is not available.",
+        snackPosition: SnackPosition.BOTTOM,
+      );
+      return;
+    }
 
-  if (reportedUserId.isEmpty) {
-    Get.snackbar(
-      "Unable to report".tr,
-      "Logged-in user information is not available.".tr,
-      snackPosition: SnackPosition.BOTTOM,
-    );
-    return;
-  }
+    if (reportedUserId.isEmpty) {
+      Get.snackbar(
+        "Unable to report".tr,
+        "Logged-in user information is not available.".tr,
+        snackPosition: SnackPosition.BOTTOM,
+      );
+      return;
+    }
 
-  // Continue existing code...
-  final SupportTicketController supportController =
-      Get.isRegistered<SupportTicketController>()
-          ? Get.find<SupportTicketController>()
-          : Get.put(
-              SupportTicketController(),
-              permanent: false,
-            );
+    // Continue existing code...
+    final SupportTicketController supportController =
+        Get.isRegistered<SupportTicketController>()
+        ? Get.find<SupportTicketController>()
+        : Get.put(SupportTicketController(), permanent: false);
 
-  final TextEditingController detailsController =
-      TextEditingController();
+    final TextEditingController detailsController = TextEditingController();
 
-  String? selectedReason;
-  bool isSubmitting = false;
+    String? selectedReason;
+    bool isSubmitting = false;
 
-  final List<String> reasons = [
-    "Incorrect listing information".tr,
-    "Misleading or fake listing".tr,
-    "Property is no longer available".tr,
-    "Inappropriate content".tr,
-    "Suspected scam or fraud".tr,
-    "Other".tr,
-  ];
+    final List<String> reasons = [
+      "Incorrect listing information".tr,
+      "Misleading or fake listing".tr,
+      "Property is no longer available".tr,
+      "Inappropriate content".tr,
+      "Suspected scam or fraud".tr,
+      "Other".tr,
+    ];
 
-  bool reportSubmitted = false;
-  String? submitError;
+    bool reportSubmitted = false;
+    String? submitError;
 
-  await showModalBottomSheet<void>(
-    context: context,
-    isScrollControlled: true,
-    useSafeArea: true,
-    backgroundColor: Colors.transparent,
-    barrierColor: Colors.black.withOpacity(.45),
+    await showModalBottomSheet<void>(
+      context: context,
+      isScrollControlled: true,
+      useSafeArea: true,
+      backgroundColor: Colors.transparent,
+      barrierColor: Colors.black.withOpacity(.45),
 
-    builder: (BuildContext sheetContext) {
-      return StatefulBuilder(
-        builder: (
-          BuildContext context,
-          StateSetter setSheetState,
-        ) {
-          final double keyboardHeight =
-              MediaQuery.viewInsetsOf(context).bottom;
+      builder: (BuildContext sheetContext) {
+        return StatefulBuilder(
+          builder: (BuildContext context, StateSetter setSheetState) {
+            final double keyboardHeight = MediaQuery.viewInsetsOf(
+              context,
+            ).bottom;
 
-          return AnimatedPadding(
-            duration:
-                const Duration(milliseconds: 200),
-            curve: Curves.easeOut,
-            padding: EdgeInsets.only(
-              bottom: keyboardHeight,
-            ),
-            child: Container(
-              constraints: BoxConstraints(
-                maxHeight:
-                    MediaQuery.sizeOf(context)
-                            .height *
-                        .88,
-              ),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius:
-                    BorderRadius.vertical(
-                  top: Radius.circular(22.r),
+            return AnimatedPadding(
+              duration: const Duration(milliseconds: 200),
+              curve: Curves.easeOut,
+              padding: EdgeInsets.only(bottom: keyboardHeight),
+              child: Container(
+                constraints: BoxConstraints(
+                  maxHeight: MediaQuery.sizeOf(context).height * .88,
                 ),
-              ),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.vertical(
+                    top: Radius.circular(22.r),
+                  ),
+                ),
 
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  // ============================================
-                  // HANDLE
-                  // ============================================
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    // ============================================
+                    // HANDLE
+                    // ============================================
+                    SizedBox(height: 10.h),
 
-                  SizedBox(height: 10.h),
-
-                  Container(
-                    width: 38.w,
-                    height: 4.h,
-                    decoration: BoxDecoration(
-                      color:
-                          const Color(0xFFD8D8D8),
-                      borderRadius:
-                          BorderRadius.circular(
-                        20.r,
+                    Container(
+                      width: 38.w,
+                      height: 4.h,
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFD8D8D8),
+                        borderRadius: BorderRadius.circular(20.r),
                       ),
                     ),
-                  ),
 
-                  // ============================================
-                  // HEADER
-                  // ============================================
-
-                  Padding(
-                    padding:
-                        EdgeInsets.fromLTRB(
-                      18.w,
-                      12.h,
-                      8.w,
-                      10.h,
-                    ),
-                    child: Row(
-                      children: [
-                        Container(
-                          width: 38.w,
-                          height: 38.w,
-                          decoration:
-                              BoxDecoration(
-                            color:
-                                const Color(
-                              0xFFFFF1F1,
-                            ),
-                            borderRadius:
-                                BorderRadius
-                                    .circular(
-                              10.r,
-                            ),
-                          ),
-                          child: Icon(
-                            Icons.flag_outlined,
-                            size: 20.sp,
-                            color:
-                                const Color(
-                              0xFFD64545,
-                            ),
-                          ),
-                        ),
-
-                        SizedBox(width: 11.w),
-
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment:
-                                CrossAxisAlignment
-                                    .start,
-                            children: [
-                              Text(
-                                "Report listing".tr,
-                                style: TextStyle(
-                                  fontSize: 17.sp,
-                                  fontWeight:
-                                      FontWeight
-                                          .w700,
-                                  color:
-                                      const Color(
-                                    0xFF222222,
-                                  ),
-                                ),
-                              ),
-
-                              SizedBox(
-                                height: 2.h,
-                              ),
-
-                              Text(
-                                "Tell us what's wrong with this property.".tr,
-                                style:
-                                    TextStyle(
-                                  fontSize:
-                                      10.5.sp,
-                                  color:
-                                      const Color(
-                                    0xFF777777,
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-
-                        IconButton(
-                          onPressed:
-                              isSubmitting
-                                  ? null
-                                  : () {
-                                      FocusManager
-                                          .instance
-                                          .primaryFocus
-                                          ?.unfocus();
-
-                                      Navigator.of(
-                                        sheetContext,
-                                      ).pop();
-                                    },
-                          icon: Icon(
-                            Icons.close_rounded,
-                            size: 22.sp,
-                            color:
-                                const Color(
-                              0xFF555555,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-
-                  Divider(
-                    height: 1,
-                    color:
-                        Colors.grey.shade200,
-                  ),
-
-                  // ============================================
-                  // CONTENT
-                  // ============================================
-
-                  Flexible(
-                    child:
-                        SingleChildScrollView(
-                      keyboardDismissBehavior:
-                          ScrollViewKeyboardDismissBehavior
-                              .onDrag,
-
-                      padding:
-                          EdgeInsets.fromLTRB(
-                        18.w,
-                        16.h,
-                        18.w,
-                        16.h,
-                      ),
-
-                      child: Column(
-                        crossAxisAlignment:
-                            CrossAxisAlignment
-                                .start,
+                    // ============================================
+                    // HEADER
+                    // ============================================
+                    Padding(
+                      padding: EdgeInsets.fromLTRB(18.w, 12.h, 8.w, 10.h),
+                      child: Row(
                         children: [
-                          Text(
-                            "Why are you reporting this listing?".tr,
-                            style: TextStyle(
-                              fontSize: 13.sp,
-                              fontWeight:
-                                  FontWeight.w600,
-                              color:
-                                  const Color(
-                                0xFF292929,
-                              ),
+                          Container(
+                            width: 38.w,
+                            height: 38.w,
+                            decoration: BoxDecoration(
+                              color: const Color(0xFFFFF1F1),
+                              borderRadius: BorderRadius.circular(10.r),
+                            ),
+                            child: Icon(
+                              Icons.flag_outlined,
+                              size: 20.sp,
+                              color: const Color(0xFFD64545),
                             ),
                           ),
 
-                          SizedBox(height: 4.h),
+                          SizedBox(width: 11.w),
 
-                          Text(
-                            "Choose the reason that best describes the issue.".tr,
-                            style: TextStyle(
-                              fontSize: 10.5.sp,
-                              color:
-                                  const Color(
-                                0xFF888888,
-                              ),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  "Report listing".tr,
+                                  style: TextStyle(
+                                    fontSize: 17.sp,
+                                    fontWeight: FontWeight.w700,
+                                    color: const Color(0xFF222222),
+                                  ),
+                                ),
+
+                                SizedBox(height: 2.h),
+
+                                Text(
+                                  "Tell us what's wrong with this property.".tr,
+                                  style: TextStyle(
+                                    fontSize: 10.5.sp,
+                                    color: const Color(0xFF777777),
+                                  ),
+                                ),
+                              ],
                             ),
                           ),
 
-                          SizedBox(height: 14.h),
+                          IconButton(
+                            onPressed: isSubmitting
+                                ? null
+                                : () {
+                                    FocusManager.instance.primaryFocus
+                                        ?.unfocus();
 
-                          // ====================================
-                          // REASONS
-                          // ====================================
+                                    Navigator.of(sheetContext).pop();
+                                  },
+                            icon: Icon(
+                              Icons.close_rounded,
+                              size: 22.sp,
+                              color: const Color(0xFF555555),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
 
-                          ...reasons.map(
-                            (String reason) {
-                              final bool
-                                  isSelected =
-                                  selectedReason ==
-                                      reason;
+                    Divider(height: 1, color: Colors.grey.shade200),
+
+                    // ============================================
+                    // CONTENT
+                    // ============================================
+                    Flexible(
+                      child: SingleChildScrollView(
+                        keyboardDismissBehavior:
+                            ScrollViewKeyboardDismissBehavior.onDrag,
+
+                        padding: EdgeInsets.fromLTRB(18.w, 16.h, 18.w, 16.h),
+
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              "Why are you reporting this listing?".tr,
+                              style: TextStyle(
+                                fontSize: 13.sp,
+                                fontWeight: FontWeight.w600,
+                                color: const Color(0xFF292929),
+                              ),
+                            ),
+
+                            SizedBox(height: 4.h),
+
+                            Text(
+                              "Choose the reason that best describes the issue."
+                                  .tr,
+                              style: TextStyle(
+                                fontSize: 10.5.sp,
+                                color: const Color(0xFF888888),
+                              ),
+                            ),
+
+                            SizedBox(height: 14.h),
+
+                            // ====================================
+                            // REASONS
+                            // ====================================
+                            ...reasons.map((String reason) {
+                              final bool isSelected = selectedReason == reason;
 
                               return Padding(
-                                padding:
-                                    EdgeInsets.only(
-                                  bottom: 8.h,
-                                ),
+                                padding: EdgeInsets.only(bottom: 8.h),
                                 child: InkWell(
-                                  onTap:
-                                      isSubmitting
-                                          ? null
-                                          : () {
-                                              setSheetState(
-                                                () {
-                                                  selectedReason =
-                                                      reason;
-                                                },
-                                              );
-                                            },
-                                  borderRadius:
-                                      BorderRadius
-                                          .circular(
-                                    10.r,
-                                  ),
-                                  child:
-                                      AnimatedContainer(
-                                    duration:
-                                        const Duration(
-                                      milliseconds:
-                                          150,
+                                  onTap: isSubmitting
+                                      ? null
+                                      : () {
+                                          setSheetState(() {
+                                            selectedReason = reason;
+                                          });
+                                        },
+                                  borderRadius: BorderRadius.circular(10.r),
+                                  child: AnimatedContainer(
+                                    duration: const Duration(milliseconds: 150),
+                                    width: double.infinity,
+                                    padding: EdgeInsets.symmetric(
+                                      horizontal: 13.w,
+                                      vertical: 11.h,
                                     ),
-                                    width:
-                                        double.infinity,
-                                    padding:
-                                        EdgeInsets
-                                            .symmetric(
-                                      horizontal:
-                                          13.w,
-                                      vertical:
-                                          11.h,
-                                    ),
-                                    decoration:
-                                        BoxDecoration(
-                                      color:
-                                          isSelected
-                                              ? AppColors
-                                                  .primary
-                                                  .withOpacity(
-                                                    .05,
-                                                  )
-                                              : Colors
-                                                  .white,
-                                      borderRadius:
-                                          BorderRadius
-                                              .circular(
-                                        10.r,
-                                      ),
-                                      border:
-                                          Border.all(
-                                        color:
-                                            isSelected
-                                                ? AppColors
-                                                    .primary
-                                                : const Color(
-                                                    0xFFE5E5E5,
-                                                  ),
-                                        width:
-                                            isSelected
-                                                ? 1.2
-                                                : 1,
+                                    decoration: BoxDecoration(
+                                      color: isSelected
+                                          ? AppColors.primary.withOpacity(.05)
+                                          : Colors.white,
+                                      borderRadius: BorderRadius.circular(10.r),
+                                      border: Border.all(
+                                        color: isSelected
+                                            ? AppColors.primary
+                                            : const Color(0xFFE5E5E5),
+                                        width: isSelected ? 1.2 : 1,
                                       ),
                                     ),
                                     child: Row(
@@ -1195,586 +1129,403 @@ Future<void> _showReportListingSheet(
                                         Expanded(
                                           child: Text(
                                             reason,
-                                            style:
-                                                TextStyle(
-                                              fontSize:
-                                                  11.5.sp,
-                                              fontWeight:
-                                                  isSelected
-                                                      ? FontWeight.w600
-                                                      : FontWeight.w500,
-                                              color:
-                                                  const Color(
-                                                0xFF333333,
-                                              ),
+                                            style: TextStyle(
+                                              fontSize: 11.5.sp,
+                                              fontWeight: isSelected
+                                                  ? FontWeight.w600
+                                                  : FontWeight.w500,
+                                              color: const Color(0xFF333333),
                                             ),
                                           ),
                                         ),
 
-                                        SizedBox(
-                                          width: 10.w,
-                                        ),
+                                        SizedBox(width: 10.w),
 
                                         Icon(
                                           isSelected
-                                              ? Icons
-                                                  .radio_button_checked
-                                              : Icons
-                                                  .radio_button_off,
+                                              ? Icons.radio_button_checked
+                                              : Icons.radio_button_off,
                                           size: 20.sp,
-                                          color:
-                                              isSelected
-                                                  ? AppColors.primary
-                                                  : Colors.grey.shade400,
+                                          color: isSelected
+                                              ? AppColors.primary
+                                              : Colors.grey.shade400,
                                         ),
                                       ],
                                     ),
                                   ),
                                 ),
                               );
-                            },
-                          ),
+                            }),
 
-                          SizedBox(height: 10.h),
+                            SizedBox(height: 10.h),
 
-                          // ====================================
-                          // ADDITIONAL DETAILS
-                          // ====================================
-
-                          Row(
-                            children: [
-                              Text(
-                                "Additional details".tr,
-                                style:
-                                    TextStyle(
-                                  fontSize: 13.sp,
-                                  fontWeight:
-                                      FontWeight
-                                          .w600,
-                                  color:
-                                      const Color(
-                                    0xFF292929,
-                                  ),
-                                ),
-                              ),
-
-                              SizedBox(width: 5.w),
-
-                              Text(
-                                "(Optional)".tr,
-                                style:
-                                    TextStyle(
-                                  fontSize: 10.sp,
-                                  color: Colors
-                                      .grey
-                                      .shade500,
-                                ),
-                              ),
-                            ],
-                          ),
-
-                          SizedBox(height: 8.h),
-
-                          // ====================================
-                          // TEXT FIELD
-                          //
-                          // NO CUSTOM FOCUS NODE
-                          // ====================================
-
-                          TextField(
-                            controller:
-                                detailsController,
-
-                            enabled:
-                                !isSubmitting,
-
-                            minLines: 3,
-                            maxLines: 5,
-                            maxLength: 500,
-
-                            textCapitalization:
-                                TextCapitalization
-                                    .sentences,
-
-                            keyboardType:
-                                TextInputType
-                                    .multiline,
-
-                            textInputAction:
-                                TextInputAction
-                                    .newline,
-
-                            decoration:
-                                InputDecoration(
-                              hintText:
-                                  "Provide additional information that may help us review this listing.".tr,
-
-                              hintStyle:
-                                  TextStyle(
-                                fontSize:
-                                    10.5.sp,
-                                height: 1.4,
-                                color: Colors
-                                    .grey
-                                    .shade500,
-                              ),
-
-                              filled: true,
-
-                              fillColor:
-                                  const Color(
-                                0xFFFAFAFA,
-                              ),
-
-                              counterStyle:
-                                  TextStyle(
-                                fontSize: 9.sp,
-                                color: Colors
-                                    .grey
-                                    .shade500,
-                              ),
-
-                              contentPadding:
-                                  EdgeInsets.all(
-                                13.w,
-                              ),
-
-                              enabledBorder:
-                                  OutlineInputBorder(
-                                borderRadius:
-                                    BorderRadius
-                                        .circular(
-                                  10.r,
-                                ),
-                                borderSide:
-                                    const BorderSide(
-                                  color: Color(
-                                    0xFFE5E5E5,
-                                  ),
-                                ),
-                              ),
-
-                              focusedBorder:
-                                  OutlineInputBorder(
-                                borderRadius:
-                                    BorderRadius
-                                        .circular(
-                                  10.r,
-                                ),
-                                borderSide:
-                                    BorderSide(
-                                  color: AppColors
-                                      .primary,
-                                  width: 1.2,
-                                ),
-                              ),
-
-                              disabledBorder:
-                                  OutlineInputBorder(
-                                borderRadius:
-                                    BorderRadius
-                                        .circular(
-                                  10.r,
-                                ),
-                                borderSide:
-                                    const BorderSide(
-                                  color: Color(
-                                    0xFFE5E5E5,
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ),
-
-                          SizedBox(height: 8.h),
-
-                          // ====================================
-                          // INFO
-                          // ====================================
-
-                          Container(
-                            width:
-                                double.infinity,
-                            padding:
-                                EdgeInsets.all(
-                              11.w,
-                            ),
-                            decoration:
-                                BoxDecoration(
-                              color:
-                                  const Color(
-                                0xFFF7F7F7,
-                              ),
-                              borderRadius:
-                                  BorderRadius
-                                      .circular(
-                                9.r,
-                              ),
-                            ),
-                            child: Row(
-                              crossAxisAlignment:
-                                  CrossAxisAlignment
-                                      .start,
+                            // ====================================
+                            // ADDITIONAL DETAILS
+                            // ====================================
+                            Row(
                               children: [
-                                Icon(
-                                  Icons
-                                      .info_outline_rounded,
-                                  size: 16.sp,
-                                  color:
-                                      const Color(
-                                    0xFF777777,
+                                Text(
+                                  "Additional details".tr,
+                                  style: TextStyle(
+                                    fontSize: 13.sp,
+                                    fontWeight: FontWeight.w600,
+                                    color: const Color(0xFF292929),
                                   ),
                                 ),
 
-                                SizedBox(
-                                  width: 8.w,
-                                ),
+                                SizedBox(width: 5.w),
 
-                                Expanded(
-                                  child: Text(
-                                    "Reports are reviewed by our support team.".tr,
-                                    style:
-                                        TextStyle(
-                                      fontSize:
-                                          9.5.sp,
-                                      height: 1.45,
-                                      color:
-                                          const Color(
-                                        0xFF777777,
-                                      ),
-                                    ),
+                                Text(
+                                  "(Optional)".tr,
+                                  style: TextStyle(
+                                    fontSize: 10.sp,
+                                    color: Colors.grey.shade500,
                                   ),
                                 ),
                               ],
                             ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
 
-                  // ============================================
-                  // SUBMIT BUTTON
-                  // ============================================
+                            SizedBox(height: 8.h),
 
-                  Container(
-                    width: double.infinity,
-                    padding:
-                        EdgeInsets.fromLTRB(
-                      18.w,
-                      11.h,
-                      18.w,
-                      12.h,
-                    ),
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      border: Border(
-                        top: BorderSide(
-                          color: Colors
-                              .grey.shade200,
-                        ),
-                      ),
-                    ),
-                    child: SizedBox(
-                      width: double.infinity,
-                      height: 46.h,
-                      child: ElevatedButton(
-                        onPressed:
-                            selectedReason ==
-                                        null ||
-                                    isSubmitting
-                                ? null
-                                : () async {
-                                    // ==========================
-                                    // REMOVE KEYBOARD
-                                    // ==========================
+                            // ====================================
+                            // TEXT FIELD
+                            //
+                            // NO CUSTOM FOCUS NODE
+                            // ====================================
+                            TextField(
+                              controller: detailsController,
 
-                                    FocusManager
-                                        .instance
-                                        .primaryFocus
-                                        ?.unfocus();
+                              enabled: !isSubmitting,
 
-                                    final String
-                                        subject =
-                                        selectedReason!;
+                              minLines: 3,
+                              maxLines: 5,
+                              maxLength: 500,
 
-                                    final String
-                                        details =
-                                        detailsController
-                                            .text
-                                            .trim();
+                              textCapitalization: TextCapitalization.sentences,
 
-                                    final String
-                                        message =
-                                        details
-                                                .isNotEmpty
-                                            ? details
-                                            : subject;
+                              keyboardType: TextInputType.multiline,
 
-                                    setSheetState(
-                                      () {
-                                        isSubmitting =
-                                            true;
-                                      },
-                                    );
+                              textInputAction: TextInputAction.newline,
 
-                                    try {
-                                      final result =
-                                          await supportController
-                                              .createTicket(
-                                        category:
-                                            SupportCategory
-                                                .reportListing,
-                                        subject:
-                                            subject,
-                                        message:
-                                            message,
-                                        listingId:
-                                            listingId,
-                                            reportedUserId: reportedUserId,
-                                      );
+                              decoration: InputDecoration(
+                                hintText:
+                                    "Provide additional information that may help us review this listing."
+                                        .tr,
 
-                                      if (!sheetContext
-                                          .mounted) {
-                                        return;
-                                      }
-
-                                      if (result !=
-                                          null) {
-                                        reportSubmitted =
-                                            true;
-
-                                        Navigator.of(
-                                          sheetContext,
-                                        ).pop();
-
-                                        return;
-                                      }
-
-                                      submitError =
-                                          supportController
-                                                  .createError
-                                                  .isNotEmpty
-                                              ? supportController
-                                                  .createError
-                                              : "Unable to submit report".tr;
-
-                                      if (sheetContext
-                                          .mounted) {
-                                        setSheetState(
-                                          () {
-                                            isSubmitting =
-                                                false;
-                                          },
-                                        );
-                                      }
-                                    } catch (e) {
-                                      submitError =
-                                          e
-                                              .toString()
-                                              .replaceFirst(
-                                                'Exception: '.tr,
-                                                '',
-                                              );
-
-                                      if (sheetContext
-                                          .mounted) {
-                                        setSheetState(
-                                          () {
-                                            isSubmitting =
-                                                false;
-                                          },
-                                        );
-                                      }
-                                    }
-                                  },
-
-                        style:
-                            ElevatedButton
-                                .styleFrom(
-                          backgroundColor:
-                              AppColors.primary,
-
-                          disabledBackgroundColor:
-                              AppColors.primary
-                                  .withOpacity(
-                                    .35,
-                                  ),
-
-                          foregroundColor:
-                              Colors.white,
-
-                          disabledForegroundColor:
-                              Colors.white,
-
-                          elevation: 0,
-
-                          shape:
-                              RoundedRectangleBorder(
-                            borderRadius:
-                                BorderRadius
-                                    .circular(
-                              10.r,
-                            ),
-                          ),
-                        ),
-
-                        child: isSubmitting
-                            ? SizedBox(
-                                width: 20.w,
-                                height: 20.w,
-                                child:
-                                    const CircularProgressIndicator(
-                                  strokeWidth:
-                                      2,
-                                  color:
-                                      Colors.white,
+                                hintStyle: TextStyle(
+                                  fontSize: 10.5.sp,
+                                  height: 1.4,
+                                  color: Colors.grey.shade500,
                                 ),
-                              )
-                            : Text(
-                                "Submit Report".tr,
-                                style:
-                                    TextStyle(
-                                  fontSize:
-                                      12.5.sp,
-                                  fontWeight:
-                                      FontWeight
-                                          .w600,
+
+                                filled: true,
+
+                                fillColor: const Color(0xFFFAFAFA),
+
+                                counterStyle: TextStyle(
+                                  fontSize: 9.sp,
+                                  color: Colors.grey.shade500,
+                                ),
+
+                                contentPadding: EdgeInsets.all(13.w),
+
+                                enabledBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(10.r),
+                                  borderSide: const BorderSide(
+                                    color: Color(0xFFE5E5E5),
+                                  ),
+                                ),
+
+                                focusedBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(10.r),
+                                  borderSide: BorderSide(
+                                    color: AppColors.primary,
+                                    width: 1.2,
+                                  ),
+                                ),
+
+                                disabledBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(10.r),
+                                  borderSide: const BorderSide(
+                                    color: Color(0xFFE5E5E5),
+                                  ),
                                 ),
                               ),
+                            ),
+
+                            SizedBox(height: 8.h),
+
+                            // ====================================
+                            // INFO
+                            // ====================================
+                            Container(
+                              width: double.infinity,
+                              padding: EdgeInsets.all(11.w),
+                              decoration: BoxDecoration(
+                                color: const Color(0xFFF7F7F7),
+                                borderRadius: BorderRadius.circular(9.r),
+                              ),
+                              child: Row(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Icon(
+                                    Icons.info_outline_rounded,
+                                    size: 16.sp,
+                                    color: const Color(0xFF777777),
+                                  ),
+
+                                  SizedBox(width: 8.w),
+
+                                  Expanded(
+                                    child: Text(
+                                      "Reports are reviewed by our support team."
+                                          .tr,
+                                      style: TextStyle(
+                                        fontSize: 9.5.sp,
+                                        height: 1.45,
+                                        color: const Color(0xFF777777),
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
                     ),
-                  ),
-                ],
-              ),
-            ),
-          );
-        },
-      );
-    },
-  );
 
-  // ============================================================
-  // IMPORTANT:
-  // At this point bottom sheet is closed.
-  //
-  // Do NOT manually dispose a FocusNode because there isn't one.
-  // ============================================================
+                    // ============================================
+                    // SUBMIT BUTTON
+                    // ============================================
+                    Container(
+                      width: double.infinity,
+                      padding: EdgeInsets.fromLTRB(18.w, 11.h, 18.w, 12.h),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        border: Border(
+                          top: BorderSide(color: Colors.grey.shade200),
+                        ),
+                      ),
+                      child: SizedBox(
+                        width: double.infinity,
+                        height: 46.h,
+                        child: ElevatedButton(
+                          onPressed: selectedReason == null || isSubmitting
+                              ? null
+                              : () async {
+                                  // ==========================
+                                  // REMOVE KEYBOARD
+                                  // ==========================
 
-  if (!mounted) {
-    return;
-  }
+                                  FocusManager.instance.primaryFocus?.unfocus();
 
-  // Give Flutter one frame to completely remove
-  // the bottom-sheet route / keyboard dependencies.
-  await Future<void>.delayed(
-    const Duration(milliseconds: 150),
-  );
+                                  final String subject = selectedReason!;
 
-  if (!mounted) {
-    return;
-  }
+                                  final String details = detailsController.text
+                                      .trim();
 
-  if (reportSubmitted) {
-    Get.snackbar(
-      "Report submitted".tr,
-      "Thank you. Our support team will review this listing.".tr,
-      snackPosition: SnackPosition.BOTTOM,
-      backgroundColor: Colors.green.shade700,
-      colorText: Colors.white,
-      margin: EdgeInsets.all(12.w),
-      duration: const Duration(
-        seconds: 3,
-      ),
-    );
-  } else if (submitError != null &&
-      submitError!.isNotEmpty) {
-    Get.snackbar(
-      "Unable to submit report".tr,
-      submitError!,
-      snackPosition: SnackPosition.BOTTOM,
-      backgroundColor: Colors.red.shade700,
-      colorText: Colors.white,
-      margin: EdgeInsets.all(12.w),
-    );
-  }
+                                  final String message = details.isNotEmpty
+                                      ? details
+                                      : subject;
 
-  // Do not manually dispose the TextEditingController here.
-  // It is local to this short-lived modal and avoiding disposal
-  // prevents pending EditableText callbacks from accessing a
-  // disposed controller during route teardown.
-}
+                                  setSheetState(() {
+                                    isSubmitting = true;
+                                  });
 
-// ============================================================
-// REPORT REASON TILE
-// ============================================================
+                                  try {
+                                    final result = await supportController
+                                        .createTicket(
+                                          category:
+                                              SupportCategory.reportListing,
+                                          subject: subject,
+                                          message: message,
+                                          listingId: listingId,
+                                          reportedUserId: reportedUserId,
+                                        );
 
-Widget _buildReportReason({
-  required String title,
-  required bool selected,
-  required bool enabled,
-  required VoidCallback onTap,
-}) {
-  return Material(
-    color: Colors.transparent,
-    child: InkWell(
-      onTap: enabled ? onTap : null,
-      borderRadius: BorderRadius.circular(10.r),
-      child: AnimatedContainer(
-        duration:
-            const Duration(milliseconds: 150),
-        width: double.infinity,
-        padding: EdgeInsets.symmetric(
-          horizontal: 13.w,
-          vertical: 11.h,
-        ),
-        decoration: BoxDecoration(
-          color: selected
-              ? AppColors.primary.withOpacity(0.05)
-              : Colors.white,
-          borderRadius:
-              BorderRadius.circular(10.r),
-          border: Border.all(
-            color: selected
-                ? AppColors.primary
-                : const Color(0xFFE5E5E5),
-            width: selected ? 1.2 : 1,
-          ),
-        ),
-        child: Row(
-          children: [
-            Expanded(
-              child: Text(
-                title,
-                style: TextStyle(
-                  fontSize: 11.5.sp,
-                  fontWeight: selected
-                      ? FontWeight.w600
-                      : FontWeight.w500,
-                  color:
-                      const Color(0xFF333333),
+                                    if (!sheetContext.mounted) {
+                                      return;
+                                    }
+
+                                    if (result != null) {
+                                      reportSubmitted = true;
+
+                                      Navigator.of(sheetContext).pop();
+
+                                      return;
+                                    }
+
+                                    submitError =
+                                        supportController.createError.isNotEmpty
+                                        ? supportController.createError
+                                        : "Unable to submit report".tr;
+
+                                    if (sheetContext.mounted) {
+                                      setSheetState(() {
+                                        isSubmitting = false;
+                                      });
+                                    }
+                                  } catch (e) {
+                                    submitError = e.toString().replaceFirst(
+                                      'Exception: '.tr,
+                                      '',
+                                    );
+
+                                    if (sheetContext.mounted) {
+                                      setSheetState(() {
+                                        isSubmitting = false;
+                                      });
+                                    }
+                                  }
+                                },
+
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: AppColors.primary,
+
+                            disabledBackgroundColor: AppColors.primary
+                                .withOpacity(.35),
+
+                            foregroundColor: Colors.white,
+
+                            disabledForegroundColor: Colors.white,
+
+                            elevation: 0,
+
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(10.r),
+                            ),
+                          ),
+
+                          child: isSubmitting
+                              ? SizedBox(
+                                  width: 20.w,
+                                  height: 20.w,
+                                  child: const CircularProgressIndicator(
+                                    strokeWidth: 2,
+                                    color: Colors.white,
+                                  ),
+                                )
+                              : Text(
+                                  "Submit Report".tr,
+                                  style: TextStyle(
+                                    fontSize: 12.5.sp,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
               ),
-            ),
+            );
+          },
+        );
+      },
+    );
 
-            SizedBox(width: 10.w),
+    // ============================================================
+    // IMPORTANT:
+    // At this point bottom sheet is closed.
+    //
+    // Do NOT manually dispose a FocusNode because there isn't one.
+    // ============================================================
 
-            Icon(
-              selected
-                  ? Icons.radio_button_checked
-                  : Icons.radio_button_off,
-              size: 20.sp,
-              color: selected
-                  ? AppColors.primary
-                  : Colors.grey.shade400,
+    if (!mounted) {
+      return;
+    }
+
+    // Give Flutter one frame to completely remove
+    // the bottom-sheet route / keyboard dependencies.
+    await Future<void>.delayed(const Duration(milliseconds: 150));
+
+    if (!mounted) {
+      return;
+    }
+
+    if (reportSubmitted) {
+      Get.snackbar(
+        "Report submitted".tr,
+        "Thank you. Our support team will review this listing.".tr,
+        snackPosition: SnackPosition.BOTTOM,
+        backgroundColor: Colors.green.shade700,
+        colorText: Colors.white,
+        margin: EdgeInsets.all(12.w),
+        duration: const Duration(seconds: 3),
+      );
+    } else if (submitError != null && submitError!.isNotEmpty) {
+      Get.snackbar(
+        "Unable to submit report".tr,
+        submitError!,
+        snackPosition: SnackPosition.BOTTOM,
+        backgroundColor: Colors.red.shade700,
+        colorText: Colors.white,
+        margin: EdgeInsets.all(12.w),
+      );
+    }
+
+    // Do not manually dispose the TextEditingController here.
+    // It is local to this short-lived modal and avoiding disposal
+    // prevents pending EditableText callbacks from accessing a
+    // disposed controller during route teardown.
+  }
+
+  // ============================================================
+  // REPORT REASON TILE
+  // ============================================================
+
+  Widget _buildReportReason({
+    required String title,
+    required bool selected,
+    required bool enabled,
+    required VoidCallback onTap,
+  }) {
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: enabled ? onTap : null,
+        borderRadius: BorderRadius.circular(10.r),
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 150),
+          width: double.infinity,
+          padding: EdgeInsets.symmetric(horizontal: 13.w, vertical: 11.h),
+          decoration: BoxDecoration(
+            color: selected
+                ? AppColors.primary.withOpacity(0.05)
+                : Colors.white,
+            borderRadius: BorderRadius.circular(10.r),
+            border: Border.all(
+              color: selected ? AppColors.primary : const Color(0xFFE5E5E5),
+              width: selected ? 1.2 : 1,
             ),
-          ],
+          ),
+          child: Row(
+            children: [
+              Expanded(
+                child: Text(
+                  title,
+                  style: TextStyle(
+                    fontSize: 11.5.sp,
+                    fontWeight: selected ? FontWeight.w600 : FontWeight.w500,
+                    color: const Color(0xFF333333),
+                  ),
+                ),
+              ),
+
+              SizedBox(width: 10.w),
+
+              Icon(
+                selected ? Icons.radio_button_checked : Icons.radio_button_off,
+                size: 20.sp,
+                color: selected ? AppColors.primary : Colors.grey.shade400,
+              ),
+            ],
+          ),
         ),
       ),
-    ),
-  );
-}
+    );
+  }
 
-// THIS closes _PropertyDetailsScreenState
+  // THIS closes _PropertyDetailsScreenState
 }
-

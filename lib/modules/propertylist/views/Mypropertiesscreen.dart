@@ -161,7 +161,17 @@ class _MyPropertiesScreenState extends State<MyPropertiesScreen> {
                                           () => const PropertyDetailsScreen(),
                                           transition: Transition.rightToLeft,
                                         );
+                                        
                                       },
+                                       onEdit: () {
+    Get.to(
+      () => ListYourPropertyScreen(
+        property: listings[index],
+        isEdit: true,
+      ),
+      transition: Transition.rightToLeft,
+    );
+  },
                                     );
                                   },
                                 ),
@@ -305,8 +315,9 @@ class _MyPropertiesScreenState extends State<MyPropertiesScreen> {
 class _PropertyCard extends StatelessWidget {
   final Property listing;
   final VoidCallback onTap;
+   final VoidCallback onEdit;
 
-  const _PropertyCard({required this.listing, required this.onTap});
+  const _PropertyCard({required this.listing, required this.onTap,  required this.onEdit,});
 
   @override
   Widget build(BuildContext context) {
@@ -340,51 +351,55 @@ class _PropertyCard extends StatelessWidget {
       ),
     );
   }
+Widget _buildThumbnail() {
+  return Stack(
+    children: [
+      ClipRRect(
+        borderRadius: BorderRadius.circular(12),
+        child: listing.photos.isNotEmpty
+            ? Image.network(
+                (listing.photos
+                        .where((photo) => photo.sortOrder == 0)
+                        .isNotEmpty
+                    ? listing.photos
+                        .firstWhere((photo) => photo.sortOrder == 0)
+                        .url
+                    : listing.photos.first.url),
+                width: 80.w,
+                height: 80.h,
+                fit: BoxFit.cover,
+                errorBuilder: (_, __, ___) {
+                  return _placeholder();
+                },
+              )
+            : _placeholder(),
+      ),
 
-  Widget _buildThumbnail() {
-    return Stack(
-      children: [
-        ClipRRect(
-          borderRadius: BorderRadius.circular(12),
-          child: listing.photos.isNotEmpty
-              ? Image.network(
-                  listing.photos.first.url,
-                  width: 80.w,
-                  height: 80.h,
-                  fit: BoxFit.cover,
-                  errorBuilder: (_, __, ___) {
-                    return _placeholder();
-                  },
-                )
-              : _placeholder(),
-        ),
-
-        Positioned(
-          left: 6,
-          bottom: 6,
-          child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-            decoration: BoxDecoration(
-              color: Colors.black54,
-              borderRadius: BorderRadius.circular(6),
-            ),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                const Icon(Icons.photo_camera, size: 10, color: Colors.white),
-                const SizedBox(width: 3),
-                Text(
-                  "${listing.photos.length}",
-                  style: TextStyle(color: Colors.white, fontSize: 8.sp),
-                ),
-              ],
-            ),
+      Positioned(
+        left: 6,
+        bottom: 6,
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+          decoration: BoxDecoration(
+            color: Colors.black54,
+            borderRadius: BorderRadius.circular(6),
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Icon(Icons.photo_camera, size: 10, color: Colors.white),
+              const SizedBox(width: 3),
+              Text(
+                "${listing.photos.length}",
+                style: TextStyle(color: Colors.white, fontSize: 8.sp),
+              ),
+            ],
           ),
         ),
-      ],
-    );
-  }
-
+      ),
+    ],
+  );
+}
   Widget _placeholder() {
     return Container(
       width: 80.w,
@@ -415,6 +430,16 @@ class _PropertyCard extends StatelessWidget {
                 ),
               ),
             ),
+
+              IconButton(
+      onPressed: onEdit,
+      icon: const Icon(
+        Icons.edit_outlined,
+        color: AppColors.primary,
+        size: 20,
+      ),
+    ),
+
             _StatusBadge(status: listing.status),
           ],
         ),

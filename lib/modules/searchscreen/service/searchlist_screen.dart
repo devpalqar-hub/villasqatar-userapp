@@ -29,8 +29,7 @@ class PropertySearchController extends GetxController {
   // SEARCH
   // ============================================================
 
-  final TextEditingController searchTextController =
-      TextEditingController();
+  final TextEditingController searchTextController = TextEditingController();
 
   String search = '';
 
@@ -64,6 +63,7 @@ class PropertySearchController extends GetxController {
   Property? selectedProperty;
 
   String detailsError = '';
+  String createdById = '';
 
   // ============================================================
   // INIT
@@ -80,9 +80,7 @@ class PropertySearchController extends GetxController {
   // FETCH PROPERTIES
   // ============================================================
 
-  Future<void> fetchProperties({
-    bool loadMore = false,
-  }) async {
+  Future<void> fetchProperties({bool loadMore = false}) async {
     if (loadMore) {
       if (isLoadingMore || !hasMore) {
         return;
@@ -116,6 +114,9 @@ class PropertySearchController extends GetxController {
       if (search.trim().isNotEmpty) {
         query['search'] = search.trim();
       }
+      if (createdById.isNotEmpty) {
+        query['createdById'] = createdById;
+      }
 
       // Property type
       if (type.isNotEmpty) {
@@ -129,8 +130,7 @@ class PropertySearchController extends GetxController {
 
       // Furnishing
       if (furnishingStatus.isNotEmpty) {
-        query['furnishingStatus'] =
-            furnishingStatus;
+        query['furnishingStatus'] = furnishingStatus;
       }
 
       // Nearby
@@ -140,85 +140,61 @@ class PropertySearchController extends GetxController {
 
       // Price
       if (minPrice != null) {
-        query['minPrice'] =
-            minPrice!.toString();
+        query['minPrice'] = minPrice!.toString();
       }
 
       if (maxPrice != null) {
-        query['maxPrice'] =
-            maxPrice!.toString();
+        query['maxPrice'] = maxPrice!.toString();
       }
 
       // Bedrooms
       if (minBedrooms != null) {
-        query['minBedrooms'] =
-            minBedrooms!.toString();
+        query['minBedrooms'] = minBedrooms!.toString();
       }
 
       // Bathrooms
       if (minBathrooms != null) {
-        query['minBathrooms'] =
-            minBathrooms!.toString();
+        query['minBathrooms'] = minBathrooms!.toString();
       }
 
       // Area
       if (minArea != null) {
-        query['minArea'] =
-            minArea!.toString();
+        query['minArea'] = minArea!.toString();
       }
 
       if (maxArea != null) {
-        query['maxArea'] =
-            maxArea!.toString();
+        query['maxArea'] = maxArea!.toString();
       }
 
       final String endpoint =
           '${ApiEndpoints.propertyList}'
           '?${Uri(queryParameters: query).query}';
 
-      debugPrint(
-        '========== PROPERTY SEARCH ==========',
-      );
+      debugPrint('========== PROPERTY SEARCH ==========');
 
-      debugPrint(
-        'ENDPOINT: $endpoint',
-      );
+      debugPrint('ENDPOINT: $endpoint');
 
-      final response =
-          await ApiHandler.get(endpoint);
+      final response = await ApiHandler.get(endpoint);
 
-      final MyPropertyModel model =
-          MyPropertyModel.fromJson(
-        response,
-      );
+      final MyPropertyModel model = MyPropertyModel.fromJson(response);
 
       if (loadMore) {
-        properties.addAll(
-          model.data,
-        );
+        properties.addAll(model.data);
       } else {
         properties = model.data;
       }
 
       meta = model.meta;
 
-      hasMore =
-          page < model.meta.totalPages;
+      hasMore = page < model.meta.totalPages;
 
       if (hasMore) {
         page++;
       }
     } catch (e) {
-      error = e
-          .toString()
-          .replaceFirst(
-            'Exception: ',
-            '',
-          );
+      error = e.toString().replaceFirst('Exception: ', '');
 
-      debugPrint(
-        'PROPERTY SEARCH ERROR: $error',
-      );
+      debugPrint('PROPERTY SEARCH ERROR: $error');
     } finally {
       isLoading = false;
       isLoadingMore = false;
@@ -231,11 +207,8 @@ class PropertySearchController extends GetxController {
   // SEARCH PROPERTY
   // ============================================================
 
-  Future<void> searchProperty(
-    String value,
-  ) async {
-    final String query =
-        value.trim();
+  Future<void> searchProperty(String value) async {
+    final String query = value.trim();
 
     search = query;
 
@@ -248,11 +221,8 @@ class PropertySearchController extends GetxController {
   // INITIAL SEARCH
   // ============================================================
 
-  Future<void> applyInitialSearch(
-    String? value,
-  ) async {
-    final String query =
-        value?.trim() ?? '';
+  Future<void> applyInitialSearch(String? value) async {
+    final String query = value?.trim() ?? '';
 
     if (query.isEmpty) {
       return;
@@ -271,14 +241,10 @@ class PropertySearchController extends GetxController {
   // INITIAL PURPOSE
   // ============================================================
 
-  Future<void> applyInitialPurpose(
-    String? value,
-  ) async {
-    final String selectedPurpose =
-        value?.trim().toUpperCase() ?? '';
+  Future<void> applyInitialPurpose(String? value) async {
+    final String selectedPurpose = value?.trim().toUpperCase() ?? '';
 
-    if (selectedPurpose != 'SALE' &&
-        selectedPurpose != 'RENT') {
+    if (selectedPurpose != 'SALE' && selectedPurpose != 'RENT') {
       return;
     }
 
@@ -305,14 +271,18 @@ class PropertySearchController extends GetxController {
     int? minBathrooms,
     double? minArea,
     double? maxArea,
+    String? createdById,
   }) async {
     if (search != null) {
       this.search = search.trim();
 
-      _setSearchText(
-        this.search,
-      );
+      _setSearchText(this.search);
     }
+
+    if (createdById != null) {
+  this.createdById = createdById;
+}
+
 
     if (type != null) {
       this.type = type;
@@ -323,8 +293,7 @@ class PropertySearchController extends GetxController {
     }
 
     if (furnishingStatus != null) {
-      this.furnishingStatus =
-          furnishingStatus;
+      this.furnishingStatus = furnishingStatus;
     }
 
     if (nearbyTag != null) {
@@ -376,31 +345,31 @@ class PropertySearchController extends GetxController {
   // ============================================================
 
   Future<void> refreshProperties() async {
-  search = '';
+    search = '';
 
-  searchTextController.clear();
+    searchTextController.clear();
 
-  type = '';
-  purpose = '';
-  furnishingStatus = '';
-  nearbyTag = '';
+    type = '';
+    purpose = '';
+    furnishingStatus = '';
+    nearbyTag = '';
 
-  minPrice = null;
-  maxPrice = null;
+    minPrice = null;
+    maxPrice = null;
 
-  minBedrooms = null;
-  minBathrooms = null;
+    minBedrooms = null;
+    minBathrooms = null;
 
-  minArea = null;
-  maxArea = null;
+    minArea = null;
+    maxArea = null;
 
-  page = 1;
-  hasMore = true;
+    page = 1;
+    hasMore = true;
 
-  update();
+    update();
 
-  await fetchProperties();
-}
+    await fetchProperties();
+  }
 
   // ============================================================
   // RESET FILTER VALUES
@@ -428,15 +397,10 @@ class PropertySearchController extends GetxController {
   // SAFE SEARCH TEXT UPDATE
   // ============================================================
 
-  void _setSearchText(
-    String value,
-  ) {
-    searchTextController.value =
-        TextEditingValue(
+  void _setSearchText(String value) {
+    searchTextController.value = TextEditingValue(
       text: value,
-      selection: TextSelection.collapsed(
-        offset: value.length,
-      ),
+      selection: TextSelection.collapsed(offset: value.length),
     );
   }
 
@@ -444,9 +408,7 @@ class PropertySearchController extends GetxController {
   // PROPERTY DETAILS
   // ============================================================
 
-  Future<void> fetchPropertyDetails(
-    String propertyId,
-  ) async {
+  Future<void> fetchPropertyDetails(String propertyId) async {
     try {
       isDetailsLoading = true;
 
@@ -456,23 +418,14 @@ class PropertySearchController extends GetxController {
 
       update();
 
-      final response =
-          await ApiHandler.get(
+      final response = await ApiHandler.get(
         '${ApiEndpoints.propertyList}'
         '/$propertyId',
       );
 
-      selectedProperty =
-          Property.fromJson(
-        response,
-      );
+      selectedProperty = Property.fromJson(response);
     } catch (e) {
-      detailsError = e
-          .toString()
-          .replaceFirst(
-            'Exception: ',
-            '',
-          );
+      detailsError = e.toString().replaceFirst('Exception: ', '');
     } finally {
       isDetailsLoading = false;
 
@@ -483,21 +436,18 @@ class PropertySearchController extends GetxController {
   // ============================================================
   // CLEAR PROPERTY DETAILS
   // ============================================================
-   Future<void> clearSearch() async {
-  search = '';
+  Future<void> clearSearch() async {
+    search = '';
 
-  searchTextController.clear();
+    searchTextController.clear();
 
-  // Remove any selection/cursor position
-  searchTextController.selection =
-      const TextSelection.collapsed(
-    offset: 0,
-  );
+    // Remove any selection/cursor position
+    searchTextController.selection = const TextSelection.collapsed(offset: 0);
 
-  update();
+    update();
 
-  await fetchProperties();
-}
+    await fetchProperties();
+  }
 
   void clearPropertyDetails() {
     selectedProperty = null;

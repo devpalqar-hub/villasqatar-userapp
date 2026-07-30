@@ -11,36 +11,49 @@ import 'package:get/get_utils/src/extensions/internacionalization.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:villas_qatar/Core/constants/app_colors.dart';
 import 'package:villas_qatar/Core/widgets/primary_button.dart';
+import 'package:villas_qatar/modules/home/service/UtilsController.dart';
 import 'package:villas_qatar/modules/mainscreen/mainscreen.dart';
+import 'package:villas_qatar/modules/propertylist/model/myproperty_model.dart';
 import 'package:villas_qatar/modules/propertylist/service/listproperty_controller.dart';
 
 class ListYourPropertyScreen extends StatefulWidget {
-  const ListYourPropertyScreen({super.key});
+  final Property? property;
+  final bool isEdit;
+  const ListYourPropertyScreen({super.key, this.property, this.isEdit = false});
 
   @override
   State<ListYourPropertyScreen> createState() => _ListYourPropertyScreenState();
 }
 
 class _ListYourPropertyScreenState extends State<ListYourPropertyScreen> {
+  @override
+  void initState() {
+    super.initState();
+
+    if (widget.isEdit && widget.property != null) {
+      controller.loadProperty(widget.property!);
+    }
+  }
+
   final ListPropertyController controller = Get.put(ListPropertyController());
+  final Utilscontroller utilsController = Get.put(Utilscontroller());
   final ImagePicker _picker = ImagePicker();
 
   final descriptionCtrl = TextEditingController();
   String currency = 'QAR';
-
-
 
   String? zoneArea;
   String city = 'Doha';
   String country = 'Qatar';
   String propertyPosition = 'Residential'; // 'Residential' | 'Commercial'
 
-  final List<String> stepLabels =  [
+  final List<String> stepLabels = [
     'Basic Info'.tr,
     'Details'.tr,
     'Features'.tr,
     'Location'.tr,
     'Media'.tr,
+    'Review'.tr,
   ];
 
   @override
@@ -211,6 +224,9 @@ class _ListYourPropertyScreenState extends State<ListYourPropertyScreen> {
         return _buildStep4(key: const ValueKey('step4'));
       case 5:
         return _buildStep5(key: const ValueKey('step5'));
+      case 6:
+        return _buildReviewStep(key: const ValueKey('review'));
+
       default:
         return const SizedBox.shrink();
     }
@@ -251,7 +267,7 @@ class _ListYourPropertyScreenState extends State<ListYourPropertyScreen> {
               value: controller.countryCode,
               onChanged: controller.setCountryCode,
             ),
-          SizedBox(width: 10),
+            SizedBox(width: 10),
             Expanded(
               child: _AppTextField(
                 controller: controller.phoneController,
@@ -272,7 +288,10 @@ class _ListYourPropertyScreenState extends State<ListYourPropertyScreen> {
 
           SizedBox(
             width: double.infinity,
-            child: PrimaryButton(title: "Send OTP".tr, onTap: controller.sendOtp),
+            child: PrimaryButton(
+              title: "Send OTP".tr,
+              onTap: controller.sendOtp,
+            ),
           ),
         ],
         if (controller.showOtpField && !controller.whatsappVerified) ...[
@@ -303,7 +322,7 @@ class _ListYourPropertyScreenState extends State<ListYourPropertyScreen> {
             alignment: Alignment.centerRight,
             child: TextButton(
               onPressed: controller.sendOtp,
-              child:  Text("Resend OTP".tr),
+              child: Text("Resend OTP".tr),
             ),
           ),
         ],
@@ -355,7 +374,7 @@ class _ListYourPropertyScreenState extends State<ListYourPropertyScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                 Text(
+                Text(
                   "WhatsApp Verification".tr,
                   style: TextStyle(
                     color: AppColors.greenText,
@@ -418,17 +437,28 @@ class _ListYourPropertyScreenState extends State<ListYourPropertyScreen> {
         _fieldLabel('Property Type'.tr, required: true),
         const SizedBox(height: 8),
 
-        _AppDropdownField(
-          value: controller.propertyType.isEmpty
-              ? null
-              : controller.propertyType,
-          hint: 'Select property type'.tr,
-          icon: Icons.apartment_outlined,
-          items:  ["Apartment".tr, "Villa".tr, "Townhouse".tr, "Studio".tr, "Office".tr],
-          onChanged: (v) {
-            if (v != null) {
-              controller.setPropertyType(v);
-            }
+        GetBuilder<Utilscontroller>(
+          builder: (utils) {
+            return _AppDropdownField(
+              value: controller.propertyType.isEmpty
+                  ? null
+                  : controller.propertyType,
+              hint: 'Select property type'.tr,
+              icon: Icons.apartment_outlined,
+              items: utils.listingTypes.map((e) => e.title).toList(),
+              onChanged: (value) {
+                if (value != null) {
+                  final selected = utils.listingTypes.firstWhere(
+                    (e) => e.title == value,
+                  );
+
+                  controller.propertyType = selected.title;
+                  controller.selectedTypeId = selected.id;
+
+                  controller.update();
+                }
+              },
+            );
           },
         ),
 
@@ -557,9 +587,9 @@ class _ListYourPropertyScreenState extends State<ListYourPropertyScreen> {
         const SizedBox(height: 8),
 
         _AppTextField(
-          controller:  controller.areaNameController,
+          controller: controller.areaController,
           hint: "Enter property area".tr,
-          keyboardType: TextInputType.number,
+          keyboardType: const TextInputType.numberWithOptions(decimal: true),
           prefixIcon: Icons.square_foot_outlined,
         ),
 
@@ -681,7 +711,7 @@ class _ListYourPropertyScreenState extends State<ListYourPropertyScreen> {
         const SizedBox(height: 22),
 
         Row(
-          children:  [
+          children: [
             Icon(Icons.tune_outlined, size: 18, color: AppColors.primary),
             SizedBox(width: 8),
             Expanded(
@@ -695,7 +725,7 @@ class _ListYourPropertyScreenState extends State<ListYourPropertyScreen> {
 
         const SizedBox(height: 4),
 
-       Padding(
+        Padding(
           padding: EdgeInsets.only(left: 26),
           child: Text(
             "Add any additional features not listed above".tr,
@@ -730,7 +760,7 @@ class _ListYourPropertyScreenState extends State<ListYourPropertyScreen> {
               size: 18,
             ),
             const SizedBox(width: 8),
-             Expanded(
+            Expanded(
               child: Text(
                 "Furnishing".tr,
                 style: TextStyle(fontWeight: FontWeight.w700, fontSize: 14),
@@ -759,7 +789,7 @@ class _ListYourPropertyScreenState extends State<ListYourPropertyScreen> {
               size: 18,
             ),
             const SizedBox(width: 8),
-           Expanded(
+            Expanded(
               child: Text(
                 "Amenities".tr,
                 style: TextStyle(fontWeight: FontWeight.w700, fontSize: 14),
@@ -788,7 +818,7 @@ class _ListYourPropertyScreenState extends State<ListYourPropertyScreen> {
               size: 18,
             ),
             const SizedBox(width: 8),
-          Expanded(
+            Expanded(
               child: Text(
                 "Nearby Tags".tr,
                 style: TextStyle(fontWeight: FontWeight.w700, fontSize: 14),
@@ -814,7 +844,7 @@ class _ListYourPropertyScreenState extends State<ListYourPropertyScreen> {
           border: Border.all(color: AppColors.primary),
           borderRadius: BorderRadius.circular(8.r),
         ),
-        child:  Row(
+        child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
             Icon(Icons.add, size: 16, color: AppColors.primary),
@@ -832,82 +862,68 @@ class _ListYourPropertyScreenState extends State<ListYourPropertyScreen> {
       ),
     );
   }
-Widget _buildSelectedAmenities() {
-  if (controller.selectedAmenities.isEmpty) {
-    return  Padding(
-      padding: EdgeInsets.only(left: 26),
-      child: Text(
-        "No amenities selected".tr,
-        style: TextStyle(
-          color: AppColors.hintGrey,
-          fontSize: 12,
+
+  Widget _buildSelectedAmenities() {
+    if (controller.selectedAmenities.isEmpty) {
+      return Padding(
+        padding: EdgeInsets.only(left: 26),
+        child: Text(
+          "No amenities selected".tr,
+          style: TextStyle(color: AppColors.hintGrey, fontSize: 12),
         ),
+      );
+    }
+
+    final selectedItems = utilsController.amenities
+        .where((item) => controller.selectedAmenities.contains(item.id))
+        .toList();
+
+    return Padding(
+      padding: const EdgeInsets.only(left: 26),
+      child: Wrap(
+        spacing: 8,
+        runSpacing: 8,
+        children: selectedItems.map((item) {
+          return Container(
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+            decoration: BoxDecoration(
+              color: AppColors.pinkChipBg,
+              borderRadius: BorderRadius.circular(8),
+              border: Border.all(color: AppColors.primary.withOpacity(.2)),
+            ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                if (item.image != null && item.image!.isNotEmpty) ...[
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(4),
+                    child: Image.network(
+                      item.image!,
+                      width: 18,
+                      height: 18,
+                      fit: BoxFit.cover,
+                      errorBuilder: (_, __, ___) => const SizedBox.shrink(),
+                    ),
+                  ),
+                  const SizedBox(width: 5),
+                ],
+
+                Text(
+                  item.title,
+                  style: const TextStyle(
+                    color: AppColors.primary,
+                    fontSize: 11,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ],
+            ),
+          );
+        }).toList(),
       ),
     );
   }
 
-  final selectedItems = controller.amenities
-      .where(
-        (item) => controller.selectedAmenities
-            .contains(item.id),
-      )
-      .toList();
-
-  return Padding(
-    padding: const EdgeInsets.only(left: 26),
-    child: Wrap(
-      spacing: 8,
-      runSpacing: 8,
-      children: selectedItems.map((item) {
-        return Container(
-          padding: const EdgeInsets.symmetric(
-            horizontal: 10,
-            vertical: 6,
-          ),
-          decoration: BoxDecoration(
-            color: AppColors.pinkChipBg,
-            borderRadius: BorderRadius.circular(8),
-            border: Border.all(
-              color:
-                  AppColors.primary.withOpacity(.2),
-            ),
-          ),
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              if (item.image != null &&
-                  item.image!.isNotEmpty) ...[
-                ClipRRect(
-                  borderRadius:
-                      BorderRadius.circular(4),
-                  child: Image.network(
-                    item.image!,
-                    width: 18,
-                    height: 18,
-                    fit: BoxFit.cover,
-                    errorBuilder:
-                        (_, __, ___) =>
-                            const SizedBox.shrink(),
-                  ),
-                ),
-                const SizedBox(width: 5),
-              ],
-
-              Text(
-                item.title,
-                style: const TextStyle(
-                  color: AppColors.primary,
-                  fontSize: 11,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-            ],
-          ),
-        );
-      }).toList(),
-    ),
-  );
-}
   Widget _chipRow(List<String> labels, Set<String> selectedSet) {
     return Wrap(
       spacing: 10,
@@ -929,526 +945,432 @@ Widget _buildSelectedAmenities() {
       }).toList(),
     );
   }
-void _showAmenitiesBottomSheet() {
-  showModalBottomSheet(
-    context: context,
-    isScrollControlled: true,
-    backgroundColor: Colors.white,
-    shape: const RoundedRectangleBorder(
-      borderRadius: BorderRadius.vertical(
-        top: Radius.circular(24),
+
+  void _showAmenitiesBottomSheet() {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.white,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
       ),
-    ),
-    builder: (_) {
-      return StatefulBuilder(
-        builder: (context, sheetState) {
-          return SafeArea(
-            child: SizedBox(
-              height:
-                  MediaQuery.of(context).size.height *
-                  .65,
-              child: Padding(
-                padding: const EdgeInsets.fromLTRB(
-                  20,
-                  12,
-                  20,
-                  20,
-                ),
-                child: Column(
-                  children: [
-                    Container(
-                      width: 42,
-                      height: 4,
-                      decoration: BoxDecoration(
-                        color: Colors.grey.shade300,
-                        borderRadius:
-                            BorderRadius.circular(20),
+      builder: (_) {
+        return StatefulBuilder(
+          builder: (context, sheetState) {
+            return SafeArea(
+              child: SizedBox(
+                height: MediaQuery.of(context).size.height * .65,
+                child: Padding(
+                  padding: const EdgeInsets.fromLTRB(20, 12, 20, 20),
+                  child: Column(
+                    children: [
+                      Container(
+                        width: 42,
+                        height: 4,
+                        decoration: BoxDecoration(
+                          color: Colors.grey.shade300,
+                          borderRadius: BorderRadius.circular(20),
+                        ),
                       ),
-                    ),
 
-                    const SizedBox(height: 18),
+                      const SizedBox(height: 18),
 
-                    Row(
-                      children: [
-                        Expanded(
-                          child: Text(
-                            "Select Amenities".tr,
-                            style: TextStyle(
-                              fontSize: 18,
-                              fontWeight:
-                                  FontWeight.w700,
+                      Row(
+                        children: [
+                          Expanded(
+                            child: Text(
+                              "Select Amenities".tr,
+                              style: TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.w700,
+                              ),
                             ),
                           ),
-                        ),
-                        IconButton(
-                          onPressed: () =>
-                              Navigator.pop(context),
-                          icon: const Icon(
-                            Icons.close_rounded,
+                          IconButton(
+                            onPressed: () => Navigator.pop(context),
+                            icon: const Icon(Icons.close_rounded),
                           ),
-                        ),
-                      ],
-                    ),
-
-                    const SizedBox(height: 4),
-
-                  Align(
-                      alignment: Alignment.centerLeft,
-                      child: Text(
-                        "Choose the amenities available in your property.".tr,
-                        style: TextStyle(
-                          color: AppColors.hintGrey,
-                          fontSize: 12,
-                        ),
+                        ],
                       ),
-                    ),
 
-                    const SizedBox(height: 18),
+                      const SizedBox(height: 4),
 
-                    Expanded(
-                      child: GridView.builder(
-                        itemCount:
-                            controller.amenities.length,
-                        gridDelegate:
-                            const SliverGridDelegateWithFixedCrossAxisCount(
-                          crossAxisCount: 3,
-                          crossAxisSpacing: 10,
-                          mainAxisSpacing: 10,
-                          mainAxisExtent: 105,
-                        ),
-                        itemBuilder: (_, index) {
-                          final amenity =
-                              controller.amenities[index];
-
-                          final selected = controller
-                              .selectedAmenities
-                              .contains(amenity.id);
-
-                          return _AmenityTile(
-                            label: amenity.title,
-                            image: amenity.image,
-                            selected: selected,
-                            onTap: () {
-                              sheetState(() {
-                                controller.toggleAmenity(
-                                  amenity.id,
-                                );
-                              });
-                            },
-                          );
-                        },
-                      ),
-                    ),
-
-                    const SizedBox(height: 12),
-
-                    SizedBox(
-                      width: double.infinity,
-                      height: 48,
-                      child: ElevatedButton(
-                        style:
-                            ElevatedButton.styleFrom(
-                          backgroundColor:
-                              AppColors.primary,
-                          elevation: 0,
-                          shape: RoundedRectangleBorder(
-                            borderRadius:
-                                BorderRadius.circular(
-                                  14,
-                                ),
-                          ),
-                        ),
-                        onPressed: () {
-                          controller.update();
-                          Navigator.pop(context);
-                        },
+                      Align(
+                        alignment: Alignment.centerLeft,
                         child: Text(
-                          "Done".tr,
+                          "Choose the amenities available in your property.".tr,
                           style: TextStyle(
-                            color: Colors.white,
-                            fontWeight:
-                                FontWeight.w600,
+                            color: AppColors.hintGrey,
+                            fontSize: 12,
                           ),
                         ),
                       ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          );
-        },
-      );
-    },
-  );
-}
-Widget _buildSelectedNearbyTags() {
-  if (controller.selectedNearbyTags.isEmpty) {
-    return  Padding(
-      padding: EdgeInsets.only(left: 26),
-      child: Text(
-        "No nearby tags selected".tr,
-        style: TextStyle(
-          color: AppColors.hintGrey,
-          fontSize: 12,
-        ),
-      ),
-    );
-  }
 
-  final selectedItems = controller.nearbyTags
-      .where(
-        (item) => controller.selectedNearbyTags
-            .contains(item.id),
-      )
-      .toList();
+                      const SizedBox(height: 18),
 
-  return Padding(
-    padding: const EdgeInsets.only(left: 26),
-    child: Wrap(
-      spacing: 8,
-      runSpacing: 8,
-      children: selectedItems.map((item) {
-        return Container(
-          padding: const EdgeInsets.symmetric(
-            horizontal: 10,
-            vertical: 6,
-          ),
-          decoration: BoxDecoration(
-            color: AppColors.pinkChipBg,
-            borderRadius: BorderRadius.circular(8),
-            border: Border.all(
-              color:
-                  AppColors.primary.withOpacity(.25),
-            ),
-          ),
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              if (item.image != null &&
-                  item.image!.isNotEmpty) ...[
-                ClipRRect(
-                  borderRadius:
-                      BorderRadius.circular(4),
-                  child: Image.network(
-                    item.image!,
-                    width: 18,
-                    height: 18,
-                    fit: BoxFit.cover,
-                    errorBuilder:
-                        (_, __, ___) =>
-                            const SizedBox.shrink(),
-                  ),
-                ),
-                const SizedBox(width: 5),
-              ],
+                      Expanded(
+                        child: GridView.builder(
+                          itemCount: utilsController.amenities.length,
+                          gridDelegate:
+                              const SliverGridDelegateWithFixedCrossAxisCount(
+                                crossAxisCount: 3,
+                                crossAxisSpacing: 10,
+                                mainAxisSpacing: 10,
+                                mainAxisExtent: 105,
+                              ),
+                          itemBuilder: (_, index) {
+                            final amenity = utilsController.amenities[index];
 
-              Text(
-                item.title,
-                style: const TextStyle(
-                  color: AppColors.primary,
-                  fontSize: 11,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-            ],
-          ),
-        );
-      }).toList(),
-    ),
-  );
-}
+                            final selected = controller.selectedAmenities
+                                .contains(amenity.id);
 
-Widget _buildSelectedFurnishing() {
-  if (controller.selectedFurnishing.isEmpty) {
-    return  Padding(
-      padding: EdgeInsets.only(left: 26),
-      child: Text(
-        "No furnishing option selected".tr,
-        style: TextStyle(
-          color: AppColors.hintGrey,
-          fontSize: 12,
-        ),
-      ),
-    );
-  }
-
-  final selectedItems = controller
-      .furnishingOptions
-      .where(
-        (item) => controller.selectedFurnishing
-            .contains(item.id),
-      )
-      .toList();
-
-  return Padding(
-    padding: const EdgeInsets.only(left: 26),
-    child: Wrap(
-      spacing: 8,
-      runSpacing: 8,
-      children: selectedItems.map((item) {
-        return Container(
-          padding: const EdgeInsets.symmetric(
-            horizontal: 10,
-            vertical: 6,
-          ),
-          decoration: BoxDecoration(
-            color: AppColors.pinkChipBg,
-            borderRadius: BorderRadius.circular(8),
-            border: Border.all(
-              color:
-                  AppColors.primary.withOpacity(.25),
-            ),
-          ),
-          child: Text(
-            item.title,
-            style: const TextStyle(
-              color: AppColors.primary,
-              fontWeight: FontWeight.w600,
-              fontSize: 11,
-            ),
-          ),
-        );
-      }).toList(),
-    ),
-  );
-}
-
-void _showFurnishingBottomSheet() {
-  showModalBottomSheet(
-    context: context,
-    isScrollControlled: true,
-    backgroundColor: Colors.white,
-    shape: const RoundedRectangleBorder(
-      borderRadius: BorderRadius.vertical(
-        top: Radius.circular(24),
-      ),
-    ),
-    builder: (_) {
-      return StatefulBuilder(
-        builder: (context, sheetState) {
-          return SafeArea(
-            child: Padding(
-              padding: const EdgeInsets.fromLTRB(
-                20,
-                16,
-                20,
-                20,
-              ),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Container(
-                    width: 42,
-                    height: 4,
-                    decoration: BoxDecoration(
-                      color: Colors.grey.shade300,
-                      borderRadius:
-                          BorderRadius.circular(20),
-                    ),
-                  ),
-
-                  const SizedBox(height: 18),
-
-                  const Text(
-                    "Furnishing",
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.w700,
-                    ),
-                  ),
-
-                  const SizedBox(height: 10),
-
-                  ...controller.furnishingOptions
-                      .map((item) {
-                    final selected = controller
-                        .selectedFurnishing
-                        .contains(item.id);
-
-                    return ListTile(
-                      contentPadding: EdgeInsets.zero,
-                      leading: Icon(
-                        selected
-                            ? Icons
-                                  .radio_button_checked
-                            : Icons
-                                  .radio_button_off,
-                        color: AppColors.primary,
-                      ),
-                      title: Text(
-                        item.title,
-                        style: const TextStyle(
-                          fontWeight:
-                              FontWeight.w500,
+                            return _AmenityTile(
+                              label: amenity.title,
+                              image: amenity.image,
+                              selected: selected,
+                              onTap: () {
+                                sheetState(() {
+                                  controller.toggleAmenity(amenity.id);
+                                });
+                              },
+                            );
+                          },
                         ),
                       ),
-                      onTap: () {
-                        sheetState(() {
-                          controller
-                              .toggleFurnishing(
-                            item.id,
-                          );
-                        });
-                      },
-                    );
-                  }),
 
-                  const SizedBox(height: 12),
+                      const SizedBox(height: 12),
 
-                  PrimaryButton(
-                    title: "Done",
-                    onTap: () {
-                      controller.update();
-                      Navigator.pop(context);
-                    },
+                      SizedBox(
+                        width: double.infinity,
+                        height: 48,
+                        child: ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: AppColors.primary,
+                            elevation: 0,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(14),
+                            ),
+                          ),
+                          onPressed: () {
+                            controller.update();
+                            Navigator.pop(context);
+                          },
+                          child: Text(
+                            "Done".tr,
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
+                ),
+              ),
+            );
+          },
+        );
+      },
+    );
+  }
+
+  Widget _buildSelectedNearbyTags() {
+    if (controller.selectedNearbyTags.isEmpty) {
+      return Padding(
+        padding: EdgeInsets.only(left: 26),
+        child: Text(
+          "No nearby tags selected".tr,
+          style: TextStyle(color: AppColors.hintGrey, fontSize: 12),
+        ),
+      );
+    }
+
+    final selectedItems = controller.nearbyTags
+        .where((item) => controller.selectedNearbyTags.contains(item.id))
+        .toList();
+
+    return Padding(
+      padding: const EdgeInsets.only(left: 26),
+      child: Wrap(
+        spacing: 8,
+        runSpacing: 8,
+        children: selectedItems.map((item) {
+          return Container(
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+            decoration: BoxDecoration(
+              color: AppColors.pinkChipBg,
+              borderRadius: BorderRadius.circular(8),
+              border: Border.all(color: AppColors.primary.withOpacity(.25)),
+            ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                if (item.image != null && item.image!.isNotEmpty) ...[
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(4),
+                    child: Image.network(
+                      item.image!,
+                      width: 18,
+                      height: 18,
+                      fit: BoxFit.cover,
+                      errorBuilder: (_, __, ___) => const SizedBox.shrink(),
+                    ),
+                  ),
+                  const SizedBox(width: 5),
                 ],
+
+                Text(
+                  item.title,
+                  style: const TextStyle(
+                    color: AppColors.primary,
+                    fontSize: 11,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ],
+            ),
+          );
+        }).toList(),
+      ),
+    );
+  }
+
+  Widget _buildSelectedFurnishing() {
+    if (controller.selectedFurnishing.isEmpty) {
+      return Padding(
+        padding: EdgeInsets.only(left: 26),
+        child: Text(
+          "No furnishing option selected".tr,
+          style: TextStyle(color: AppColors.hintGrey, fontSize: 12),
+        ),
+      );
+    }
+
+    final selectedItems = utilsController.furnishingOptions
+        .where((item) => controller.selectedFurnishing.contains(item.id))
+        .toList();
+
+    return Padding(
+      padding: const EdgeInsets.only(left: 26),
+      child: Wrap(
+        spacing: 8,
+        runSpacing: 8,
+        children: selectedItems.map((item) {
+          return Container(
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+            decoration: BoxDecoration(
+              color: AppColors.pinkChipBg,
+              borderRadius: BorderRadius.circular(8),
+              border: Border.all(color: AppColors.primary.withOpacity(.25)),
+            ),
+            child: Text(
+              item.title,
+              style: const TextStyle(
+                color: AppColors.primary,
+                fontWeight: FontWeight.w600,
+                fontSize: 11,
               ),
             ),
           );
-        },
-      );
-    },
-  );
-}
-void _showNearbyTagsBottomSheet() {
-  showModalBottomSheet(
-    context: context,
-    isScrollControlled: true,
-    backgroundColor: Colors.white,
-    shape: const RoundedRectangleBorder(
-      borderRadius: BorderRadius.vertical(
-        top: Radius.circular(24),
+        }).toList(),
       ),
-    ),
-    builder: (_) {
-      return StatefulBuilder(
-        builder: (context, sheetState) {
-          return SafeArea(
-            child: SizedBox(
-              height:
-                  MediaQuery.of(context).size.height *
-                  .65,
+    );
+  }
+
+  void _showFurnishingBottomSheet() {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.white,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+      ),
+      builder: (_) {
+        return StatefulBuilder(
+          builder: (context, sheetState) {
+            return SafeArea(
               child: Padding(
-                padding: const EdgeInsets.fromLTRB(
-                  20,
-                  12,
-                  20,
-                  20,
-                ),
+                padding: const EdgeInsets.fromLTRB(20, 16, 20, 20),
                 child: Column(
+                  mainAxisSize: MainAxisSize.min,
                   children: [
                     Container(
                       width: 42,
                       height: 4,
                       decoration: BoxDecoration(
                         color: Colors.grey.shade300,
-                        borderRadius:
-                            BorderRadius.circular(20),
+                        borderRadius: BorderRadius.circular(20),
                       ),
                     ),
 
                     const SizedBox(height: 18),
 
-                    Row(
-                      children: [
-                    Expanded(
-                          child: Text(
-                            "Nearby Tags".tr,
-                            style: TextStyle(
-                              fontSize: 18,
-                              fontWeight:
-                                  FontWeight.w700,
-                            ),
-                          ),
-                        ),
-                        IconButton(
-                          onPressed: () =>
-                              Navigator.pop(context),
-                          icon:
-                              const Icon(Icons.close),
-                        ),
-                      ],
-                    ),
-
-                    const SizedBox(height: 15),
-
-                    Expanded(
-                      child: GridView.builder(
-                        itemCount:
-                            controller.nearbyTags.length,
-                        gridDelegate:
-                            const SliverGridDelegateWithFixedCrossAxisCount(
-                          crossAxisCount: 3,
-                          crossAxisSpacing: 10,
-                          mainAxisSpacing: 10,
-                          mainAxisExtent: 105,
-                        ),
-                        itemBuilder: (_, index) {
-                          final tag =
-                              controller.nearbyTags[index];
-
-                          final selected = controller
-                              .selectedNearbyTags
-                              .contains(tag.id);
-
-                          return _AmenityTile(
-                            label: tag.title,
-                            image: tag.image,
-                            selected: selected,
-                            onTap: () {
-                              sheetState(() {
-                                controller
-                                    .toggleNearbyTag(
-                                  tag.id,
-                                );
-                              });
-                            },
-                          );
-                        },
+                    const Text(
+                      "Furnishing",
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.w700,
                       ),
                     ),
+
+                    const SizedBox(height: 10),
+
+                    ...controller.furnishingOptions.map((item) {
+                      final selected = controller.selectedFurnishing.contains(
+                        item.id,
+                      );
+
+                      return ListTile(
+                        contentPadding: EdgeInsets.zero,
+                        leading: Icon(
+                          selected
+                              ? Icons.radio_button_checked
+                              : Icons.radio_button_off,
+                          color: AppColors.primary,
+                        ),
+                        title: Text(
+                          item.title,
+                          style: const TextStyle(fontWeight: FontWeight.w500),
+                        ),
+                        onTap: () {
+                          sheetState(() {
+                            controller.toggleFurnishing(item.id);
+                          });
+                        },
+                      );
+                    }),
 
                     const SizedBox(height: 12),
 
-                    SizedBox(
-                      width: double.infinity,
-                      height: 48,
-                      child: ElevatedButton(
-                        style:
-                            ElevatedButton.styleFrom(
-                          backgroundColor:
-                              AppColors.primary,
-                          shape: RoundedRectangleBorder(
-                            borderRadius:
-                                BorderRadius.circular(
-                                  14,
-                                ),
-                          ),
-                        ),
-                        onPressed: () {
-                          controller.update();
-                          Navigator.pop(context);
-                        },
-                        child:  Text(
-                          "Done".tr,
-                          style: TextStyle(
-                            color: Colors.white,
-                          ),
-                        ),
-                      ),
+                    PrimaryButton(
+                      title: "Done",
+                      onTap: () {
+                        controller.update();
+                        Navigator.pop(context);
+                      },
                     ),
                   ],
                 ),
               ),
-            ),
-          );
-        },
-      );
-    },
-  );
-}
+            );
+          },
+        );
+      },
+    );
+  }
+
+  void _showNearbyTagsBottomSheet() {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.white,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+      ),
+      builder: (_) {
+        return StatefulBuilder(
+          builder: (context, sheetState) {
+            return SafeArea(
+              child: SizedBox(
+                height: MediaQuery.of(context).size.height * .65,
+                child: Padding(
+                  padding: const EdgeInsets.fromLTRB(20, 12, 20, 20),
+                  child: Column(
+                    children: [
+                      Container(
+                        width: 42,
+                        height: 4,
+                        decoration: BoxDecoration(
+                          color: Colors.grey.shade300,
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                      ),
+
+                      const SizedBox(height: 18),
+
+                      Row(
+                        children: [
+                          Expanded(
+                            child: Text(
+                              "Nearby Tags".tr,
+                              style: TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.w700,
+                              ),
+                            ),
+                          ),
+                          IconButton(
+                            onPressed: () => Navigator.pop(context),
+                            icon: const Icon(Icons.close),
+                          ),
+                        ],
+                      ),
+
+                      const SizedBox(height: 15),
+
+                      Expanded(
+                        child: GridView.builder(
+                          itemCount: utilsController.nearbyTags.length,
+                          gridDelegate:
+                              const SliverGridDelegateWithFixedCrossAxisCount(
+                                crossAxisCount: 3,
+                                crossAxisSpacing: 10,
+                                mainAxisSpacing: 10,
+                                mainAxisExtent: 105,
+                              ),
+                          itemBuilder: (_, index) {
+                            final tag = utilsController.nearbyTags[index];
+
+                            final selected = controller.selectedNearbyTags
+                                .contains(tag.id);
+
+                            return _AmenityTile(
+                              label: tag.title,
+                              image: tag.image,
+                              selected: selected,
+                              onTap: () {
+                                sheetState(() {
+                                  controller.toggleNearbyTag(tag.id);
+                                });
+                              },
+                            );
+                          },
+                        ),
+                      ),
+
+                      const SizedBox(height: 12),
+
+                      SizedBox(
+                        width: double.infinity,
+                        height: 48,
+                        child: ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: AppColors.primary,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(14),
+                            ),
+                          ),
+                          onPressed: () {
+                            controller.update();
+                            Navigator.pop(context);
+                          },
+                          child: Text(
+                            "Done".tr,
+                            style: TextStyle(color: Colors.white),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            );
+          },
+        );
+      },
+    );
+  }
 
   // ---------------------------------------------------------
   // STEP 4 — LOCATION DETAILS
@@ -1492,24 +1414,39 @@ void _showNearbyTagsBottomSheet() {
         const SizedBox(height: 8),
 
         _AppTextField(
-          controller: controller.areaController,
+          controller: controller.areaNameController,
           hint: "Name of Area".tr,
           prefixIcon: Icons.map_outlined,
-        
-         
         ),
 
         const SizedBox(height: 18),
-
-        _fieldLabel("Municipality / City".tr, required: true),
+        _fieldLabel("Muncipality".tr, required: true),
         const SizedBox(height: 8),
 
-        _AppTextField(
-          controller: controller.cityController,
-          hint: "Enter municipality".tr,
-          prefixIcon: Icons.location_city_outlined,
-        ),
+        GetBuilder<Utilscontroller>(
+          builder: (utils) {
+            return _AppDropdownField(
+              value: controller.cityController.text.isEmpty
+                  ? null
+                  : controller.cityController.text,
+              hint: "Select Municipality".tr,
+              icon: Icons.location_city_outlined,
+              items: utils.municipalities.map((e) => e.name).toList(),
+              onChanged: (value) {
+                if (value != null) {
+                  final selected = utils.municipalities.firstWhere(
+                    (e) => e.name == value,
+                  );
 
+                  controller.cityController.text = selected.name;
+                  controller.selectedMunicipalityId = selected.id;
+
+                  controller.update();
+                }
+              },
+            );
+          },
+        ),
         const SizedBox(height: 18),
 
         _fieldLabel("Landmark".tr),
@@ -1584,12 +1521,13 @@ void _showNearbyTagsBottomSheet() {
             border: Border.all(color: AppColors.fieldBorder),
           ),
           child: Row(
-            children:[
+            children: [
               Icon(Icons.map_outlined, color: AppColors.primary),
               SizedBox(width: 10),
               Expanded(
                 child: Text(
-                  "Google Map integration can be added here for selecting the exact location.".tr,
+                  "Google Map integration can be added here for selecting the exact location."
+                      .tr,
                   style: TextStyle(fontSize: 12, color: AppColors.labelGrey),
                 ),
               ),
@@ -1600,13 +1538,6 @@ void _showNearbyTagsBottomSheet() {
     );
   }
 
-  // ---------------------------------------------------------
-  // STEP 5 — PHOTOS & VIDEOS (MEDIA)
-  // ---------------------------------------------------------
-  // ---------------------------------------------------------
-  // STEP 5
-  // ---------------------------------------------------------
-
   Widget _buildStep5({Key? key}) {
     return Column(
       key: key,
@@ -1615,17 +1546,97 @@ void _showNearbyTagsBottomSheet() {
         _sectionHeader(
           icon: Icons.camera_alt_outlined,
           title: "Photos & Videos".tr,
-          subtitle: "Add high quality photos and videos to attract more buyers".tr,
+          subtitle:
+              "Add high quality photos and videos to attract more buyers".tr,
         ),
 
         const SizedBox(height: 20),
 
-        //=========================================================
-        // PHOTOS
-        //=========================================================
+        _fieldLabel("Cover Image".tr, required: true),
+
+        Padding(
+          padding: const EdgeInsets.only(top: 2, bottom: 12),
+          child: Text(
+            "This image will be shown first in listings.".tr,
+            style: TextStyle(color: AppColors.hintGrey, fontSize: 12),
+          ),
+        ),
+
+        (controller.coverImage.isEmpty && controller.existingPhotos.isEmpty)
+            ? GestureDetector(
+                onTap: _pickCoverImage,
+                child: const _DashedUploadBox(
+                  icon: Icons.image_outlined,
+                  title: "Upload Cover Image",
+                  subtitle: "JPG, PNG up to 10MB",
+                  filled: true,
+                ),
+              )
+            : Stack(
+                children: [
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(14),
+                    child: controller.coverImage.isNotEmpty
+                        ? Image.file(
+                            File(controller.coverImage),
+                            width: double.infinity,
+                            height: 190,
+                            fit: BoxFit.cover,
+                          )
+                        : Image.network(
+                            controller.existingPhotos.first.url,
+                            width: double.infinity,
+                            height: 190,
+                            fit: BoxFit.cover,
+                          ),
+                  ),
+                  Positioned(
+                    top: 10,
+                    right: 10,
+                    child: InkWell(
+                      onTap: controller.removeCoverImage,
+                      child: Container(
+                        padding: const EdgeInsets.all(6),
+                        decoration: const BoxDecoration(
+                          color: Colors.black54,
+                          shape: BoxShape.circle,
+                        ),
+                        child: const Icon(
+                          Icons.close,
+                          color: Colors.white,
+                          size: 18,
+                        ),
+                      ),
+                    ),
+                  ),
+                  Positioned(
+                    left: 10,
+                    bottom: 10,
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 10,
+                        vertical: 5,
+                      ),
+                      decoration: BoxDecoration(
+                        color: AppColors.primary,
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      child: const Text(
+                        "Cover",
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+
+        const SizedBox(height: 22),
         _fieldLabel("Property Photos".tr, required: true),
 
-      Padding(
+        Padding(
           padding: EdgeInsets.only(top: 2, bottom: 12),
           child: Text(
             "Upload clear and attractive photos (Max 20 photos)".tr,
@@ -1633,33 +1644,79 @@ void _showNearbyTagsBottomSheet() {
           ),
         ),
 
-        SizedBox(
-          height: 82,
-          child: ListView.separated(
-            scrollDirection: Axis.horizontal,
-            itemCount: controller.images.isEmpty ? 4 : controller.images.length,
-            separatorBuilder: (_, __) => const SizedBox(width: 8),
-            itemBuilder: (_, index) {
-              if (controller.images.isEmpty) {
-                const colors = [
-                  Color(0xFFEFE3D8),
-                  Color(0xFFE7DED6),
-                  Color(0xFFEDEAE4),
-                  Color(0xFFDCE4E8),
-                ];
+       SizedBox(
+  height: 82,
+  child: ListView.separated(
+    scrollDirection: Axis.horizontal,
+    separatorBuilder: (_, __) => const SizedBox(width: 8),
+    itemCount: controller.images.isNotEmpty
+        ? controller.images.length
+        : controller.existingPhotos.isNotEmpty
+            ? controller.existingPhotos.length
+            : 4,
+    itemBuilder: (_, index) {
+      // No images
+      if (controller.images.isEmpty &&
+          controller.existingPhotos.isEmpty) {
+        const colors = [
+          Color(0xFFEFE3D8),
+          Color(0xFFE7DED6),
+          Color(0xFFEDEAE4),
+          Color(0xFFDCE4E8),
+        ];
 
-                return _PhotoThumbnail(color: colors[index]);
-              }
+        return _PhotoThumbnail(color: colors[index]);
+      }
 
-              return _PhotoThumbnail(
-                imagePath: controller.images[index],
-                onRemove: () {
-                  controller.removeImage(index);
-                },
-              );
-            },
+      // Newly selected local images
+      if (controller.images.isNotEmpty) {
+        return _PhotoThumbnail(
+          imagePath: controller.images[index],
+          onRemove: () {
+            controller.removeImage(index);
+          },
+        );
+      }
+
+      // Existing images from API
+      return Stack(
+        children: [
+          ClipRRect(
+            borderRadius: BorderRadius.circular(10),
+            child: Image.network(
+              controller.existingPhotos[index].url,
+              width: 82,
+              height: 82,
+              fit: BoxFit.cover,
+            ),
           ),
-        ),
+          Positioned(
+            top: 4,
+            right: 4,
+            child: InkWell(
+              onTap: () {
+                controller.existingPhotos.removeAt(index);
+                controller.update();
+              },
+              child: Container(
+                padding: const EdgeInsets.all(4),
+                decoration: const BoxDecoration(
+                  color: Colors.black54,
+                  shape: BoxShape.circle,
+                ),
+                child: const Icon(
+                  Icons.close,
+                  color: Colors.white, 
+                  size: 14,
+                ),
+              ),
+            ),
+          ),
+        ],
+      );
+    },
+  ),
+),
 
         const SizedBox(height: 14),
 
@@ -1675,43 +1732,43 @@ void _showNearbyTagsBottomSheet() {
 
         const SizedBox(height: 22),
 
-        //=========================================================
-        // VIDEOS
-        //=========================================================
-        _fieldLabel("Property Videos"),
+        // //=========================================================
+        // // VIDEOS
+        // //=========================================================
+        // _fieldLabel("Property Videos"),
 
-        const Padding(
-          padding: EdgeInsets.only(top: 2, bottom: 4),
-          child: Text(
-            "(Optional)",
-            style: TextStyle(color: AppColors.hintGrey, fontSize: 11),
-          ),
-        ),
+        // const Padding(
+        //   padding: EdgeInsets.only(top: 2, bottom: 4),
+        //   child: Text(
+        //     "(Optional)",
+        //     style: TextStyle(color: AppColors.hintGrey, fontSize: 11),
+        //   ),
+        // ),
 
-        const Padding(
-          padding: EdgeInsets.only(bottom: 12),
-          child: Text(
-            "Upload video tour of your property (Max 3 videos)",
-            style: TextStyle(color: AppColors.hintGrey, fontSize: 12),
-          ),
-        ),
+        // const Padding(
+        //   padding: EdgeInsets.only(bottom: 12),
+        //   child: Text(
+        //     "Upload video tour of your property (Max 3 videos)",
+        //     style: TextStyle(color: AppColors.hintGrey, fontSize: 12),
+        //   ),
+        // ),
 
-        GestureDetector(
-          onTap: _pickVideo,
-          child: _DashedUploadBox(
-            icon: Icons.videocam_outlined,
-            title: controller.video.isEmpty ? "Add Video" : "Video Selected",
-            subtitle: controller.video.isEmpty
-                ? "MP4, MOV up to 50MB each"
-                : controller.video.split('/').last,
-          ),
-        ),
+        // GestureDetector(
+        //   onTap: _pickVideo,
+        //   child: _DashedUploadBox(
+        //     icon: Icons.videocam_outlined,
+        //     title: controller.video.isEmpty ? "Add Video" : "Video Selected",
+        //     subtitle: controller.video.isEmpty
+        //         ? "MP4, MOV up to 50MB each"
+        //         : controller.video.split('/').last,
+        //   ),
+        // ),
 
-        const SizedBox(height: 16),
+        // const SizedBox(height: 16),
 
-        _buildVideoGuidelines(),
+        // _buildVideoGuidelines(),
 
-        const SizedBox(height: 22),
+        // const SizedBox(height: 22),
 
         //=========================================================
         // DOCUMENTS
@@ -1747,6 +1804,283 @@ void _showNearbyTagsBottomSheet() {
         _buildTipBox(),
       ],
     );
+  }
+
+  Widget _buildReviewStep({Key? key}) {
+    return SingleChildScrollView(
+      key: key,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _sectionHeader(
+            icon: Icons.fact_check_outlined,
+            title: "Review Listing".tr,
+            subtitle: "Verify all details before submitting".tr,
+          ),
+
+          const SizedBox(height: 24),
+
+          _reviewSection(
+            title: "Basic Information",
+            step: 0,
+            children: [
+              _reviewTile("Full Name", controller.fullNameController.text),
+              _reviewTile(
+                "Phone",
+                "${controller.countryCode} ${controller.phoneController.text}",
+              ),
+              _reviewTile("Email", controller.emailController.text),
+              _reviewTile(
+                "WhatsApp Verified",
+                controller.whatsappVerified ? "Yes" : "No",
+              ),
+              _reviewTile("Description", controller.descriptionController.text),
+            ],
+          ),
+
+          _reviewSection(
+            title: "Property Details",
+            step: 1,
+            children: [
+              _reviewTile(
+                "Property Name",
+                controller.propertyNameController.text,
+              ),
+
+              _reviewTile("Property Type", controller.propertyType),
+
+              _reviewTile("Purpose", controller.propertyPurpose),
+
+              _reviewTile("Price", "QAR ${controller.priceController.text}"),
+
+              _reviewTile("Area", "${controller.areaController.text} sqm"),
+
+              _reviewTile("Bedrooms", controller.bedroomsController.text),
+
+              _reviewTile("Bathrooms", controller.bathroomsController.text),
+
+              _reviewTile(
+                "Living Rooms",
+                controller.livingRoomsController.text,
+              ),
+
+              _reviewTile(
+                "Parking Spaces",
+                controller.parkingSpacesController.text,
+              ),
+
+              _reviewTile(
+                "Floor Number",
+                controller.floorNumberController.text,
+              ),
+
+              _reviewTile(
+                "Total Floors",
+                controller.totalFloorsController.text,
+              ),
+
+              _reviewTile("Year Built", controller.yearBuiltController.text),
+            ],
+          ),
+
+          _reviewSection(
+            title: "Features & Amenities",
+            step: 2,
+            children: [
+              _reviewTile(
+                "Other Features",
+                controller.otherFeatureController.text,
+              ),
+
+              const SizedBox(height: 12),
+
+              const Text(
+                "Furnishing",
+                style: TextStyle(fontWeight: FontWeight.bold),
+              ),
+
+              const SizedBox(height: 8),
+
+              _buildSelectedFurnishing(),
+
+              const SizedBox(height: 16),
+
+              const Text(
+                "Amenities",
+                style: TextStyle(fontWeight: FontWeight.bold),
+              ),
+
+              const SizedBox(height: 8),
+
+              _buildSelectedAmenities(),
+
+              const SizedBox(height: 16),
+
+              const Text(
+                "Nearby Tags",
+                style: TextStyle(fontWeight: FontWeight.bold),
+              ),
+
+              const SizedBox(height: 8),
+
+              _buildSelectedNearbyTags(),
+            ],
+          ),
+          _reviewSection(
+            title: "Location",
+            step: 3,
+            children: [
+              _reviewTile("Address Line 1", controller.addressController.text),
+
+              _reviewTile("Address Line 2", controller.streetController.text),
+
+              _reviewTile("Area", controller.areaNameController.text),
+
+              _reviewTile("Municipality", controller.cityController.text),
+
+              _reviewTile("Landmark", controller.landmarkController.text),
+
+              _reviewTile("Latitude", controller.latitudeController.text),
+
+              _reviewTile("Longitude", controller.longitudeController.text),
+            ],
+          ),
+
+          _reviewSection(
+            title: "Photos & Media",
+            step: 4,
+            children: [
+              if (controller.coverImage.isNotEmpty)
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text(
+                      "Cover Image",
+                      style: TextStyle(fontWeight: FontWeight.bold),
+                    ),
+
+                    const SizedBox(height: 10),
+
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(12),
+                      child: Image.file(
+                        File(controller.coverImage),
+                        height: 180,
+                        width: double.infinity,
+                        fit: BoxFit.cover,
+                      ),
+                    ),
+                  ],
+                ),
+
+              const SizedBox(height: 20),
+
+              const Text(
+                "Gallery",
+                style: TextStyle(fontWeight: FontWeight.bold),
+              ),
+
+              const SizedBox(height: 10),
+
+              Wrap(
+                spacing: 10,
+                runSpacing: 10,
+                children: controller.images.map((path) {
+                  return ClipRRect(
+                    borderRadius: BorderRadius.circular(10),
+                    child: Image.file(
+                      File(path),
+                      width: 90,
+                      height: 90,
+                      fit: BoxFit.cover,
+                    ),
+                  );
+                }).toList(),
+              ),
+
+              const SizedBox(height: 12),
+
+              _reviewTile("Total Photos", controller.images.length.toString()),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _reviewSection({
+    required String title,
+    required int step,
+    required List<Widget> children,
+  }) {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 16),
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: Colors.grey.shade200),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Expanded(
+                child: Text(
+                  title,
+                  style: const TextStyle(fontWeight: FontWeight.bold),
+                ),
+              ),
+
+              InkWell(
+                onTap: () {
+                  controller.currentStep = step;
+                  controller.update();
+                },
+                child: const Row(
+                  children: [
+                    Icon(Icons.edit, size: 18),
+                    SizedBox(width: 4),
+                    Text("Edit"),
+                  ],
+                ),
+              ),
+            ],
+          ),
+
+          const Divider(),
+
+          ...children,
+        ],
+      ),
+    );
+  }
+
+  Widget _reviewTile(String title, String value) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 6),
+      child: Row(
+        children: [
+          Expanded(child: Text(title)),
+          Text(
+            value.isEmpty ? "-" : value,
+            style: const TextStyle(fontWeight: FontWeight.w600),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Future<void> _pickCoverImage() async {
+    final ImagePicker picker = ImagePicker();
+
+    final XFile? image = await picker.pickImage(source: ImageSource.gallery);
+
+    if (image == null) return;
+
+    controller.coverImage = image.path;
+    controller.update();
   }
 
   Future<void> _pickImages() async {
@@ -1937,98 +2271,82 @@ void _showNearbyTagsBottomSheet() {
       ),
     );
   }
-Widget _buildBottomButton() {
-  final bool isLastStep =
-      controller.currentStep ==
-      controller.steps.length - 1;
 
-  return SizedBox(
-    width: double.infinity,
-    height: 54,
-    child: ElevatedButton(
-      // Prevent multiple submissions
-      onPressed: controller.isSubmitting
-          ? null
-          : () async {
-              // ==========================================
-              // NORMAL NEXT STEP
-              // ==========================================
+  Widget _buildBottomButton() {
+    final bool isReviewStep = controller.currentStep == 5;
+    return SizedBox(
+      width: double.infinity,
+      height: 54,
+      child: ElevatedButton(
+        // Prevent multiple submissions
+        onPressed: controller.isSubmitting
+            ? null
+            : () async {
+                if (!isReviewStep) {
+                  controller.nextStep();
+                  return;
+                }
 
-              if (!isLastStep) {
-                controller.nextStep();
-                return;
-              }
+                bool success;
 
-              // ==========================================
-              // FINAL STEP - ADD PROPERTY
-              // ==========================================
+                if (widget.isEdit) {
+                  success = await controller.updateProperty(
+                    widget.property!.id,
+                  );
+                } else {
+                  success = await controller.addProperty();
+                }
 
-              final bool success =
-                  await controller.addProperty();
-
-              if (!success) {
-                return;
-              }
-
-              // ==========================================
-              // CLOSE ADD PROPERTY SCREEN
-              //
-              // true tells My Properties:
-              // "A new property was added"
-              // ==========================================
-
-              Get.back(result: true);
-            },
-
-      style: ElevatedButton.styleFrom(
-        backgroundColor: AppColors.primary,
-        disabledBackgroundColor:
-            AppColors.primary.withOpacity(.7),
-        shape: RoundedRectangleBorder(
-          borderRadius:
-              BorderRadius.circular(14),
+                if (success) {
+                  Get.back(result: true);
+                }
+              },
+        style: ElevatedButton.styleFrom(
+          backgroundColor: AppColors.primary,
+          disabledBackgroundColor: AppColors.primary.withOpacity(.7),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(14),
+          ),
+          elevation: 0,
         ),
-        elevation: 0,
-      ),
 
-      child: controller.isSubmitting
-          ? const SizedBox(
-              width: 22,
-              height: 22,
-              child:
-                  CircularProgressIndicator(
-                color: Colors.white,
-                strokeWidth: 2,
-              ),
-            )
-          : Row(
-              mainAxisAlignment:
-                  MainAxisAlignment.center,
-              children: [
-                Text(
-                  isLastStep
-                      ? 'Review & Publish'.tr
-                      : 'Save & Continue'.tr,
-                  style: const TextStyle(
-                    fontSize: 16,
-                    fontWeight:
-                        FontWeight.w700,
+        child: controller.isSubmitting
+            ? const SizedBox(
+                width: 22,
+                height: 22,
+                child: CircularProgressIndicator(
+                  color: Colors.white,
+                  strokeWidth: 2,
+                ),
+              )
+            : Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    isReviewStep
+                        ? (widget.isEdit
+                              ? "Update Property".tr
+                              : "Submit Property".tr)
+                        : "Save & Continue".tr,
+                    style: const TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w700,
+                      color: Colors.white,
+                    ),
+                  ),
+
+                  const SizedBox(width: 8),
+
+                  const Icon(
+                    Icons.arrow_forward,
+                    size: 18,
                     color: Colors.white,
                   ),
-                ),
-
-                const SizedBox(width: 8),
-
-                const Icon(
-                  Icons.arrow_forward,
-                  size: 18,
-                  color: Colors.white,
-                ),
-              ],
-            ),
-    ),
-  );
-}
+                ],
+              ),
+      ),
+    );
+  }
 }
 
 // =================================================================
@@ -2415,34 +2733,26 @@ class _AmenityTile extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.all(8),
         decoration: BoxDecoration(
-          color: selected
-              ? AppColors.pinkChipBg
-              : Colors.white,
+          color: selected ? AppColors.pinkChipBg : Colors.white,
           borderRadius: BorderRadius.circular(12),
           border: Border.all(
-            color: selected
-                ? AppColors.primary
-                : AppColors.fieldBorder,
+            color: selected ? AppColors.primary : AppColors.fieldBorder,
             width: selected ? 1.5 : 1,
           ),
         ),
         child: Column(
-          mainAxisAlignment:
-              MainAxisAlignment.center,
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            if (image != null &&
-                image!.trim().isNotEmpty)
+            if (image != null && image!.trim().isNotEmpty)
               ClipRRect(
-                borderRadius:
-                    BorderRadius.circular(8),
+                borderRadius: BorderRadius.circular(8),
                 child: Image.network(
                   image!,
                   width: 36,
                   height: 36,
                   fit: BoxFit.cover,
 
-                  errorBuilder:
-                      (context, error, stackTrace) {
+                  errorBuilder: (context, error, stackTrace) {
                     return const Icon(
                       Icons.home_outlined,
                       size: 30,
@@ -2467,12 +2777,8 @@ class _AmenityTile extends StatelessWidget {
               textAlign: TextAlign.center,
               style: TextStyle(
                 fontSize: 11,
-                fontWeight: selected
-                    ? FontWeight.w700
-                    : FontWeight.w500,
-                color: selected
-                    ? AppColors.primary
-                    : Colors.black87,
+                fontWeight: selected ? FontWeight.w700 : FontWeight.w500,
+                color: selected ? AppColors.primary : Colors.black87,
               ),
             ),
           ],
@@ -2481,6 +2787,7 @@ class _AmenityTile extends StatelessWidget {
     );
   }
 }
+
 // =================================================================
 // FEATURE CHIP (Step 3 "Other Features" checkbox chip)
 // =================================================================
