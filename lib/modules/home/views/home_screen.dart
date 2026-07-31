@@ -91,6 +91,7 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.white,
       appBar: AppBar(
         backgroundColor: Colors.white,
         leading: Container(),
@@ -177,69 +178,83 @@ class _HomeScreenState extends State<HomeScreen> {
               // QuickActionsCard(onPurposeSelected: widget.onPurposeSelected),
               Padding(
                 padding: EdgeInsets.symmetric(horizontal: 16.w),
-                child: SectionHeader(title: "Browse by Category".tr),
+                child: SectionHeader(
+                  title: "Browse by Category".tr,
+                  showSeeAll: false,
+                ),
               ),
 
               GetBuilder<Utilscontroller>(
                 builder: (__) {
-                  return Row(
-                    spacing: 5.w,
-                    children: [
-                      SizedBox(width: 16.w),
-                      for (var data in utilscontroller.listingTypes)
-                        Container(
-                          padding: EdgeInsets.all(5.w),
-                          height: 100.h,
-                          width: 100.h,
+                  return SingleChildScrollView(
+                    scrollDirection: Axis.horizontal,
+                    child: Row(
+                      spacing: 5.w,
+                      children: [
+                        SizedBox(width: 16.w),
+                        for (var data in utilscontroller.listingTypes)
+                          Container(
+                            padding: EdgeInsets.all(5.w),
+                            height: 100.h,
+                            width: 100.h,
 
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.black.withOpacity(.02),
-                                spreadRadius: .1,
-                                blurRadius: 10,
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(10.r),
+                              border: Border.all(
+                                color: Colors.black.withValues(alpha: .05),
                               ),
-                            ],
-                          ),
-                          child: Column(
-                            children: [
-                              Image.network(
-                                data.image ?? "",
-                                width: 60.w,
-                                height: 60.w,
-                              ),
-                              Text(
-                                data.title.tr,
-                                style: TextStyle(
-                                  fontFamily: "Rubik",
-                                  fontSize: 13.sp,
-                                  fontWeight: FontWeight.w400,
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.black.withOpacity(.02),
+                                  spreadRadius: .1,
+                                  blurRadius: 10,
                                 ),
-                              ),
-                              Text(
-                                data.title.tr,
-                                style: TextStyle(
-                                  fontFamily: "Rubik",
-                                  fontSize: 10.sp,
-                                  fontWeight: FontWeight.w400,
+                              ],
+                            ),
+                            child: Column(
+                              children: [
+                                Image.network(
+                                  data.image ?? "",
+                                  width: 50.w,
+                                  height: 50.w,
+                                  fit: BoxFit.fill,
                                 ),
-                              ),
-                            ],
+                                Text(
+                                  data.title.tr,
+                                  textAlign: TextAlign.center,
+                                  maxLines: 1,
+                                  style: TextStyle(
+                                    fontFamily: "Rubik",
+                                    fontSize: 13.sp,
+                                    fontWeight: FontWeight.w400,
+                                  ),
+                                ),
+                                Text(
+                                  (data.propertyCount ?? "0") + " Properties",
+                                  style: TextStyle(
+                                    fontFamily: "Rubik",
+                                    fontSize: 9.5.sp,
+                                    fontWeight: FontWeight.w400,
+                                  ),
+                                ),
+                              ],
+                            ),
                           ),
-                        ),
-                    ],
+                      ],
+                    ),
                   );
                 },
               ),
 
               Padding(
                 padding: EdgeInsets.symmetric(horizontal: 16.w),
-                child: Row(children: [Container()]),
+                child: _buildFeaturedPropertiesSection(),
               ),
+
               Padding(
                 padding: EdgeInsets.symmetric(horizontal: 16.w),
-                child: SectionHeader(title: "Near You".tr),
+                child: SectionHeader(title: "Near You".tr, showSeeAll: false),
               ),
 
               Container(
@@ -262,184 +277,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
               ),
 
-              // /// AI PRICE ESTIMATOR - PREMIUM CARD
-              // Container(
-              //   width: double.infinity,
-              //   padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 14.h),
-              //   decoration: BoxDecoration(
-              //     color: Colors.white,
-              //     borderRadius: BorderRadius.circular(16.r),
-              //     border: Border.all(
-              //       color: const Color(0xFF8E123E).withOpacity(0.12),
-              //     ),
-              //     boxShadow: [
-              //       BoxShadow(
-              //         color: Colors.black.withOpacity(0.05),
-              //         blurRadius: 16,
-              //         offset: const Offset(0, 5),
-              //       ),
-              //     ],
-              //   ),
-              //   child: InkWell(
-              //     borderRadius: BorderRadius.circular(16.r),
-              //     onTap: () {
-              //       Navigator.push(
-              //         context,
-              //         MaterialPageRoute(builder: (_) => PriceEstimatorScreen()),
-              //       );
-              //     },
-              //     child: Row(
-              //       children: [
-              //         /// ICON
-              //         Container(
-              //           width: 48.w,
-              //           height: 48.w,
-              //           decoration: BoxDecoration(
-              //             color: const Color(0xFF8E123E).withOpacity(0.08),
-              //             borderRadius: BorderRadius.circular(14.r),
-              //           ),
-              //           child: Stack(
-              //             alignment: Alignment.center,
-              //             children: [
-              //               Icon(
-              //                 Icons.home_work_outlined,
-              //                 color: const Color(0xFF8E123E),
-              //                 size: 25.sp,
-              //               ),
-
-              //               Positioned(
-              //                 top: 7.h,
-              //                 right: 7.w,
-              //                 child: Icon(
-              //                   Icons.auto_awesome,
-              //                   size: 11.sp,
-              //                   color: const Color(0xFF8E123E),
-              //                 ),
-              //               ),
-              //             ],
-              //           ),
-              //         ),
-
-              //         SizedBox(width: 14.w),
-
-              //         /// TEXT
-              //         Expanded(
-              //           child: Column(
-              //             crossAxisAlignment: CrossAxisAlignment.start,
-              //             children: [
-              //               Row(
-              //                 children: [
-              //                   Flexible(
-              //                     child: Text(
-              //                       "AI Price Estimator".tr,
-              //                       style: TextStyle(
-              //                         fontSize: 15.sp,
-              //                         fontWeight: FontWeight.w700,
-              //                         color: const Color(0xFF222222),
-              //                       ),
-              //                     ),
-              //                   ),
-
-              //                   SizedBox(width: 7.w),
-              //                 ],
-              //               ),
-
-              //               SizedBox(height: 5.h),
-
-              //               Text(
-              //                 "Get an instant estimate of your property's market value"
-              //                     .tr,
-              //                 maxLines: 2,
-              //                 overflow: TextOverflow.ellipsis,
-              //                 style: TextStyle(
-              //                   fontSize: 11.sp,
-              //                   height: 1.35,
-              //                   color: Colors.grey.shade600,
-              //                 ),
-              //               ),
-              //             ],
-              //           ),
-              //         ),
-
-              //         SizedBox(width: 10.w),
-
-              //         /// ARROW
-              //         Container(
-              //           width: 32.w,
-              //           height: 32.w,
-              //           decoration: BoxDecoration(
-              //             color: const Color(0xFF8E123E),
-              //             borderRadius: BorderRadius.circular(10.r),
-              //           ),
-              //           child: Icon(
-              //             Icons.arrow_forward_rounded,
-              //             color: Colors.white,
-              //             size: 17.sp,
-              //           ),
-              //         ),
-              //       ],
-              //     ),
-              //   ),
-              // ),
-              EstimatorCard(),
-              SectionHeader(title: "Property Categories".tr, showSeeAll: false),
-
-              SizedBox(
-                height: 70.h,
-                child: ListView(
-                  scrollDirection: Axis.horizontal,
-                  children: [
-                    CategoryCard(
-                      title: 'Villas'.tr,
-                      icon: Icons.home_outlined,
-                      onTap: () => widget.onCategorySelected("VILLA"),
-                    ),
-
-                    SizedBox(width: 5.w),
-
-                    CategoryCard(
-                      title: 'Apartments'.tr,
-                      icon: Icons.apartment,
-                      onTap: () => widget.onCategorySelected("APARTMENT"),
-                    ),
-
-                    SizedBox(width: 5.w),
-
-                    CategoryCard(
-                      title: 'Townhouses'.tr,
-                      icon: Icons.house_siding,
-                      onTap: () => widget.onCategorySelected("TOWNHOUSE"),
-                    ),
-
-                    SizedBox(width: 5.w),
-
-                    CategoryCard(
-                      title: 'Offices'.tr,
-                      icon: Icons.business,
-                      onTap: () => widget.onCategorySelected("OFFICE"),
-                    ),
-
-                    SizedBox(width: 5.w),
-
-                    CategoryCard(
-                      title: 'Commercial'.tr,
-                      icon: Icons.store,
-                      onTap: () => widget.onCategorySelected("COMMERCIAL"),
-                    ),
-
-                    SizedBox(width: 5.w),
-
-                    CategoryCard(
-                      title: 'Land'.tr,
-                      icon: Icons.map_outlined,
-                      onTap: () => widget.onCategorySelected("LAND"),
-                    ),
-                  ],
-                ),
-              ),
-
-              _buildFeaturedPropertiesSection(),
-
+              VillaValuationCard(onGetEstimate: () {}),
               _buildBannersSection(),
               SectionHeader(title: "Featured Dealers".tr),
 
@@ -449,7 +287,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   scrollDirection: Axis.horizontal,
                   physics: const BouncingScrollPhysics(),
                   clipBehavior: Clip.none,
-                  itemCount: 3,
+                  itemCount: 2,
                   separatorBuilder: (_, __) => SizedBox(width: 12.w),
                   itemBuilder: (context, index) {
                     final agents = [
@@ -465,12 +303,12 @@ class _HomeScreenState extends State<HomeScreen> {
                         "designation": "Property Consultant",
                         "phone": "+974 55 987 654",
                       },
-                      {
-                        "image": "assets/images/agent3.png",
-                        "name": "Mohammed Khalid",
-                        "designation": "Real Estate Advisor",
-                        "phone": "+974 55 456 789",
-                      },
+                      // {
+                      //   "image": "assets/images/agent3.png",
+                      //   "name": "Mohammed Khalid",
+                      //   "designation": "Real Estate Advisor",
+                      //   "phone": "+974 55 456 789",
+                      // },
                     ];
 
                     final agent = agents[index];
@@ -588,7 +426,7 @@ class _HomeScreenState extends State<HomeScreen> {
             SectionHeader(title: "Featured Properties".tr),
             SizedBox(height: 10.h),
             SizedBox(
-              height: 250.h,
+              height: 230.h,
 
               child: ListView.separated(
                 controller: featuredScrollController,
@@ -648,7 +486,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
                     verified: property.contactVerified,
 
-                    isFeatured: property.isFeatured,
+                    isFeatured: true,
 
                     propertyId: property.id,
 

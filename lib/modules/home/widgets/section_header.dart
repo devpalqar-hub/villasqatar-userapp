@@ -25,6 +25,7 @@ class SectionHeader extends StatelessWidget {
           title,
           style: AppTextStyles.bold14.copyWith(
             color: AppColors.textPrimary,
+            fontWeight: FontWeight.w400,
           ),
         ),
 
@@ -39,7 +40,8 @@ class SectionHeader extends StatelessWidget {
                   'See all'.tr,
                   style: AppTextStyles.medium13.copyWith(
                     color: AppColors.primary,
-                    fontSize: 11.sp,
+                    fontSize: 10.sp,
+                    fontWeight: FontWeight.w400,
                   ),
                 ),
                 SizedBox(width: 4.w),
