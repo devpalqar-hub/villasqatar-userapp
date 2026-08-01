@@ -14,120 +14,146 @@ class AgentContactCard extends StatelessWidget {
     return Container(
       width: double.infinity,
       padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 14.h),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(10.r),
-        border: Border.all(color: const Color(0xffECECEC)),
-      ),
+     decoration: BoxDecoration(
+  color: Colors.white,
+  borderRadius: BorderRadius.circular(16.r),
+   border: Border.all(color: const Color(0xffECECEC)),
+      
+  boxShadow: [
+    BoxShadow(
+      color: Colors.black.withOpacity(.04),
+      blurRadius: 12,
+      offset: const Offset(0, 4),
+    ),
+  ],
+),
+     
       child: Row(
+  crossAxisAlignment: CrossAxisAlignment.center,
+  children: [
+    // Avatar
+    CircleAvatar(
+      radius: 30.r,
+      backgroundColor: const Color(0xffF3F4F6),
+      backgroundImage: const AssetImage("assets/agent.png"),
+    ),
+
+    SizedBox(width: 14.w),
+
+    // Details
+    Expanded(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
         children: [
-          /// Profile
-          ClipRRect(
-            borderRadius: BorderRadius.circular(20.r),
-            child: Image.asset(
-              "assets/agent.png",
-              width: 60.w,
-              height: 60.h,
-              fit: BoxFit.cover,
-              errorBuilder: (context, error, stackTrace) {
-                return Container(
-                  width: 60.w,
-                  height: 60.h,
-                  decoration: const BoxDecoration(
-                    color: Color(0xffF3F4F6),
-                    shape: BoxShape.circle,
-                  ),
-                  child: Icon(
-                    Icons.person,
-                    size: 25.sp,
-                    color: Colors.grey.shade600,
-                  ),
-                );
-              },
+          Text(
+            property.createdBy.name ?? "Property Owner",
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: TextStyle(
+              fontSize: 16.sp,
+              fontWeight: FontWeight.w500,
+              color: const Color(0xff202124),
             ),
           ),
 
-          SizedBox(width: 14.w),
+          SizedBox(height: 6.h),
 
-          /// Details
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                property.createdBy.name ?? "Property Owner",
-                style: TextStyle(
-                  fontSize: 16.sp,
-                  fontWeight: FontWeight.w700,
-                  color: const Color(0xff202124),
-                ),
+          if (property.contactVerified)
+            Container(
+              padding: EdgeInsets.symmetric(
+                horizontal: 8.w,
+                vertical: 4.h,
               ),
-
-              SizedBox(height: 4.h),
-
-              Text(
-                property.createdBy.role.replaceAll("_", " "),
-                style: TextStyle(
-                  fontSize: 12.sp,
-                  color: const Color(0xff666666),
-                  fontWeight: FontWeight.w500,
-                ),
+              decoration: BoxDecoration(
+                color: Colors.green.shade50,
+                borderRadius: BorderRadius.circular(20.r),
               ),
-
-              SizedBox(height: 6.h),
-
-              Row(
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
                 children: [
-                  Icon(Icons.star, color: const Color(0xffF5B400), size: 12.sp),
+                  Icon(
+                    Icons.verified_rounded,
+                    color: Colors.green,
+                    size: 14.sp,
+                  ),
                   SizedBox(width: 4.w),
                   Text(
-                    "4.9",
+                    "Verified Contact",
                     style: TextStyle(
                       fontSize: 10.sp,
                       fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                  Text(
-                    " (150 Reviews)",
-                    style: TextStyle(
-                      fontSize: 10.sp,
-                      color: const Color(0xff666666),
+                      color: Colors.green.shade700,
                     ),
                   ),
                 ],
               ),
-            ],
-          ),
-          SizedBox(width: 14.w),
+            ),
 
-          /// Actions
-          Row(
-            children: [
-              GestureDetector(
-                onTap: () => _makeCall(property.contactPhone),
-                child: _actionButton(
-                  color: AppColors.primary,
-                  icon: const Icon(Icons.call_outlined, color: Colors.white),
-                  label: "Call",
+          if (property.createdBy.role.toLowerCase() == "dealer") ...[
+            SizedBox(height: 6.h),
+            Row(
+              children: [
+                Icon(
+                  Icons.star_rounded,
+                  color: Colors.amber,
+                  size: 14.sp,
                 ),
-              ),
-
-              SizedBox(width: 4.w),
-
-              GestureDetector(
-                onTap: () => _openWhatsApp(property.contactWhatsapp),
-                child: _actionButton(
-                  color: const Color(0xff25D366),
-                  icon: const FaIcon(
-                    FontAwesomeIcons.whatsapp,
-                    color: Colors.white,
+                SizedBox(width: 4.w),
+                Text(
+                  "4.9",
+                  style: TextStyle(
+                    fontWeight: FontWeight.w600,
+                    fontSize: 11.sp,
                   ),
-                  label: "WhatsApp",
                 ),
-              ),
-            ],
-          ),
+                Text(
+                  " (150 Reviews)",
+                  style: TextStyle(
+                    fontSize: 10.sp,
+                    color: Colors.grey.shade600,
+                  ),
+                ),
+              ],
+            ),
+          ],
         ],
       ),
+    ),
+
+    SizedBox(width: 12.w),
+
+    // Actions
+    Row(
+      children: [
+        GestureDetector(
+          onTap: () => _makeCall(property.contactPhone),
+          child: _actionButton(
+            color: AppColors.primary,
+            icon: const Icon(
+              Icons.call_outlined,
+              color: Colors.white,
+            ),
+            label: "Call",
+          ),
+        ),
+        SizedBox(width: 10.w),
+        GestureDetector(
+          onTap: () => _openWhatsApp(property.contactWhatsapp),
+          child: _actionButton(
+            color: const Color(0xff25D366),
+            icon: const FaIcon(
+              FontAwesomeIcons.whatsapp,
+              color: Colors.white,
+            ),
+            label: "WhatsApp",
+          ),
+        ),
+      ],
+    ),
+  ],
+)
+      
     );
   }
 

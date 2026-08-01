@@ -14,6 +14,7 @@ class PropertySearchController extends GetxController {
   bool hasMore = true;
 
   String error = '';
+  String? locationId;
 
   // ============================================================
   // PAGINATION
@@ -42,6 +43,7 @@ class PropertySearchController extends GetxController {
   String furnishingStatus = '';
   String nearbyTag = '';
 
+  List<String> selectedNearbyTags = [];
   double? minPrice;
   double? maxPrice;
 
@@ -53,7 +55,7 @@ class PropertySearchController extends GetxController {
 
   List<String> furnishingOptions = [];
   List<String> nearbyTags = [];
-
+  List<String> selectedAmenities = [];
   // ============================================================
   // PROPERTY DETAILS
   // ============================================================
@@ -105,6 +107,14 @@ class PropertySearchController extends GetxController {
     update();
 
     try {
+      debugPrint("=========== FETCH PROPERTIES ===========");
+debugPrint("this.minPrice = $minPrice");
+debugPrint("this.maxPrice = $maxPrice");
+debugPrint("this.minBedrooms = $minBedrooms");
+debugPrint("this.minBathrooms = $minBathrooms");
+debugPrint("this.minArea = $minArea");
+debugPrint("this.maxArea = $maxArea");
+debugPrint("========================================");
       final Map<String, String> query = {
         'page': page.toString(),
         'limit': limit.toString(),
@@ -114,11 +124,12 @@ class PropertySearchController extends GetxController {
       if (search.trim().isNotEmpty) {
         query['search'] = search.trim();
       }
+
       if (createdById.isNotEmpty) {
         query['createdById'] = createdById;
       }
 
-      // Property type
+      // Property Type
       if (type.isNotEmpty) {
         query['type'] = type;
       }
@@ -128,16 +139,29 @@ class PropertySearchController extends GetxController {
         query['purpose'] = purpose;
       }
 
+      // Municipality
+      if (locationId != null && locationId!.isNotEmpty) {
+        query['municipalityId'] = locationId!;
+      }
+
       // Furnishing
       if (furnishingStatus.isNotEmpty) {
-        query['furnishingStatus'] = furnishingStatus;
+        query['furnishingId'] = furnishingStatus;
       }
 
-      // Nearby
+      // // Amenities
+      // if (selectedAmenities.isNotEmpty) {
+      //   query['amenityIds'] = selectedAmenities.join(',');
+      // }
+
+      // // Nearby Tags
+      // if (selectedNearbyTags.isNotEmpty) {
+      //   query['nearbyTagIds'] = selectedNearbyTags.join(',');
+      // }
+
       if (nearbyTag.isNotEmpty) {
-        query['nearbyTag'] = nearbyTag;
+        query['nearbyTagId'] = nearbyTag;
       }
-
       // Price
       if (minPrice != null) {
         query['minPrice'] = minPrice!.toString();
@@ -167,11 +191,9 @@ class PropertySearchController extends GetxController {
       }
 
       final String endpoint =
-          '${ApiEndpoints.propertyList}'
-          '?${Uri(queryParameters: query).query}';
+          '${ApiEndpoints.propertyList}?${Uri(queryParameters: query).query}';
 
       debugPrint('========== PROPERTY SEARCH ==========');
-
       debugPrint('ENDPOINT: $endpoint');
 
       final response = await ApiHandler.get(endpoint);
@@ -193,12 +215,10 @@ class PropertySearchController extends GetxController {
       }
     } catch (e) {
       error = e.toString().replaceFirst('Exception: ', '');
-
       debugPrint('PROPERTY SEARCH ERROR: $error');
     } finally {
       isLoading = false;
       isLoadingMore = false;
-
       update();
     }
   }
@@ -213,6 +233,17 @@ class PropertySearchController extends GetxController {
     search = query;
 
     _setSearchText(query);
+
+    debugPrint("=========== APPLY FILTERS ===========");
+debugPrint("minPrice: $minPrice");
+debugPrint("maxPrice: $maxPrice");
+debugPrint("minBedrooms: $minBedrooms");
+debugPrint("minBathrooms: $minBathrooms");
+debugPrint("minArea: $minArea");
+debugPrint("maxArea: $maxArea");
+debugPrint("locationId: $locationId");
+debugPrint("furnishingStatus: $furnishingStatus");
+debugPrint("====================================");
 
     await fetchProperties();
   }
@@ -258,63 +289,67 @@ class PropertySearchController extends GetxController {
   // ============================================================
   // APPLY FILTERS
   // ============================================================
+Future<void> applyFilters({
+  String? search,
+  String? type,
+  String? purpose,
+  String? locationId,
+  String? furnishingStatus,
+  List<String>? amenities,
+  List<String>? nearbyTags,
+  double? minPrice,
+  double? maxPrice,
+  int? minBedrooms,
+  int? minBathrooms,
+  double? minArea,
+  double? maxArea,
+  String? createdById,
+}) async {
 
-  Future<void> applyFilters({
-    String? search,
-    String? type,
-    String? purpose,
-    String? furnishingStatus,
-    String? nearbyTag,
-    double? minPrice,
-    double? maxPrice,
-    int? minBedrooms,
-    int? minBathrooms,
-    double? minArea,
-    double? maxArea,
-    String? createdById,
-  }) async {
-    if (search != null) {
-      this.search = search.trim();
-
-      _setSearchText(this.search);
-    }
-
-    if (createdById != null) {
-  this.createdById = createdById;
-}
-
-
-    if (type != null) {
-      this.type = type;
-    }
-
-    if (purpose != null) {
-      this.purpose = purpose;
-    }
-
-    if (furnishingStatus != null) {
-      this.furnishingStatus = furnishingStatus;
-    }
-
-    if (nearbyTag != null) {
-      this.nearbyTag = nearbyTag;
-    }
-
-    this.minPrice = minPrice;
-    this.maxPrice = maxPrice;
-
-    this.minBedrooms = minBedrooms;
-    this.minBathrooms = minBathrooms;
-
-    this.minArea = minArea;
-    this.maxArea = maxArea;
-
-    await fetchProperties();
+  if (search != null) {
+    this.search = search.trim();
+    _setSearchText(this.search);
   }
 
-  // ============================================================
-  // RESET SEARCH + FILTERS
-  // ============================================================
+  if (type != null) this.type = type;
+
+  if (purpose != null) this.purpose = purpose;
+
+  if (locationId != null) this.locationId = locationId;
+
+  if (furnishingStatus != null) {
+    this.furnishingStatus = furnishingStatus;
+  }
+
+  if (amenities != null) {
+    selectedAmenities = amenities;
+  }
+
+  if (nearbyTags != null) {
+    selectedNearbyTags = nearbyTags;
+  }
+
+  if (createdById != null) {
+    this.createdById = createdById;
+  }
+
+  this.minPrice = minPrice;
+  this.maxPrice = maxPrice;
+
+  this.minBedrooms = minBedrooms;
+  this.minBathrooms = minBathrooms;
+
+  this.minArea = minArea;
+  this.maxArea = maxArea;
+
+  page = 1;
+  hasMore = true;
+
+  await fetchProperties();
+}
+  
+
+  
 
   Future<void> resetSearch() async {
     _resetFilterValues();
@@ -329,11 +364,13 @@ class PropertySearchController extends GetxController {
   // ============================================================
   // CLEAR FILTERS
   // ============================================================
-
   Future<void> clearFilters() async {
     _resetFilterValues();
 
-    _setSearchText('');
+    searchTextController.clear();
+
+    page = 1;
+    hasMore = true;
 
     update();
 
@@ -345,23 +382,9 @@ class PropertySearchController extends GetxController {
   // ============================================================
 
   Future<void> refreshProperties() async {
-    search = '';
+    _resetFilterValues();
 
     searchTextController.clear();
-
-    type = '';
-    purpose = '';
-    furnishingStatus = '';
-    nearbyTag = '';
-
-    minPrice = null;
-    maxPrice = null;
-
-    minBedrooms = null;
-    minBathrooms = null;
-
-    minArea = null;
-    maxArea = null;
 
     page = 1;
     hasMore = true;
@@ -380,8 +403,14 @@ class PropertySearchController extends GetxController {
 
     type = '';
     purpose = '';
+
+    locationId = null;
+
     furnishingStatus = '';
     nearbyTag = '';
+
+    selectedAmenities.clear();
+    selectedNearbyTags.clear();
 
     minPrice = null;
     maxPrice = null;
@@ -391,8 +420,9 @@ class PropertySearchController extends GetxController {
 
     minArea = null;
     maxArea = null;
-  }
 
+    createdById = '';
+  }
   // ============================================================
   // SAFE SEARCH TEXT UPDATE
   // ============================================================

@@ -7,10 +7,7 @@ import 'package:villas_qatar/modules/propertylist/model/myproperty_model.dart';
 class PropertyInfoCard extends StatelessWidget {
   final Property property;
 
-  const PropertyInfoCard({
-    super.key,
-    required this.property,
-  });
+  const PropertyInfoCard({super.key, required this.property});
 
   static const Color primary = Color(0xFFA60F46);
   static const Color textDark = Color(0xFF1F2937);
@@ -19,13 +16,13 @@ class PropertyInfoCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-   final String propertyType = property.type.title
-    .replaceAll("_", " ")
-    .toLowerCase()
-    .split(" ")
-    .where((e) => e.isNotEmpty)
-    .map((e) => e[0].toUpperCase() + e.substring(1))
-    .join(" ");
+    final String propertyType = property.type.title
+        .replaceAll("_", " ")
+        .toLowerCase()
+        .split(" ")
+        .where((e) => e.isNotEmpty)
+        .map((e) => e[0].toUpperCase() + e.substring(1))
+        .join(" ");
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -35,24 +32,18 @@ class PropertyInfoCard extends StatelessWidget {
         // FOR SALE PILL
         // =========================================================
         Container(
-          padding: EdgeInsets.symmetric(
-            horizontal: 12.w,
-            vertical: 2.h,
-          ),
+          padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 2.h),
           decoration: BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.circular(20.r),
-            border: Border.all(
-              color: primary.withOpacity(.65),
-              width: 1,
-            ),
+            border: Border.all(color: primary.withOpacity(.65), width: 1),
           ),
           child: Text(
             "For Sale".tr,
             style: TextStyle(
               fontSize: 10.sp,
               fontWeight: FontWeight.w500,
-              color: AppColors.primary
+              color: AppColors.primary,
             ),
           ),
         ),
@@ -67,9 +58,9 @@ class PropertyInfoCard extends StatelessWidget {
           maxLines: 2,
           overflow: TextOverflow.ellipsis,
           style: TextStyle(
-            fontSize: 16.sp,
+            fontSize: 15.sp,
             height: 1.15,
-            fontWeight: FontWeight.w600,
+            fontWeight: FontWeight.w500,
             color: textDark,
             letterSpacing: -.25,
           ),
@@ -92,7 +83,7 @@ class PropertyInfoCard extends StatelessWidget {
 
             Expanded(
               child: Text(
-               "${property.areaName}, ${property.municipality.name}, ${property.country}",
+                "${property.areaName}, ${property.municipality.name}, ${property.country}",
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
                 style: TextStyle(
@@ -104,53 +95,40 @@ class PropertyInfoCard extends StatelessWidget {
             ),
 
             SizedBox(width: 5.w),
-
-            Container(
-              padding: EdgeInsets.symmetric(
-                horizontal: 10.w,
-                vertical: 6.h,
-              ),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(30.r),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(.06),
-                    blurRadius: 14,
-                    offset: const Offset(0, 4),
-                  ),
-                ],
-              ),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Icon(
-                    property.contactVerified
-                        ? Icons.verified_rounded
-                        : Icons.verified_outlined,
-                    size: 14.sp,
-                    color: property.contactVerified
-                        ? Colors.green
-                        : primary,
-                  ),
-
-                  SizedBox(width: 5.w),
-
-                  Text(
-                    property.contactVerified
-                        ? "Verified".tr
-                        : "Not Verified".tr,
-                    style: TextStyle(
-                      fontSize: 10.sp,
-                      fontWeight: FontWeight.w500,
-                      color: property.contactVerified
-                          ? Colors.green
-                          : primary,
+            if (property.priceNegotiable)
+              Container(
+                padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 6.h),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(30.r),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(.06),
+                      blurRadius: 14,
+                      offset: const Offset(0, 4),
                     ),
-                  ),
-                ],
+                  ],
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(
+                      Icons.local_offer_outlined,
+                      size: 14.sp,
+                      color: Colors.green,
+                    ),
+                    SizedBox(width: 5.w),
+                    Text(
+                      "Negotiable".tr,
+                      style: TextStyle(
+                        fontSize: 10.sp,
+                        fontWeight: FontWeight.w500,
+                        color: Colors.green,
+                      ),
+                    ),
+                  ],
+                ),
               ),
-            ),
           ],
         ),
 
@@ -164,10 +142,7 @@ class PropertyInfoCard extends StatelessWidget {
           decoration: BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.circular(12.r),
-            border: Border.all(
-              color: borderColor,
-              width: 1,
-            ),
+            border: Border.all(color: borderColor, width: 1),
           ),
           child: Column(
             children: [
@@ -211,11 +186,7 @@ class PropertyInfoCard extends StatelessWidget {
                 ),
               ),
 
-              Divider(
-                height: 1,
-                thickness: 1,
-                color: borderColor,
-              ),
+              Divider(height: 1, thickness: 1, color: borderColor),
 
               // ================= SECOND ROW =================
               SizedBox(
@@ -269,27 +240,16 @@ class PropertyInfoCard extends StatelessWidget {
   }
 
   Widget _verticalDivider() {
-    return Container(
-      width: 1,
-      height: 26.h,
-      color: const Color(0xFFE3E3E3),
-    );
+    return Container(width: 1, height: 26.h, color: const Color(0xFFE3E3E3));
   }
 
-  Widget _infoItem({
-    required IconData icon,
-    required String text,
-  }) {
+  Widget _infoItem({required IconData icon, required String text}) {
     return Padding(
       padding: EdgeInsets.symmetric(horizontal: 8.w),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(
-            icon,
-            size: 18.sp,
-            color: const Color(0xFF858585),
-          ),
+          Icon(icon, size: 18.sp, color: const Color(0xFF858585)),
 
           SizedBox(width: 7.w),
 

@@ -84,7 +84,7 @@ class PropertyDetailsCard extends StatelessWidget {
               "Property Details".tr,
               style: TextStyle(
                 fontSize: 16.sp,
-                fontWeight: FontWeight.w700,
+                fontWeight: FontWeight.w500,
                 color: const Color(0xff1F2937),
               ),
             ),
@@ -109,7 +109,7 @@ class PropertyDetailsCard extends StatelessWidget {
                         item["title"].toString(),
                         style: TextStyle(
                           fontSize: 12.sp,
-                          fontWeight: FontWeight.w500,
+                          fontWeight: FontWeight.w400,
                           color: const Color(0xff222222),
                         ),
                       ),
@@ -119,7 +119,7 @@ class PropertyDetailsCard extends StatelessWidget {
                       item["value"].toString(),
                       style: TextStyle(
                         fontSize: 13.sp,
-                        fontWeight: FontWeight.w600,
+                        fontWeight: FontWeight.w400,
                         color: const Color(0xff666666),
                       ),
                     ),

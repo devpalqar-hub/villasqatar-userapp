@@ -9,12 +9,14 @@ class HeroImageCard extends StatefulWidget {
   final Property property;
   final bool isMyProperty;
   final VoidCallback? onReport;
+  final int selectedImageIndex;
 
   const HeroImageCard({
     super.key,
     required this.property,
     this.isMyProperty = false,
     this.onReport,
+     required this.selectedImageIndex,
   });
 
   @override
@@ -23,23 +25,46 @@ class HeroImageCard extends StatefulWidget {
 }
 
 class _HeroImageCardState extends State<HeroImageCard> {
-  final PageController _pageController = PageController();
 
-  int currentPage = 0;
+int currentPage = 0;
 
-  late final WishlistController wishlistController;
+@override
+void didUpdateWidget(covariant HeroImageCard oldWidget) {
+  super.didUpdateWidget(oldWidget);
 
-  @override
-  void initState() {
-    super.initState();
+  if (oldWidget.selectedImageIndex != widget.selectedImageIndex) {
+    currentPage = widget.selectedImageIndex;
 
-    /// Make sure controller exists before GetBuilder uses it
-    if (Get.isRegistered<WishlistController>()) {
-      wishlistController = Get.find<WishlistController>();
-    } else {
-      wishlistController = Get.put(WishlistController());
+    _pageController.animateToPage(
+      widget.selectedImageIndex,
+      duration: const Duration(milliseconds: 300),
+      curve: Curves.easeInOut,
+    );
+
+    if (mounted) {
+      setState(() {});
     }
   }
+}
+
+  late final WishlistController wishlistController;
+  late final PageController _pageController;
+
+  @override
+ void initState() {
+  super.initState();
+
+  currentPage = widget.selectedImageIndex;
+  _pageController = PageController(
+    initialPage: widget.selectedImageIndex,
+  );
+
+  if (Get.isRegistered<WishlistController>()) {
+    wishlistController = Get.find<WishlistController>();
+  } else {
+    wishlistController = Get.put(WishlistController());
+  }
+}
 
   @override
   void dispose() {

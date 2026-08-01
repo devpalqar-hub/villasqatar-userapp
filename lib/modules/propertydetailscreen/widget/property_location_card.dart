@@ -3,223 +3,244 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get_utils/src/extensions/internacionalization.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:villas_qatar/modules/propertylist/model/myproperty_model.dart';
+import 'package:webview_flutter/webview_flutter.dart';
 
-class PropertyLocationCard extends StatelessWidget {
+class PropertyLocationCard extends StatefulWidget {
   final Property property;
 
-  const PropertyLocationCard({
-    super.key,
-    required this.property,
-  });
+  const PropertyLocationCard({super.key, required this.property});
 
   static const Color primary = Color(0xFFA60F46);
+
+  @override
+  State<PropertyLocationCard> createState() => _PropertyLocationCardState();
+}
+
+class _PropertyLocationCardState extends State<PropertyLocationCard> {
+  late final WebViewController _controller;
+
+  @override
+  void initState() {
+    super.initState();
+
+    final lat = widget.property.latitude;
+    final lng = widget.property.longitude;
+
+    final html =
+        '''
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  overflow: hidden;
+}
+iframe {
+  border: 0;
+  width: 100%;
+  height: 100%;
+}
+</style>
+</head>
+<body>
+<iframe
+    loading="lazy"
+    allowfullscreen
+    src="https://maps.google.com/maps?q=$lat,$lng(Property)&z=16&output=embed">
+</iframe>
+</body>
+</html>
+''';
+
+    _controller = WebViewController()
+      ..setJavaScriptMode(JavaScriptMode.unrestricted)
+      ..loadHtmlString(html);
+  }
 
   @override
   Widget build(BuildContext context) {
     return Container(
       width: double.infinity,
-      padding: EdgeInsets.fromLTRB(
-        14.w,
-        15.h,
-        14.w,
-        13.h,
-      ),
+      padding: EdgeInsets.fromLTRB(14.w, 15.h, 14.w, 13.h),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(12.r),
-        border: Border.all(
-          color: const Color(0xFFE7E7E7),
-          width: 1,
-        ),
+        border: Border.all(color: const Color(0xFFE7E7E7), width: 1),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // =========================================================
-          // LOCATION TITLE
-          // =========================================================
           Text(
             "Location".tr,
             style: TextStyle(
               fontSize: 16.sp,
-              fontWeight: FontWeight.w700,
-              color: const Color(0xFF1F2937),
+              fontWeight: FontWeight.w500,
+              color: const Color(0xff202124),
             ),
           ),
 
-          SizedBox(height: 11.h),
+          SizedBox(height: 10.h),
 
-          // =========================================================
-          // ADDRESS LEFT + MAP RIGHT
-          // =========================================================
+          ClipRRect(
+            borderRadius: BorderRadius.circular(3.r),
+            child: SizedBox(
+              height: 160.h,
+              width: double.infinity,
+              child: WebViewWidget(controller: _controller),
+            ),
+          ),
+
+          SizedBox(height: 10.h),
+
           Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // ADDRESS PILL
-              Expanded(
-                child: Align(
-                  alignment: Alignment.centerLeft,
-                  child: Container(
-                    constraints: BoxConstraints(
-                      maxWidth: 155.w,
-                    ),
-                    padding: EdgeInsets.symmetric(
-                      horizontal: 11.w,
-                      vertical: 6.h,
-                    ),
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(30.r),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withOpacity(.08),
-                          blurRadius: 14,
-                          offset: const Offset(0, 5),
-                        ),
-                      ],
-                    ),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Icon(
-                          Icons.location_on_rounded,
-                          size: 15.sp,
-                          color: primary,
-                        ),
-
-                        SizedBox(width: 7.w),
-
-                        Flexible(
-                          child: Text(
-                            "${property.areaName}, ${property.municipality}",
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                            style: TextStyle(
-                              fontSize: 10.5.sp,
-                              fontWeight: FontWeight.w500,
-                              color: const Color(0xFF252525),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
+              Icon(
+                Icons.location_on,
+                color: PropertyLocationCard.primary,
+                size: 16.sp,
               ),
 
-              SizedBox(width: 12.w),
+              SizedBox(width: 8.w),
 
-              // =====================================================
-              // MAP PREVIEW
-              // =====================================================
-              Container(
-                width: 180.w,
-                height: 90.h,
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(10.r),
-                  color: const Color(0xFFF3F3F3),
-                ),
-                clipBehavior: Clip.antiAlias,
-                child: Stack(
-                  fit: StackFit.expand,
-                  children: [
-                    // -------------------------------------------------
-                    // Replace this Container with GoogleMap or your
-                    // static map image if available.
-                    // -------------------------------------------------
-                    Container(
-                      decoration: const BoxDecoration(
-                        color: Color(0xFFF4F3EF),
-                      ),
-                      child: CustomPaint(
-                        painter: _SimpleMapPainter(),
-                      ),
-                    ),
-
-                    Center(
-                      child: Icon(
-                        Icons.location_on_rounded,
-                        size: 30.sp,
-                        color: primary,
-                      ),
-                    ),
-                  ],
+              Expanded(
+                child: Text(
+                  "${widget.property.areaName}, ${widget.property.municipality.name}, ${widget.property.country}",
+                  style: TextStyle(
+                    fontSize: 13.sp,
+                    color: const Color(0xff555555),
+                    height: 1.4,
+                  ),
                 ),
               ),
             ],
           ),
 
-          SizedBox(height: 14.h),
+          SizedBox(height: 10.h),
 
-          // =========================================================
-          // VIEW ON MAPS BUTTON
-          // =========================================================
           SizedBox(
             width: double.infinity,
-            height: 43.h,
-            child: OutlinedButton(
+            height: 40.h,
+            child: ElevatedButton.icon(
               onPressed: () async {
-                final Uri uri = Uri.parse(
-                  "https://www.google.com/maps/search/?api=1&query="
-                  "${property.latitude},${property.longitude}",
+                final uri = Uri.parse(
+                  "https://www.google.com/maps/search/?api=1&query=${widget.property.latitude},${widget.property.longitude}",
                 );
 
                 if (await canLaunchUrl(uri)) {
-                  await launchUrl(
-                    uri,
-                    mode: LaunchMode.externalApplication,
-                  );
+                  await launchUrl(uri, mode: LaunchMode.externalApplication);
                 }
               },
-              style: OutlinedButton.styleFrom(
-                padding: EdgeInsets.symmetric(horizontal: 15.w),
-                foregroundColor: primary,
-                side: const BorderSide(
-                  color: primary,
-                  width: 1,
-                ),
+              icon: const Icon(Icons.map_outlined),
+              label: Text("View on Google Maps".tr),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: PropertyLocationCard.primary,
+                foregroundColor: Colors.white,
+                elevation: 0,
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(9.r),
+                  borderRadius: BorderRadius.circular(12.r),
                 ),
-              ),
-              child: Row(
-                children: [
-                  const Spacer(),
-
-                  Icon(
-                    Icons.map_outlined,
-                    size: 20.sp,
-                    color: primary,
-                  ),
-
-                  SizedBox(width: 9.w),
-
-                  Text(
-                    "View on Maps".tr,
-                    style: TextStyle(
-                      fontSize: 12.sp,
-                      fontWeight: FontWeight.w600,
-                      color: primary,
-                    ),
-                  ),
-
-                  const Spacer(),
-
-                  Icon(
-                    Icons.chevron_right_rounded,
-                    size: 22.sp,
-                    color: primary,
-                  ),
-                ],
               ),
             ),
+          ),
+
+          SizedBox(height: 10.h),
+
+          Text(
+            "Nearby Places".tr,
+            style: TextStyle(
+              fontSize: 16.sp,
+              fontWeight: FontWeight.w500,
+              color: const Color(0xff202124),
+            ),
+          ),
+
+          SizedBox(height: 14.h),
+
+          GridView.builder(
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            itemCount: widget.property.nearbyTags.length,
+            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: 4,
+              crossAxisSpacing: 10.w,
+              mainAxisSpacing: 10.h,
+              childAspectRatio: 1, // <-- Square
+            ),
+            itemBuilder: (_, index) {
+              return _NearbyCard(item: widget.property.nearbyTags[index]);
+            },
           ),
         ],
       ),
     );
   }
 }
+  
+  class _NearbyCard extends StatelessWidget {
+  final NearbyTag item;
 
+  const _NearbyCard({required this.item});
+
+  @override
+  Widget build(BuildContext context) {
+    return AspectRatio(
+      aspectRatio: 1,
+      child: Container(
+        padding: EdgeInsets.all(4.w),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(10.r),
+          border: Border.all(color: const Color(0xffECECEC)),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(.04),
+              blurRadius: 6,
+              offset: const Offset(0, 2),
+            ),
+          ],
+        ),
+        child: Column(
+          children: [
+            Expanded(
+              child: (item.image ?? "").isNotEmpty
+                  ? ClipRRect(
+                      borderRadius: BorderRadius.circular(6.r),
+                      child: Image.network(
+                        item.image!,
+                        width: double.infinity,
+                        fit: BoxFit.cover,
+                      ),
+                    )
+                  : Center(
+                      child: Icon(
+                        Icons.place,
+                        color: PropertyLocationCard.primary,
+                        size: 28.sp,
+                      ),
+                    ),
+            ),
+            SizedBox(height: 4.h),
+            Text(
+              item.title,
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontSize: 9.sp,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
 // ===================================================================
 // SIMPLE MAP BACKGROUND
 // Remove this if you use GoogleMap/static map image.

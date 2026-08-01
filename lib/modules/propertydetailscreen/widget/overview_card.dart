@@ -44,9 +44,9 @@ class _OverviewCardState extends State<OverviewCard> {
           Text(
             "Overview".tr,
             style: TextStyle(
-              fontSize: 15.sp,
+              fontSize: 16.sp,
               height: 1.1,
-              fontWeight: FontWeight.w700,
+              fontWeight: FontWeight.w500,
               color: const Color(0xFF1F2937),
             ),
           ),
