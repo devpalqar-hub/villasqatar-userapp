@@ -9,14 +9,10 @@ import 'package:villas_qatar/Core/theme/app_textstyles.dart';
 
 import 'package:villas_qatar/modules/PlansandFeatures/model/featured_property_model.dart';
 import 'package:villas_qatar/modules/PlansandFeatures/services/featured_properties_controller.dart';
-
 import 'package:villas_qatar/modules/home/widgets/property_card.dart';
-import 'package:villas_qatar/modules/propertydetailscreen/compareselectionscreen.dart';
-
 import 'package:villas_qatar/modules/propertydetailscreen/widget/agent_conatct_card.dart';
 import 'package:villas_qatar/modules/propertydetailscreen/widget/boost_plan_bottomsheet.dart';
 import 'package:villas_qatar/modules/propertydetailscreen/widget/bottom_actioncard.dart';
-import 'package:villas_qatar/modules/propertydetailscreen/widget/compare_bottomsheet.dart';
 import 'package:villas_qatar/modules/propertydetailscreen/widget/compare_card_widget.dart';
 import 'package:villas_qatar/modules/propertydetailscreen/widget/herocard.dart';
 import 'package:villas_qatar/modules/propertydetailscreen/widget/property_details_card.dart';
@@ -25,6 +21,7 @@ import 'package:villas_qatar/modules/propertydetailscreen/widget/property_locati
 import 'package:villas_qatar/modules/propertydetailscreen/widget/overview_card.dart';
 import 'package:villas_qatar/modules/propertylist/model/myproperty_model.dart';
 import 'package:villas_qatar/modules/propertylist/service/myproperties_listcontroller.dart';
+import 'package:villas_qatar/modules/propertylist/views/add_listproperty.dart';
 
 import 'package:villas_qatar/modules/searchscreen/service/searchlist_screen.dart';
 import 'package:villas_qatar/modules/support/service/support_ticket_controller.dart';
@@ -89,8 +86,11 @@ class _PropertyDetailsScreenState extends State<PropertyDetailsScreen> {
     super.dispose();
   }
 
+
   @override
+  
   Widget build(BuildContext context) {
+    
     return GetBuilder<PropertySearchController>(
       builder: (controller) {
         if (controller.isDetailsLoading) {
@@ -121,8 +121,16 @@ class _PropertyDetailsScreenState extends State<PropertyDetailsScreen> {
             body: Center(child: Text("Property not found".tr)),
           );
         }
-
+       
         final property = controller.selectedProperty!;
+        final issue = (property.latestReview?.message?.trim().isNotEmpty ?? false)
+    ? property.latestReview!.message
+    : (property.rejectionReason?.trim().isNotEmpty ?? false)
+        ? property.rejectionReason!
+        : "No review message available";
+        print(property.latestReview);
+print(property.latestReview?.message);
+print(property.rejectionReason);
 
         final String loggedInUserId = StorageService.getUserId();
 
@@ -176,55 +184,157 @@ class _PropertyDetailsScreenState extends State<PropertyDetailsScreen> {
                             padding: EdgeInsets.fromLTRB(16.w, 10.h, 16.w, 0),
                             child: Column(
                               children: [
-                                SizedBox(
-                                  height: 64.h,
-                                  child: ListView.separated(
-                                    scrollDirection: Axis.horizontal,
-                                    itemCount: property.photos.length,
-                                    separatorBuilder: (_, __) =>
-                                        SizedBox(width: 8.w),
-                                    itemBuilder: (context, index) {
-                                      final photo = property.photos[index];
-                                      final bool isSelected =
-                                          selectedImageIndex == index;
+                                if (property.photos.length > 1) ...[
+                                  SizedBox(
+                                    height: 64.h,
+                                    child: ListView.separated(
+                                      scrollDirection: Axis.horizontal,
+                                      itemCount: property.photos.length,
+                                      separatorBuilder: (_, __) =>
+                                          SizedBox(width: 8.w),
+                                      itemBuilder: (context, index) {
+                                        final photo = property.photos[index];
+                                        final isSelected =
+                                            selectedImageIndex == index;
 
-                                      return GestureDetector(
-                                        onTap: () {
-                                          setState(() {
-                                            selectedImageIndex = index;
-                                          });
-                                        },
-                                        child: AnimatedContainer(
-                                          duration: const Duration(
-                                            milliseconds: 200,
+                                        return GestureDetector(
+                                          onTap: () {
+                                            setState(() {
+                                              selectedImageIndex = index;
+                                            });
+                                          },
+                                          child: AnimatedContainer(
+                                            duration: const Duration(
+                                              milliseconds: 200,
+                                            ),
+                                            width: 64.w,
+                                            height: 64.h,
+                                            decoration: BoxDecoration(
+                                              borderRadius:
+                                                  BorderRadius.circular(10.r),
+                                              border: Border.all(
+                                                color: isSelected
+                                                    ? AppColors.primary
+                                                    : Colors.grey.shade300,
+                                                width: isSelected ? 2 : 1,
+                                              ),
+                                            ),
+                                            child: ClipRRect(
+                                              borderRadius:
+                                                  BorderRadius.circular(8.r),
+                                              child: Image.network(
+                                                photo.url,
+                                                fit: BoxFit.cover,
+                                              ),
+                                            ),
                                           ),
-                                          width: 64.w,
-                                          height: 64.h,
-                                          decoration: BoxDecoration(
-                                            borderRadius: BorderRadius.circular(
-                                              10.r,
-                                            ),
-                                            border: Border.all(
-                                              color: isSelected
-                                                  ? AppColors.primary
-                                                  : Colors.grey.shade300,
-                                              width: isSelected ? 2 : 1,
-                                            ),
-                                          ),
-                                          child: ClipRRect(
-                                            borderRadius: BorderRadius.circular(
-                                              8.r,
-                                            ),
-                                            child: Image.network(
-                                              photo.url,
-                                              fit: BoxFit.cover,
-                                            ),
-                                          ),
-                                        ),
-                                      );
-                                    },
+                                        );
+                                      },
+                                    ),
                                   ),
-                                ),
+
+                                  SizedBox(height: 12.h),
+                                ],
+                               if (isMyProperty &&
+    property.status.toUpperCase() == "REJECTED")
+  Padding(
+  padding: EdgeInsets.fromLTRB(0.w, 5.h, 20.w, 8.h),
+  child: Row(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+      Icon(
+       Icons.error_outline_rounded,
+        color: Colors.red,
+        size: 18.sp,
+      ),
+
+      SizedBox(width: 8.w),
+
+      Expanded(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              "Listing Rejected".tr,
+              style: TextStyle(
+                fontSize: 13.sp,
+                fontWeight: FontWeight.w500,
+                color: Colors.red.shade500,
+              ),
+            ),
+
+            SizedBox(height: 2.h),
+
+            RichText(
+              text: TextSpan(
+                style: TextStyle(
+                  fontSize: 11.sp,
+                  color: Colors.black87,
+                  height: 1.4,
+                ),
+                children: [
+                  const TextSpan(
+                    text: "Issue: ",
+                    style: TextStyle(
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                  TextSpan(
+                    text: issue,
+                    style: TextStyle(
+                      color: Colors.red.shade700,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+Container(
+  height: 28.h,
+  decoration: BoxDecoration(
+    border: Border.all(color: AppColors.primary),
+    borderRadius: BorderRadius.circular(20.r),
+  ),
+  child: InkWell(
+    borderRadius: BorderRadius.circular(20.r),
+    onTap: () {
+      Get.to(
+        () => ListYourPropertyScreen(
+          property: property,
+          isEdit: true,
+        ),
+      );
+    },
+    child: Padding(
+      padding: EdgeInsets.symmetric(horizontal: 10.w),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(
+            Icons.edit_outlined,
+            size: 12.sp,
+            color: AppColors.primary,
+          ),
+          SizedBox(width: 4.w),
+          Text(
+            "Edit and Resubmit",
+            style: TextStyle(
+              color: AppColors.primary,
+              fontSize: 10.sp,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+        ],
+      ),
+    ),
+  ),
+)
+    ],
+  ),
+),
                                 PropertyInfoCard(property: property),
 
                                 SizedBox(height: 5.h),
@@ -309,11 +419,10 @@ class _PropertyDetailsScreenState extends State<PropertyDetailsScreen> {
                                         itemCount: property.amenities.length,
                                         gridDelegate:
                                             SliverGridDelegateWithFixedCrossAxisCount(
-                                              crossAxisCount:
-                                                  2, // 2 per row (change to 3 if preferred)
-                                              crossAxisSpacing: 12.w,
-                                              mainAxisSpacing: 12.h,
-                                              childAspectRatio: 3.2,
+                                              crossAxisCount: 3,
+                                              crossAxisSpacing: 6.w,
+                                              mainAxisSpacing: 6.h,
+                                              childAspectRatio: 2.3,
                                             ),
                                         itemBuilder: (context, index) {
                                           final amenity =
@@ -321,11 +430,11 @@ class _PropertyDetailsScreenState extends State<PropertyDetailsScreen> {
 
                                           return Container(
                                             padding: EdgeInsets.symmetric(
-                                              horizontal: 12.w,
-                                              vertical: 6.h,
+                                              horizontal: 6.w,
+                                              vertical: 4.h,
                                             ),
                                             decoration: BoxDecoration(
-                                              color: const Color(0xffF9F9FB),
+                                              //color: const Color(0xffF9F9FB),
                                               borderRadius:
                                                   BorderRadius.circular(8.r),
                                               border: Border.all(
@@ -334,44 +443,21 @@ class _PropertyDetailsScreenState extends State<PropertyDetailsScreen> {
                                             ),
                                             child: Row(
                                               children: [
-                                                ClipRRect(
-                                                  borderRadius:
-                                                      BorderRadius.circular(
-                                                        8.r,
+                                                (amenity.image ?? "").isNotEmpty
+                                                    ? Image.network(
+                                                        amenity.image!,
+                                                        width: 16.w,
+                                                        height: 16.w,
+                                                        fit: BoxFit.contain,
+                                                      )
+                                                    : Icon(
+                                                        Icons.check_circle,
+                                                        size: 14.sp,
+                                                        color:
+                                                            AppColors.primary,
                                                       ),
-                                                  child:
-                                                      (amenity.image ?? "")
-                                                          .isNotEmpty
-                                                      ? Image.network(
-                                                          amenity.image!,
-                                                          width: 42.w,
-                                                          height: 42.w,
-                                                          fit: BoxFit.cover,
-                                                        )
-                                                      : Container(
-                                                          width: 42.w,
-                                                          height: 42.w,
-                                                          decoration: BoxDecoration(
-                                                            color: AppColors
-                                                                .primary
-                                                                .withOpacity(
-                                                                  .1,
-                                                                ),
-                                                            borderRadius:
-                                                                BorderRadius.circular(
-                                                                  8.r,
-                                                                ),
-                                                          ),
-                                                          child: Icon(
-                                                            Icons.check_circle,
-                                                            color: AppColors
-                                                                .primary,
-                                                            size: 20.sp,
-                                                          ),
-                                                        ),
-                                                ),
 
-                                                SizedBox(width: 14.w),
+                                                SizedBox(width: 5.w),
 
                                                 Expanded(
                                                   child: Text(
@@ -380,13 +466,11 @@ class _PropertyDetailsScreenState extends State<PropertyDetailsScreen> {
                                                     overflow:
                                                         TextOverflow.ellipsis,
                                                     style: TextStyle(
-                                                      fontSize: 11.sp,
+                                                      fontSize: 9.sp,
                                                       fontWeight:
                                                           FontWeight.w400,
-                                                      height: 1.25,
-                                                      color: const Color(
-                                                        0xff1F2937,
-                                                      ),
+                                                      height: 1.2,
+                                                      color: Colors.black,
                                                     ),
                                                   ),
                                                 ),
@@ -398,16 +482,95 @@ class _PropertyDetailsScreenState extends State<PropertyDetailsScreen> {
                                     ],
                                   ),
                                 ),
+
+                                if (property.otherFeatures
+                                    .trim()
+                                    .isNotEmpty) ...[
+                                  SizedBox(height: 15.h),
+
+                                  Container(
+                                    width: double.infinity,
+                                    padding: EdgeInsets.all(16.w),
+                                    decoration: BoxDecoration(
+                                      color: Colors.white,
+                                      borderRadius: BorderRadius.circular(12.r),
+                                      border: Border.all(
+                                        color: const Color(0xffECECEC),
+                                      ),
+                                    ),
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          "Other Features".tr,
+                                          style: TextStyle(
+                                            fontSize: 16.sp,
+                                            fontWeight: FontWeight.w500,
+                                          ),
+                                        ),
+
+                                        SizedBox(height: 14.h),
+
+                                        ...property.otherFeatures
+                                            .split(',')
+                                            .where((e) => e.trim().isNotEmpty)
+                                            .map(
+                                              (feature) => Padding(
+                                                padding: EdgeInsets.only(
+                                                  bottom: 12.h,
+                                                ),
+                                                child: Row(
+                                                  crossAxisAlignment:
+                                                      CrossAxisAlignment.start,
+                                                  children: [
+                                                    Container(
+                                                      margin: EdgeInsets.only(
+                                                        top: 2.h,
+                                                      ),
+                                                      width: 22.w,
+                                                      height: 22.w,
+                                                      decoration: BoxDecoration(
+                                                        color: AppColors.primary
+                                                            .withOpacity(.12),
+                                                        shape: BoxShape.circle,
+                                                      ),
+                                                      child: Icon(
+                                                        Icons.check,
+                                                        color:
+                                                            AppColors.primary,
+                                                        size: 14.sp,
+                                                      ),
+                                                    ),
+
+                                                    SizedBox(width: 10.w),
+
+                                                    Expanded(
+                                                      child: Text(
+                                                        feature.trim(),
+                                                        style: AppTextStyles
+                                                            .body14
+                                                            .copyWith(
+                                                              height: 1.45,
+                                                              color:
+                                                                  const Color(
+                                                                    0xff444444,
+                                                                  ),
+                                                            ),
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
+                                              ),
+                                            ),
+                                      ],
+                                    ),
+                                  ),
+                                ],
                                 SizedBox(height: 12.h),
-
                                 CompareCard(property: property),
-                                 SizedBox(height: 12.h),
+                                SizedBox(height: 12.h),
                                 AgentContactCard(property: property),
-
-                                // ComparePropertyCard(
-                                //   currentProperty: property,
-                                //   properties: controller.properties,
-                                // ),
                                 SizedBox(height: 12.h),
                                 GetBuilder<FeaturedPropertiesController>(
                                   builder: (featuredController) {

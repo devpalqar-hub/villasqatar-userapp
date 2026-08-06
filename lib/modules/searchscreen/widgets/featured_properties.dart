@@ -142,7 +142,7 @@ class _FeaturedPropertiesState extends State<FeaturedProperties> {
                   "Featured Properties".tr,
                   style: AppTextStyles.title18.copyWith(
                     fontSize: 15.sp,
-                    fontWeight: FontWeight.w600,
+                    fontWeight: FontWeight.w500,
                     color: Colors.black,
                   ),
                 ),

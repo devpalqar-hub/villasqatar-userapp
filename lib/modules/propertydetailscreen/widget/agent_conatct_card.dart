@@ -1,9 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:get/get_navigation/src/extension_navigation.dart';
+import 'package:get/get_utils/src/extensions/internacionalization.dart';
+import 'package:get/utils.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:villas_qatar/Core/constants/app_colors.dart';
 import 'package:villas_qatar/modules/propertylist/model/myproperty_model.dart';
+import 'package:villas_qatar/modules/sellerpropertyscreen/views/seller_property_screen.dart';
 
 class AgentContactCard extends StatelessWidget {
   final Property property;
@@ -11,149 +15,177 @@ class AgentContactCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      width: double.infinity,
-      padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 14.h),
-     decoration: BoxDecoration(
-  color: Colors.white,
-  borderRadius: BorderRadius.circular(16.r),
-   border: Border.all(color: const Color(0xffECECEC)),
+    return InkWell(
+       borderRadius: BorderRadius.circular(16.r),
+  onTap: () {
+    debugPrint("Seller tapped");
+    Get.to(
+      () => SellerPropertiesScreen(
+        sellerId: property.createdBy.id,
+        sellerName: property.createdBy.name,
+      ),
+    );
+  },
+      child: Container(
+        width: double.infinity,
+        padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 14.h),
+       decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16.r),
+         border: Border.all(color: const Color(0xffECECEC)),
+        
+        boxShadow: [
+      BoxShadow(
+        color: Colors.black.withOpacity(.04),
+        blurRadius: 12,
+        offset: const Offset(0, 4),
+      ),
+        ],
+      ),
+       
+        child: Row(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+      // Avatar
+      CircleAvatar(
+        radius: 30.r,
+        backgroundColor: const Color(0xffF3F4F6),
+        backgroundImage: const AssetImage("assets/agent.png"),
+      ),
       
-  boxShadow: [
-    BoxShadow(
-      color: Colors.black.withOpacity(.04),
-      blurRadius: 12,
-      offset: const Offset(0, 4),
-    ),
-  ],
-),
-     
-      child: Row(
-  crossAxisAlignment: CrossAxisAlignment.center,
-  children: [
-    // Avatar
-    CircleAvatar(
-      radius: 30.r,
-      backgroundColor: const Color(0xffF3F4F6),
-      backgroundImage: const AssetImage("assets/agent.png"),
-    ),
-
-    SizedBox(width: 14.w),
-
-    // Details
-    Expanded(
-      child: Column(
+      SizedBox(width: 14.w),
+      
+      // Details
+      Expanded(
+        child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,
         children: [
-          Text(
-            property.createdBy.name ?? "Property Owner",
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-            style: TextStyle(
-              fontSize: 16.sp,
-              fontWeight: FontWeight.w500,
-              color: const Color(0xff202124),
-            ),
+      Text(
+        property.createdBy.name.isNotEmpty
+            ? property.createdBy.name
+            : "Property Owner".tr,
+        maxLines: 1,
+        overflow: TextOverflow.ellipsis,
+        style: TextStyle(
+          fontSize: 16.sp,
+          fontWeight: FontWeight.w600,
+          color: const Color(0xff202124),
+        ),
+      ),
+      
+      SizedBox(height: 4.h),
+      
+      Text(
+        property.createdBy.role.toUpperCase() == "DEALER"
+            ? "Dealer".tr
+            : "Property Owner".tr,
+        style: TextStyle(
+          fontSize: 12.sp,
+          color: Colors.grey.shade600,
+          fontWeight: FontWeight.w500,
+        ),
+      ),
+      
+        
+      
+      if (property.contactVerified)
+       
+        Container(
+          padding: EdgeInsets.symmetric(
+            horizontal: 8.w,
+            vertical: 4.h,
           ),
-
-          SizedBox(height: 6.h),
-
-          if (property.contactVerified)
-            Container(
-              padding: EdgeInsets.symmetric(
-                horizontal: 8.w,
-                vertical: 4.h,
+          decoration: BoxDecoration(
+            color: Colors.green.shade50,
+            borderRadius: BorderRadius.circular(20.r),
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(
+                Icons.verified_rounded,
+                color: Colors.green,
+                size: 14.sp,
               ),
-              decoration: BoxDecoration(
-                color: Colors.green.shade50,
-                borderRadius: BorderRadius.circular(20.r),
+              SizedBox(width: 4.w),
+              Text(
+                "Verified Contact".tr,
+                style: TextStyle(
+                  fontSize: 10.sp,
+                  fontWeight: FontWeight.w600,
+                  color: Colors.green.shade700,
+                ),
               ),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Icon(
-                    Icons.verified_rounded,
-                    color: Colors.green,
-                    size: 14.sp,
-                  ),
-                  SizedBox(width: 4.w),
-                  Text(
-                    "Verified Contact",
-                    style: TextStyle(
-                      fontSize: 10.sp,
-                      fontWeight: FontWeight.w600,
-                      color: Colors.green.shade700,
-                    ),
-                  ),
-                ],
+            ],
+          ),
+        ),
+      
+      if (property.createdBy.role.toUpperCase() == "DEALER") ...[
+        SizedBox(height: 5.h),
+        Row(
+          children: [
+            Icon(
+              Icons.star_rounded,
+              color: Colors.amber,
+              size: 14.sp,
+            ),
+            SizedBox(width: 4.w),
+            Text(
+              "4.9",
+              style: TextStyle(
+                fontWeight: FontWeight.w600,
+                fontSize: 11.sp,
               ),
             ),
-
-          if (property.createdBy.role.toLowerCase() == "dealer") ...[
-            SizedBox(height: 6.h),
-            Row(
-              children: [
-                Icon(
-                  Icons.star_rounded,
-                  color: Colors.amber,
-                  size: 14.sp,
-                ),
-                SizedBox(width: 4.w),
-                Text(
-                  "4.9",
-                  style: TextStyle(
-                    fontWeight: FontWeight.w600,
-                    fontSize: 11.sp,
-                  ),
-                ),
-                Text(
-                  " (150 Reviews)",
-                  style: TextStyle(
-                    fontSize: 10.sp,
-                    color: Colors.grey.shade600,
-                  ),
-                ),
-              ],
+            Text(
+              " (150 Reviews)",
+              style: TextStyle(
+                fontSize: 10.sp,
+                color: Colors.grey.shade600,
+              ),
             ),
           ],
-        ],
-      ),
-    ),
-
-    SizedBox(width: 12.w),
-
-    // Actions
-    Row(
-      children: [
-        GestureDetector(
-          onTap: () => _makeCall(property.contactPhone),
-          child: _actionButton(
-            color: AppColors.primary,
-            icon: const Icon(
-              Icons.call_outlined,
-              color: Colors.white,
-            ),
-            label: "Call",
-          ),
-        ),
-        SizedBox(width: 10.w),
-        GestureDetector(
-          onTap: () => _openWhatsApp(property.contactWhatsapp),
-          child: _actionButton(
-            color: const Color(0xff25D366),
-            icon: const FaIcon(
-              FontAwesomeIcons.whatsapp,
-              color: Colors.white,
-            ),
-            label: "WhatsApp",
-          ),
         ),
       ],
-    ),
-  ],
-)
+        ],
+      ),
+      ),
       
+      SizedBox(width: 12.w),
+      
+      // Actions
+      Row(
+        children: [
+          GestureDetector(
+            onTap: () => _makeCall(property.contactPhone),
+            child: _actionButton(
+              color: AppColors.primary,
+              icon: const Icon(
+                Icons.call_outlined,
+                color: Colors.white,
+              ),
+              label: "Call",
+            ),
+          ),
+          SizedBox(width: 10.w),
+          GestureDetector(
+            onTap: () => _openWhatsApp(property.contactWhatsapp),
+            child: _actionButton(
+              color: const Color(0xff25D366),
+              icon: const FaIcon(
+                FontAwesomeIcons.whatsapp,
+                color: Colors.white,
+              ),
+              label: "WhatsApp",
+            ),
+          ),
+        ],
+      ),
+        ],
+      )
+        
+      ),
     );
   }
 

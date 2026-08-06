@@ -3,6 +3,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:villas_qatar/Core/constants/app_colors.dart';
 import 'package:villas_qatar/Core/theme/app_textstyles.dart';
+import 'package:villas_qatar/modules/home/service/UtilsController.dart';
 import 'package:villas_qatar/modules/searchscreen/service/searchlist_screen.dart';
 
 class PropertyCategorySection extends StatelessWidget {
@@ -10,62 +11,109 @@ class PropertyCategorySection extends StatelessWidget {
 
   final PropertySearchController controller;
 
-  final List<Map<String, dynamic>> categories = [
-    {"title": "Villa", "type": "VILLA", "icon": Icons.home_outlined},
-    {
-      "title": "Apartment",
-      "type": "APARTMENT",
-      "icon": Icons.apartment_outlined,
-    },
-    {"title": "Townhouse", "type": "TOWNHOUSE", "icon": Icons.house_outlined},
-    {"title": "Penthouse", "type": "PENTHOUSE", "icon": Icons.apartment},
-    {"title": "Studio", "type": "STUDIO", "icon": Icons.king_bed_outlined},
-    {
-      "title": "Commercial",
-      "type": "COMMERCIAL",
-      "icon": Icons.storefront_outlined,
-    },
-    {"title": "Land", "type": "LAND", "icon": Icons.landscape_outlined},
-  ];
-
+  @override
   @override
   Widget build(BuildContext context) {
-    return GetBuilder<PropertySearchController>(
-      builder: (_) {
-        return Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              "Property Categories".tr,
-              style: AppTextStyles.title14.copyWith(
-                fontWeight: FontWeight.w700,
-              ),
-            ),
+    return GetBuilder<Utilscontroller>(
+      builder: (utils) {
+        return GetBuilder<PropertySearchController>(
+          builder: (_) {
+            return Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  "Property Categories".tr,
+                  style: AppTextStyles.title14.copyWith(
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
 
-            SizedBox(height: 14.h),
+                SizedBox(height: 14.h),
 
-            SizedBox(
-              height: 90.h,
-              child: ListView.builder(
-                scrollDirection: Axis.horizontal,
-                itemCount: categories.length,
-                itemBuilder: (_, index) {
-                  final item = categories[index];
+                SizedBox(
+                  height: 70.h,
+                  child: ListView.separated(
+                    scrollDirection: Axis.horizontal,
+                    itemCount: utils.listingTypes.length,
+                    separatorBuilder: (_, __) => SizedBox(width: 10.w),
+                    itemBuilder: (_, index) {
+                      final item = utils.listingTypes[index];
 
-                  final bool selected = controller.type == item["type"];
+                      final bool selected = controller.filter.type == item.id;
 
-                  return CategoryChip(
-                    title: item["title"],
-                    icon: item["icon"],
-                    selected: selected,
-                    onTap: () {
-                      controller.applyFilters(type: item["type"]);
+                      return InkWell(
+                        borderRadius: BorderRadius.circular(10.r),
+                        onTap: () {
+                          controller.applyFilters(type: item.id);
+                        },
+                        child: AnimatedContainer(
+                          duration: const Duration(milliseconds: 250),
+                          width: 65.w,
+                          height: 70.h,
+                          padding: EdgeInsets.symmetric(
+                            horizontal: 6.w,
+                            vertical: 6.h,
+                          ),
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(10.r),
+                            border: Border.all(
+                              color: selected
+                                  ? AppColors.primary
+                                  : const Color(0xffE6E9EF),
+                              width: selected ? 1.2 : 1,
+                            ),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black.withOpacity(.03),
+                                blurRadius: 8,
+                                offset: const Offset(0, 3),
+                              ),
+                            ],
+                          ),
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Image.network(
+                                item.image ?? "",
+                                width: 24.w,
+                                height: 22.w,
+                                fit: BoxFit.contain,
+
+                                errorBuilder: (_, __, ___) => Icon(
+                                  Icons.home_work_outlined,
+                                  size: 20.sp,
+                                  
+                                ),
+                              ),
+
+                              SizedBox(height: 6.h),
+
+                              Text(
+                                item.title.tr,
+                                maxLines: 2,
+                                textAlign: TextAlign.center,
+                                overflow: TextOverflow.ellipsis,
+                                style: AppTextStyles.body12.copyWith(
+                                  fontSize: 9.sp,
+                                  fontWeight: selected
+                                      ? FontWeight.w600
+                                      : FontWeight.w500,
+                                  color: selected
+                                      ? AppColors.primary
+                                      : Colors.black,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      );
                     },
-                  );
-                },
-              ),
-            ),
-          ],
+                  ),
+                ),
+              ],
+            );
+          },
         );
       },
     );
@@ -74,14 +122,14 @@ class PropertyCategorySection extends StatelessWidget {
 
 class CategoryChip extends StatelessWidget {
   final String title;
-  final IconData icon;
+  final String? image;
   final bool selected;
   final VoidCallback onTap;
 
   const CategoryChip({
     super.key,
     required this.title,
-    required this.icon,
+    required this.image,
     required this.selected,
     required this.onTap,
   });
@@ -110,10 +158,25 @@ class CategoryChip extends StatelessWidget {
                   ),
                 ],
               ),
-              child: Icon(
-                icon,
-                size: 28.sp,
-                color: selected ? Colors.white : AppColors.primary,
+              child: Center(
+                child: image != null && image!.isNotEmpty
+                    ? Image.network(
+                        image!,
+                        width: 30.w,
+                        height: 30.w,
+                        fit: BoxFit.contain,
+                        color: selected ? Colors.white : AppColors.primary,
+                        errorBuilder: (_, __, ___) => Icon(
+                          Icons.home_work_outlined,
+                          size: 28.sp,
+                          color: selected ? Colors.white : AppColors.primary,
+                        ),
+                      )
+                    : Icon(
+                        Icons.home_work_outlined,
+                        size: 28.sp,
+                        color: selected ? Colors.white : AppColors.primary,
+                      ),
               ),
             ),
 
@@ -121,8 +184,8 @@ class CategoryChip extends StatelessWidget {
 
             Text(
               title.tr,
-              style: AppTextStyles.body13.copyWith(
-                fontWeight: selected ? FontWeight.w700 : FontWeight.w500,
+              style: AppTextStyles.body12.copyWith(
+                fontWeight: selected ? FontWeight.w500 : FontWeight.w400,
                 color: selected ? AppColors.primary : Colors.black,
               ),
             ),

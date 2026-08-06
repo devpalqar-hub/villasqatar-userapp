@@ -33,8 +33,6 @@ class _MyPropertiesScreenState extends State<MyPropertiesScreen> {
 
   final searchCtrl = TextEditingController();
 
- 
-
   @override
   void initState() {
     super.initState();
@@ -161,17 +159,16 @@ class _MyPropertiesScreenState extends State<MyPropertiesScreen> {
                                           () => const PropertyDetailsScreen(),
                                           transition: Transition.rightToLeft,
                                         );
-                                        
                                       },
-                                       onEdit: () {
-    Get.to(
-      () => ListYourPropertyScreen(
-        property: listings[index],
-        isEdit: true,
-      ),
-      transition: Transition.rightToLeft,
-    );
-  },
+                                      onEdit: () {
+                                        Get.to(
+                                          () => ListYourPropertyScreen(
+                                            property: listings[index],
+                                            isEdit: true,
+                                          ),
+                                          transition: Transition.rightToLeft,
+                                        );
+                                      },
                                     );
                                   },
                                 ),
@@ -197,7 +194,7 @@ class _MyPropertiesScreenState extends State<MyPropertiesScreen> {
 
         icon: const Icon(Icons.add, color: Colors.white),
 
-        label:  Text(
+        label: Text(
           "List Property".tr,
           style: TextStyle(fontWeight: FontWeight.w700, color: Colors.white),
         ),
@@ -205,10 +202,6 @@ class _MyPropertiesScreenState extends State<MyPropertiesScreen> {
     );
   }
 
-  // ---------------------------------------------------------
-  // TOP BAR — matches the form screens (back arrow, centered
-  // title, maroon accent action on the right)
-  // ---------------------------------------------------------
   Widget _buildTopBar() {
     return Padding(
       padding: const EdgeInsets.fromLTRB(12, 8, 16, 8),
@@ -218,13 +211,13 @@ class _MyPropertiesScreenState extends State<MyPropertiesScreen> {
             icon: const Icon(Icons.arrow_back, color: AppColors.primary),
             onPressed: () {},
           ),
-           Expanded(
+          Expanded(
             child: Text(
               "My Properties".tr,
               textAlign: TextAlign.center,
               style: TextStyle(
                 fontSize: 18,
-                fontWeight: FontWeight.w700,
+                fontWeight: FontWeight.w500,
                 color: Colors.black87,
               ),
             ),
@@ -240,9 +233,6 @@ class _MyPropertiesScreenState extends State<MyPropertiesScreen> {
     );
   }
 
-  // ---------------------------------------------------------
-  // SEARCH BAR — same field styling as the form's text fields
-  // ---------------------------------------------------------
   Widget _buildSearchBar() {
     return Padding(
       padding: const EdgeInsets.fromLTRB(20, 4, 20, 12),
@@ -256,8 +246,8 @@ class _MyPropertiesScreenState extends State<MyPropertiesScreen> {
         child: TextField(
           controller: searchCtrl,
           onChanged: (_) => setState(() {}),
-          style:  TextStyle(fontSize: 12, color: Colors.black87),
-          decoration:  InputDecoration(
+          style: TextStyle(fontSize: 12, color: Colors.black87),
+          decoration: InputDecoration(
             hintText: 'Search by property name or location'.tr,
             hintStyle: TextStyle(color: AppColors.hintGrey, fontSize: 12),
             prefixIcon: Icon(Icons.search, color: AppColors.hintGrey, size: 18),
@@ -291,12 +281,12 @@ class _MyPropertiesScreenState extends State<MyPropertiesScreen> {
               ),
             ),
             const SizedBox(height: 16),
-             Text(
+            Text(
               'No properties found'.tr,
               style: TextStyle(fontWeight: FontWeight.w700, fontSize: 15),
             ),
             const SizedBox(height: 6),
-             Text(
+            Text(
               'Try a different search or filter, or list a new property'.tr,
               textAlign: TextAlign.center,
               style: TextStyle(color: AppColors.hintGrey, fontSize: 12.5),
@@ -308,16 +298,16 @@ class _MyPropertiesScreenState extends State<MyPropertiesScreen> {
   }
 }
 
-// =================================================================
-// PROPERTY CARD
-// =================================================================
-
 class _PropertyCard extends StatelessWidget {
   final Property listing;
   final VoidCallback onTap;
-   final VoidCallback onEdit;
+  final VoidCallback onEdit;
 
-  const _PropertyCard({required this.listing, required this.onTap,  required this.onEdit,});
+  const _PropertyCard({
+    required this.listing,
+    required this.onTap,
+    required this.onEdit,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -351,55 +341,57 @@ class _PropertyCard extends StatelessWidget {
       ),
     );
   }
-Widget _buildThumbnail() {
-  return Stack(
-    children: [
-      ClipRRect(
-        borderRadius: BorderRadius.circular(12),
-        child: listing.photos.isNotEmpty
-            ? Image.network(
-                (listing.photos
-                        .where((photo) => photo.sortOrder == 0)
-                        .isNotEmpty
-                    ? listing.photos
-                        .firstWhere((photo) => photo.sortOrder == 0)
-                        .url
-                    : listing.photos.first.url),
-                width: 80.w,
-                height: 80.h,
-                fit: BoxFit.cover,
-                errorBuilder: (_, __, ___) {
-                  return _placeholder();
-                },
-              )
-            : _placeholder(),
-      ),
 
-      Positioned(
-        left: 6,
-        bottom: 6,
-        child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-          decoration: BoxDecoration(
-            color: Colors.black54,
-            borderRadius: BorderRadius.circular(6),
-          ),
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              const Icon(Icons.photo_camera, size: 10, color: Colors.white),
-              const SizedBox(width: 3),
-              Text(
-                "${listing.photos.length}",
-                style: TextStyle(color: Colors.white, fontSize: 8.sp),
-              ),
-            ],
+  Widget _buildThumbnail() {
+    return Stack(
+      children: [
+        ClipRRect(
+          borderRadius: BorderRadius.circular(12),
+          child: listing.photos.isNotEmpty
+              ? Image.network(
+                  (listing.photos
+                          .where((photo) => photo.sortOrder == 0)
+                          .isNotEmpty
+                      ? listing.photos
+                            .firstWhere((photo) => photo.sortOrder == 0)
+                            .url
+                      : listing.photos.first.url),
+                  width: 80.w,
+                  height: 80.h,
+                  fit: BoxFit.cover,
+                  errorBuilder: (_, __, ___) {
+                    return _placeholder();
+                  },
+                )
+              : _placeholder(),
+        ),
+
+        Positioned(
+          left: 6,
+          bottom: 6,
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+            decoration: BoxDecoration(
+              color: Colors.black54,
+              borderRadius: BorderRadius.circular(6),
+            ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const Icon(Icons.photo_camera, size: 10, color: Colors.white),
+                const SizedBox(width: 3),
+                Text(
+                  "${listing.photos.length}",
+                  style: TextStyle(color: Colors.white, fontSize: 8.sp),
+                ),
+              ],
+            ),
           ),
         ),
-      ),
-    ],
-  );
-}
+      ],
+    );
+  }
+
   Widget _placeholder() {
     return Container(
       width: 80.w,
@@ -424,21 +416,22 @@ Widget _buildThumbnail() {
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
                 style: TextStyle(
-                  fontWeight: FontWeight.w700,
+                  fontWeight: FontWeight.w500,
                   fontSize: 12.sp,
                   color: Colors.black87,
                 ),
               ),
             ),
 
+            if (listing.status.toUpperCase() == "REJECTED")
               IconButton(
-      onPressed: onEdit,
-      icon: const Icon(
-        Icons.edit_outlined,
-        color: AppColors.primary,
-        size: 20,
-      ),
-    ),
+                icon: const Icon(
+                  Icons.edit_outlined,
+                  color: AppColors.primary,
+                  size: 20,
+                ),
+                onPressed: () => _showRejectedDialog(listing, onEdit),
+              ),
 
             _StatusBadge(status: listing.status),
           ],
@@ -471,7 +464,7 @@ Widget _buildThumbnail() {
           "QAR ${_formatPrice(listing.price)}"
           "${listing.purpose == "RENT" ? " / month" : ""}",
           style: const TextStyle(
-            fontWeight: FontWeight.w800,
+            fontWeight: FontWeight.w600,
             fontSize: 15,
             color: AppColors.primary,
           ),
@@ -518,8 +511,210 @@ Widget _buildThumbnail() {
         .replaceAllMapped(RegExp(r'\B(?=(\d{3})+(?!\d))'), (match) => ",");
   }
 }
+void _showRejectedDialog(
+  Property listing,
+  VoidCallback onEdit,
+) {
+  final review = listing.latestReview;
 
-// =================================================================
+  Get.dialog(
+    Dialog(
+      insetPadding: const EdgeInsets.symmetric(horizontal: 24),
+      backgroundColor: Colors.transparent,
+      child: Container(
+        padding: const EdgeInsets.all(20),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(22),
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+
+            Container(
+              width: 62,
+              height: 62,
+              decoration: BoxDecoration(
+                color: Colors.red.shade50,
+                shape: BoxShape.circle,
+              ),
+              child: const Icon(
+                Icons.report_problem_outlined,
+                color: Colors.red,
+                size: 30,
+              ),
+            ),
+
+            const SizedBox(height: 18),
+
+            Text(
+              "Listing Rejected".tr,
+              style: const TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.w700,
+              ),
+            ),
+
+            const SizedBox(height: 8),
+
+            Text(
+              "Please review the issue below and update your listing before submitting it again."
+                  .tr,
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontSize: 13,
+                color: Colors.grey.shade600,
+                height: 1.5,
+              ),
+            ),
+
+            const SizedBox(height: 22),
+
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.all(14),
+              decoration: BoxDecoration(
+                color: const Color(0xffFFF5F5),
+                borderRadius: BorderRadius.circular(14),
+                border: Border.all(
+                  color: const Color(0xffF7D4D4),
+                ),
+              ),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+
+                  const Icon(
+                    Icons.info_outline,
+                    color: Colors.red,
+                    size: 18,
+                  ),
+
+                  const SizedBox(width: 10),
+
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment:
+                          CrossAxisAlignment.start,
+                      children: [
+
+                        Text(
+                          "Issue".tr,
+                          style: const TextStyle(
+                            fontWeight: FontWeight.w600,
+                            fontSize: 13,
+                          ),
+                        ),
+
+                        const SizedBox(height: 6),
+
+                        Text(
+                          listing.rejectionReason?.isNotEmpty == true
+                              ? listing.rejectionReason!
+                              : review?.message ?? "-",
+                          style: TextStyle(
+                            fontSize: 13,
+                            color: Colors.grey.shade800,
+                            height: 1.45,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+
+            if (review != null) ...[
+              const SizedBox(height: 16),
+
+              Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 8,
+                ),
+                decoration: BoxDecoration(
+                  color: const Color(0xffF8F8F8),
+                  borderRadius: BorderRadius.circular(30),
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+
+                    const Icon(
+                      Icons.verified_user_outlined,
+                      size: 16,
+                      color: AppColors.primary,
+                    ),
+
+                    const SizedBox(width: 6),
+
+                    Text(
+                      review.reviewedBy.name,
+                      style: const TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+
+            const SizedBox(height: 24),
+
+            Row(
+              children: [
+
+                Expanded(
+                  child: OutlinedButton(
+                    style: OutlinedButton.styleFrom(
+                      minimumSize: const Size.fromHeight(46),
+                      shape: RoundedRectangleBorder(
+                        borderRadius:
+                            BorderRadius.circular(12),
+                      ),
+                    ),
+                    onPressed: () => Get.back(),
+                    child: Text("Close".tr),
+                  ),
+                ),
+
+                const SizedBox(width: 12),
+
+                Expanded(
+                  child: ElevatedButton.icon(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: AppColors.primary,
+                      foregroundColor: Colors.white,
+                      elevation: 0,
+                      minimumSize: const Size.fromHeight(46),
+                      shape: RoundedRectangleBorder(
+                        borderRadius:
+                            BorderRadius.circular(12),
+                      ),
+                    ),
+                    onPressed: () {
+                      Get.back();
+                      onEdit();
+                    },
+                    icon: const Icon(
+                      Icons.edit_outlined,
+                      size: 18,
+                    ),
+                    label: Text("Edit & Resubmit".tr),
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    ),
+    barrierDismissible: true,
+  );
+}
+//===============================================================
 // STATUS BADGE (Active / Draft / Sold) — same pill language as
 // the WhatsApp Verified banner (colored bg + colored text)
 // =================================================================
@@ -532,26 +727,30 @@ class _StatusBadge extends StatelessWidget {
   Widget build(BuildContext context) {
     Color bg;
     Color fg;
-
     switch (status.toUpperCase()) {
-      case "ACTIVE":
-        bg = AppColors.greenBg;
-        fg = AppColors.greenText;
+      case "APPROVED":
+        bg = const Color(0xffEAF8EF);
+        fg = Colors.green;
         break;
 
       case "PENDING":
-        bg = Colors.grey.shade100;
-        fg = Colors.grey;
+        bg = const Color(0xffFFF8E7);
+        fg = Colors.orange;
         break;
 
-      case "INACTIVE":
-        bg = AppColors.pinkChipBg;
-        fg = AppColors.primary;
+      case "REJECTED":
+        bg = const Color(0xffFFECEC);
+        fg = Colors.red;
+        break;
+
+      case "SOLD":
+        bg = Colors.blue.shade50;
+        fg = Colors.blue;
         break;
 
       default:
-        bg = Colors.orange.shade100;
-        fg = Colors.orange;
+        bg = Colors.grey.shade100;
+        fg = Colors.grey;
     }
 
     return Container(

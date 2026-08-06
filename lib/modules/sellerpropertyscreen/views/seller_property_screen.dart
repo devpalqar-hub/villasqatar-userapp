@@ -7,107 +7,99 @@ import 'package:villas_qatar/modules/propertylist/model/myproperty_model.dart';
 import 'package:villas_qatar/modules/searchscreen/service/searchlist_screen.dart';
 import 'package:villas_qatar/modules/sellerpropertyscreen/widget/seller_property_card.dart';
 
-class SellerPropertiesScreen extends StatelessWidget {
-  SellerPropertiesScreen({
-    super.key,
-    required this.sellerId,
-    required this.sellerName,
-  }) {
-    controller.createdById = sellerId;
-    controller.fetchProperties();
-  }
-
+class SellerPropertiesScreen extends StatefulWidget {
   final String sellerId;
   final String sellerName;
 
-  final PropertySearchController controller =
-      Get.put(PropertySearchController());
+  const SellerPropertiesScreen({
+    super.key,
+    required this.sellerId,
+    required this.sellerName,
+  });
 
   @override
- @override
-Widget build(BuildContext context) {
-  return GetBuilder<PropertySearchController>(
-    builder: (controller) {
-      final properties = controller.properties;
+  State<SellerPropertiesScreen> createState() => _SellerPropertiesScreenState();
+}
 
-      final saleCount =
-          properties.where((e) => e.purpose == "SALE").length;
+class _SellerPropertiesScreenState extends State<SellerPropertiesScreen> {
+  late final PropertySearchController controller;
 
-      final rentCount =
-          properties.where((e) => e.purpose == "RENT").length;
+  @override
+  void initState() {
+    super.initState();
 
-      if (controller.isLoading) {
-        return const Scaffold(
-          body: Center(
-            child: CircularProgressIndicator(),
+    controller = Get.put(PropertySearchController());
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      controller.applyFilters(createdById: widget.sellerId);
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return GetBuilder<PropertySearchController>(
+      builder: (controller) {
+        final properties = controller.properties;
+
+        final saleCount = properties.where((e) => e.purpose == "SALE").length;
+
+        final rentCount = properties.where((e) => e.purpose == "RENT").length;
+
+        if (controller.isLoading) {
+          return const Scaffold(
+            body: Center(child: CircularProgressIndicator()),
+          );
+        }
+
+        return Scaffold(
+          backgroundColor: AppColors.background,
+          appBar: AppBar(
+            backgroundColor: Colors.white,
+            elevation: 0,
+            centerTitle: true,
+            surfaceTintColor: Colors.white,
+            title: Text("Seller Properties".tr, style: AppTextStyles.title16),
+          ),
+          body: CustomScrollView(
+            physics: const BouncingScrollPhysics(),
+            slivers: [
+              SliverToBoxAdapter(
+                child: _SellerHeader(
+                  sellerName: widget.sellerName,
+                  propertyCount: properties.length,
+                  saleCount: saleCount,
+                  rentCount: rentCount,
+                ),
+              ),
+
+              if (properties.isEmpty)
+                const SliverFillRemaining(
+                  hasScrollBody: false,
+                  child: Center(child: Text("No Properties Found")),
+                )
+              else
+                SliverPadding(
+                  padding: EdgeInsets.symmetric(horizontal: 16.w),
+                  sliver: SliverGrid(
+                    delegate: SliverChildBuilderDelegate((context, index) {
+                      return SellerPropertyCard(property: properties[index]);
+                    }, childCount: properties.length),
+                    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: 2,
+                      mainAxisSpacing: 13.h,
+                      crossAxisSpacing: 12.w,
+                      childAspectRatio: .65,
+                    ),
+                  ),
+                ),
+
+              SliverToBoxAdapter(child: SizedBox(height: 30.h)),
+            ],
           ),
         );
-      }
-
-      return Scaffold(
-        backgroundColor: AppColors.background,
-        appBar: AppBar(
-          backgroundColor: Colors.white,
-          elevation: 0,
-          centerTitle: true,
-          surfaceTintColor: Colors.white,
-          title: Text(
-            "Seller Properties".tr,
-            style: AppTextStyles.title16,
-          ),
-        ),
-        body: CustomScrollView(
-          physics: const BouncingScrollPhysics(),
-          slivers: [
-            SliverToBoxAdapter(
-              child: _SellerHeader(
-                sellerName: sellerName,
-                propertyCount: properties.length,
-                saleCount: saleCount,
-                rentCount: rentCount,
-              ),
-            ),
-
-          
-
-            if (properties.isEmpty)
-              const SliverFillRemaining(
-                hasScrollBody: false,
-                child: Center(
-                  child: Text("No Properties Found"),
-                ),
-              )
-            else
-              SliverPadding(
-                padding: EdgeInsets.symmetric(horizontal: 16.w),
-                sliver: SliverGrid(
-                  delegate: SliverChildBuilderDelegate(
-                    (context, index) {
-                      return SellerPropertyCard(
-                        property: properties[index],
-                      );
-                    },
-                    childCount: properties.length,
-                  ),
-                  gridDelegate:
-                      SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 2,
-                    mainAxisSpacing: 13.h,
-                    crossAxisSpacing: 12.w,
-                    childAspectRatio: .65,
-                  ),
-                ),
-              ),
-
-            SliverToBoxAdapter(
-              child: SizedBox(height: 30.h),
-            ),
-          ],
-        ),
-      );
-    },
-  );
-}
+      },
+    );
+  }
 }
 
 class _SellerHeader extends StatelessWidget {
@@ -190,7 +182,7 @@ class _SellerHeader extends StatelessWidget {
                         ),
                       ),
 
-                      SizedBox(height:4.h),
+                      SizedBox(height: 4.h),
 
                       Row(
                         children: [
@@ -264,10 +256,6 @@ class _SellerHeader extends StatelessWidget {
                     "For Rent",
                   ),
                 ),
-
-              
-
-               
               ],
             ),
           ),

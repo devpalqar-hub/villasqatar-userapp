@@ -66,8 +66,8 @@ class _CompareBottomSheetState extends State<CompareBottomSheet> {
   @override
   Widget build(BuildContext context) {
     return DraggableScrollableSheet(
-      initialChildSize: .75,
-      maxChildSize: .95,
+      initialChildSize: .70,
+      maxChildSize: .80,
       minChildSize: .65,
       expand: false,
       builder: (_, scrollController) {
@@ -258,6 +258,7 @@ class _CompareBottomSheetState extends State<CompareBottomSheet> {
   }
 }
 
+
 class ComparePropertyTile extends StatelessWidget {
   final Property property;
   final bool selected;
@@ -278,128 +279,139 @@ class ComparePropertyTile extends StatelessWidget {
 
     return InkWell(
       onTap: onTap,
-      borderRadius: BorderRadius.circular(10.r),
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 550),
-        padding: EdgeInsets.all(10.w),
-        decoration: BoxDecoration(
-          color: selected ? AppColors.primary.withOpacity(.08) : Colors.white,
-          borderRadius: BorderRadius.circular(10.r),
-          border: Border.all(
-            color: selected ? AppColors.primary : Colors.grey.shade300,
-            width: selected ? 1.8 : 1,
-          ),
-        ),
-        child: Row(
-          children: [
-            /// Image
-            ClipRRect(
-              borderRadius: BorderRadius.circular(10.r),
-              child: image.isNotEmpty
-                  ? Image.network(
-                      image,
-                      width: 70.w,
-                      height: 70.w,
-                      fit: BoxFit.cover,
-                    )
-                  : Container(
-                      width: 70.w,
-                      height: 70.w,
-                      color: Colors.grey.shade200,
-                      child: Icon(
-                        Icons.home_work_outlined,
-                        color: Colors.grey,
-                        size: 28.sp,
-                      ),
-                    ),
+      child: Column(
+        children: [
+          Padding(
+            padding: EdgeInsets.symmetric(
+              vertical: 8.h,
+              horizontal: 2.w,
             ),
+            child: Row(
+              children: [
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(8.r),
+                  child: image.isNotEmpty
+                      ? Image.network(
+                          image,
+                          width: 56.w,
+                          height: 56.w,
+                          fit: BoxFit.cover,
+                        )
+                      : Container(
+                          width: 56.w,
+                          height: 56.w,
+                          color: Colors.grey.shade200,
+                          child: Icon(
+                            Icons.home_work_outlined,
+                            size: 20.sp,
+                            color: Colors.grey,
+                          ),
+                        ),
+                ),
 
-            SizedBox(width: 12.w),
+                SizedBox(width: 10.w),
 
-            /// Details
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  /// Property Name
-                  Text(
-                    property.propertyName,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: AppTextStyles.title14.copyWith(
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-
-                  SizedBox(height: 4.h),
-
-                  /// Location
-                  Text(
-                    "${property.areaName}, ${property.municipality.name}",
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: AppTextStyles.body13.copyWith(
-                      color: Colors.grey.shade600,
-                    ),
-                  ),
-
-                  SizedBox(height: 8.h),
-
-                  Row(
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        "QAR ${property.price.toStringAsFixed(0)}",
-                        style: AppTextStyles.body14.copyWith(
-                          color: AppColors.primary,
-                          fontWeight: FontWeight.w500,
+                        property.propertyName,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: AppTextStyles.body13.copyWith(
+                          fontWeight: FontWeight.w600,
                         ),
                       ),
 
-                      const Spacer(),
+                      SizedBox(height: 2.h),
 
-                      Icon(Icons.bed_outlined, size: 15.sp, color: Colors.grey),
-
-                      SizedBox(width: 2.w),
-
-                      Text("${property.bedrooms}"),
-
-                      SizedBox(width: 10.w),
-
-                      Icon(
-                        Icons.bathtub_outlined,
-                        size: 15.sp,
-                        color: Colors.grey,
+                      Text(
+                        property.areaName,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: AppTextStyles.body12.copyWith(
+                          fontSize: 9.sp,
+                          color: Colors.grey,
+                        ),
                       ),
 
-                      SizedBox(width: 2.w),
+                      SizedBox(height: 4.h),
 
-                      Text("${property.bathrooms}"),
+                      Text(
+                        "QAR ${property.price.toStringAsFixed(0)}",
+                        style: AppTextStyles.body12.copyWith(
+                          fontSize: 10.sp,
+                          color: AppColors.primary,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+
+                      SizedBox(height: 3.h),
+
+                      Row(
+                        children: [
+                          Icon(
+                            Icons.bed_outlined,
+                            size: 12.sp,
+                            color: Colors.grey,
+                          ),
+                          SizedBox(width: 2.w),
+                          Text(
+                            "${property.bedrooms}",
+                            style: TextStyle(fontSize: 9.sp),
+                          ),
+
+                          SizedBox(width: 8.w),
+
+                          Icon(
+                            Icons.bathtub_outlined,
+                            size: 12.sp,
+                            color: Colors.grey,
+                          ),
+                          SizedBox(width: 2.w),
+                          Text(
+                            "${property.bathrooms}",
+                            style: TextStyle(fontSize: 9.sp),
+                          ),
+                        ],
+                      ),
                     ],
                   ),
-                ],
-              ),
-            ),
-
-            SizedBox(width: 10.w),
-
-            /// Selection
-            AnimatedContainer(
-              duration: const Duration(milliseconds: 550),
-              width: 15.w,
-              height: 15.w,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: selected ? AppColors.primary : Colors.white,
-                border: Border.all(
-                  color: selected ? AppColors.primary : Colors.grey.shade400,
                 ),
-              ),
-              child: selected
-                  ? Icon(Icons.check, size: 10.sp, color: Colors.white)
-                  : null,
+
+                AnimatedContainer(
+                  duration: const Duration(milliseconds: 200),
+                  width: 18.w,
+                  height: 18.w,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: selected
+                        ? AppColors.primary
+                        : Colors.transparent,
+                    border: Border.all(
+                      color: selected
+                          ? AppColors.primary
+                          : Colors.grey.shade400,
+                    ),
+                  ),
+                  child: selected
+                      ? Icon(
+                          Icons.check,
+                          size: 10.sp,
+                          color: Colors.white,
+                        )
+                      : null,
+                ),
+              ],
             ),
-          ],
-        ),
+          ),
+
+          Divider(
+            height: 1,
+            color: Colors.grey.shade200,
+          ),
+        ],
       ),
     );
   }
@@ -462,8 +474,8 @@ class ComparisonView extends StatelessWidget {
               Expanded(
                 child: Text(
                   "Property Comparison",
-                  style: AppTextStyles.title18.copyWith(
-                    fontWeight: FontWeight.bold,
+                  style: AppTextStyles.title14.copyWith(
+                    fontWeight: FontWeight.w500,
                   ),
                 ),
               ),
@@ -562,7 +574,7 @@ class ComparisonView extends StatelessWidget {
             padding: EdgeInsets.all(20.w),
             child: SizedBox(
               width: double.infinity,
-              height: 50.h,
+              height: 42.h,
               child: OutlinedButton(
                 onPressed: onBack,
                 style: OutlinedButton.styleFrom(
@@ -583,9 +595,10 @@ class ComparisonView extends StatelessWidget {
     );
   }
 
-  Widget _titleColumn() {
-    return SizedBox(width: 130.w, child: const SizedBox());
-  }
+Widget _titleColumn() {
+  return SizedBox(width: 110.w);
+}
+
 
   Widget _propertyColumn(Property property) {
     final image = property.sortedPhotos.isNotEmpty
@@ -593,7 +606,7 @@ class ComparisonView extends StatelessWidget {
         : "";
 
     return Container(
-      width: 180.w,
+    width: 220.w,
       padding: EdgeInsets.only(left: 12.w),
       child: Column(
         children: [
@@ -616,43 +629,68 @@ class ComparisonView extends StatelessWidget {
             textAlign: TextAlign.center,
             maxLines: 2,
             overflow: TextOverflow.ellipsis,
-            style: AppTextStyles.body14.copyWith(fontWeight: FontWeight.bold),
+            style: AppTextStyles.body12.copyWith(fontWeight: FontWeight.w500),
           ),
         ],
       ),
     );
   }
 
-  Widget _row(
-    String title,
-    List<Property> properties,
-    String Function(Property) value,
-  ) {
-    return Padding(
-      padding: EdgeInsets.symmetric(vertical: 14.h),
+Widget _row(
+  String title,
+  List<Property> properties,
+  String Function(Property) value,
+) {
+  return Container(
+    decoration: BoxDecoration(
+      border: Border(
+        bottom: BorderSide(
+          color: Colors.grey.shade200,
+        ),
+      ),
+    ),
+    child: IntrinsicHeight(
       child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           Container(
-            width: 130.w,
-            padding: EdgeInsets.only(right: 10.w),
+            width: 110.w,
+            padding: EdgeInsets.symmetric(
+              horizontal: 8.w,
+              vertical: 14.h,
+            ),
+            color: const Color(0xffFAFAFA),
+            alignment: Alignment.centerLeft,
             child: Text(
               title,
-              style: AppTextStyles.body14.copyWith(fontWeight: FontWeight.bold),
+              style: AppTextStyles.body13.copyWith(
+                fontWeight: FontWeight.w600,
+              ),
             ),
           ),
 
           ...properties.map(
-            (property) => SizedBox(
-              width: 180.w,
-              child: Padding(
-                padding: EdgeInsets.only(left: 12.w),
-                child: Text(value(property), style: AppTextStyles.body14),
+            (property) => Container(
+              width: 220.w,
+              padding: EdgeInsets.symmetric(
+                horizontal: 12.w,
+                vertical: 14.h,
+              ),
+              decoration: BoxDecoration(
+                border: Border(
+                  left: BorderSide(
+                    color: Colors.grey.shade200,
+                  ),
+                ),
+              ),
+              child: Text(
+                value(property),
+                style: AppTextStyles.body13,
               ),
             ),
           ),
         ],
       ),
-    );
-  }
-}
+    ),
+  );
+}}

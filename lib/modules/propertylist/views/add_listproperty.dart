@@ -10,8 +10,11 @@ import 'package:get/get_state_manager/src/simple/get_state.dart';
 import 'package:get/get_utils/src/extensions/internacionalization.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:villas_qatar/Core/constants/app_colors.dart';
+import 'package:villas_qatar/Core/theme/app_textstyles.dart';
 import 'package:villas_qatar/Core/widgets/primary_button.dart';
+import 'package:villas_qatar/modules/home/model/location_repsone_model.dart';
 import 'package:villas_qatar/modules/home/service/UtilsController.dart';
+import 'package:villas_qatar/modules/home/service/loaction_controller.dart';
 import 'package:villas_qatar/modules/mainscreen/mainscreen.dart';
 import 'package:villas_qatar/modules/propertylist/model/myproperty_model.dart';
 import 'package:villas_qatar/modules/propertylist/service/listproperty_controller.dart';
@@ -235,178 +238,263 @@ class _ListYourPropertyScreenState extends State<ListYourPropertyScreen> {
   // ---------------------------------------------------------
   // STEP 1 — BASIC INFO
   // ---------------------------------------------------------
-  Widget _buildStep1({Key? key}) {
-    return Column(
-      key: key,
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        _sectionHeader(
-          icon: Icons.person_outline,
-          title: 'Property Owner Details'.tr,
-          subtitle: 'Enter your details to get started'.tr,
+ 
+ Widget _buildStep1({Key? key}) {
+  return Column(
+    key: key,
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+      _sectionHeader(
+        icon: Icons.person_outline,
+        title: "Property Owner Details".tr,
+        subtitle: "Enter your details to get started".tr,
+      ),
+
+      const SizedBox(height: 24),
+
+      //------------------------------------------------------------------
+      // FULL NAME
+      //------------------------------------------------------------------
+
+      _fieldLabel("Full Name".tr, required: true),
+
+      const SizedBox(height: 8),
+
+      _AppTextField(
+        controller: controller.fullNameController,
+        hint: "Enter your full name".tr,
+        prefixIcon: Icons.person_outline,
+      ),
+
+      const SizedBox(height: 24),
+
+      //------------------------------------------------------------------
+      // PHONE
+      //------------------------------------------------------------------
+         //------------------------------------------------------------------
+      // EMAIL
+      //------------------------------------------------------------------
+       
+       _fieldLabel("Contact Number".tr, required: true),
+
+const SizedBox(height: 8),
+
+Row(
+  crossAxisAlignment: CrossAxisAlignment.start,
+  children: [
+    _CountryCodeDropdown(
+      value: controller.countryCode,
+      onChanged: controller.setCountryCode,
+    ),
+
+     SizedBox(width: 5.w),
+
+    Expanded(
+      child: _AppTextField(
+        controller: controller.phoneController,
+        hint: "Enter mobile number".tr,
+        keyboardType: TextInputType.phone,
+        enabled: !controller.phoneChecked,
+      ),
+    ),
+
+    SizedBox(width: 5.w),
+
+    // BEFORE CHECK
+    if (!controller.phoneChecked)
+      SizedBox(
+        width: 90,
+        height: 48,
+        child: PrimaryButton(
+          title: "Check".tr,
+          onTap: controller.checkPhone,
         ),
+      )
 
-        const SizedBox(height: 20),
-
-        _fieldLabel('Full Name'.tr, required: true),
-        const SizedBox(height: 8),
-
-        _AppTextField(
-          controller: controller.fullNameController,
-          hint: 'Enter your full name'.tr,
-          prefixIcon: Icons.person_outline,
+    // VERIFIED
+    else if (controller.whatsappVerified)
+      Container(
+        width: 80.w,
+        height: 48,
+        padding: EdgeInsets.symmetric(horizontal: 6.w),
+        decoration: BoxDecoration(
+          color: const Color(0xFFE8F5E9),
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: Colors.green),
         ),
-
-        const SizedBox(height: 18),
-        _fieldLabel('Contact Number'.tr, required: true),
-        const SizedBox(height: 8),
-
-        Row(
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
           children: [
-            _CountryCodeDropdown(
-              value: controller.countryCode,
-              onChanged: controller.setCountryCode,
+            Icon(
+              Icons.verified_rounded,
+              color: Colors.green,
+              size: 12,
             ),
-            SizedBox(width: 10),
-            Expanded(
-              child: _AppTextField(
-                controller: controller.phoneController,
-                hint: 'Enter mobile number'.tr,
-                keyboardType: TextInputType.phone,
-                enabled: !controller.whatsappVerified,
+            SizedBox(width: 6),
+            Text(
+              "Verified",
+              style: TextStyle(
+                fontSize: 10.sp,
+                color: Colors.green,
+                fontWeight: FontWeight.w600,
               ),
             ),
-
-            if (controller.whatsappVerified) ...[
-              const SizedBox(width: 10),
-              const Icon(Icons.verified, color: Colors.green, size: 22),
-            ],
           ],
         ),
-        if (!controller.whatsappVerified && !controller.showOtpField) ...[
-          const SizedBox(height: 12),
+      ),
+  ],
+),
 
-          SizedBox(
-            width: double.infinity,
-            child: PrimaryButton(
-              title: "Send OTP".tr,
-              onTap: controller.sendOtp,
-            ),
+// NOT VERIFIED
+if (controller.phoneChecked && !controller.whatsappVerified) ...[
+  const SizedBox(height: 16),
+
+  _buildWhatsAppVerifiedBanner(),
+
+  const SizedBox(height: 16),
+
+  if (!controller.showOtpField)
+    SizedBox(
+      width: double.infinity,
+      child: PrimaryButton(
+        title: "Send OTP".tr,
+        onTap: controller.sendOtp,
+      ),
+    ),
+
+  if (controller.showOtpField) ...[
+    const SizedBox(height: 20),
+
+    _fieldLabel("Verification Code".tr, required: true),
+
+    const SizedBox(height: 8),
+
+    _AppTextField(
+      controller: controller.otpController,
+      hint: "Enter 6-digit OTP".tr,
+      keyboardType: TextInputType.number,
+      prefixIcon: Icons.lock_outline,
+    ),
+
+    const SizedBox(height: 12),
+
+    SizedBox(
+      width: double.infinity,
+      child: PrimaryButton(
+        title: "Verify Number".tr,
+        onTap: controller.verifyOtp,
+      ),
+    ),
+
+    Align(
+      alignment: Alignment.centerRight,
+      child: TextButton(
+        onPressed: controller.sendOtp,
+        child: Text("Resend OTP".tr),
+      ),
+    ),
+  ],
+],
+
+   SizedBox(height: 15.h),
+      _fieldLabel("Email Address".tr),
+
+      const SizedBox(height: 8),
+
+      _AppTextField(
+        controller: controller.emailController,
+        hint: "Enter your email".tr,
+        keyboardType: TextInputType.emailAddress,
+        prefixIcon: Icons.email_outlined,
+      ),
+
+      const SizedBox(height: 24),
+
+      //------------------------------------------------------------------
+      // DESCRIPTION
+      //------------------------------------------------------------------
+
+      _fieldLabel("Property Description".tr, required: true),
+
+      const SizedBox(height: 8),
+
+      _AppTextField(
+        controller: controller.descriptionController,
+        hint: "Describe your property".tr,
+        prefixIcon: Icons.description_outlined,
+        maxLines: 4,
+        maxLength: 250,
+        showCounter: true,
+      ),
+    ],
+  );
+}
+
+Widget _buildWhatsAppVerifiedBanner() {
+  final verified = controller.whatsappVerified;
+
+  return AnimatedContainer(
+    duration: const Duration(milliseconds: 250),
+    width: double.infinity,
+    padding: const EdgeInsets.all(14),
+    decoration: BoxDecoration(
+      color: verified
+          ? const Color(0xFFE9F8EF)
+          : const Color(0xFFFFF7E8),
+      borderRadius: BorderRadius.circular(14),
+      border: Border.all(
+        color: verified
+            ? const Color(0xFF34A853)
+            : const Color(0xFFF4B400),
+      ),
+    ),
+    child: Row(
+      children: [
+        CircleAvatar(
+          radius: 18,
+          backgroundColor: verified
+              ? const Color(0xFF34A853)
+              : const Color(0xFFF4B400),
+          child: Icon(
+            verified
+                ? Icons.check
+                : Icons.warning_amber_rounded,
+            color: Colors.white,
+            size: 18,
           ),
-        ],
-        if (controller.showOtpField && !controller.whatsappVerified) ...[
-          const SizedBox(height: 18),
-
-          _fieldLabel("Verification Code".tr, required: true),
-
-          const SizedBox(height: 8),
-
-          _AppTextField(
-            controller: controller.otpController,
-            hint: "Enter 6-digit OTP".tr,
-            keyboardType: TextInputType.number,
-            prefixIcon: Icons.lock_outline,
-          ),
-
-          const SizedBox(height: 12),
-
-          SizedBox(
-            width: double.infinity,
-            child: PrimaryButton(
-              title: "Verify OTP".tr,
-              onTap: controller.verifyOtp,
-            ),
-          ),
-
-          Align(
-            alignment: Alignment.centerRight,
-            child: TextButton(
-              onPressed: controller.sendOtp,
-              child: Text("Resend OTP".tr),
-            ),
-          ),
-        ],
-
-        const SizedBox(height: 18),
-
-        _fieldLabel('Email Address'.tr),
-        const SizedBox(height: 8),
-
-        _AppTextField(
-          controller: controller.emailController,
-          hint: 'Enter your email address'.tr,
-          prefixIcon: Icons.email_outlined,
-          keyboardType: TextInputType.emailAddress,
         ),
 
-        const SizedBox(height: 18),
+        const SizedBox(width: 12),
 
-        _fieldLabel('Short Description'.tr, required: true),
-        const SizedBox(height: 8),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                verified
+                    ? "WhatsApp Verified".tr
+                    : "Verification Required".tr,
+                style: const TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 14,
+                ),
+              ),
 
-        _AppTextField(
-          controller: controller.descriptionController,
-          hint: 'Write a short description about your property'.tr,
-          prefixIcon: Icons.description_outlined,
-          maxLines: 4,
-          maxLength: 250,
-          showCounter: true,
+              const SizedBox(height: 2),
+
+              Text(
+                verified
+                    ? "Your contact number has been verified."
+                    : "Verify your WhatsApp number before publishing this property.",
+                style: const TextStyle(fontSize: 12),
+              ),
+            ],
+          ),
         ),
       ],
-    );
-  }
-
-  Widget _buildWhatsAppVerifiedBanner() {
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-      decoration: BoxDecoration(
-        color: AppColors.greenBg,
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: Row(
-        children: [
-          const Icon(Icons.chat, color: Color(0xFF25D366), size: 26),
-
-          const SizedBox(width: 10),
-
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  "WhatsApp Verification".tr,
-                  style: TextStyle(
-                    color: AppColors.greenText,
-                    fontWeight: FontWeight.w700,
-                    fontSize: 13,
-                  ),
-                ),
-
-                const SizedBox(height: 2),
-
-                Text(
-                  controller.whatsappVerified
-                      ? "Your contact number is verified".tr
-                      : "Your contact number is not verified".tr,
-                  style: const TextStyle(
-                    color: AppColors.greenText,
-                    fontSize: 12,
-                  ),
-                ),
-              ],
-            ),
-          ),
-
-          Switch(
-            value: controller.whatsappVerified,
-            activeColor: const Color(0xFF25D366),
-            onChanged: controller.setWhatsappVerified,
-          ),
-        ],
-      ),
-    );
-  }
+    ),
+  );
+}
 
   // ---------------------------------------------------------
   // STEP 2 — PROPERTY DETAILS
@@ -1375,7 +1463,20 @@ class _ListYourPropertyScreenState extends State<ListYourPropertyScreen> {
   // ---------------------------------------------------------
   // STEP 4 — LOCATION DETAILS
   // ---------------------------------------------------------
+  void _fillCoordinates(LocationResponse location) {
+    controller.latitudeController.text = location.data.latitude.toString();
+
+    controller.longitudeController.text = location.data.longitude.toString();
+
+    controller.addressController.text = location.data.formattedAddress;
+
+    controller.areaNameController.text = location.data.areaName;
+
+    controller.update();
+  }
+
   Widget _buildStep4({Key? key}) {
+    final LocationController locationController = Get.put(LocationController());
     return Column(
       key: key,
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -1449,6 +1550,77 @@ class _ListYourPropertyScreenState extends State<ListYourPropertyScreen> {
         ),
         const SizedBox(height: 18),
 
+        Row(
+          children: [
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  _fieldLabel("Latitude".tr, required: true),
+                  const SizedBox(height: 8),
+                  _AppTextField(
+                    controller: controller.latitudeController,
+                    hint: "Latitude".tr,
+                    keyboardType: const TextInputType.numberWithOptions(
+                      decimal: true,
+                    ),
+                    prefixIcon: Icons.my_location,
+                  ),
+                ],
+              ),
+            ),
+
+            const SizedBox(width: 12),
+
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  _fieldLabel("Longitude".tr, required: true),
+                  const SizedBox(height: 8),
+                  _AppTextField(
+                    controller: controller.longitudeController,
+                    hint: "Longitude".tr,
+                    keyboardType: const TextInputType.numberWithOptions(
+                      decimal: true,
+                    ),
+                    prefixIcon: Icons.explore_outlined,
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+
+        SizedBox(height: 10.h),
+        Row(
+          children: [
+            Expanded(
+              child: _LocationActionButton(
+                icon: Icons.my_location_rounded,
+                title: "Use GPS".tr,
+                onTap: () async {
+                  await locationController.detectCurrentLocation();
+
+                  if (locationController.location != null) {
+                    _fillCoordinates(locationController.location!);
+                  }
+                },
+              ),
+            ),
+
+            SizedBox(width: 12.w),
+
+            Expanded(
+              child: _LocationActionButton(
+                icon: Icons.search_rounded,
+                title: "Search".tr,
+                onTap: _showLocationBottomSheet,
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 18),
         _fieldLabel("Landmark".tr),
         const SizedBox(height: 8),
 
@@ -1457,60 +1629,6 @@ class _ListYourPropertyScreenState extends State<ListYourPropertyScreen> {
           hint: "Nearby landmark".tr,
           prefixIcon: Icons.place_outlined,
         ),
-
-        const SizedBox(height: 18),
-
-        Row(
-          children: [
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  _fieldLabel("Latitude".tr),
-
-                  const SizedBox(height: 8),
-
-                  _AppTextField(
-                    controller: controller.latitudeController,
-                    hint: "Latitude".tr,
-                    keyboardType: const TextInputType.numberWithOptions(
-                      decimal: true,
-                    ),
-                    prefixIcon: Icons.my_location_outlined,
-                    onChanged: (value) {
-                      controller.setLatitude(double.tryParse(value) ?? 0);
-                    },
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(width: 12),
-
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  _fieldLabel("Longitude".tr),
-
-                  const SizedBox(height: 8),
-
-                  _AppTextField(
-                    controller: controller.longitudeController,
-                    hint: "Longitude".tr,
-                    keyboardType: const TextInputType.numberWithOptions(
-                      decimal: true,
-                    ),
-                    prefixIcon: Icons.public_outlined,
-                    onChanged: (value) {
-                      controller.setLongitude(double.tryParse(value) ?? 0);
-                    },
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
-
         const SizedBox(height: 18),
 
         Container(
@@ -1535,6 +1653,61 @@ class _ListYourPropertyScreenState extends State<ListYourPropertyScreen> {
           ),
         ),
       ],
+    );
+  }
+
+  void _showLocationBottomSheet() {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      builder: (_) {
+        return GetBuilder<LocationController>(
+          builder: (location) {
+            return SafeArea(
+              child: SizedBox(
+                height: MediaQuery.of(context).size.height * .75,
+                child: Padding(
+                  padding: const EdgeInsets.all(20),
+                  child: Column(
+                    children: [
+                      TextField(
+                        controller: location.searchController,
+                        decoration: InputDecoration(
+                          hintText: "Search location",
+                          prefixIcon: Icon(Icons.search),
+                        ),
+                        onChanged: location.onSearchChanged,
+                      ),
+
+                      SizedBox(height: 20),
+
+                      Expanded(
+                        child: ListView.builder(
+                          itemCount: location.results.length,
+                          itemBuilder: (_, index) {
+                            final item = location.results[index];
+
+                            return ListTile(
+                              leading: const Icon(Icons.location_on),
+                              title: Text(item.data.title),
+                              subtitle: Text(item.data.formattedAddress),
+                              onTap: () {
+                                location.selectLocation(item);
+                                _fillCoordinates(item);
+                                Navigator.pop(context);
+                              },
+                            );
+                          },
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            );
+          },
+        );
+      },
     );
   }
 
@@ -1644,79 +1817,79 @@ class _ListYourPropertyScreenState extends State<ListYourPropertyScreen> {
           ),
         ),
 
-       SizedBox(
-  height: 82,
-  child: ListView.separated(
-    scrollDirection: Axis.horizontal,
-    separatorBuilder: (_, __) => const SizedBox(width: 8),
-    itemCount: controller.images.isNotEmpty
-        ? controller.images.length
-        : controller.existingPhotos.isNotEmpty
-            ? controller.existingPhotos.length
-            : 4,
-    itemBuilder: (_, index) {
-      // No images
-      if (controller.images.isEmpty &&
-          controller.existingPhotos.isEmpty) {
-        const colors = [
-          Color(0xFFEFE3D8),
-          Color(0xFFE7DED6),
-          Color(0xFFEDEAE4),
-          Color(0xFFDCE4E8),
-        ];
+        SizedBox(
+          height: 82,
+          child: ListView.separated(
+            scrollDirection: Axis.horizontal,
+            separatorBuilder: (_, __) => const SizedBox(width: 8),
+            itemCount: controller.images.isNotEmpty
+                ? controller.images.length
+                : controller.existingPhotos.isNotEmpty
+                ? controller.existingPhotos.length
+                : 4,
+            itemBuilder: (_, index) {
+              // No images
+              if (controller.images.isEmpty &&
+                  controller.existingPhotos.isEmpty) {
+                const colors = [
+                  Color(0xFFEFE3D8),
+                  Color(0xFFE7DED6),
+                  Color(0xFFEDEAE4),
+                  Color(0xFFDCE4E8),
+                ];
 
-        return _PhotoThumbnail(color: colors[index]);
-      }
+                return _PhotoThumbnail(color: colors[index]);
+              }
 
-      // Newly selected local images
-      if (controller.images.isNotEmpty) {
-        return _PhotoThumbnail(
-          imagePath: controller.images[index],
-          onRemove: () {
-            controller.removeImage(index);
-          },
-        );
-      }
+              // Newly selected local images
+              if (controller.images.isNotEmpty) {
+                return _PhotoThumbnail(
+                  imagePath: controller.images[index],
+                  onRemove: () {
+                    controller.removeImage(index);
+                  },
+                );
+              }
 
-      // Existing images from API
-      return Stack(
-        children: [
-          ClipRRect(
-            borderRadius: BorderRadius.circular(10),
-            child: Image.network(
-              controller.existingPhotos[index].url,
-              width: 82,
-              height: 82,
-              fit: BoxFit.cover,
-            ),
+              // Existing images from API
+              return Stack(
+                children: [
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(10),
+                    child: Image.network(
+                      controller.existingPhotos[index].url,
+                      width: 82,
+                      height: 82,
+                      fit: BoxFit.cover,
+                    ),
+                  ),
+                  Positioned(
+                    top: 4,
+                    right: 4,
+                    child: InkWell(
+                      onTap: () {
+                        controller.existingPhotos.removeAt(index);
+                        controller.update();
+                      },
+                      child: Container(
+                        padding: const EdgeInsets.all(4),
+                        decoration: const BoxDecoration(
+                          color: Colors.black54,
+                          shape: BoxShape.circle,
+                        ),
+                        child: const Icon(
+                          Icons.close,
+                          color: Colors.white,
+                          size: 14,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              );
+            },
           ),
-          Positioned(
-            top: 4,
-            right: 4,
-            child: InkWell(
-              onTap: () {
-                controller.existingPhotos.removeAt(index);
-                controller.update();
-              },
-              child: Container(
-                padding: const EdgeInsets.all(4),
-                decoration: const BoxDecoration(
-                  color: Colors.black54,
-                  shape: BoxShape.circle,
-                ),
-                child: const Icon(
-                  Icons.close,
-                  color: Colors.white, 
-                  size: 14,
-                ),
-              ),
-            ),
-          ),
-        ],
-      );
-    },
-  ),
-),
+        ),
 
         const SizedBox(height: 14),
 
@@ -2288,7 +2461,6 @@ class _ListYourPropertyScreenState extends State<ListYourPropertyScreen> {
                 }
 
                 bool success;
-
                 if (widget.isEdit) {
                   success = await controller.updateProperty(
                     widget.property!.id,
@@ -2352,6 +2524,45 @@ class _ListYourPropertyScreenState extends State<ListYourPropertyScreen> {
 // =================================================================
 // AMENITY DATA MODEL
 // =================================================================
+class _LocationActionButton extends StatelessWidget {
+  final IconData icon;
+  final String title;
+  final VoidCallback onTap;
+
+  const _LocationActionButton({
+    required this.icon,
+    required this.title,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      height: 42.h,
+      child: OutlinedButton.icon(
+        onPressed: onTap,
+        icon: Icon(icon, size: 18.sp, color: AppColors.primary),
+        label: Text(
+          title,
+          style: AppTextStyles.body13.copyWith(
+            color: AppColors.primary,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+        style: OutlinedButton.styleFrom(
+          backgroundColor: Colors.white,
+          foregroundColor: AppColors.primary,
+          side: BorderSide(color: AppColors.primary.withOpacity(.25)),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(10.r),
+          ),
+          padding: EdgeInsets.symmetric(horizontal: 10.w),
+        ),
+      ),
+    );
+  }
+}
+
 class _AmenityData {
   final String label;
   final IconData icon;
@@ -2574,11 +2785,11 @@ class _CountryCodeDropdown extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: 52,
+      height: 48.h,
       padding: const EdgeInsets.symmetric(horizontal: 10),
       decoration: BoxDecoration(
         color: AppColors.fieldBg,
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(10),
         border: Border.all(color: AppColors.fieldBorder),
       ),
       child: DropdownButtonHideUnderline(
@@ -2613,6 +2824,7 @@ class _CountryCodeDropdown extends StatelessWidget {
 // =================================================================
 // CURRENCY DROPDOWN
 // =================================================================
+
 class _CurrencyDropdown extends StatelessWidget {
   final String value;
   final ValueChanged<String> onChanged;

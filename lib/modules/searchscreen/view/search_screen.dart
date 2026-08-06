@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
+import 'package:villas_qatar/Core/utils/app_location.dart';
+import 'package:villas_qatar/modules/home/service/loaction_controller.dart';
 import 'package:villas_qatar/modules/searchscreen/service/searchlist_screen.dart';
 import 'package:villas_qatar/modules/searchscreen/widgets/category_section.dart';
 
@@ -12,9 +14,7 @@ import '../../../core/constants/app_colors.dart';
 import '../../../core/theme/app_textstyles.dart';
 
 class SearchScreen extends StatelessWidget {
- 
-
-  SearchScreen({super.key, });
+  SearchScreen({super.key});
 
   final PropertySearchController controller = Get.put(
     PropertySearchController(),
@@ -45,12 +45,20 @@ class SearchScreen extends StatelessWidget {
                             size: 20.sp,
                           ),
                           SizedBox(width: 4.w),
-                          Text(
-                            "Doha, Qatar".tr,
-                            style: AppTextStyles.medium13.copyWith(
-                              color: const Color(0xff3D3D3D),
-                              fontWeight: FontWeight.w600,
-                            ),
+                          GetBuilder<LocationController>(
+                            builder: (_) {
+                              return Text(
+                                AppLocation.areaName.isNotEmpty
+                                    ? AppLocation.areaName
+                                    : "Doha, Qatar".tr,
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                style: AppTextStyles.medium13.copyWith(
+                                  color: const Color(0xff3D3D3D),
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              );
+                            },
                           ),
                           SizedBox(width: 2.w),
                           Icon(
@@ -139,7 +147,7 @@ class SearchScreen extends StatelessWidget {
                                         "Find Your".tr,
                                         style: AppTextStyles.title18.copyWith(
                                           fontSize: 18.sp,
-                                          fontWeight: FontWeight.w700,
+                                          fontWeight: FontWeight.w500,
                                           height: 1.15,
                                         ),
                                       ),
@@ -148,7 +156,7 @@ class SearchScreen extends StatelessWidget {
                                         "Dream Property".tr,
                                         style: AppTextStyles.title18.copyWith(
                                           fontSize: 18.sp,
-                                          fontWeight: FontWeight.w700,
+                                          fontWeight: FontWeight.w500,
                                           height: 1.15,
                                         ),
                                       ),
@@ -173,10 +181,7 @@ class SearchScreen extends StatelessWidget {
                         ),
                       ),
                       SizedBox(height: 12.h),
-                      SearchFilterCard(
-                        controller: controller,
-                       
-                      ),
+                      SearchFilterCard(controller: controller),
 
                       SizedBox(height: 24.h),
                       PropertyCategorySection(controller: controller),

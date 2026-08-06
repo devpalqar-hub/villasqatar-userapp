@@ -51,26 +51,26 @@ class _MainScreenState extends State<MainScreen> {
     /// Apply initial SEARCH if provided
     if (widget.initialSearch != null &&
         widget.initialSearch!.trim().isNotEmpty) {
-      controller.search = widget.initialSearch!.trim();
+      controller.filter.search = widget.initialSearch!.trim();
 
       controller.searchTextController.text = widget.initialSearch!.trim();
     }
 
     /// Apply initial PROPERTY TYPE if provided
     if (widget.initialType != null && widget.initialType!.trim().isNotEmpty) {
-      controller.type = widget.initialType!.trim();
+      controller.filter.type = widget.initialType!.trim();
     }
 
     /// Apply initial BUY / RENT
     if (widget.initialPurpose != null &&
         widget.initialPurpose!.trim().isNotEmpty) {
-      controller.purpose = widget.initialPurpose!.trim().toUpperCase();
+      controller.filter.purpose = widget.initialPurpose!.trim().toUpperCase();
     }
 
     /// Apply initial category if needed
     if (widget.initialCategory != null &&
         widget.initialCategory!.trim().isNotEmpty) {
-      controller.type = widget.initialCategory!.trim();
+      controller.filter.type = widget.initialCategory!.trim();
     }
 
     /// Create pages AFTER controller values are set
@@ -89,7 +89,7 @@ class _MainScreenState extends State<MainScreen> {
 
       ChatListScreen(),
 
-      const SettingsScreen(),
+     SettingsScreen(),
     ];
 
     /// If MainScreen was opened directly on Search,
@@ -137,17 +137,15 @@ class _MainScreenState extends State<MainScreen> {
   }
 
   void _handleCategorySearch(String type) {
-    debugPrint("CATEGORY CLICKED: $type");
-
     final controller = Get.isRegistered<PropertySearchController>()
         ? Get.find<PropertySearchController>()
         : Get.put(PropertySearchController());
 
     // Clear previous property-name search
-    controller.search = "";
+    controller.filter.search = "";
 
     // Set selected category/type
-    controller.type = type;
+    controller.filter.type = type;
 
     // Fetch filtered properties
     controller.fetchProperties();
@@ -180,16 +178,16 @@ class _MainScreenState extends State<MainScreen> {
         : Get.put(PropertySearchController());
 
     /// Clear previous property-name search
-    controller.search = "";
+    controller.filter.search = "";
     controller.searchTextController.clear();
 
     /// Clear previous category
-    controller.type = "";
+    controller.filter.type = "";
 
     /// Set BUY or RENT
     /// BUY  = SALE
     /// RENT = RENT
-    controller.purpose = purpose;
+    controller.filter.purpose = purpose;
 
     /// Rebuild SearchFilterCard
     controller.update();

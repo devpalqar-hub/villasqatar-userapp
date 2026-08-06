@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:villas_qatar/Core/network/api_handler.dart';
 import 'package:villas_qatar/modules/home/model/ListingOptions.dart';
-import 'package:villas_qatar/modules/home/service/global_location_controller.dart';
+
 
 class Utilscontroller extends GetxController {
   /// Plain (non-Rx) state — call update() after mutating and wrap the

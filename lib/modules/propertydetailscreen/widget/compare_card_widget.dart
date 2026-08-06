@@ -29,40 +29,36 @@ class CompareCard extends StatelessWidget {
       child: Row(
         children: [
           CircleAvatar(
-            radius: 20.r,
+            radius: 15.r,
             backgroundColor: AppColors.primary.withOpacity(.1),
             child: Icon(
               Icons.compare_arrows_rounded,
               color: AppColors.primary,
-              size: 28.sp,
+              size: 15.sp,
             ),
           ),
 
           SizedBox(width: 16.w),
-
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
                   "Compare Properties",
-                  style: AppTextStyles.title16.copyWith(
+                  style: AppTextStyles.title14.copyWith(
                     fontWeight: FontWeight.w500,
                   ),
                 ),
-
                 SizedBox(height: 6.h),
-
                 Text(
                   "Compare this property with similar listings.",
                   style: AppTextStyles.body12.copyWith(
-                    color: Colors.black,
+                    color: Colors.grey.shade600,
                   ),
                 ),
               ],
             ),
           ),
-
           ElevatedButton(
             onPressed: () {
               showModalBottomSheet(

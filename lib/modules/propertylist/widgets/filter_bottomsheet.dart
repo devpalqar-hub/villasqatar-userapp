@@ -113,8 +113,8 @@ void showFilterBottomSheet(BuildContext context) {
                             children: [
                               Text(
                                 "Filter Properties",
-                                style: AppTextStyles.title16.copyWith(
-                                  fontWeight: FontWeight.w700,
+                                style: AppTextStyles.title14.copyWith(
+                                  fontWeight: FontWeight.w500,
                                 ),
                               ),
 
@@ -427,7 +427,7 @@ Widget sectionTitle(String title) {
     padding: EdgeInsets.only(bottom: 10.h, top: 2.h),
     child: Text(
       title,
-      style: AppTextStyles.title14.copyWith(fontWeight: FontWeight.w700),
+      style: AppTextStyles.title14.copyWith(fontWeight: FontWeight.w500),
     ),
   );
 }

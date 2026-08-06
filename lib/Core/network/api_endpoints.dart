@@ -68,4 +68,15 @@ class ApiEndpoints {
 
   static const String geocode = "/api/listings/geocode";
   static const String reverseGeocode = "/api/listings/reverse-geocode";
+  static String myProfile = "/api/users/profile/me";
+  static String userById(String id) => "/api/users/$id";
+  static const String dealers = "/api/dealers";
+  static String dealerDetails(String dealerId) {
+    return "/api/dealers/$dealerId";
+  }
+  static const String nearbyProperties = "/api/listings/nearby";
+  static const String verifyPhoneCheck = "/api/listings/verify-phone/check";
+  static const String verifyPhoneSendOtp = "/api/listings/verify-phone/send-otp";
+  static const String verifyPhoneVerifyOtp =  "/api/listings/verify-phone/verify-otp";
+   
 }

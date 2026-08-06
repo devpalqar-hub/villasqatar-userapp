@@ -38,7 +38,7 @@ class PropertiesSection extends StatelessWidget {
                   "Properties".tr,
                   style: AppTextStyles.title18.copyWith(
                     fontSize: 15.sp,
-                    fontWeight: FontWeight.w600,
+                    fontWeight: FontWeight.w500,
                     color: Colors.black,
                   ),
                 ),
@@ -361,7 +361,7 @@ child: photos.isNotEmpty
                       SizedBox(width: 4.w),
 
                       Text(
-                        "${property.areaName}, ${property.municipality}",
+                        "${property.areaName},  ${property.municipality.name}",
                         style: AppTextStyles.body13.copyWith(
                           color: Colors.grey,
                         ),

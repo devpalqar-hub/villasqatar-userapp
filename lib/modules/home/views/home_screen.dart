@@ -5,11 +5,12 @@ import 'package:get/get.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:villas_qatar/Core/constants/app_colors.dart';
 import 'package:villas_qatar/Core/theme/app_textstyles.dart';
+import 'package:villas_qatar/Core/utils/app_location.dart';
 import 'package:villas_qatar/modules/PlansandFeatures/model/featured_property_model.dart';
 import 'package:villas_qatar/modules/PlansandFeatures/services/featured_properties_controller.dart';
+import 'package:villas_qatar/modules/dealers/service/view/detail_list_screen.dart';
 import 'package:villas_qatar/modules/home/service/UtilsController.dart';
 import 'package:villas_qatar/modules/home/service/banner_controller.dart';
-import 'package:villas_qatar/modules/home/service/global_location_controller.dart';
 import 'package:villas_qatar/modules/home/service/loaction_controller.dart';
 import 'package:villas_qatar/modules/home/widgets/agent_card.dart';
 import 'package:villas_qatar/modules/home/widgets/category_card.dart';
@@ -121,8 +122,8 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                 ],
               ),
-              child: GetBuilder<GlobalLocationController>(
-                builder: (controller) {
+              child: GetBuilder<LocationController>(
+                builder: (_) {
                   return Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
@@ -131,12 +132,14 @@ class _HomeScreenState extends State<HomeScreen> {
                         color: AppColors.primary,
                         size: 14.sp,
                       ),
+
                       SizedBox(width: 6.w),
+
                       Flexible(
                         child: Text(
-                          controller.areaName.isEmpty
+                          AppLocation.areaName.isEmpty
                               ? "Doha".tr
-                              : controller.areaName,
+                              : AppLocation.areaName,
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                           style: AppTextStyles.body13.copyWith(
@@ -144,7 +147,9 @@ class _HomeScreenState extends State<HomeScreen> {
                           ),
                         ),
                       ),
+
                       SizedBox(width: 2.w),
+
                       Icon(
                         Icons.keyboard_arrow_down,
                         size: 16.sp,
@@ -245,23 +250,29 @@ class _HomeScreenState extends State<HomeScreen> {
               Container(
                 padding: EdgeInsets.symmetric(horizontal: 16.w),
                 height: 100.h,
-                child: ListView(
-                  scrollDirection: Axis.horizontal,
-                  children: const [
-                    LocationCard(
-                      title: 'The Pearl',
-                      distance: '2.3 km away',
-                      image: 'assets/lct1.jpeg',
-                    ),
-                    LocationCard(
-                      title: 'Lusail City',
-                      distance: '6.7 km away',
-                      image: 'assets/lct.jpeg',
-                    ),
-                  ],
+                child: GetBuilder<LocationController>(
+                  builder: (controller) {
+                    if (controller.isNearbyLoading) {
+                      return const Center(child: CircularProgressIndicator());
+                    }
+
+                    if (controller.nearbyProperties.isEmpty) {
+                      return const Center(child: Text("No nearby properties"));
+                    }
+
+                    return ListView.separated(
+                      scrollDirection: Axis.horizontal,
+                      itemCount: controller.nearbyProperties.length,
+                      separatorBuilder: (_, __) => SizedBox(width: 10.w),
+                      itemBuilder: (context, index) {
+                        final property = controller.nearbyProperties[index];
+
+                        return LocationCard(property: property);
+                      },
+                    );
+                  },
                 ),
               ),
-
               // /// AI PRICE ESTIMATOR - PREMIUM CARD
               // Container(
               //   width: double.infinity,
@@ -441,8 +452,13 @@ class _HomeScreenState extends State<HomeScreen> {
               _buildFeaturedPropertiesSection(),
 
               _buildBannersSection(),
-              SectionHeader(title: "Featured Dealers".tr),
-
+              SectionHeader(
+                title: "Featured Dealers".tr,
+                showSeeAll: true,
+                onSeeAllTap: () {
+                  Get.to(() => const DealerListScreen());
+                },
+              ),
               SizedBox(
                 height: 165.h,
                 child: ListView.separated(
@@ -790,9 +806,6 @@ Future<void> _handleBannerTap(String linkUrl) async {
   }
 }
 
-
-
-
 void showLocationBottomSheet(BuildContext context) {
   final controller = Get.find<LocationController>();
 
@@ -806,12 +819,8 @@ void showLocationBottomSheet(BuildContext context) {
   );
 }
 
-
 class LocationBottomSheet extends StatelessWidget {
-  const LocationBottomSheet({
-    super.key,
-    required this.controller,
-  });
+  const LocationBottomSheet({super.key, required this.controller});
 
   final LocationController controller;
 
@@ -823,14 +832,12 @@ class LocationBottomSheet extends StatelessWidget {
           expand: false,
           initialChildSize: .50,
           // minChildSize: .45,
-           maxChildSize: .60,
+          maxChildSize: .60,
           builder: (context, scrollController) {
             return Container(
               decoration: const BoxDecoration(
                 color: Colors.white,
-                borderRadius: BorderRadius.vertical(
-                  top: Radius.circular(28),
-                ),
+                borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
               ),
               child: Column(
                 children: [
@@ -870,10 +877,7 @@ class LocationBottomSheet extends StatelessWidget {
                               color: Colors.grey.shade100,
                               shape: BoxShape.circle,
                             ),
-                            child: Icon(
-                              Icons.close_rounded,
-                              size: 18.sp,
-                            ),
+                            child: Icon(Icons.close_rounded, size: 18.sp),
                           ),
                         ),
                       ],
@@ -888,17 +892,13 @@ class LocationBottomSheet extends StatelessWidget {
                       borderRadius: BorderRadius.circular(10.r),
                       onTap: () async {
                         await controller.detectCurrentLocation();
-
-                        if (controller.location != null) {
-                          GlobalLocationController.to.setLocation(
-                            controller.location!.toJson(),
-                          );
-                        }
-
                         Get.back();
                       },
                       child: Container(
-                        padding: EdgeInsets.symmetric(horizontal:16.w,vertical: 10.h),
+                        padding: EdgeInsets.symmetric(
+                          horizontal: 16.w,
+                          vertical: 10.h,
+                        ),
                         decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(10.r),
                           color: AppColors.primary.withOpacity(.05),
@@ -910,7 +910,7 @@ class LocationBottomSheet extends StatelessWidget {
                               color: Colors.black.withOpacity(.04),
                               blurRadius: 15,
                               offset: const Offset(0, 6),
-                            )
+                            ),
                           ],
                         ),
                         child: Row(
@@ -933,8 +933,7 @@ class LocationBottomSheet extends StatelessWidget {
 
                             Expanded(
                               child: Column(
-                                crossAxisAlignment:
-                                    CrossAxisAlignment.start,
+                                crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Text(
                                     "Use Current Location".tr,
@@ -988,24 +987,21 @@ class LocationBottomSheet extends StatelessWidget {
                           color: Colors.grey.shade600,
                         ),
 
-                        suffixIcon:
-                            controller.searchController.text.isNotEmpty
-                                ? IconButton(
-                                    onPressed: () {
-                                      controller.searchController.clear();
-                                      controller.results.clear();
-                                      controller.update();
-                                    },
-                                    icon: const Icon(Icons.close_rounded),
-                                  )
-                                : null,
+                        suffixIcon: controller.searchController.text.isNotEmpty
+                            ? IconButton(
+                                onPressed: () {
+                                  controller.searchController.clear();
+                                  controller.results.clear();
+                                  controller.update();
+                                },
+                                icon: const Icon(Icons.close_rounded),
+                              )
+                            : null,
 
                         filled: true,
                         fillColor: Colors.grey.shade100,
 
-                        contentPadding: EdgeInsets.symmetric(
-                          vertical: 16.h,
-                        ),
+                        contentPadding: EdgeInsets.symmetric(vertical: 16.h),
 
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(10.r),
@@ -1032,155 +1028,164 @@ class LocationBottomSheet extends StatelessWidget {
 
                   if (controller.isLoading)
                     const Expanded(
-                      child: Center(
-                        child: CircularProgressIndicator(),
-                      ),
+                      child: Center(child: CircularProgressIndicator()),
                     ),
 
-                 
                   if (!controller.isLoading)
-                  Expanded(
-  child: controller.results.isEmpty
-      ? SingleChildScrollView(
-          controller: scrollController,
-          physics: const BouncingScrollPhysics(),
-          child: SizedBox(
-            height: 180.h,
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Container(
-                  height: 45.w,
-                  width: 45.w,
-                  decoration: BoxDecoration(
-                    color: AppColors.primary.withOpacity(.08),
-                    shape: BoxShape.circle,
-                  ),
-                  child: Icon(
-                    Icons.location_searching_rounded,
-                    color: AppColors.primary,
-                    size: 20.sp,
-                  ),
-                ),
-                SizedBox(height: 15.h),
-                Text(
-                  controller.searchController.text.isEmpty
-                      ? "Search for a location".tr
-                      : "No locations found".tr,
-                  style: AppTextStyles.medium14.copyWith(
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-                SizedBox(height: 6.h),
-                Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 40.w),
-                  child: Text(
-                    controller.searchController.text.isEmpty
-                        ? "Search by city, area or landmark".tr
-                        : "Try another keyword".tr,
-                    textAlign: TextAlign.center,
-                    style: AppTextStyles.body13.copyWith(
-                      color: Colors.grey.shade600,
+                    Expanded(
+                      child: controller.results.isEmpty
+                          ? SingleChildScrollView(
+                              controller: scrollController,
+                              physics: const BouncingScrollPhysics(),
+                              child: SizedBox(
+                                height: 180.h,
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Container(
+                                      height: 45.w,
+                                      width: 45.w,
+                                      decoration: BoxDecoration(
+                                        color: AppColors.primary.withOpacity(
+                                          .08,
+                                        ),
+                                        shape: BoxShape.circle,
+                                      ),
+                                      child: Icon(
+                                        Icons.location_searching_rounded,
+                                        color: AppColors.primary,
+                                        size: 20.sp,
+                                      ),
+                                    ),
+                                    SizedBox(height: 15.h),
+                                    Text(
+                                      controller.searchController.text.isEmpty
+                                          ? "Search for a location".tr
+                                          : "No locations found".tr,
+                                      style: AppTextStyles.medium14.copyWith(
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                    ),
+                                    SizedBox(height: 6.h),
+                                    Padding(
+                                      padding: EdgeInsets.symmetric(
+                                        horizontal: 40.w,
+                                      ),
+                                      child: Text(
+                                        controller.searchController.text.isEmpty
+                                            ? "Search by city, area or landmark"
+                                                  .tr
+                                            : "Try another keyword".tr,
+                                        textAlign: TextAlign.center,
+                                        style: AppTextStyles.body13.copyWith(
+                                          color: Colors.grey.shade600,
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            )
+                          : ListView.separated(
+                              controller: scrollController,
+                              physics: const BouncingScrollPhysics(),
+                              padding: EdgeInsets.fromLTRB(20.w, 0, 20.w, 25.h),
+                              itemCount: controller.results.length,
+                              separatorBuilder: (_, __) =>
+                                  SizedBox(height: 12.h),
+                              itemBuilder: (_, index) {
+                                final item = controller.results[index];
+
+                                return Material(
+                                  color: Colors.white,
+                                  borderRadius: BorderRadius.circular(18.r),
+                                  elevation: .5,
+                                  shadowColor: Colors.black12,
+                                  child: InkWell(
+                                    borderRadius: BorderRadius.circular(18.r),
+                                    onTap: () {
+                                      controller.selectLocation(item);
+                                      Get.back();
+                                    },
+                                    child: Padding(
+                                      padding: EdgeInsets.all(14.w),
+                                      child: Row(
+                                        children: [
+                                          Container(
+                                            width: 45.w,
+                                            height: 45.w,
+                                            decoration: BoxDecoration(
+                                              color: AppColors.primary
+                                                  .withOpacity(.08),
+                                              borderRadius:
+                                                  BorderRadius.circular(15.r),
+                                            ),
+                                            child: Icon(
+                                              Icons.location_on_rounded,
+                                              color: AppColors.primary,
+                                              size: 20.sp,
+                                            ),
+                                          ),
+
+                                          SizedBox(width: 14.w),
+
+                                          Expanded(
+                                            child: Column(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                              children: [
+                                                Text(
+                                                  item.data.areaName,
+                                                  maxLines: 1,
+                                                  overflow:
+                                                      TextOverflow.ellipsis,
+                                                  style: AppTextStyles.medium14
+                                                      .copyWith(
+                                                        fontWeight:
+                                                            FontWeight.w700,
+                                                      ),
+                                                ),
+
+                                                SizedBox(height: 5.h),
+
+                                                Text(
+                                                  item.data.formattedAddress,
+                                                  maxLines: 2,
+                                                  overflow:
+                                                      TextOverflow.ellipsis,
+                                                  style: AppTextStyles.body13
+                                                      .copyWith(
+                                                        color: Colors
+                                                            .grey
+                                                            .shade600,
+                                                        height: 1.4,
+                                                      ),
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+
+                                          SizedBox(width: 8.w),
+
+                                          Icon(
+                                            Icons.arrow_forward_ios_rounded,
+                                            color: AppColors.primary,
+                                            size: 14.sp,
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                );
+                              },
+                            ),
                     ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        )
-      : ListView.separated(
-          controller: scrollController,
-          physics: const BouncingScrollPhysics(),
-          padding: EdgeInsets.fromLTRB(20.w, 0, 20.w, 25.h),
-          itemCount: controller.results.length,
-          separatorBuilder: (_, __) => SizedBox(height: 12.h),
-          itemBuilder: (_, index) {
-            final item = controller.results[index];
-
-            return Material(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(18.r),
-              elevation: .5,
-              shadowColor: Colors.black12,
-              child: InkWell(
-                borderRadius: BorderRadius.circular(18.r),
-                onTap: () {
-                  GlobalLocationController.to.setLocation(
-                    item.toJson(),
-                  );
-
-                  controller.searchController.clear();
-                  controller.results.clear();
-                  controller.update();
-
-                  Get.back();
-                },
-                child: Padding(
-                  padding: EdgeInsets.all(14.w),
-                  child: Row(
-                    children: [
-                      Container(
-                        width: 45.w,
-                        height: 45.w,
-                        decoration: BoxDecoration(
-                          color:
-                              AppColors.primary.withOpacity(.08),
-                          borderRadius:
-                              BorderRadius.circular(15.r),
-                        ),
-                        child: Icon(
-                          Icons.location_on_rounded,
-                          color: AppColors.primary,
-                          size: 20.sp,
-                        ),
-                      ),
-
-                      SizedBox(width: 14.w),
-
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment:
-                              CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              item.data.areaName,
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                              style: AppTextStyles.medium14.copyWith(
-                                fontWeight: FontWeight.w700,
-                              ),
-                            ),
-
-                            SizedBox(height: 5.h),
-
-                            Text(
-                              item.data.formattedAddress,
-                              maxLines: 2,
-                              overflow: TextOverflow.ellipsis,
-                              style: AppTextStyles.body13.copyWith(
-                                color: Colors.grey.shade600,
-                                height: 1.4,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-
-                      SizedBox(width: 8.w),
-
-                   Icon(
-                          Icons.arrow_forward_ios_rounded,
-                          color: AppColors.primary,
-                          size: 14.sp,
-                        ),
-                    
-                    ],
-                  ),
-                ),
+                ],
               ),
             );
           },
-        ),
-),
-                ],),);},);},);}}
-              
+        );
+      },
+    );
+  }
+}

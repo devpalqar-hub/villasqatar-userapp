@@ -11,6 +11,7 @@ import 'package:villas_qatar/Core/services/storage_service.dart';
 import 'package:villas_qatar/modules/propertylist/model/listing_options_model.dart';
 import 'package:villas_qatar/modules/propertylist/model/myproperty_model.dart';
 import 'package:villas_qatar/modules/propertylist/model/upload_property_model.dart';
+import 'package:villas_qatar/modules/propertylist/service/myproperties_listcontroller.dart';
 
 class ListPropertyController extends GetxController {
   //--------------------------------------------------
@@ -19,19 +20,19 @@ class ListPropertyController extends GetxController {
 
   int currentStep = 0;
 
-final List<String> steps = [
-  "Basic Info",
-  "Details",
-  "Features",
-  "Location",
-  "Media",
-  "Review",
-];
+  final List<String> steps = [
+    "Basic Info",
+    "Details",
+    "Features",
+    "Location",
+    "Media",
+    "Review",
+  ];
 
-ListPropertyController() {
-  debugPrint("CONTROLLER CREATED");
-  debugPrint("Steps = ${steps.length}");
-}
+  ListPropertyController() {
+    debugPrint("CONTROLLER CREATED");
+    debugPrint("Steps = ${steps.length}");
+  }
   //--------------------------------------------------
   // LOADING
   //--------------------------------------------------
@@ -139,6 +140,7 @@ ListPropertyController() {
   final List<Photo> existingPhotos = [];
 
   String video = "";
+  bool phoneChecked = false;
 
   //--------------------------------------------------
   // INIT
@@ -154,17 +156,17 @@ ListPropertyController() {
   }
 
   void nextStep() {
-  debugPrint("Current Step Before: $currentStep");
-  debugPrint("Steps Length: ${steps.length}");
+    debugPrint("Current Step Before: $currentStep");
+    debugPrint("Steps Length: ${steps.length}");
 
-  if (currentStep < steps.length - 1) {
-    currentStep++;
-    debugPrint("Current Step After: $currentStep");
-    update();
-  } else {
-    debugPrint("Already last step");
+    if (currentStep < steps.length - 1) {
+      currentStep++;
+      debugPrint("Current Step After: $currentStep");
+      update();
+    } else {
+      debugPrint("Already last step");
+    }
   }
-}
 
   void previousStep() {
     if (currentStep > 0) {
@@ -541,12 +543,7 @@ ListPropertyController() {
     }
   }
 
-  Future<void> sendOtp() async {
-    // API call
-
-    showOtpField = true;
-    update();
-  }
+  
 
   Future<String?> uploadPropertyImage(File image) async {
     try {
@@ -625,189 +622,272 @@ ListPropertyController() {
 
     return photos;
   }
-Future<bool> updateProperty(String listingId) async {
-  if (isSubmitting) return false;
 
-  try {
-    isSubmitting = true;
-    error = "";
-    update();
+  Future<bool> updateProperty(
+    String listingId) async {
+    try {
+      isSubmitting = true;
+      error = "";
+      update();
 
-   List<Map<String, dynamic>> photoList = existingPhotos
-    .map<Map<String, dynamic>>(
-      (e) => <String, dynamic>{
-        "url": e.url,
-        "sortOrder": e.sortOrder,
-        "caption": e.caption,
-      },
-    )
-    .toList();
+      List<Map<String, dynamic>> photoList = existingPhotos
+          .map<Map<String, dynamic>>(
+            (e) => <String, dynamic>{
+              "url": e.url,
+              "sortOrder": e.sortOrder,
+              "caption": e.caption,
+            },
+          )
+          .toList();
 
-    // Upload newly selected images and append them
-    if (images.isNotEmpty || coverImage.isNotEmpty) {
-      final newPhotos = await uploadAllPropertyImages();
+      // Upload newly selected images and append them
+      if (images.isNotEmpty || coverImage.isNotEmpty) {
+        final newPhotos = await uploadAllPropertyImages();
 
-      int sortOrder = photoList.length;
-    
-    for (final photo in newPhotos) {
-  photoList.add(
-    <String, dynamic>{
-      "url": photo["url"],
-      "sortOrder": sortOrder++,
-      "caption": photo["caption"] ?? "",
-    },
-  );
-}
+        int sortOrder = photoList.length;
+
+        for (final photo in newPhotos) {
+          photoList.add(<String, dynamic>{
+            "url": photo["url"],
+            "sortOrder": sortOrder++,
+            "caption": photo["caption"] ?? "",
+          });
+        }
+      }
+
+      final body = {
+        "propertyName": propertyNameController.text.trim(),
+        "description": descriptionController.text.trim(),
+        "purpose": propertyPurpose,
+        "typeId": selectedTypeId,
+
+        "latitude": latitude,
+        "longitude": longitude,
+
+        "bedrooms": int.tryParse(bedroomsController.text.trim()) ?? 0,
+        "bathrooms": int.tryParse(bathroomsController.text.trim()) ?? 0,
+        "area": double.tryParse(areaController.text.trim()) ?? 0,
+
+        "livingRooms": int.tryParse(livingRoomsController.text.trim()) ?? 0,
+        "parkingSpaces": int.tryParse(parkingSpacesController.text.trim()) ?? 0,
+        "floorNumber": int.tryParse(floorNumberController.text.trim()) ?? 0,
+        "totalFloors": int.tryParse(totalFloorsController.text.trim()) ?? 0,
+
+        "yearBuilt": yearBuiltController.text.trim().isEmpty
+            ? null
+            : int.tryParse(yearBuiltController.text.trim()),
+
+        "furnishingId": selectedFurnishing.isEmpty
+            ? null
+            : selectedFurnishing.first,
+
+        "extraProperties": {},
+
+        "price": num.tryParse(priceController.text.trim()) ?? 0,
+        "priceNegotiable": priceNegotiable,
+
+        "addressLine1": addressController.text.trim(),
+        "addressLine2": streetController.text.trim(),
+        "areaName": areaNameController.text.trim(),
+        "municipalityId": selectedMunicipalityId,
+
+        "contactPhone": "$countryCode${phoneController.text.trim()}",
+        "contactWhatsapp": "$countryCode${phoneController.text.trim()}",
+
+        "amenities": selectedAmenities.toList(),
+        "nearbyTags": selectedNearbyTags.toList(),
+
+        "otherFeatures": otherFeatureController.text.trim(),
+
+        // Existing + newly uploaded photos
+        "photos": photoList,
+      };
+
+      debugPrint(const JsonEncoder.withIndent("  ").convert(body));
+      await ApiHandler.patch("/api/listings/$listingId", body: body);
+
+
+      if (Get.isRegistered<MyPropertyController>()) {
+        await Get.find<MyPropertyController>().refreshProperties();
+      }
+
+
+      return true;
+    } catch (e) {
+      error = e.toString();
+
+      Fluttertoast.showToast(msg: error);
+
+      return false;
+    } finally {
+      isSubmitting = false;
+      update();
     }
-
-    final body = {
-      "propertyName": propertyNameController.text.trim(),
-      "description": descriptionController.text.trim(),
-      "purpose": propertyPurpose,
-      "typeId": selectedTypeId,
-
-      "latitude": latitude,
-      "longitude": longitude,
-
-      "bedrooms": int.tryParse(bedroomsController.text.trim()) ?? 0,
-      "bathrooms": int.tryParse(bathroomsController.text.trim()) ?? 0,
-      "area": double.tryParse(areaController.text.trim()) ?? 0,
-
-      "livingRooms":
-          int.tryParse(livingRoomsController.text.trim()) ?? 0,
-      "parkingSpaces":
-          int.tryParse(parkingSpacesController.text.trim()) ?? 0,
-      "floorNumber":
-          int.tryParse(floorNumberController.text.trim()) ?? 0,
-      "totalFloors":
-          int.tryParse(totalFloorsController.text.trim()) ?? 0,
-
-      "yearBuilt": yearBuiltController.text.trim().isEmpty
-          ? null
-          : int.tryParse(yearBuiltController.text.trim()),
-
-      "furnishingId":
-          selectedFurnishing.isEmpty ? null : selectedFurnishing.first,
-
-      "extraProperties": {},
-
-      "price": num.tryParse(priceController.text.trim()) ?? 0,
-      "priceNegotiable": priceNegotiable,
-
-      "addressLine1": addressController.text.trim(),
-      "addressLine2": streetController.text.trim(),
-      "areaName": areaNameController.text.trim(),
-      "municipalityId": selectedMunicipalityId,
-
-      "contactPhone": "$countryCode${phoneController.text.trim()}",
-      "contactWhatsapp": "$countryCode${phoneController.text.trim()}",
-
-      "amenities": selectedAmenities.toList(),
-      "nearbyTags": selectedNearbyTags.toList(),
-
-      "otherFeatures": otherFeatureController.text.trim(),
-
-      // Existing + newly uploaded photos
-      "photos": photoList,
-    };
-
-    debugPrint(const JsonEncoder.withIndent("  ").convert(body));
-
-    await ApiHandler.patch(
-      "/api/listings/$listingId",
-      body: body,
-    );
-
-    Fluttertoast.showToast(
-      msg: "Property updated successfully.",
-    );
-
-    return true;
-  } catch (e) {
-    error = e.toString();
-
-    Fluttertoast.showToast(msg: error);
-
-    return false;
-  } finally {
-    isSubmitting = false;
-    update();
   }
-}
-  Future<void> verifyOtp() async {
-    // Verify OTP API
 
-    whatsappVerified = true;
-    showOtpField = false;
 
-    update();
-  }
 
 
   void loadProperty(Property property) {
-  // Step 1
-  fullNameController.text = property.createdBy.name;
-  phoneController.text = property.contactPhone;
-  emailController.text = property.createdBy.email;
-  descriptionController.text = property.description;
+    // Step 1
+    fullNameController.text = property.createdBy.name;
+    phoneController.text = property.contactPhone;
+    emailController.text = property.createdBy.email;
+    descriptionController.text = property.description;
 
-  // Step 2
-  propertyNameController.text = property.propertyName;
+    // Step 2
+    propertyNameController.text = property.propertyName;
 
-  propertyType = property.type.title;
-  selectedTypeId = property.type.id;
+    propertyType = property.type.title;
+    selectedTypeId = property.type.id;
 
-  propertyPurpose = property.purpose;
+    propertyPurpose = property.purpose;
 
-  bedroomsController.text = property.bedrooms.toString();
-  bathroomsController.text = property.bathrooms.toString();
-  livingRoomsController.text = property.livingRooms.toString();
-  parkingSpacesController.text = property.parkingSpaces.toString();
+    bedroomsController.text = property.bedrooms.toString();
+    bathroomsController.text = property.bathrooms.toString();
+    livingRoomsController.text = property.livingRooms.toString();
+    parkingSpacesController.text = property.parkingSpaces.toString();
 
-  areaController.text = property.area.toString();
-  priceController.text = property.price.toString();
+    areaController.text = property.area.toString();
+    priceController.text = property.price.toString();
 
-  yearBuiltController.text =
-      property.yearBuilt?.toString() ?? "";
+    yearBuiltController.text = property.yearBuilt?.toString() ?? "";
 
-  floorNumberController.text =
-      property.floorNumber.toString();
+    floorNumberController.text = property.floorNumber.toString();
 
-  totalFloorsController.text =
-      property.totalFloors.toString();
+    totalFloorsController.text = property.totalFloors.toString();
 
-  // Step 3
-  selectedFurnishing.clear();
-  selectedFurnishing.add(property.furnishing.id);
+    // Step 3
+    selectedFurnishing.clear();
+    selectedFurnishing.add(property.furnishing.id);
 
-  selectedAmenities
-    ..clear()
-    ..addAll(property.amenities.map((e) => e.id));
+    selectedAmenities
+      ..clear()
+      ..addAll(property.amenities.map((e) => e.id));
 
-  selectedNearbyTags
-    ..clear()
-    ..addAll(property.nearbyTags.map((e) => e.id));
+    selectedNearbyTags
+      ..clear()
+      ..addAll(property.nearbyTags.map((e) => e.id));
 
-  otherFeatureController.text = property.otherFeatures;
+    otherFeatureController.text = property.otherFeatures;
 
-  // Step 4
-  addressController.text = property.addressLine1;
-  streetController.text = property.addressLine2;
-  areaNameController.text = property.areaName;
+    // Step 4
+    addressController.text = property.addressLine1;
+    streetController.text = property.addressLine2;
+    areaNameController.text = property.areaName;
 
-  cityController.text = property.municipality.name;
-  selectedMunicipalityId = property.municipality.id;
+    cityController.text = property.municipality.name;
+    selectedMunicipalityId = property.municipality.id;
 
-  latitudeController.text = property.latitude.toString();
-  longitudeController.text = property.longitude.toString();
+    latitudeController.text = property.latitude.toString();
+    longitudeController.text = property.longitude.toString();
 
-  latitude = property.latitude;
-  longitude = property.longitude;
+    latitude = property.latitude;
+    longitude = property.longitude;
 
-  priceNegotiable = property.priceNegotiable;
-  existingPhotos
-  ..clear()
-  ..addAll(property.sortedPhotos);
-  update();
+    priceNegotiable = property.priceNegotiable;
+    existingPhotos
+      ..clear()
+      ..addAll(property.sortedPhotos);
+    update();
+  }
+
+
+
+Future<bool> checkPhone() async {
+  try {
+    isLoading = true;
+    update();
+
+    final response = await ApiHandler.post(
+      ApiEndpoints.verifyPhoneCheck,
+      body: {
+        "phone": "$countryCode${phoneController.text.trim()}",
+      },
+    );
+
+    whatsappVerified = response["verified"] == true;
+    phoneChecked = true;
+    showOtpField = false;
+
+    update();
+    return true;
+  } catch (e) {
+    Fluttertoast.showToast(
+      msg: e.toString().replaceFirst("Exception: ", ""),
+    );
+    return false;
+  } finally {
+    isLoading = false;
+    update();
+  }
+}
+
+Future<bool> sendOtp() async {
+  try {
+    isLoading = true;
+    update();
+
+    final response = await ApiHandler.post(
+      ApiEndpoints.verifyPhoneSendOtp,
+      body: {
+        "phone": "$countryCode${phoneController.text.trim()}",
+      },
+    );
+
+    showOtpField = true;
+
+    Fluttertoast.showToast(
+      msg: response["message"] ?? "OTP sent successfully",
+    );
+
+    update();
+    return true;
+  } catch (e) {
+    Fluttertoast.showToast(
+      msg: e.toString().replaceFirst("Exception: ", ""),
+    );
+    return false;
+  } finally {
+    isLoading = false;
+    update();
+  }
+}
+
+Future<bool> verifyOtp() async {
+  try {
+    isLoading = true;
+    update();
+
+    final response = await ApiHandler.post(
+      ApiEndpoints.verifyPhoneVerifyOtp,
+      body: {
+        "phone": "$countryCode${phoneController.text.trim()}",
+        "otp": otpController.text.trim(),
+      },
+    );
+
+    debugPrint("VERIFY OTP RESPONSE : $response");
+
+    whatsappVerified = true;
+    phoneChecked = true;
+    showOtpField = false;
+    otpController.clear();
+
+    Fluttertoast.showToast(
+      msg: response["message"] ?? "Phone verified successfully",
+    );
+
+    update();
+    return true;
+  } catch (e) {
+    Fluttertoast.showToast(
+      msg: e.toString().replaceFirst("Exception: ", ""),
+    );
+    return false;
+  } finally {
+    isLoading = false;
+    update();
+  }
 }
 }
