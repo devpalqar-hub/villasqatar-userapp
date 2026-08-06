@@ -61,18 +61,12 @@ class _MyFeaturedPropertiesScreenState
         centerTitle: true,
         backgroundColor: Colors.white,
         surfaceTintColor: Colors.white,
-        leading: IconButton(
-          onPressed: () => Get.back(),
-          icon: const Icon(
-            Icons.arrow_back_ios_new_rounded,
-            size: 20,
-          ),
-        ),
+        
         title: Text(
           'My Featured Properties'.tr,
           style: TextStyle(
             fontSize: 18.sp,
-            fontWeight: FontWeight.w700,
+            fontWeight: FontWeight.w500,
             color: const Color(0xFF202020),
           ),
         ),
@@ -230,7 +224,7 @@ class _MyFeaturedPropertiesScreenState
                                     style: TextStyle(
                                       fontSize: 16.sp,
                                       fontWeight:
-                                          FontWeight.w700,
+                                          FontWeight.w500,
                                       color:
                                           const Color(
                                         0xFF202020,
@@ -426,7 +420,7 @@ class _MyFeaturedPropertiesScreenState
               textAlign: TextAlign.center,
               style: TextStyle(
                 fontSize: 16.sp,
-                fontWeight: FontWeight.w700,
+                fontWeight: FontWeight.w500,
                 color: const Color(0xFF222222),
               ),
             ),
@@ -516,7 +510,7 @@ class _MyFeaturedPropertiesScreenState
               textAlign: TextAlign.center,
               style: TextStyle(
                 fontSize: 16.sp,
-                fontWeight: FontWeight.w700,
+                fontWeight: FontWeight.w500,
                 color: const Color(0xFF222222),
               ),
             ),
@@ -533,7 +527,7 @@ class _MyFeaturedPropertiesScreenState
               style: TextStyle(
                 fontSize: 12.sp,
                 height: 1.5,
-                color: Colors.grey.shade600,
+                color: Colors.grey.shade500,
               ),
             ),
 
@@ -563,616 +557,6 @@ class _MyFeaturedPropertiesScreenState
   }
 }
 
-// ============================================================
-// MY FEATURED PROPERTY CARD
-// ============================================================
-
-// class _FeaturedPropertyCard
-//     extends StatelessWidget {
-//   final MyFeaturedProperty property;
-
-//   const _FeaturedPropertyCard({
-//     required this.property,
-//   });
-
-//   @override
-//   Widget build(BuildContext context) {
-//     final listing = property.listing;
-//     final plan = property.plan;
-
-//     return Material(
-//       color: Colors.transparent,
-//       child: InkWell(
-//         borderRadius:
-//             BorderRadius.circular(14.r),
-//         onTap: () {
-//           // Use listing.id if you want to open
-//           // property details.
-//           //
-//           // Example:
-//           //
-//           // Get.to(
-//           //   () => PropertyDetailScreen(
-//           //     propertyId: listing.id,
-//           //   ),
-//           // );
-//         },
-//         child: Container(
-//           padding: EdgeInsets.all(15.w),
-//           decoration: BoxDecoration(
-//             color: Colors.white,
-//             borderRadius:
-//                 BorderRadius.circular(14.r),
-//             border: Border.all(
-//               color: const Color(0xFFEBEBEF),
-//             ),
-//             boxShadow: [
-//               BoxShadow(
-//                 color:
-//                     Colors.black.withOpacity(.035),
-//                 blurRadius: 10,
-//                 offset: const Offset(0, 3),
-//               ),
-//             ],
-//           ),
-//           child: Column(
-//             crossAxisAlignment:
-//                 CrossAxisAlignment.start,
-//             children: [
-//               // ==================================================
-//               // HEADER
-//               // ==================================================
-
-//               Row(
-//                 crossAxisAlignment:
-//                     CrossAxisAlignment.start,
-//                 children: [
-//                   // Property icon
-//                   Container(
-//                     width: 48.w,
-//                     height: 48.w,
-//                     decoration: BoxDecoration(
-//                       color: AppColors.primary
-//                           .withOpacity(.07),
-//                       borderRadius:
-//                           BorderRadius.circular(
-//                         11.r,
-//                       ),
-//                     ),
-//                     alignment: Alignment.center,
-//                     child: Icon(
-//                       Icons.home_work_outlined,
-//                       size: 25.sp,
-//                       color: AppColors.primary,
-//                     ),
-//                   ),
-
-//                   SizedBox(width: 12.w),
-
-//                   // Property name/status
-//                   Expanded(
-//                     child: Column(
-//                       crossAxisAlignment:
-//                           CrossAxisAlignment.start,
-//                       children: [
-//                         Text(
-//                           listing.propertyName
-//                                   .trim()
-//                                   .isNotEmpty
-//                               ? listing.propertyName
-//                               : 'Property',
-//                           maxLines: 2,
-//                           overflow:
-//                               TextOverflow.ellipsis,
-//                           style: TextStyle(
-//                             fontSize: 15.sp,
-//                             height: 1.25,
-//                             fontWeight:
-//                                 FontWeight.w700,
-//                             color: const Color(
-//                               0xFF202020,
-//                             ),
-//                           ),
-//                         ),
-
-//                         SizedBox(height: 5.h),
-
-//                         Row(
-//                           children: [
-//                             Icon(
-//                               Icons
-//                                   .verified_outlined,
-//                               size: 13.sp,
-//                               color: Colors
-//                                   .grey.shade500,
-//                             ),
-
-//                             SizedBox(width: 4.w),
-
-//                             Flexible(
-//                               child: Text(
-//                                 listing.statusLabel
-//                                         .isNotEmpty
-//                                     ? listing
-//                                         .statusLabel
-//                                     : 'Property',
-//                                 maxLines: 1,
-//                                 overflow: TextOverflow
-//                                     .ellipsis,
-//                                 style: TextStyle(
-//                                   fontSize: 10.5.sp,
-//                                   color: Colors
-//                                       .grey.shade600,
-//                                 ),
-//                               ),
-//                             ),
-//                           ],
-//                         ),
-//                       ],
-//                     ),
-//                   ),
-
-//                   SizedBox(width: 8.w),
-
-//                   _buildStatusBadge(),
-//                 ],
-//               ),
-
-//               SizedBox(height: 15.h),
-
-//               Divider(
-//                 height: 1,
-//                 color: Colors.grey.shade200,
-//               ),
-
-//               SizedBox(height: 14.h),
-
-//               // ==================================================
-//               // PLAN NAME
-//               // ==================================================
-
-//               _buildInfoRow(
-//                 icon: Icons
-//                     .workspace_premium_outlined,
-//                 title: 'Plan',
-//                 value: plan.name.trim().isNotEmpty
-//                     ? plan.name
-//                     : '-',
-//               ),
-
-//               SizedBox(height: 12.h),
-
-//               // ==================================================
-//               // FEATURED LOCATION
-//               // ==================================================
-
-//               _buildInfoRow(
-//                 icon: Icons
-//                     .location_on_outlined,
-//                 title: 'Featured On',
-//                 value: property
-//                         .locationLabel.isNotEmpty
-//                     ? property.locationLabel
-//                     : '-',
-//               ),
-
-//               SizedBox(height: 12.h),
-
-//               // ==================================================
-//               // DURATION
-//               // ==================================================
-
-//               _buildInfoRow(
-//                 icon: Icons.timelapse_rounded,
-//                 title: 'Duration',
-//                 value: plan.durationDays > 0
-//                     ? '${plan.durationDays} Days'
-//                     : plan.durationLabel.isNotEmpty
-//                         ? plan.durationLabel
-//                         : '-',
-//               ),
-
-//               SizedBox(height: 12.h),
-
-//               // ==================================================
-//               // AMOUNT
-//               // ==================================================
-
-//               _buildInfoRow(
-//                 icon: Icons.payments_outlined,
-//                 title: 'Paid Amount',
-//                 value:
-//                     property.formattedPaidAmount,
-//               ),
-
-//               SizedBox(height: 12.h),
-
-//               // ==================================================
-//               // PAYMENT STATUS
-//               // ==================================================
-
-//               _buildInfoRow(
-//                 icon:
-//                     Icons.receipt_long_outlined,
-//                 title: 'Payment Status',
-//                 value: property
-//                         .paymentStatusLabel
-//                         .isNotEmpty
-//                     ? property
-//                         .paymentStatusLabel
-//                     : '-',
-//               ),
-
-//               // ==================================================
-//               // DATES
-//               // ==================================================
-
-//               if (property.startDate != null ||
-//                   property.endDate != null) ...[
-//                 SizedBox(height: 15.h),
-
-//                 Divider(
-//                   height: 1,
-//                   color: Colors.grey.shade200,
-//                 ),
-
-//                 SizedBox(height: 14.h),
-
-//                 Row(
-//                   children: [
-//                     if (property.startDate !=
-//                         null)
-//                       Expanded(
-//                         child: _buildDateBox(
-//                           icon: Icons
-//                               .play_circle_outline_rounded,
-//                           title: 'Started',
-//                           date:
-//                               property.startDate!,
-//                         ),
-//                       ),
-
-//                     if (property.startDate !=
-//                             null &&
-//                         property.endDate !=
-//                             null)
-//                       SizedBox(width: 10.w),
-
-//                     if (property.endDate !=
-//                         null)
-//                       Expanded(
-//                         child: _buildDateBox(
-//                           icon: Icons
-//                               .event_outlined,
-//                           title: 'Ends',
-//                           date:
-//                               property.endDate!,
-//                         ),
-//                       ),
-//                   ],
-//                 ),
-//               ],
-
-//               // ==================================================
-//               // ACTIVE / EXPIRED INFORMATION
-//               // ==================================================
-
-//               if (property.isCurrentlyActive) ...[
-//                 SizedBox(height: 13.h),
-
-//                 Container(
-//                   width: double.infinity,
-//                   padding:
-//                       EdgeInsets.symmetric(
-//                     horizontal: 11.w,
-//                     vertical: 10.h,
-//                   ),
-//                   decoration: BoxDecoration(
-//                     color: AppColors.primary
-//                         .withOpacity(.045),
-//                     borderRadius:
-//                         BorderRadius.circular(
-//                       8.r,
-//                     ),
-//                   ),
-//                   child: Row(
-//                     children: [
-//                       Icon(
-//                         Icons.schedule_outlined,
-//                         size: 15.sp,
-//                         color:
-//                             AppColors.primary,
-//                       ),
-
-//                       SizedBox(width: 7.w),
-
-//                       Expanded(
-//                         child: Text(
-//                           property.remainingDays >
-//                                   0
-//                               ? '${property.remainingDays} days remaining'
-//                               : 'Ends today',
-//                           style: TextStyle(
-//                             fontSize: 10.5.sp,
-//                             fontWeight:
-//                                 FontWeight.w600,
-//                             color: AppColors
-//                                 .primary,
-//                           ),
-//                         ),
-//                       ),
-//                     ],
-//                   ),
-//                 ),
-//               ],
-
-//               if (property.isExpired) ...[
-//                 SizedBox(height: 13.h),
-
-//                 Container(
-//                   width: double.infinity,
-//                   padding:
-//                       EdgeInsets.symmetric(
-//                     horizontal: 11.w,
-//                     vertical: 10.h,
-//                   ),
-//                   decoration: BoxDecoration(
-//                     color: Colors.grey
-//                         .withOpacity(.08),
-//                     borderRadius:
-//                         BorderRadius.circular(
-//                       8.r,
-//                     ),
-//                   ),
-//                   child: Row(
-//                     children: [
-//                       Icon(
-//                         Icons
-//                             .history_toggle_off_rounded,
-//                         size: 15.sp,
-//                         color:
-//                             Colors.grey.shade600,
-//                       ),
-
-//                       SizedBox(width: 7.w),
-
-//                       Text(
-//                         'This featured plan has expired',
-//                         style: TextStyle(
-//                           fontSize: 10.5.sp,
-//                           fontWeight:
-//                               FontWeight.w600,
-//                           color: Colors
-//                               .grey.shade700,
-//                         ),
-//                       ),
-//                     ],
-//                   ),
-//                 ),
-//               ],
-//             ],
-//           ),
-//         ),
-//       ),
-//     );
-//   }
-
-//   // ============================================================
-//   // STATUS BADGE
-//   // ============================================================
-
-//   Widget _buildStatusBadge() {
-//     String text;
-//     Color color;
-
-//     if (property.isExpired) {
-//       text = 'Expired';
-//       color = Colors.grey.shade600;
-//     } else if (property.isCurrentlyActive) {
-//       text = 'Active';
-//       color = const Color(0xFF258A57);
-//     } else if (property.isFailed) {
-//       text = 'Failed';
-//       color = Colors.red.shade600;
-//     } else if (property.isPaid) {
-//       text = 'Paid';
-//       color = const Color(0xFF258A57);
-//     } else {
-//       text = property
-//               .paymentStatusLabel.isNotEmpty
-//           ? property.paymentStatusLabel
-//           : 'Pending';
-
-//       color = Colors.orange.shade700;
-//     }
-
-//     return Container(
-//       padding: EdgeInsets.symmetric(
-//         horizontal: 9.w,
-//         vertical: 5.h,
-//       ),
-//       decoration: BoxDecoration(
-//         color: color.withOpacity(.10),
-//         borderRadius:
-//             BorderRadius.circular(20.r),
-//       ),
-//       child: Text(
-//         text,
-//         style: TextStyle(
-//           fontSize: 9.sp,
-//           fontWeight: FontWeight.w700,
-//           color: color,
-//         ),
-//       ),
-//     );
-//   }
-
-//   // ============================================================
-//   // INFO ROW
-//   // ============================================================
-
-//   Widget _buildInfoRow({
-//     required IconData icon,
-//     required String title,
-//     required String value,
-//   }) {
-//     return Row(
-//       crossAxisAlignment:
-//           CrossAxisAlignment.center,
-//       children: [
-//         Container(
-//           width: 34.w,
-//           height: 34.w,
-//           alignment: Alignment.center,
-//           decoration: BoxDecoration(
-//             color: AppColors.primary
-//                 .withOpacity(.055),
-//             borderRadius:
-//                 BorderRadius.circular(8.r),
-//           ),
-//           child: Icon(
-//             icon,
-//             size: 17.sp,
-//             color: AppColors.primary,
-//           ),
-//         ),
-
-//         SizedBox(width: 10.w),
-
-//         Expanded(
-//           child: Column(
-//             crossAxisAlignment:
-//                 CrossAxisAlignment.start,
-//             children: [
-//               Text(
-//                 title,
-//                 style: TextStyle(
-//                   fontSize: 9.5.sp,
-//                   color: Colors.grey.shade500,
-//                 ),
-//               ),
-
-//               SizedBox(height: 2.h),
-
-//               Text(
-//                 value,
-//                 maxLines: 2,
-//                 overflow:
-//                     TextOverflow.ellipsis,
-//                 style: TextStyle(
-//                   fontSize: 11.5.sp,
-//                   height: 1.25,
-//                   fontWeight:
-//                       FontWeight.w600,
-//                   color: const Color(
-//                     0xFF333333,
-//                   ),
-//                 ),
-//               ),
-//             ],
-//           ),
-//         ),
-//       ],
-//     );
-//   }
-
-//   // ============================================================
-//   // DATE BOX
-//   // ============================================================
-
-//   Widget _buildDateBox({
-//     required IconData icon,
-//     required String title,
-//     required DateTime date,
-//   }) {
-//     return Container(
-//       padding: EdgeInsets.all(10.w),
-//       decoration: BoxDecoration(
-//         color: const Color(0xFFF8F8FA),
-//         borderRadius:
-//             BorderRadius.circular(8.r),
-//         border: Border.all(
-//           color: const Color(0xFFEEEEF2),
-//         ),
-//       ),
-//       child: Row(
-//         children: [
-//           Icon(
-//             icon,
-//             size: 16.sp,
-//             color: AppColors.primary,
-//           ),
-
-//           SizedBox(width: 7.w),
-
-//           Expanded(
-//             child: Column(
-//               crossAxisAlignment:
-//                   CrossAxisAlignment.start,
-//               children: [
-//                 Text(
-//                   title,
-//                   style: TextStyle(
-//                     fontSize: 8.5.sp,
-//                     color:
-//                         Colors.grey.shade500,
-//                   ),
-//                 ),
-
-//                 SizedBox(height: 3.h),
-
-//                 Text(
-//                   _formatDate(date),
-//                   maxLines: 1,
-//                   overflow:
-//                       TextOverflow.ellipsis,
-//                   style: TextStyle(
-//                     fontSize: 10.sp,
-//                     fontWeight:
-//                         FontWeight.w700,
-//                     color: const Color(
-//                       0xFF333333,
-//                     ),
-//                   ),
-//                 ),
-//               ],
-//             ),
-//           ),
-//         ],
-//       ),
-//     );
-//   }
-
-//   // ============================================================
-//   // FORMAT DATE
-//   // ============================================================
-
-//   String _formatDate(
-//     DateTime date,
-//   ) {
-//     const List<String> months = [
-//       'Jan',
-//       'Feb',
-//       'Mar',
-//       'Apr',
-//       'May',
-//       'Jun',
-//       'Jul',
-//       'Aug',
-//       'Sep',
-//       'Oct',
-//       'Nov',
-//       'Dec',
-//     ];
-
-//     final DateTime localDate =
-//         date.toLocal();
-
-//     return '${localDate.day} '
-//         '${months[localDate.month - 1]} '
-//         '${localDate.year}';
-//   }
-// }
 class _FeaturedPropertyCard extends StatelessWidget {
   final MyFeaturedProperty property;
 
@@ -1226,7 +610,7 @@ class _FeaturedPropertyCard extends StatelessWidget {
                   overflow: TextOverflow.ellipsis,
                   style: TextStyle(
                     fontSize: 13.sp,
-                    fontWeight: FontWeight.w700,
+                    fontWeight: FontWeight.w500,
                     color: const Color(0xFF202020),
                   ),
                 ),
@@ -1241,7 +625,7 @@ class _FeaturedPropertyCard extends StatelessWidget {
                   overflow: TextOverflow.ellipsis,
                   style: TextStyle(
                     fontSize: 10.sp,
-                    color: Colors.grey.shade600,
+                    color: Colors.grey.shade500,
                   ),
                 ),
 
@@ -1266,7 +650,7 @@ class _FeaturedPropertyCard extends StatelessWidget {
                         overflow: TextOverflow.ellipsis,
                         style: TextStyle(
                           fontSize: 9.5.sp,
-                          color: Colors.grey.shade600,
+                          color: Colors.grey.shade500,
                         ),
                       ),
                     ),
@@ -1280,7 +664,7 @@ class _FeaturedPropertyCard extends StatelessWidget {
                             : 'Ends today',
                         style: TextStyle(
                           fontSize: 9.sp,
-                          fontWeight: FontWeight.w600,
+                          fontWeight: FontWeight.w500,
                           color: AppColors.primary,
                         ),
                       ),

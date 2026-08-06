@@ -48,21 +48,12 @@ class _WishlistScreenState extends State<WishlistScreen> {
         backgroundColor: Colors.white,
         elevation: 0,
         surfaceTintColor: Colors.white,
-        centerTitle: false,
-        titleSpacing: 0,
-        leading: IconButton(
-          onPressed: () => Get.back(),
-          icon: Icon(
-            Icons.arrow_back_ios_new_rounded,
-            size: 18.sp,
-            color: const Color(0xff222222),
-          ),
-        ),
+        centerTitle: true,
         title: Text(
           "My Wishlist".tr,
           style: AppTextStyles.title18.copyWith(
             fontSize: 17.sp,
-            fontWeight: FontWeight.w700,
+            fontWeight: FontWeight.w500,
             color: const Color(0xff202124),
           ),
         ),
@@ -85,7 +76,9 @@ class _WishlistScreenState extends State<WishlistScreen> {
 
             return property.propertyName.toLowerCase().contains(query) ||
                 property.areaName.toLowerCase().contains(query) ||
-                property.municipality.name.toLowerCase().contains(query.toLowerCase());
+                property.municipality.name.toLowerCase().contains(
+                  query.toLowerCase(),
+                );
           }).toList();
 
           return RefreshIndicator(
@@ -111,7 +104,7 @@ class _WishlistScreenState extends State<WishlistScreen> {
                             "Saved Properties".tr,
                             style: AppTextStyles.title16.copyWith(
                               fontSize: 15.sp,
-                              fontWeight: FontWeight.w700,
+                              fontWeight: FontWeight.w500,
                               color: const Color(0xff202124),
                             ),
                           ),

@@ -157,7 +157,7 @@ class _FeaturedPropertiesState extends State<FeaturedProperties> {
                         "See All".tr,
                         style: AppTextStyles.body14.copyWith(
                           fontSize: 12.sp,
-                          fontWeight: FontWeight.w700,
+                          fontWeight: FontWeight.w500,
                           color: AppColors.primary,
                         ),
                       ),
@@ -335,7 +335,7 @@ class LocalityCard extends StatelessWidget {
                     overflow: TextOverflow.ellipsis,
                     style: AppTextStyles.title16.copyWith(
                       fontSize: 11.sp,
-                      fontWeight: FontWeight.w700,
+                      fontWeight: FontWeight.w500,
                     ),
                   ),
 
@@ -347,7 +347,7 @@ class LocalityCard extends StatelessWidget {
                     overflow: TextOverflow.ellipsis,
                     style: AppTextStyles.title16.copyWith(
                       fontSize: 11.sp,
-                      fontWeight: FontWeight.w800,
+                      fontWeight: FontWeight.w500,
                     ),
                   ),
 

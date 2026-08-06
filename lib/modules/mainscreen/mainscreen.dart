@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get_core/src/get_main.dart';
 import 'package:get/get_instance/src/extension_instance.dart';
+import 'package:villas_qatar/Core/utils/auth_guard.dart';
 import 'package:villas_qatar/modules/chats/views/chatlistscreen.dart';
 import 'package:villas_qatar/modules/home/views/home_screen.dart';
 import 'package:villas_qatar/modules/mainscreen/home_bottom_nav.dart';
@@ -89,7 +90,7 @@ class _MainScreenState extends State<MainScreen> {
 
       ChatListScreen(),
 
-     SettingsScreen(),
+      SettingsScreen(),
     ];
 
     /// If MainScreen was opened directly on Search,
@@ -128,6 +129,21 @@ class _MainScreenState extends State<MainScreen> {
       bottomNavigationBar: HomeBottomNav(
         currentIndex: currentIndex,
         onChanged: (index) {
+          if (index == 2 &&
+              !AuthGuard.requireLogin(
+                message: "Please login to manage your properties.",
+              )) {
+            return;
+          }
+
+         
+          if (index == 3 &&
+              !AuthGuard.requireLogin(
+                message: "Please login to access your chats.",
+              )) {
+            return;
+          }
+
           setState(() {
             currentIndex = index;
           });

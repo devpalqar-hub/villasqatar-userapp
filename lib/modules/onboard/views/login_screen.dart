@@ -1,4 +1,5 @@
-import 'package:country_code_picker/country_code_picker.dart';
+
+import 'package:country_pickers/utils/utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
@@ -80,62 +81,95 @@ class LoginScreen extends StatelessWidget {
                       SizedBox(height: 30.h),
 
                       Container(
-                        height: 50.h,
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(8.r),
-                          border: Border.all(color: AppColors.border),
-                        ),
-                        child: Row(
-                          children: [
-                            CountryCodePicker(
-                              initialSelection: 'QA',
+  height: 52.h,
+  decoration: BoxDecoration(
+    color: Colors.white,
+    borderRadius: BorderRadius.circular(8.r),
+    border: Border.all(color: AppColors.border),
+  ),
+  child: Row(
+    children: [
+      SizedBox(
+        width: 110.w,
+        child: DropdownButtonHideUnderline(
+          child: DropdownButton<String>(
+            value: controller.selectedCountry,
+            isExpanded: true,
+            icon: Icon(
+              Icons.keyboard_arrow_down,
+              color: AppColors.textSecondary,
+              size: 20.sp,
+            ),
+            items: ["QA", "IN", "AE", "US"]
+                .map((code) {
+                  final country =
+                      CountryPickerUtils.getCountryByIsoCode(code);
 
-                              showDropDownButton: true,
-                              alignLeft: false,
-                              padding: EdgeInsets.zero,
-                              textStyle: AppTextStyles.body13.copyWith(
-                                fontSize: 12.sp,
-                                color: AppColors.textPrimary,
-                              ),
-                              onChanged: (country) {
-                                controller.selectedCountryCode =
-                                    country.dialCode ?? "+974";
-
-                                controller.phoneNumber =
-                                    "${controller.selectedCountryCode}${controller.phoneController.text.trim()}";
-                              },
-                            ),
-
-                            Container(
-                              width: 1,
-                              height: 28.h,
-                              color: AppColors.border,
-                            ),
-
-                            SizedBox(width: 12.w),
-
-                            Expanded(
-                              child: TextField(
-                                controller: controller.phoneController,
-                                keyboardType: TextInputType.phone,
-                                onChanged: (value) {
-                                  controller.phoneNumber =
-                                      "${controller.selectedCountryCode}${value.trim()}";
-                                },
-                                style: AppTextStyles.body14,
-                                decoration: InputDecoration(
-                                  border: InputBorder.none,
-                                  hintText: "WhatsApp Number".tr,
-                                  hintStyle: AppTextStyles.body14.copyWith(
-                                    color: AppColors.textHint,
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
+                  return DropdownMenuItem<String>(
+                    value: code,
+                    child: Padding(
+                      padding: EdgeInsets.only(left: 8.w),
+                      child: Row(
+                        children: [
+                          SizedBox(
+                            width: 22.w,
+                            height: 16.h,
+                            child: CountryPickerUtils
+                                .getDefaultFlagImage(country),
+                          ),
+                          SizedBox(width: 8.w),
+                          Text(
+                            "+${country.phoneCode}",
+                            style: AppTextStyles.body13,
+                          ),
+                        ],
                       ),
+                    ),
+                  );
+                })
+                .toList(),
+            onChanged: (value) {
+              if (value == null) return;
+
+              controller.selectedCountry = value;
+
+              controller.phoneNumber =
+                  "${controller.selectedCountryCode}${controller.phoneController.text.trim()}";
+
+              controller.update();
+            },
+          ),
+        ),
+      ),
+
+      Container(
+        width: 1,
+        height: 28.h,
+        color: AppColors.border,
+      ),
+
+      Expanded(
+        child: TextField(
+          controller: controller.phoneController,
+          keyboardType: TextInputType.phone,
+          style: AppTextStyles.body14,
+          onChanged: (value) {
+            controller.phoneNumber =
+                "${controller.selectedCountryCode}${value.trim()}";
+          },
+          decoration: InputDecoration(
+            border: InputBorder.none,
+            contentPadding: EdgeInsets.symmetric(horizontal: 14.w),
+            hintText: "WhatsApp Number".tr,
+            hintStyle: AppTextStyles.body14.copyWith(
+              color: AppColors.textHint,
+            ),
+          ),
+        ),
+      ),
+    ],
+  ),
+),
 
                       SizedBox(height: 25.h),
 

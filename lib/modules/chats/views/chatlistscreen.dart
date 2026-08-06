@@ -20,20 +20,46 @@ class ChatListScreen extends StatelessWidget {
     final controller = Get.put(ChatListController());
     return Scaffold(
       backgroundColor: AppColors.background,
+      appBar: AppBar(
+        backgroundColor: Colors.white,
+        elevation: 0,
+        surfaceTintColor: Colors.white,
+        centerTitle: true,
+        title: Text(
+          "My Chats".tr,
+          style: TextStyle(
+            fontSize: 18.sp,
+            fontWeight: FontWeight.w500,
+            color: Colors.black87,
+          ),
+        ),
+        leading: IconButton(
+          onPressed: () => Get.back(),
+          icon: const Icon(Icons.arrow_back, color: AppColors.primary),
+        ),
+        actions: [
+          IconButton(
+            tooltip: "My Visits".tr,
+            onPressed: () {
+              Get.to(() => const VisitListScreen());
+            },
+            icon: const Icon(
+              Icons.calendar_month_outlined,
+              color: AppColors.primary,
+            ),
+          ),
+        ],
+      ),
       body: SafeArea(
         child: Padding(
-          padding: EdgeInsets.symmetric(horizontal: 12.h),
+          padding: EdgeInsets.symmetric(horizontal: 16.h),
           child: Column(
             children: [
-              _buildTopBar(),
-
-              SizedBox(height: 6.h),
-
               Container(
                 height: 38.h,
                 decoration: BoxDecoration(
                   color: AppColors.fieldBg,
-                  borderRadius: BorderRadius.circular(50.r),
+                  borderRadius: BorderRadius.circular(10.r),
                   border: Border.all(color: AppColors.fieldBorder),
                 ),
                 child: TextField(
@@ -57,7 +83,7 @@ class ChatListScreen extends StatelessWidget {
                     }
 
                     if (controller.filteredConversations.isEmpty) {
-                      return Center(child: Text("No Conversations".tr));
+                      return Center(child: Text("No Conversations".tr,style: TextStyle(fontSize: 15.sp,fontWeight: FontWeight.w500,)));
                     }
 
                     return RefreshIndicator(
@@ -114,41 +140,6 @@ class ChatListScreen extends StatelessWidget {
             ],
           ),
         ),
-      ),
-    );
-  }
-
-  Widget _buildTopBar() {
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(12, 8, 16, 8),
-      child: Row(
-        children: [
-          IconButton(
-            icon: const Icon(Icons.arrow_back, color: AppColors.primary),
-            onPressed: () {},
-          ),
-          Expanded(
-            child: Text(
-              'My Chats'.tr,
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                fontSize: 18.sp,
-                fontWeight: FontWeight.w700,
-                color: Colors.black87,
-              ),
-            ),
-          ),
-          IconButton(
-            tooltip: "My Visits".tr,
-            icon: const Icon(
-              Icons.calendar_month_outlined,
-              color: AppColors.primary,
-            ),
-            onPressed: () {
-              Get.to(() => const VisitListScreen());
-            },
-          ),
-        ],
       ),
     );
   }

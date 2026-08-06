@@ -52,364 +52,338 @@ class PropertyCard extends StatelessWidget {
         ? Get.find<WishlistController>()
         : Get.put(WishlistController());
 
-    return InkWell(
-      borderRadius: BorderRadius.circular(10.r),
-
-      /// =========================================================
-      /// CARD TAP -> PROPERTY DETAILS
-      /// =========================================================
-      onTap: () {
-        final String id = propertyId?.trim() ?? '';
-
-        if (id.isEmpty) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text("Property details are not available")),
-          );
-
-          return;
-        }
-
-        Get.to(
-          () => const PropertyDetailsScreen(),
-          arguments: {"propertyId": id},
-          transition: Transition.rightToLeft,
-          duration: const Duration(milliseconds: 500),
-        );
-      },
-
-      child: Container(
-        width: 168.w,
-        margin: EdgeInsets.only(right: 5.w),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(10.r),
-          border: Border.all(color: Colors.grey.shade200, width: 1),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(.06),
-              blurRadius: 12,
-              offset: const Offset(0, 4),
-            ),
-          ],
-        ),
-        clipBehavior: Clip.antiAlias,
-
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            /// ===================================================
-            /// IMAGE SECTION
-            /// ===================================================
-            Stack(
-              children: [
-                _buildImage(),
-
-                /// =================================================
-                /// FEATURED TAG
-                /// =================================================
-                if (isFeatured)
-                  Positioned(
-                    top: 10.h,
-                    left: 10.w,
-                    child: Container(
-                      padding: EdgeInsets.symmetric(
-                        horizontal: 10.w,
-                        vertical: 5.h,
-                      ),
-                      decoration: BoxDecoration(
-                        color: AppColors.primary,
-                        borderRadius: BorderRadius.circular(8.r),
-                      ),
-                      child: Text(
-                        "Featured",
-                        style: AppTextStyles.medium13.copyWith(
-                          color: Colors.white,
-                          fontSize: 10.sp,
-                        ),
+    return Container(
+      width: 168.w,
+      margin: EdgeInsets.only(right: 5.w),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(10.r),
+        border: Border.all(color: Colors.grey.shade200, width: 1),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(.06),
+            blurRadius: 12,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      clipBehavior: Clip.antiAlias,
+    
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          /// ===================================================
+          /// IMAGE SECTION
+          /// ===================================================
+          Stack(
+            children: [
+              _buildImage(),
+    
+              /// =================================================
+              /// FEATURED TAG
+              /// =================================================
+              if (isFeatured)
+                Positioned(
+                  top: 10.h,
+                  left: 10.w,
+                  child: Container(
+                    padding: EdgeInsets.symmetric(
+                      horizontal: 10.w,
+                      vertical: 5.h,
+                    ),
+                    decoration: BoxDecoration(
+                      color: AppColors.primary,
+                      borderRadius: BorderRadius.circular(8.r),
+                    ),
+                    child: Text(
+                      "Featured",
+                      style: AppTextStyles.medium13.copyWith(
+                        color: Colors.white,
+                        fontSize: 10.sp,
                       ),
                     ),
                   ),
-
-                /// =================================================
-                /// WISHLIST BUTTON
-                /// =================================================
-                Positioned(
-                  top: 10.h,
-                  right: 10.w,
-
-                  /// GetBuilder rebuilds the heart whenever
-                  /// WishlistController calls update().
-                  child: GetBuilder<WishlistController>(
-                    init: wishlistController,
-                    builder: (controller) {
-                      final String id = propertyId?.trim() ?? '';
-
-                      final bool wishlisted =
-                          id.isNotEmpty && controller.isWishlisted(id);
-
-                      final bool wishlistLoading =
-                          id.isNotEmpty && controller.isPropertyLoading(id);
-
-                      /// Material + InkWell gives this button
-                      /// its own tap target.
-                      ///
-                      /// Tapping here calls wishlist API.
-                      /// Tapping rest of card opens details.
-                      return Material(
-                        color: Colors.transparent,
-                        child: InkWell(
-                          customBorder: const CircleBorder(),
-
-                          onTap: wishlistLoading
-                              ? null
-                              : () async {
-                                  if (id.isEmpty) {
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                      const SnackBar(
-                                        content: Text(
-                                          "Property ID is not available",
-                                        ),
+                ),
+    
+              /// =================================================
+              /// WISHLIST BUTTON
+              /// =================================================
+              Positioned(
+                top: 10.h,
+                right: 10.w,
+    
+                /// GetBuilder rebuilds the heart whenever
+                /// WishlistController calls update().
+                child: GetBuilder<WishlistController>(
+                  init: wishlistController,
+                  builder: (controller) {
+                    final String id = propertyId?.trim() ?? '';
+    
+                    final bool wishlisted =
+                        id.isNotEmpty && controller.isWishlisted(id);
+    
+                    final bool wishlistLoading =
+                        id.isNotEmpty && controller.isPropertyLoading(id);
+    
+                    /// Material + InkWell gives this button
+                    /// its own tap target.
+                    ///
+                    /// Tapping here calls wishlist API.
+                    /// Tapping rest of card opens details.
+                    return Material(
+                      color: Colors.transparent,
+                      child: InkWell(
+                        customBorder: const CircleBorder(),
+    
+                        onTap: wishlistLoading
+                            ? null
+                            : () async {
+                                if (id.isEmpty) {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    const SnackBar(
+                                      content: Text(
+                                        "Property ID is not available",
                                       ),
-                                    );
-
-                                    return;
-                                  }
-
-                                  /// Calls:
-                                  /// WishlistController
-                                  ///     .toggleWishlist(id)
-                                  ///
-                                  /// which internally calls:
-                                  ///
-                                  /// POST wishlistByProperty(id)
-                                  await controller.toggleWishlist(id);
-                                },
-
-                          child: Container(
-                            width: 32.w,
-                            height: 32.w,
-                            alignment: Alignment.center,
-                            decoration: const BoxDecoration(
-                              color: Colors.white,
-                              shape: BoxShape.circle,
-                            ),
-
-                            /// Show loader only for the
-                            /// property currently being toggled.
-                            child: wishlistLoading
-                                ? SizedBox(
-                                    width: 15.w,
-                                    height: 15.w,
-                                    child: const CircularProgressIndicator(
-                                      strokeWidth: 2,
-                                      color: AppColors.primary,
                                     ),
-                                  )
-                                : Icon(
-                                    wishlisted
-                                        ? Icons.favorite
-                                        : Icons.favorite_border,
-                                    size: 18.sp,
-                                    color: wishlisted
-                                        ? AppColors.primary
-                                        : Colors.black87,
+                                  );
+    
+                                  return;
+                                }
+    
+                                /// Calls:
+                                /// WishlistController
+                                ///     .toggleWishlist(id)
+                                ///
+                                /// which internally calls:
+                                ///
+                                /// POST wishlistByProperty(id)
+                                await controller.toggleWishlist(id);
+                              },
+    
+                        child: Container(
+                          width: 32.w,
+                          height: 32.w,
+                          alignment: Alignment.center,
+                          decoration: const BoxDecoration(
+                            color: Colors.white,
+                            shape: BoxShape.circle,
+                          ),
+    
+                          /// Show loader only for the
+                          /// property currently being toggled.
+                          child: wishlistLoading
+                              ? SizedBox(
+                                  width: 15.w,
+                                  height: 15.w,
+                                  child: const CircularProgressIndicator(
+                                    strokeWidth: 2,
+                                    color: AppColors.primary,
                                   ),
+                                )
+                              : Icon(
+                                  wishlisted
+                                      ? Icons.favorite
+                                      : Icons.favorite_border,
+                                  size: 18.sp,
+                                  color: wishlisted
+                                      ? AppColors.primary
+                                      : Colors.black87,
+                                ),
+                        ),
+                      ),
+                    );
+                  },
+                ),
+              ),
+    
+              /// =================================================
+              /// IMAGE BOTTOM INFO
+              /// =================================================
+              Positioned(
+                bottom: 8.h,
+                left: 10.w,
+                right: 10.w,
+                child: Column(
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Row(
+                          children: [
+                            Icon(
+                              Icons.people,
+                              color: Colors.white,
+                              size: 14.sp,
+                            ),
+                            SizedBox(width: 4.w),
+                            Text(
+                              beds,
+                              style: AppTextStyles.medium13.copyWith(
+                                color: Colors.white,
+                                fontSize: 11.sp,
+                              ),
+                            ),
+                          ],
+                        ),
+    
+                        Row(
+                          children: [
+                            Icon(
+                              Icons.remove_red_eye_outlined,
+                              color: Colors.white,
+                              size: 14.sp,
+                            ),
+                            SizedBox(width: 4.w),
+                          ],
+                        ),
+                      ],
+                    ),
+    
+                    SizedBox(height: 6.h),
+    
+                    /// VERIFIED
+                    Row(
+                      children: [
+                        Icon(
+                          Icons.local_offer_outlined,
+                          size: 14.sp,
+                          color: verified ? Colors.green : Colors.red,
+                        ),
+                        SizedBox(width: 4.w),
+                        Text(
+                          verified ? "Negotiable".tr : "Non-Negotiable".tr,
+                          style: AppTextStyles.medium13.copyWith(
+                            color: Colors.white,
+                            fontSize: 10.sp,
                           ),
                         ),
-                      );
-                    },
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+    
+          /// ===================================================
+          /// PROPERTY INFORMATION
+          /// ===================================================
+          Padding(
+            padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 8.h),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                /// TITLE
+                Text(
+                  title,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  style: AppTextStyles.title16.copyWith(
+                    fontSize: 12.sp,
+                    color: AppColors.textPrimary,
                   ),
                 ),
-
-                /// =================================================
-                /// IMAGE BOTTOM INFO
-                /// =================================================
-                Positioned(
-                  bottom: 8.h,
-                  left: 10.w,
-                  right: 10.w,
-                  child: Column(
-                    children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Row(
-                            children: [
-                              Icon(
-                                Icons.people,
-                                color: Colors.white,
-                                size: 14.sp,
-                              ),
-                              SizedBox(width: 4.w),
-                              Text(
-                                beds,
-                                style: AppTextStyles.medium13.copyWith(
-                                  color: Colors.white,
-                                  fontSize: 11.sp,
-                                ),
-                              ),
-                            ],
-                          ),
-
-                          Row(
-                            children: [
-                              Icon(
-                                Icons.remove_red_eye_outlined,
-                                color: Colors.white,
-                                size: 14.sp,
-                              ),
-                              SizedBox(width: 4.w),
-                            ],
-                          ),
-                        ],
+    
+                SizedBox(height: 6.h),
+    
+                /// LOCATION
+                Row(
+                  children: [
+                    Icon(
+                      Icons.location_on_outlined,
+                      size: 12.sp,
+                      color: Colors.grey,
+                    ),
+    
+                    SizedBox(width: 4.w),
+    
+                    Expanded(
+                      child: Text(
+                        location,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: AppTextStyles.body13.copyWith(
+                          fontSize: 8.sp,
+                          color: Colors.grey,
+                        ),
                       ),
-
-                      SizedBox(height: 6.h),
-
-                      /// VERIFIED
-                      Row(
-                        children: [
-                          Icon(
-                            Icons.local_offer_outlined,
-                            size: 14.sp,
-                            color: verified ? Colors.green : Colors.red,
-                          ),
-                          SizedBox(width: 4.w),
-                          Text(
-                            verified ? "Negotiable".tr : "Non-Negotiable".tr,
-                            style: AppTextStyles.medium13.copyWith(
-                              color: Colors.white,
-                              fontSize: 10.sp,
-                            ),
-                          ),
-                        ],
+                    ),
+    
+                    if (distance.isNotEmpty)
+                      Text(
+                        distance,
+                        style: AppTextStyles.medium13.copyWith(
+                          fontSize: 8.sp,
+                          color: AppColors.primary,
+                        ),
                       ),
-                    ],
+                  ],
+                ),
+    
+                SizedBox(height: 5.h),
+    
+                /// PRICE
+                Text(
+                  price,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: AppTextStyles.bold14.copyWith(
+                    fontSize: 10.sp,
+                    color: AppColors.textPrimary,
                   ),
+                ),
+    
+                SizedBox(height: 5.h),
+    
+                /// =================================================
+                /// BEDS / BATHS / AREA
+                /// =================================================
+                Row(
+                  children: [
+                    Flexible(
+                      child: Text(
+                        "$beds Beds",
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(color: Colors.grey, fontSize: 10.sp),
+                      ),
+                    ),
+    
+                    SizedBox(width: 6.w),
+    
+                    _buildDot(),
+    
+                    SizedBox(width: 6.w),
+    
+                    Flexible(
+                      child: Text(
+                        "$bathrooms Baths",
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(color: Colors.grey, fontSize: 10.sp),
+                      ),
+                    ),
+    
+                    SizedBox(width: 6.w),
+    
+                    _buildDot(),
+    
+                    SizedBox(width: 6.w),
+    
+                    Flexible(
+                      child: Text(
+                        _areaText(),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(color: Colors.grey, fontSize: 10.sp),
+                      ),
+                    ),
+                  ],
                 ),
               ],
             ),
-
-            /// ===================================================
-            /// PROPERTY INFORMATION
-            /// ===================================================
-            Padding(
-              padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 8.h),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  /// TITLE
-                  Text(
-                    title,
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                    style: AppTextStyles.title16.copyWith(
-                      fontSize: 12.sp,
-                      color: AppColors.textPrimary,
-                    ),
-                  ),
-
-                  SizedBox(height: 6.h),
-
-                  /// LOCATION
-                  Row(
-                    children: [
-                      Icon(
-                        Icons.location_on_outlined,
-                        size: 12.sp,
-                        color: Colors.grey,
-                      ),
-
-                      SizedBox(width: 4.w),
-
-                      Expanded(
-                        child: Text(
-                          location,
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                          style: AppTextStyles.body13.copyWith(
-                            fontSize: 8.sp,
-                            color: Colors.grey,
-                          ),
-                        ),
-                      ),
-
-                      if (distance.isNotEmpty)
-                        Text(
-                          distance,
-                          style: AppTextStyles.medium13.copyWith(
-                            fontSize: 8.sp,
-                            color: AppColors.primary,
-                          ),
-                        ),
-                    ],
-                  ),
-
-                  SizedBox(height: 5.h),
-
-                  /// PRICE
-                  Text(
-                    price,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: AppTextStyles.bold14.copyWith(
-                      fontSize: 10.sp,
-                      color: AppColors.textPrimary,
-                    ),
-                  ),
-
-                  SizedBox(height: 5.h),
-
-                  /// =================================================
-                  /// BEDS / BATHS / AREA
-                  /// =================================================
-                  Row(
-                    children: [
-                      Flexible(
-                        child: Text(
-                          "$beds Beds",
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                          style: TextStyle(color: Colors.grey, fontSize: 10.sp),
-                        ),
-                      ),
-
-                      SizedBox(width: 6.w),
-
-                      _buildDot(),
-
-                      SizedBox(width: 6.w),
-
-                      Flexible(
-                        child: Text(
-                          "$bathrooms Baths",
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                          style: TextStyle(color: Colors.grey, fontSize: 10.sp),
-                        ),
-                      ),
-
-                      SizedBox(width: 6.w),
-
-                      _buildDot(),
-
-                      SizedBox(width: 6.w),
-
-                      Flexible(
-                        child: Text(
-                          _areaText(),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                          style: TextStyle(color: Colors.grey, fontSize: 10.sp),
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }

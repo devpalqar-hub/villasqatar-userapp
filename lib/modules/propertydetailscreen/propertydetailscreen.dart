@@ -86,11 +86,8 @@ class _PropertyDetailsScreenState extends State<PropertyDetailsScreen> {
     super.dispose();
   }
 
-
   @override
-  
   Widget build(BuildContext context) {
-    
     return GetBuilder<PropertySearchController>(
       builder: (controller) {
         if (controller.isDetailsLoading) {
@@ -121,16 +118,17 @@ class _PropertyDetailsScreenState extends State<PropertyDetailsScreen> {
             body: Center(child: Text("Property not found".tr)),
           );
         }
-       
+
         final property = controller.selectedProperty!;
-        final issue = (property.latestReview?.message?.trim().isNotEmpty ?? false)
-    ? property.latestReview!.message
-    : (property.rejectionReason?.trim().isNotEmpty ?? false)
-        ? property.rejectionReason!
-        : "No review message available";
+        final issue =
+            (property.latestReview?.message?.trim().isNotEmpty ?? false)
+            ? property.latestReview!.message
+            : (property.rejectionReason?.trim().isNotEmpty ?? false)
+            ? property.rejectionReason!
+            : "No review message available";
         print(property.latestReview);
-print(property.latestReview?.message);
-print(property.rejectionReason);
+        print(property.latestReview?.message);
+        print(property.rejectionReason);
 
         final String loggedInUserId = StorageService.getUserId();
 
@@ -235,106 +233,125 @@ print(property.rejectionReason);
 
                                   SizedBox(height: 12.h),
                                 ],
-                               if (isMyProperty &&
-    property.status.toUpperCase() == "REJECTED")
-  Padding(
-  padding: EdgeInsets.fromLTRB(0.w, 5.h, 20.w, 8.h),
-  child: Row(
-    crossAxisAlignment: CrossAxisAlignment.start,
-    children: [
-      Icon(
-       Icons.error_outline_rounded,
-        color: Colors.red,
-        size: 18.sp,
-      ),
+                                if (isMyProperty &&
+                                    property.status.toUpperCase() == "REJECTED")
+                                  Padding(
+                                    padding: EdgeInsets.fromLTRB(
+                                      0.w,
+                                      5.h,
+                                      20.w,
+                                      8.h,
+                                    ),
+                                    child: Row(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Icon(
+                                          Icons.error_outline_rounded,
+                                          color: Colors.red,
+                                          size: 18.sp,
+                                        ),
 
-      SizedBox(width: 8.w),
+                                        SizedBox(width: 8.w),
 
-      Expanded(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              "Listing Rejected".tr,
-              style: TextStyle(
-                fontSize: 13.sp,
-                fontWeight: FontWeight.w500,
-                color: Colors.red.shade500,
-              ),
-            ),
+                                        Expanded(
+                                          child: Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              Text(
+                                                "Listing Rejected".tr,
+                                                style: TextStyle(
+                                                  fontSize: 13.sp,
+                                                  fontWeight: FontWeight.w500,
+                                                  color: Colors.red.shade500,
+                                                ),
+                                              ),
 
-            SizedBox(height: 2.h),
+                                              SizedBox(height: 2.h),
 
-            RichText(
-              text: TextSpan(
-                style: TextStyle(
-                  fontSize: 11.sp,
-                  color: Colors.black87,
-                  height: 1.4,
-                ),
-                children: [
-                  const TextSpan(
-                    text: "Issue: ",
-                    style: TextStyle(
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                  TextSpan(
-                    text: issue,
-                    style: TextStyle(
-                      color: Colors.red.shade700,
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
-      ),
-Container(
-  height: 28.h,
-  decoration: BoxDecoration(
-    border: Border.all(color: AppColors.primary),
-    borderRadius: BorderRadius.circular(20.r),
-  ),
-  child: InkWell(
-    borderRadius: BorderRadius.circular(20.r),
-    onTap: () {
-      Get.to(
-        () => ListYourPropertyScreen(
-          property: property,
-          isEdit: true,
-        ),
-      );
-    },
-    child: Padding(
-      padding: EdgeInsets.symmetric(horizontal: 10.w),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(
-            Icons.edit_outlined,
-            size: 12.sp,
-            color: AppColors.primary,
-          ),
-          SizedBox(width: 4.w),
-          Text(
-            "Edit and Resubmit",
-            style: TextStyle(
-              color: AppColors.primary,
-              fontSize: 10.sp,
-              fontWeight: FontWeight.w500,
-            ),
-          ),
-        ],
-      ),
-    ),
-  ),
-)
-    ],
-  ),
-),
+                                              RichText(
+                                                text: TextSpan(
+                                                  style: TextStyle(
+                                                    fontSize: 11.sp,
+                                                    color: Colors.black87,
+                                                    height: 1.4,
+                                                  ),
+                                                  children: [
+                                                    const TextSpan(
+                                                      text: "Issue: ",
+                                                      style: TextStyle(
+                                                        fontWeight:
+                                                            FontWeight.w600,
+                                                      ),
+                                                    ),
+                                                    TextSpan(
+                                                      text: issue,
+                                                      style: TextStyle(
+                                                        color:
+                                                            Colors.red.shade700,
+                                                        fontWeight:
+                                                            FontWeight.w500,
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                        Container(
+                                          height: 28.h,
+                                          decoration: BoxDecoration(
+                                            border: Border.all(
+                                              color: AppColors.primary,
+                                            ),
+                                            borderRadius: BorderRadius.circular(
+                                              20.r,
+                                            ),
+                                          ),
+                                          child: InkWell(
+                                            borderRadius: BorderRadius.circular(
+                                              20.r,
+                                            ),
+                                            onTap: () {
+                                              Get.to(
+                                                () => ListYourPropertyScreen(
+                                                  property: property,
+                                                  isEdit: true,
+                                                ),
+                                              );
+                                            },
+                                            child: Padding(
+                                              padding: EdgeInsets.symmetric(
+                                                horizontal: 10.w,
+                                              ),
+                                              child: Row(
+                                                mainAxisSize: MainAxisSize.min,
+                                                children: [
+                                                  Icon(
+                                                    Icons.edit_outlined,
+                                                    size: 12.sp,
+                                                    color: AppColors.primary,
+                                                  ),
+                                                  SizedBox(width: 4.w),
+                                                  Text(
+                                                    "Edit and Resubmit",
+                                                    style: TextStyle(
+                                                      color: AppColors.primary,
+                                                      fontSize: 10.sp,
+                                                      fontWeight:
+                                                          FontWeight.w500,
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
                                 PropertyInfoCard(property: property),
 
                                 SizedBox(height: 5.h),
@@ -726,51 +743,44 @@ Container(
 
                                               final FeaturedListing listing =
                                                   featured.listing;
-
-                                              // ====================
-                                              // PROPERTY CARD
-                                              // ====================
-
                                               return GestureDetector(
                                                 behavior:
                                                     HitTestBehavior.opaque,
 
-                                                onTap: () async {
+                                                onTap: () {
                                                   final String
                                                   selectedPropertyId = listing
                                                       .id
                                                       .toString()
                                                       .trim();
+                                                  debugPrint(
+                                                    "FEATURED CARD CLICKED",
+                                                  );
+                                                  debugPrint(
+                                                    "Property ID: $selectedPropertyId",
+                                                  );
 
                                                   if (selectedPropertyId
                                                       .isEmpty) {
                                                     debugPrint(
-                                                      "FEATURED PROPERTY ID IS EMPTY"
-                                                          .tr,
+                                                      "FEATURED PROPERTY ID IS EMPTY",
                                                     );
                                                     return;
                                                   }
-
-                                                  /// Update current property ID
-                                                  propertyId =
-                                                      selectedPropertyId;
-
-                                                  /// Fetch corresponding property details
-                                                  await controller
-                                                      .fetchPropertyDetails(
-                                                        selectedPropertyId,
-                                                      );
-
-                                                  /// Refresh featured list so currently opened
-                                                  /// property is removed from featured section
-                                                  await featuredController
-                                                      .refreshFeatured(
-                                                        location: FeaturedLocation
-                                                            .propertyDetailPage,
-                                                        limit: 5,
-                                                      );
+                                                  Get.to(
+                                                    () =>
+                                                        const PropertyDetailsScreen(),
+                                                    arguments: {
+                                                      "propertyId":
+                                                          selectedPropertyId,
+                                                    },
+                                                    transition:
+                                                        Transition.rightToLeft,
+                                                    duration: const Duration(
+                                                      milliseconds: 300,
+                                                    ),
+                                                  );
                                                 },
-
                                                 child: PropertyCard(
                                                   propertyId: listing.id,
                                                   slug: listing.slug,
@@ -1134,10 +1144,6 @@ Container(
 
   void _onBoostProperty(dynamic property) {
     final String id = property.id?.toString().trim() ?? '';
-
-    debugPrint("========== OPEN BOOST SHEET ==========");
-    debugPrint("PROPERTY ID: $id");
-
     if (id.isEmpty) {
       Get.snackbar(
         "Unable to Boost".tr,

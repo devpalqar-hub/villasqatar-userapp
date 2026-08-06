@@ -1,4 +1,6 @@
+import 'package:country_pickers/utils/utils.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:sign_in_with_apple/sign_in_with_apple.dart';
@@ -19,6 +21,7 @@ class AuthController extends GetxController {
 
   bool isLoading = false;
   bool isNewUser = false;
+  String selectedCountry = "QA";
   String selectedCountryCode = "+974";
   String phoneNumber = "";
   String? accessToken;
@@ -26,11 +29,19 @@ class AuthController extends GetxController {
 
   @override
   void onInit() {
-    super.onInit();
-    accessToken = StorageService.getToken();
-    profile = StorageService.getProfile();
-    _initializeGoogle();
-  }
+  super.onInit();
+
+  accessToken = StorageService.getToken();
+  profile = StorageService.getProfile();
+
+  phoneController.addListener(() {
+    phoneNumber =
+        "$selectedCountryCode${phoneController.text.trim()}";
+  });
+
+  _initializeGoogle();
+}
+ 
 
   Future<void> _initializeGoogle() async {
     await _googleSignIn.initialize(
@@ -51,6 +62,8 @@ class AuthController extends GetxController {
 
   @override
   void reset() {
+    selectedCountry = "QA";
+selectedCountryCode = "+974";
     phoneController.clear();
     otpController.clear();
     nameController.clear();
@@ -86,40 +99,63 @@ class AuthController extends GetxController {
 
   /// ---------------- SEND OTP ----------------
   Future<bool> sendOtp() async {
-    try {
-      _setLoading(true);
+  if (!validatePhone()) return false;
 
-      await ApiHandler.post(ApiEndpoints.sendOtp, body: {"phone": phoneNumber});
+  try {
+    _setLoading(true);
 
-      return true;
-    } catch (e) {
-      debugPrint("Send OTP Error: $e");
-      return false;
-    } finally {
-      _setLoading(false);
-    }
+    await ApiHandler.post(
+      ApiEndpoints.sendOtp,
+      body: {
+        "phone": phoneNumber,
+      },
+    );
+
+    return true;
+  } catch (e) {
+    debugPrint("Send OTP Error: $e");
+
+    Fluttertoast.showToast(
+      msg: "Failed to send OTP",
+    );
+
+    return false;
+  } finally {
+    _setLoading(false);
   }
+}
 
   /// ---------------- VERIFY OTP ----------------
   Future<bool> verifyOtp() async {
-    try {
-      _setLoading(true);
+  if (!validatePhone()) return false;
+  if (!validateOtp()) return false;
 
-      final response = await ApiHandler.post(
-        ApiEndpoints.verifyOtp,
-        body: {"phone": phoneNumber, "otp": otpController.text.trim()},
-      );
+  try {
+    _setLoading(true);
 
-      await _saveUserSession(response);
+    final response = await ApiHandler.post(
+      ApiEndpoints.verifyOtp,
+      body: {
+        "phone": phoneNumber,
+        "otp": otpController.text.trim(),
+      },
+    );
 
-      return true;
-    } catch (e) {
-      debugPrint("Verify OTP Error: $e");
-      return false;
-    } finally {
-      _setLoading(false);
-    }
+    await _saveUserSession(response);
+
+    return true;
+  } catch (e) {
+    debugPrint("Verify OTP Error: $e");
+
+    Fluttertoast.showToast(
+      msg: "Invalid OTP",
+    );
+
+    return false;
+  } finally {
+    _setLoading(false);
   }
+}
 
   /// ---------------- GOOGLE LOGIN ----------------
   Future<bool> signInWithGoogle() async {
@@ -198,52 +234,49 @@ class AuthController extends GetxController {
 
   //----------Comlete profile -------------
   /// ---------------- COMPLETE PROFILE ----------------
- Future<bool> completeProfile() async {
-  try {
-    _setLoading(true);
+  Future<bool> completeProfile() async {
+    try {
+      _setLoading(true);
 
-    final body = {
-      "name": nameController.text.trim(),
-      "email": emailController.text.trim(),
-      "phone": phoneNumber,
-    };
+      final body = {
+        "name": nameController.text.trim(),
+        "email": emailController.text.trim(),
+        "phone": phoneNumber,
+      };
 
-    debugPrint("========== COMPLETE PROFILE ==========");
-    debugPrint("URL: ${ApiHandler.baseUrl}${ApiEndpoints.completeProfile}");
-    debugPrint("METHOD: POST");
-    debugPrint("HEADERS:");
-    debugPrint({
-      "Authorization": "Bearer $accessToken",
-    }.toString());
-    debugPrint("BODY:");
-    debugPrint(body.toString());
+      debugPrint("========== COMPLETE PROFILE ==========");
+      debugPrint("URL: ${ApiHandler.baseUrl}${ApiEndpoints.completeProfile}");
+      debugPrint("METHOD: POST");
+      debugPrint("HEADERS:");
+      debugPrint({"Authorization": "Bearer $accessToken"}.toString());
+      debugPrint("BODY:");
+      debugPrint(body.toString());
 
-    final response = await ApiHandler.post(
-      ApiEndpoints.completeProfile,
-      headers: {
-        "Authorization": "Bearer $accessToken",
-      },
-      body: body,
-    );
+      final response = await ApiHandler.post(
+        ApiEndpoints.completeProfile,
+        headers: {"Authorization": "Bearer $accessToken"},
+        body: body,
+      );
 
-    debugPrint("========== RESPONSE ==========");
-    debugPrint(response.toString());
+      debugPrint("========== RESPONSE ==========");
+      debugPrint(response.toString());
 
-    if (response["profile"] != null) {
-      profile = Map<String, dynamic>.from(response["profile"]);
-      await StorageService.saveProfile(profile!);
+      if (response["profile"] != null) {
+        profile = Map<String, dynamic>.from(response["profile"]);
+        await StorageService.saveProfile(profile!);
+      }
+
+      return true;
+    } catch (e, stackTrace) {
+      debugPrint("========== COMPLETE PROFILE ERROR ==========");
+      debugPrint(e.toString());
+      debugPrint(stackTrace.toString());
+      return false;
+    } finally {
+      _setLoading(false);
     }
-
-    return true;
-  } catch (e, stackTrace) {
-    debugPrint("========== COMPLETE PROFILE ERROR ==========");
-    debugPrint(e.toString());
-    debugPrint(stackTrace.toString());
-    return false;
-  } finally {
-    _setLoading(false);
   }
-}
+
   Future<void> _saveUserSession(Map<String, dynamic> response) async {
     isNewUser = response["isNew"] ?? false;
     accessToken = response["access_token"];
@@ -276,9 +309,10 @@ class AuthController extends GetxController {
     profile = null;
     isNewUser = false;
     phoneNumber = "";
-    selectedCountryCode = "+974";
+     selectedCountry = "QA";
+     selectedCountryCode = "+974";
     isLoading = false;
-
+   
     // Optional: Sign out from Google
     try {
       await _googleSignIn.signOut();
@@ -288,4 +322,61 @@ class AuthController extends GetxController {
 
     Get.offAll(() => WelcomeScreen());
   }
+
+
+  void changeCountry(String isoCode) {
+  selectedCountry = isoCode;
+
+  final country = CountryPickerUtils.getCountryByIsoCode(isoCode);
+  selectedCountryCode = "+${country.phoneCode}";
+
+  phoneNumber =
+      "$selectedCountryCode${phoneController.text.trim()}";
+
+  update();
+}
+
+
+bool validatePhone() {
+  final phone = phoneController.text.trim();
+
+  if (phone.isEmpty) {
+    Fluttertoast.showToast(
+      msg: "Please enter your WhatsApp number",
+    );
+    return false;
+  }
+
+  if (!RegExp(r'^[0-9]{6,15}$').hasMatch(phone)) {
+    Fluttertoast.showToast(
+      msg: "Please enter a valid phone number",
+    );
+    return false;
+  }
+
+  phoneNumber = "$selectedCountryCode$phone";
+  return true;
+}
+
+
+
+bool validateOtp() {
+  final otp = otpController.text.trim();
+
+  if (otp.isEmpty) {
+    Fluttertoast.showToast(
+      msg: "Please enter the OTP",
+    );
+    return false;
+  }
+
+  if (otp.length != 6) {
+    Fluttertoast.showToast(
+      msg: "OTP must be 6 digits",
+    );
+    return false;
+  }
+
+  return true;
+}
 }

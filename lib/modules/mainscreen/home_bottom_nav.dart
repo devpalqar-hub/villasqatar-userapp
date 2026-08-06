@@ -41,7 +41,7 @@ class HomeBottomNav extends StatelessWidget {
               icon: Icons.chat_bubble_outline,
               label: "Chats".tr,
               index: 3,
-              showBadge: true,
+              //showBadge: true,
             ),
             _navItem(icon: Icons.person_outline, label: "Profile".tr, index: 4),
           ],

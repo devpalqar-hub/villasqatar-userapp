@@ -6,6 +6,7 @@ import 'package:get/get.dart';
 import 'package:get/get_core/src/get_main.dart';
 import 'package:intl/intl.dart';
 import 'package:villas_qatar/Core/constants/app_colors.dart';
+import 'package:villas_qatar/Core/utils/auth_guard.dart';
 import 'package:villas_qatar/modules/offerscreen/view/make_offerscreen.dart';
 import 'package:villas_qatar/modules/visits/service/visit_controller.dart';
 import 'package:villas_qatar/modules/propertydetailscreen/widget/make_offer_Dailogue.dart';
@@ -83,6 +84,11 @@ class BottomActionCard extends StatelessWidget {
                         ),
                       ),
                       onPressed: () {
+                        if (!AuthGuard.requireLogin(
+                          message: "Login is required to make an offer.".tr,
+                        )) {
+                          return;
+                        }
                         showMakeOfferBottomSheet(context, property);
                       },
                       label: Text(
@@ -115,9 +121,16 @@ class BottomActionCard extends StatelessWidget {
                         ),
                       ),
                       onPressed: () {
+                        if (!AuthGuard.requireLogin(
+                          message:
+                              "Login is required to schedule a property visit."
+                                  .tr,
+                        )) {
+                          return;
+                        }
+
                         _showScheduleVisitSheet(context, property: property);
                       },
-
                       label: Text(
                         "Schedule".tr,
                         style: TextStyle(

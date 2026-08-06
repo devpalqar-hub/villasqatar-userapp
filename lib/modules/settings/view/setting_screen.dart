@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 
 import 'package:villas_qatar/Core/constants/app_colors.dart';
 import 'package:villas_qatar/Core/services/storage_service.dart';
+import 'package:villas_qatar/Core/utils/auth_guard.dart';
 import 'package:villas_qatar/modules/onboard/controller/auth_controller.dart';
 import 'package:villas_qatar/modules/onboard/views/welcome_screen.dart';
 import 'package:villas_qatar/modules/settings/service/profile_controller.dart';
@@ -15,9 +16,9 @@ import 'package:villas_qatar/modules/settings/view/language_screen.dart';
 import 'package:villas_qatar/modules/support/views/supports_screen.dart';
 
 class SettingsScreen extends StatelessWidget {
- SettingsScreen({super.key});
-final ProfileController controller = Get.put(ProfileController());
-     
+  SettingsScreen({super.key});
+  final ProfileController controller = Get.put(ProfileController());
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -85,6 +86,12 @@ final ProfileController controller = Get.put(ProfileController());
       icon: Icons.person_outline,
       title: "Edit Profile".tr,
       onTap: () {
+        if (!AuthGuard.requireLogin(
+          message: "Please login to edit your profile.",
+        )) {
+          return;
+        }
+
         showModalBottomSheet(
           context: Get.context!,
           isScrollControlled: true,
@@ -96,12 +103,28 @@ final ProfileController controller = Get.put(ProfileController());
     SettingItem(
       icon: Icons.favorite_outline,
       title: "Saved Properties".tr,
-      onTap: () => Get.to(() => WishlistScreen()),
+      onTap: () {
+        if (!AuthGuard.requireLogin(
+          message: "Please login to view your saved properties.",
+        )) {
+          return;
+        }
+
+        Get.to(() => WishlistScreen());
+      },
     ),
     SettingItem(
       icon: Icons.home_work_outlined,
       title: "My Featured Properties".tr,
-      onTap: () => Get.to(() => const MyFeaturedPropertiesScreen()),
+      onTap: () {
+        if (!AuthGuard.requireLogin(
+          message: "Please login to view your featured properties.",
+        )) {
+          return;
+        }
+
+        Get.to(() => const MyFeaturedPropertiesScreen());
+      },
     ),
   ];
 
@@ -132,7 +155,15 @@ final ProfileController controller = Get.put(ProfileController());
     SettingItem(
       icon: Icons.support_agent,
       title: "Support".tr,
-      onTap: () => Get.to(() => const SupportScreen()),
+      onTap: () {
+        if (!AuthGuard.requireLogin(
+          message: "Please login to contact support.",
+        )) {
+          return;
+        }
+
+        Get.to(() => const SupportScreen());
+      },
     ),
     SettingItem(icon: Icons.info_outline, title: "About".tr, onTap: () {}),
   ];
@@ -234,9 +265,9 @@ class SettingTile extends StatelessWidget {
                   Text(
                     item.title,
                     style: TextStyle(
-                      fontSize: 14.sp,
-                      fontWeight: FontWeight.w600,
-                      color: Colors.black87,
+                      fontSize: 15.sp,
+                      fontWeight: FontWeight.w400,
+                      color: Colors.black,
                     ),
                   ),
 
@@ -272,7 +303,6 @@ class ProfileHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GetBuilder<ProfileController>(
-    
       builder: (controller) {
         if (controller.isLoading) {
           return Container(

@@ -91,22 +91,22 @@ class _VisitListScreenState extends State<VisitListScreen> {
               textAlign: TextAlign.center,
               style: TextStyle(
                 fontSize: 18.sp,
-                fontWeight: FontWeight.w700,
+                fontWeight: FontWeight.w500,
                 color: Colors.black87,
               ),
             ),
           ),
 
-          IconButton(
-            icon: const Icon(Icons.refresh_rounded, color: AppColors.primary),
-            onPressed: () {
-              if (selectedTab == 0) {
-                visitController.fetchOwnerVisits();
-              } else {
-                visitController.fetchVisitorVisits();
-              }
-            },
-          ),
+          // IconButton(
+          //   icon: const Icon(Icons.refresh_rounded, color: AppColors.primary),
+          //   onPressed: () {
+          //     if (selectedTab == 0) {
+          //       visitController.fetchOwnerVisits();
+          //     } else {
+          //       visitController.fetchVisitorVisits();
+          //     }
+          //   },
+          // ),
         ],
       ),
     );

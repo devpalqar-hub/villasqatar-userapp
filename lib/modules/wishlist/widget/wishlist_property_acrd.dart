@@ -36,6 +36,7 @@ class WishlistPropertyCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       child: Material(
+        color: Colors.white,
         child: InkWell(
           onTap: _openDetails,
           borderRadius: BorderRadius.circular(12.r),
@@ -77,26 +78,26 @@ class WishlistPropertyCard extends StatelessWidget {
                     children: [
                       // NAME + HEART
                       Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(
-                            property.propertyName,
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                            style: TextStyle(
-                              fontSize: 12.5.sp,
-                              fontWeight: FontWeight.w700,
-                              color: const Color(0xff202124),
+                          Expanded(
+                            child: Text(
+                              property.propertyName,
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
+                              style: TextStyle(
+                                fontSize: 12.5.sp,
+                                fontWeight: FontWeight.w600,
+                                color: const Color(0xff202124),
+                                height: 1.3,
+                              ),
                             ),
                           ),
-
-                          SizedBox(width: 110.w),
-
+                          SizedBox(width: 8.w),
                           _WishlistButton(propertyId: property.id),
                         ],
                       ),
-
                       SizedBox(height: 4.h),
-
                       // LOCATION
                       Row(
                         children: [
@@ -213,19 +214,20 @@ class WishlistPropertyCard extends StatelessWidget {
     );
   }
 
-String _locationText() {
-  final parts = <String>[];
+  String _locationText() {
+    final parts = <String>[];
 
-  if (property.areaName.trim().isNotEmpty) {
-    parts.add(property.areaName);
+    if (property.areaName.trim().isNotEmpty) {
+      parts.add(property.areaName);
+    }
+
+    if (property.municipality.name.trim().isNotEmpty) {
+      parts.add(property.municipality.name);
+    }
+
+    return parts.isEmpty ? "Qatar" : parts.join(", ");
   }
 
-  if (property.municipality.name.trim().isNotEmpty) {
-    parts.add(property.municipality.name);
-  }
-
-  return parts.isEmpty ? "Qatar" : parts.join(", ");
-}
   String _formatPrice(num value) {
     final text = value.toStringAsFixed(0);
 

@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 
 import 'package:villas_qatar/Core/network/api_endpoints.dart';
 import 'package:villas_qatar/Core/network/api_handler.dart';
+import 'package:villas_qatar/Core/utils/auth_guard.dart';
 import 'package:villas_qatar/modules/propertylist/model/myproperty_model.dart';
 
 class WishlistController extends GetxController {
@@ -78,43 +79,48 @@ class WishlistController extends GetxController {
   // TOGGLE WISHLIST
   // ============================================================
 
-  Future<void> toggleWishlist(String propertyId) async {
-    /// Prevent double clicks
-    if (loadingPropertyIds.contains(propertyId)) {
-      return;
-    }
 
-    try {
-      loadingPropertyIds.add(propertyId);
-      update();
-
-      final response = await ApiHandler.post(
-        ApiEndpoints.wishlistByProperty(propertyId),
-      );
-      final bool isNowWishlisted = response["isWishlisted"] == true;
-
-      if (isNowWishlisted) {
-        wishlistedIds.add(propertyId);
-      } else {
-        wishlistedIds.remove(propertyId);
-
-        wishlistProperties.removeWhere((property) => property.id == propertyId);
-      }
-
-      debugPrint("IS WISHLISTED: $isNowWishlisted");
-
-      update();
-
-      /// Refresh so wishlist screen has complete property data.
-      await fetchWishlist();
-    } catch (e) {
-      debugPrint("TOGGLE WISHLIST ERROR: $e");
-    } finally {
-      loadingPropertyIds.remove(propertyId);
-      update();
-    }
+Future<void> toggleWishlist(String propertyId) async {
+  if (!AuthGuard.requireLogin(
+    message: "Login is required to save properties to your wishlist.".tr,
+  )) {
+    return;
   }
 
+  /// Prevent double clicks
+  if (loadingPropertyIds.contains(propertyId)) {
+    return;
+  }
+
+  try {
+    loadingPropertyIds.add(propertyId);
+    update();
+
+    final response = await ApiHandler.post(
+      ApiEndpoints.wishlistByProperty(propertyId),
+    );
+
+    final bool isNowWishlisted = response["isWishlisted"] == true;
+
+    if (isNowWishlisted) {
+      wishlistedIds.add(propertyId);
+    } else {
+      wishlistedIds.remove(propertyId);
+      wishlistProperties.removeWhere(
+        (property) => property.id == propertyId,
+      );
+    }
+
+    update();
+
+    await fetchWishlist();
+  } catch (e) {
+    debugPrint("TOGGLE WISHLIST ERROR: $e");
+  } finally {
+    loadingPropertyIds.remove(propertyId);
+    update();
+  }
+}
   // ============================================================
   // REFRESH
   // ============================================================

@@ -283,7 +283,7 @@ class _MyPropertiesScreenState extends State<MyPropertiesScreen> {
             const SizedBox(height: 16),
             Text(
               'No properties found'.tr,
-              style: TextStyle(fontWeight: FontWeight.w700, fontSize: 15),
+              style: TextStyle(fontWeight: FontWeight.w500, fontSize: 15),
             ),
             const SizedBox(height: 6),
             Text(

@@ -144,7 +144,7 @@ class PropertyCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-      final photos = property.sortedPhotos;
+    final photos = property.sortedPhotos;
     return InkWell(
       borderRadius: BorderRadius.circular(10.r),
       onTap: () async {
@@ -183,29 +183,28 @@ class PropertyCard extends StatelessWidget {
                   borderRadius: BorderRadius.vertical(
                     top: Radius.circular(8.r),
                   ),
-              
-                        
-child: photos.isNotEmpty
-    ? Image.network(
-        photos.first.url,
-        width: double.infinity,
-        height: 150.h,
-        fit: BoxFit.cover,
-        errorBuilder: (_, __, ___) {
-          return Image.asset(
-            "assets/villa.jpg",
-            width: double.infinity,
-            height: 150.h,
-            fit: BoxFit.cover,
-          );
-        },
-      )
-    : Image.asset(
-        "assets/villa.jpg",
-        width: double.infinity,
-        height: 150.h,
-        fit: BoxFit.cover,
-      ),
+
+                  child: photos.isNotEmpty
+                      ? Image.network(
+                          photos.first.url,
+                          width: double.infinity,
+                          height: 150.h,
+                          fit: BoxFit.cover,
+                          errorBuilder: (_, __, ___) {
+                            return Image.asset(
+                              "assets/villa.jpg",
+                              width: double.infinity,
+                              height: 150.h,
+                              fit: BoxFit.cover,
+                            );
+                          },
+                        )
+                      : Image.asset(
+                          "assets/villa.jpg",
+                          width: double.infinity,
+                          height: 150.h,
+                          fit: BoxFit.cover,
+                        ),
                 ),
 
                 // Positioned(
@@ -322,7 +321,7 @@ child: photos.isNotEmpty
                         ),
                         SizedBox(width: 4.w),
                         Text(
-                      property.sortedPhotos.length.toString(),
+                          property.sortedPhotos.length.toString(),
                           style: TextStyle(
                             color: Colors.white,
                             fontSize: 11.sp,
@@ -344,7 +343,7 @@ child: photos.isNotEmpty
                   Text(
                     property.propertyName,
                     style: AppTextStyles.title14.copyWith(
-                      fontWeight: FontWeight.w700,
+                      fontWeight: FontWeight.w500,
                     ),
                   ),
 
@@ -397,7 +396,7 @@ child: photos.isNotEmpty
                         "QAR ${property.price.toStringAsFixed(0)}",
                         style: AppTextStyles.title16.copyWith(
                           color: AppColors.primary,
-                          fontWeight: FontWeight.w700,
+                          fontWeight: FontWeight.w500,
                         ),
                       ),
 

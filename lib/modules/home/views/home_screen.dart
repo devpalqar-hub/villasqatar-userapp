@@ -8,6 +8,8 @@ import 'package:villas_qatar/Core/theme/app_textstyles.dart';
 import 'package:villas_qatar/Core/utils/app_location.dart';
 import 'package:villas_qatar/modules/PlansandFeatures/model/featured_property_model.dart';
 import 'package:villas_qatar/modules/PlansandFeatures/services/featured_properties_controller.dart';
+import 'package:villas_qatar/modules/dealers/service/dealer_controller.dart';
+import 'package:villas_qatar/modules/dealers/service/view/dealer_detail_screen.dart';
 import 'package:villas_qatar/modules/dealers/service/view/detail_list_screen.dart';
 import 'package:villas_qatar/modules/home/service/UtilsController.dart';
 import 'package:villas_qatar/modules/home/service/banner_controller.dart';
@@ -41,6 +43,7 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   late final FeaturedPropertiesController featuredController;
   late final BannerController bannerController;
+  late final DealerController dealerController;
   final ScrollController featuredScrollController = ScrollController();
   final Utilscontroller utilscontroller = Get.put(Utilscontroller());
   final LocationController locationcontroller = Get.put(LocationController());
@@ -62,7 +65,13 @@ class _HomeScreenState extends State<HomeScreen> {
         limit: 5,
       );
     });
+    dealerController = Get.isRegistered<DealerController>()
+        ? Get.find<DealerController>()
+        : Get.put(DealerController());
 
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      dealerController.fetchDealers();
+    });
     featuredScrollController.addListener(_onFeaturedScroll);
   }
 
@@ -459,48 +468,60 @@ class _HomeScreenState extends State<HomeScreen> {
                   Get.to(() => const DealerListScreen());
                 },
               ),
-              SizedBox(
-                height: 165.h,
-                child: ListView.separated(
-                  scrollDirection: Axis.horizontal,
-                  physics: const BouncingScrollPhysics(),
-                  clipBehavior: Clip.none,
-                  itemCount: 3,
-                  separatorBuilder: (_, __) => SizedBox(width: 12.w),
-                  itemBuilder: (context, index) {
-                    final agents = [
-                      {
-                        "image": "assets/images/agent1.png",
-                        "name": "Ahmed Al-Mansoori",
-                        "designation": "Senior Property Consultant",
-                        "phone": "+974 55 123 456",
-                      },
-                      {
-                        "image": "assets/images/agent2.png",
-                        "name": "Fatima Al-Kuwari",
-                        "designation": "Property Consultant",
-                        "phone": "+974 55 987 654",
-                      },
-                      {
-                        "image": "assets/images/agent3.png",
-                        "name": "Mohammed Khalid",
-                        "designation": "Real Estate Advisor",
-                        "phone": "+974 55 456 789",
-                      },
-                    ];
 
-                    final agent = agents[index];
-
-                    return AgentCards(
-                      image: agent["image"]!,
-                      name: agent["name"]!,
-                      designation: agent["designation"]!,
-                      phone: agent["phone"]!,
+              GetBuilder<DealerController>(
+                builder: (controller) {
+                  if (controller.isLoading && controller.dealers.isEmpty) {
+                    return SizedBox(
+                      height: 165.h,
+                      child: const Center(child: CircularProgressIndicator()),
                     );
-                  },
-                ),
-              ),
+                  }
 
+                  if (controller.dealers.isEmpty) {
+                    return SizedBox(
+                      height: 165.h,
+                      child: Center(
+                        child: Text(
+                          "No dealers found".tr,
+                          style: AppTextStyles.body14,
+                        ),
+                      ),
+                    );
+                  }
+
+                  return SizedBox(
+                    height: 165.h,
+                    child: ListView.separated(
+                      padding: EdgeInsets.symmetric(horizontal: 16.w),
+                      scrollDirection: Axis.horizontal,
+                      physics: const BouncingScrollPhysics(),
+                      itemCount: controller.dealers.length,
+                      separatorBuilder: (_, __) => SizedBox(width: 12.w),
+                      itemBuilder: (_, index) {
+                        final dealer = controller.dealers[index];
+
+                        return AgentCards(
+                          image: dealer.dealerProfile.coverImage,
+                          name: dealer.dealerProfile.dealerName.isNotEmpty
+                              ? dealer.dealerProfile.dealerName
+                              : dealer.name,
+                          designation:
+                              dealer.dealerProfile.tagline ??
+                              "Property Consultant",
+                          phone: dealer.dealerProfile.contactPhone,
+                          onTap: () {
+                            Get.to(
+                              () => const DealerDetailsScreen(),
+                              arguments: dealer.id,
+                            );
+                          },
+                        );
+                      },
+                    ),
+                  );
+                },
+              ),
               const WhyChooseCard(),
             ],
           ),

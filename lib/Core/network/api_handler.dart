@@ -14,121 +14,117 @@ class ApiHandler {
 
   static const String baseUrl = "https://apivillas.palqar.cloud";
 
-
-static Future<dynamic> get(
-  String endpoint, {
-  Map<String, String>? headers,
-}) async {
-  try {
-    final String url = "$baseUrl$endpoint";
-
-    final requestHeaders = _headers(headers);
-
-    debugPrint("========== GET REQUEST ==========");
-    debugPrint("URL: $url");
-
-    debugPrint("HEADERS:");
-    requestHeaders.forEach((key, value) {
-      debugPrint("$key : $value");
-    });
-
-    debugPrint("================================");
-
-    final response = await http.get(
-      Uri.parse(url),
-      headers: requestHeaders,
-    );
-
-    debugPrint("========== GET RESPONSE ==========");
-    debugPrint("URL: $url");
-    debugPrint("STATUS CODE: ${response.statusCode}");
-
+  static Future<dynamic> get(
+    String endpoint, {
+    Map<String, String>? headers,
+  }) async {
     try {
-      final json = jsonDecode(response.body);
-      debugPrint("BODY:");
-      debugPrint(const JsonEncoder.withIndent("  ").convert(json));
-    } catch (_) {
-      debugPrint("BODY:");
-      debugPrint(response.body);
+      final String url = "$baseUrl$endpoint";
+
+      final requestHeaders = _headers(headers);
+
+      debugPrint("========== GET REQUEST ==========");
+      debugPrint("URL: $url");
+
+      debugPrint("HEADERS:");
+      requestHeaders.forEach((key, value) {
+        debugPrint("$key : $value");
+      });
+
+      debugPrint("================================");
+
+      final response = await http.get(Uri.parse(url), headers: requestHeaders);
+
+      debugPrint("========== GET RESPONSE ==========");
+      debugPrint("URL: $url");
+      debugPrint("STATUS CODE: ${response.statusCode}");
+
+      try {
+        final json = jsonDecode(response.body);
+        debugPrint("BODY:");
+        debugPrint(const JsonEncoder.withIndent("  ").convert(json));
+      } catch (_) {
+        debugPrint("BODY:");
+        debugPrint(response.body);
+      }
+
+      debugPrint("=================================");
+
+      return await _handleResponse(response);
+    } on SocketException {
+      debugPrint("========== GET ERROR ==========");
+      debugPrint("No Internet Connection");
+      debugPrint("================================");
+      throw Exception("No Internet Connection");
     }
-
-    debugPrint("=================================");
-
-    return await _handleResponse(response);
-  } on SocketException {
-    debugPrint("========== GET ERROR ==========");
-    debugPrint("No Internet Connection");
-    debugPrint("================================");
-    throw Exception("No Internet Connection");
   }
-}
 
   // ============================================================
   // POST
   // ============================================================
-static Future<dynamic> post(
-  String endpoint, {
-  Map<String, dynamic>? body,
-  Map<String, String>? headers,
-}) async {
-  try {
-    final String url = "$baseUrl$endpoint";
-
-    final requestHeaders = _headers(headers);
-
-    // ========================= REQUEST =========================
-    debugPrint("========== POST REQUEST ==========");
-    debugPrint("URL: $url");
-
-    debugPrint("HEADERS:");
-    requestHeaders.forEach((key, value) {
-      debugPrint("$key : $value");
-    });
-
-    if (body != null) {
-      debugPrint("BODY:");
-      debugPrint(const JsonEncoder.withIndent("  ").convert(body));
-    }
-
-    debugPrint("==================================");
-
-    final response = await http.post(
-      Uri.parse(url),
-      headers: requestHeaders,
-      body: body != null ? jsonEncode(body) : null,
-    );
-
-    // ========================= RESPONSE =========================
-    debugPrint("========== POST RESPONSE ==========");
-    debugPrint("URL: $url");
-    debugPrint("STATUS CODE: ${response.statusCode}");
-
+  static Future<dynamic> post(
+    String endpoint, {
+    Map<String, dynamic>? body,
+    Map<String, String>? headers,
+  }) async {
     try {
-      final json = jsonDecode(response.body);
-      debugPrint("BODY:");
-      debugPrint(const JsonEncoder.withIndent("  ").convert(json));
-    } catch (_) {
-      debugPrint("BODY:");
-      debugPrint(response.body);
+      final String url = "$baseUrl$endpoint";
+
+      final requestHeaders = _headers(headers);
+
+      // ========================= REQUEST =========================
+      debugPrint("========== POST REQUEST ==========");
+      debugPrint("URL: $url");
+
+      debugPrint("HEADERS:");
+      requestHeaders.forEach((key, value) {
+        debugPrint("$key : $value");
+      });
+
+      if (body != null) {
+        debugPrint("BODY:");
+        debugPrint(const JsonEncoder.withIndent("  ").convert(body));
+      }
+
+      debugPrint("==================================");
+
+      final response = await http.post(
+        Uri.parse(url),
+        headers: requestHeaders,
+        body: body != null ? jsonEncode(body) : null,
+      );
+
+      // ========================= RESPONSE =========================
+      debugPrint("========== POST RESPONSE ==========");
+      debugPrint("URL: $url");
+      debugPrint("STATUS CODE: ${response.statusCode}");
+
+      try {
+        final json = jsonDecode(response.body);
+        debugPrint("BODY:");
+        debugPrint(const JsonEncoder.withIndent("  ").convert(json));
+      } catch (_) {
+        debugPrint("BODY:");
+        debugPrint(response.body);
+      }
+
+      debugPrint("===================================");
+
+      return await _handleResponse(response);
+    } on SocketException {
+      debugPrint("========== POST ERROR ==========");
+      debugPrint("No Internet Connection");
+      debugPrint("================================");
+      throw Exception("No Internet Connection");
+    } catch (e, stackTrace) {
+      debugPrint("========== POST ERROR ==========");
+      debugPrint("URL: $baseUrl$endpoint");
+      debugPrint("ERROR: $e");
+      debugPrint(stackTrace.toString());
+      debugPrint("================================");
+      rethrow;
     }
-
-    debugPrint("===================================");
-
-    return await _handleResponse(response);
-  } on SocketException {
-    debugPrint("========== POST ERROR ==========");
-    debugPrint("No Internet Connection");
-    debugPrint("================================");
-    throw Exception("No Internet Connection");
-  } catch (e, stackTrace) {
-    debugPrint("========== POST ERROR ==========");
-    debugPrint("URL: $baseUrl$endpoint");
-    debugPrint("ERROR: $e");
-    debugPrint(stackTrace.toString());
-    debugPrint("================================");
-    rethrow;
   }
-}
 
   // ============================================================
   // PUT
@@ -273,15 +269,16 @@ static Future<dynamic> post(
         throw Exception(_getErrorMessage(data, "Bad Request"));
 
       case 401:
-        await StorageService.logout();
-
-        if (Get.isRegistered<AuthController>()) {
-          Get.delete<AuthController>(force: true);
+        final token = StorageService.getToken();
+        if (token != null && token.isNotEmpty) {
+          await StorageService.logout();
+          if (Get.isRegistered<AuthController>()) {
+            Get.delete<AuthController>(force: true);
+          }
+        Get.offAll(() => WelcomeScreen());
         }
 
-        Get.offAll(() => WelcomeScreen());
-
-        throw Exception(_getErrorMessage(data, "Session Expired"));
+        throw Exception(_getErrorMessage(data, "Unauthorized"));
 
       case 403:
         throw Exception(_getErrorMessage(data, "Forbidden"));

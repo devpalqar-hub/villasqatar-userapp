@@ -30,7 +30,33 @@ class WelcomeScreen extends StatelessWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      SizedBox(height: 60.h),
+                      Align(
+          alignment: Alignment.centerRight,
+          child: TextButton.icon(
+            style: TextButton.styleFrom(
+              foregroundColor: AppColors.primary,
+              padding: EdgeInsets.symmetric(
+                horizontal: 8.w,
+                vertical: 4.h,
+              ),
+            ),
+            onPressed: () {
+              Get.offAll(() => MainScreen());
+            },
+            iconAlignment: IconAlignment.end,
+            icon: Icon(
+              Icons.arrow_forward_rounded,
+              size: 18.sp,
+            ),
+            label: Text(
+              "Skip".tr,
+              style: AppTextStyles.medium14.copyWith(
+                color: AppColors.primary,
+              ),
+            ),
+          ),
+        ),
+                      SizedBox(height: 40.h),
 
                       /// Logo
                       Image.asset('assets/Logo/homeLogo.png', width: 180.w),
@@ -204,13 +230,12 @@ class WelcomeScreen extends StatelessWidget {
             Icon(Icons.chat, color: Colors.white, size: 16.sp),
 
             SizedBox(width: 15.w),
-
-            Expanded(
-              child: Text(
+   
+            Text(
                 'Continue with WhatsApp'.tr,
                 style: AppTextStyles.body14.copyWith(color: Colors.white),
               ),
-            ),
+           
 
             Icon(Icons.arrow_forward_ios, color: Colors.white, size: 16.sp),
           ],

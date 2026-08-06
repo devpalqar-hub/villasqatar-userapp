@@ -40,21 +40,11 @@ class _MyTicketScreenState extends State<MyTicketScreen> {
         surfaceTintColor: Colors.transparent,
         elevation: 0,
         centerTitle: true,
-
-        leading: IconButton(
-          onPressed: () => Get.back(),
-          icon: Icon(
-            Icons.arrow_back_ios_new_rounded,
-            size: 18.sp,
-            color: AppColors.primary,
-          ),
-        ),
-
         title: Text(
           "My Tickets",
           style: TextStyle(
             fontSize: 18.sp,
-            fontWeight: FontWeight.w700,
+            fontWeight: FontWeight.w500,
             color: const Color(0xFF222222),
           ),
         ),
@@ -420,7 +410,7 @@ class _MyTicketScreenState extends State<MyTicketScreen> {
 
             Text(
               "No Support Tickets".tr,
-              style: TextStyle(fontSize: 16.sp, fontWeight: FontWeight.w700),
+              style: TextStyle(fontSize: 16.sp, fontWeight: FontWeight.w500),
             ),
 
             SizedBox(height: 7.h),

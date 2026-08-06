@@ -46,20 +46,12 @@ class _SupportScreenState extends State<SupportScreen> {
   elevation: 0,
   centerTitle: true,
 
-  leading: IconButton(
-    onPressed: () => Get.back(),
-    icon: Icon(
-      Icons.arrow_back_ios_new_rounded,
-      size: 18.sp,
-      color: AppColors.primary,
-    ),
-  ),
 
   title: Text(
     "Support".tr,
     style: TextStyle(
       fontSize: 18.sp,
-      fontWeight: FontWeight.w700,
+      fontWeight: FontWeight.w500,
       color: const Color(0xFF222222),
     ),
   ),
@@ -354,7 +346,7 @@ class _SupportScreenState extends State<SupportScreen> {
                   "How can we help?".tr,
                   style: TextStyle(
                     fontSize: 16.sp,
-                    fontWeight: FontWeight.w700,
+                    fontWeight: FontWeight.w500,
                     color: const Color(0xFF222222),
                   ),
                 ),

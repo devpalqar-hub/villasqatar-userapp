@@ -64,7 +64,7 @@ class PropertySearchController extends GetxController {
         query['createdById'] = filter.createdById;
       }
       if (filter.type.isNotEmpty) {
-        query['type'] = filter.type;
+        query['typeId'] = filter.type;
       }
       if (filter.purpose.isNotEmpty) {
         query['purpose'] = filter.purpose;
