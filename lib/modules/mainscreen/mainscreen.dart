@@ -47,7 +47,7 @@ class _MainScreenState extends State<MainScreen> {
     /// Get or create ONE search controller
     final controller = Get.isRegistered<PropertySearchController>()
         ? Get.find<PropertySearchController>()
-        : Get.put(PropertySearchController());
+        : Get.put(PropertySearchController(), permanent: true);
 
     /// Apply initial SEARCH if provided
     if (widget.initialSearch != null &&
@@ -155,7 +155,7 @@ class _MainScreenState extends State<MainScreen> {
   void _handleCategorySearch(String type) {
     final controller = Get.isRegistered<PropertySearchController>()
         ? Get.find<PropertySearchController>()
-        : Get.put(PropertySearchController());
+        : Get.put(PropertySearchController(), permanent: true);
 
     // Clear previous property-name search
     controller.filter.search = "";
@@ -177,7 +177,7 @@ class _MainScreenState extends State<MainScreen> {
 
     final controller = Get.isRegistered<PropertySearchController>()
         ? Get.find<PropertySearchController>()
-        : Get.put(PropertySearchController());
+        : Get.put(PropertySearchController(), permanent: true);
 
     controller.searchProperty(propertyName);
 
@@ -191,7 +191,7 @@ class _MainScreenState extends State<MainScreen> {
 
     final controller = Get.isRegistered<PropertySearchController>()
         ? Get.find<PropertySearchController>()
-        : Get.put(PropertySearchController());
+        : Get.put(PropertySearchController(), permanent: true);
 
     /// Clear previous property-name search
     controller.filter.search = "";

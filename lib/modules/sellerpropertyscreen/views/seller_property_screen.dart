@@ -28,7 +28,9 @@ class _SellerPropertiesScreenState extends State<SellerPropertiesScreen> {
   void initState() {
     super.initState();
 
-    controller = Get.put(PropertySearchController());
+    controller = Get.isRegistered<PropertySearchController>()
+        ? Get.find<PropertySearchController>()
+        : Get.put(PropertySearchController(), permanent: true);
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
       controller.applyFilters(createdById: widget.sellerId);

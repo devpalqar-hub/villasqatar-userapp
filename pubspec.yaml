@@ -37,7 +37,8 @@ dependencies:
   app_links: ^6.0.0
   share_plus: ^13.2.1
   fluttertoast: ^9.1.0
-  webview_flutter: ^4.14.1
+  webview_flutter: ^4.4.4
+  quill_html_editor: ^2.2.8
 
 
   cupertino_icons: ^1.0.8
@@ -48,6 +49,13 @@ dev_dependencies:
 
 
   flutter_lints: ^6.0.0
+
+# file_picker (pulled in transitively by quill_html_editor, only used for
+# the app's Android/iOS builds) is pinned to an old win32 major that
+# conflicts with package_info_plus/share_plus's newer win32 requirement.
+# This app doesn't ship a Windows build, so forcing win32 here is safe.
+dependency_overrides:
+  win32: ^5.9.0
 
 
 flutter:

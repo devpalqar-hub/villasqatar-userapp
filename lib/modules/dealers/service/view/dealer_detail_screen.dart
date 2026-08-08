@@ -5,6 +5,7 @@ import 'package:villas_qatar/Core/constants/app_colors.dart';
 import 'package:villas_qatar/Core/theme/app_textstyles.dart';
 import 'package:villas_qatar/modules/dealers/service/dealer_controller.dart';
 import 'package:villas_qatar/modules/dealers/service/model/dealer_details_model.dart';
+import 'package:villas_qatar/modules/propertydetailscreen/propertydetailscreen.dart';
 
 class DealerDetailsScreen extends StatefulWidget {
   const DealerDetailsScreen({super.key});
@@ -14,20 +15,18 @@ class DealerDetailsScreen extends StatefulWidget {
 }
 
 class _DealerDetailsScreenState extends State<DealerDetailsScreen> {
- final _controller = Get.find<DealerController>();
+  final _controller = Get.find<DealerController>();
   bool _expandAbout = false;
   bool _favorite = false;
 
- @override
-void initState() {
-  super.initState();
+  @override
+  void initState() {
+    super.initState();
 
-  WidgetsBinding.instance.addPostFrameCallback((_) {
-    _controller.fetchDealerDetails(
-      Get.arguments as String,
-    );
-  });
-}
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _controller.fetchDealerDetails(Get.arguments as String);
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -138,7 +137,7 @@ class _Header extends StatelessWidget {
             onTap: () => Get.back(),
           ),
         ),
-       
+
         Positioned(
           left: 16.w,
           bottom: -50.h,
@@ -756,127 +755,139 @@ class _PropertyCard extends StatelessWidget {
         : "";
     final forSale = listing.purpose.toLowerCase() != "rent";
 
-    return Container(
-      width: 210.w,
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16.r),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(.05),
-            blurRadius: 12,
-            offset: const Offset(0, 4),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Stack(
-            children: [
-              ClipRRect(
-                borderRadius: BorderRadius.vertical(top: Radius.circular(16.r)),
-                child: SizedBox(
-                  height: 120.h,
-                  width: double.infinity,
-                  child: (photo?.isNotEmpty ?? false)
-                      ? Image.network(
-                          photo!,
-                          fit: BoxFit.cover,
-                          errorBuilder: (_, __, ___) =>
-                              Container(color: AppColors.primarySoft),
-                        )
-                      : Container(
-                          color: AppColors.primarySoft,
-                          child: Icon(
-                            Icons.home_work_outlined,
-                            size: 40.sp,
-                            color: AppColors.primary,
-                          ),
-                        ),
-                ),
-              ),
-              Positioned(
-                top: 8,
-                right: 8,
-                child: _RoundIcon(icon: Icons.favorite_border, onTap: () {}),
-              ),
-              Positioned(
-                left: 8,
-                bottom: 8,
-                child: Container(
-                  padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 4.h),
-                  decoration: BoxDecoration(
-                    color: AppColors.primary,
-                    borderRadius: BorderRadius.circular(6.r),
-                  ),
-                  child: Text(
-                    forSale ? "FOR SALE" : "FOR RENT",
-                    style: AppTextStyles.bold12.copyWith(
-                      color: Colors.white,
-                      fontSize: 9.sp,
-                    ),
-                  ),
-                ),
-              ),
-            ],
-          ),
-          Padding(
-            padding: EdgeInsets.all(10.w),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+    return GestureDetector(
+      onTap: () {
+        debugPrint("Dealer Property Clicked: ${listing.id}");
+
+        Get.to(
+          () => PropertyDetailsScreen(propertyId: listing.id),
+          transition: Transition.rightToLeft,
+          duration: const Duration(milliseconds: 500),
+        );
+      },
+      child: Container(
+        width: 210.w,
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(16.r),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(.05),
+              blurRadius: 12,
+              offset: const Offset(0, 4),
+            ),
+          ],
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Stack(
               children: [
-                Text(
-                  listing.propertyName ?? "",
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: AppTextStyles.bold12,
+                ClipRRect(
+                  borderRadius: BorderRadius.vertical(
+                    top: Radius.circular(16.r),
+                  ),
+                  child: SizedBox(
+                    height: 120.h,
+                    width: double.infinity,
+                    child: (photo?.isNotEmpty ?? false)
+                        ? Image.network(
+                            photo!,
+                            fit: BoxFit.cover,
+                            errorBuilder: (_, __, ___) =>
+                                Container(color: AppColors.primarySoft),
+                          )
+                        : Container(
+                            color: AppColors.primarySoft,
+                            child: Icon(
+                              Icons.home_work_outlined,
+                              size: 40.sp,
+                              color: AppColors.primary,
+                            ),
+                          ),
+                  ),
                 ),
-                SizedBox(height: 4.h),
-                Row(
-                  children: [
-                    Icon(
-                      Icons.location_on_outlined,
-                      size: 12.sp,
-                      color: AppColors.textSecondary,
+              
+                Positioned(
+                  left: 8,
+                  bottom: 8,
+                  child: Container(
+                    padding: EdgeInsets.symmetric(
+                      horizontal: 8.w,
+                      vertical: 4.h,
                     ),
-                    SizedBox(width: 3.w),
-                    Expanded(
-                      child: Text(
-                        "${listing.areaName}, ${listing.municipality.name}",
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: AppTextStyles.body12.copyWith(
-                          color: AppColors.textSecondary,
-                          fontSize: 10.sp,
-                        ),
+                    decoration: BoxDecoration(
+                      color: AppColors.primary,
+                      borderRadius: BorderRadius.circular(6.r),
+                    ),
+                    child: Text(
+                      forSale ? "FOR SALE" : "FOR RENT",
+                      style: AppTextStyles.bold12.copyWith(
+                        color: Colors.white,
+                        fontSize: 9.sp,
                       ),
                     ),
-                  ],
-                ),
-                SizedBox(height: 6.h),
-                Row(
-                  children: [
-                    _feature(Icons.bed_outlined, "${listing.bedrooms} Beds"),
-                    SizedBox(width: 8.w),
-                    _feature(
-                      Icons.bathtub_outlined,
-                      "${listing.bathrooms} Baths",
-                    ),
-                  ],
-                ),
-                SizedBox(height: 8.h),
-                Text(
-                  "QAR ${listing.price.toStringAsFixed(0)}${forSale ? '' : '/month'}",
-                  style: AppTextStyles.bold16.copyWith(
-                    color: AppColors.primary,
-                    fontSize: 13.sp,
                   ),
                 ),
               ],
             ),
-          ),
-        ],
+            Padding(
+              padding: EdgeInsets.all(10.w),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    listing.propertyName ?? "",
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: AppTextStyles.bold12,
+                  ),
+                  SizedBox(height: 4.h),
+                  Row(
+                    children: [
+                      Icon(
+                        Icons.location_on_outlined,
+                        size: 12.sp,
+                        color: AppColors.textSecondary,
+                      ),
+                      SizedBox(width: 3.w),
+                      Expanded(
+                        child: Text(
+                          "${listing.areaName}, ${listing.municipality.name}",
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: AppTextStyles.body12.copyWith(
+                            color: AppColors.textSecondary,
+                            fontSize: 10.sp,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  SizedBox(height: 6.h),
+                  Row(
+                    children: [
+                      _feature(Icons.bed_outlined, "${listing.bedrooms} Beds"),
+                      SizedBox(width: 8.w),
+                      _feature(
+                        Icons.bathtub_outlined,
+                        "${listing.bathrooms} Baths",
+                      ),
+                    ],
+                  ),
+                  SizedBox(height: 8.h),
+                  Text(
+                    "QAR ${listing.price.toStringAsFixed(0)}${forSale ? '' : '/month'}",
+                    style: AppTextStyles.bold16.copyWith(
+                      color: AppColors.primary,
+                      fontSize: 13.sp,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -925,6 +936,7 @@ class _Card extends StatelessWidget {
     );
   }
 }
+
 class _BottomActions extends StatelessWidget {
   final DealerDetailsModel d;
 
@@ -968,17 +980,12 @@ class _BottomActions extends StatelessWidget {
 
             SizedBox(width: 8.w),
 
-          
-
             Expanded(
               child: _actionButton(
                 icon: Icons.chat,
                 label: "Chat",
                 filled: true,
-                onTap: () => Get.toNamed(
-                  '/chat',
-                  arguments: d.id,
-                ),
+                onTap: () => Get.toNamed('/chat', arguments: d.id),
               ),
             ),
           ],
@@ -998,11 +1005,7 @@ class _BottomActions extends StatelessWidget {
       child: filled
           ? ElevatedButton.icon(
               onPressed: onTap,
-              icon: Icon(
-                icon,
-                size: 12.sp,
-                color: Colors.white,
-              ),
+              icon: Icon(icon, size: 12.sp, color: Colors.white),
               label: Text(
                 label,
                 overflow: TextOverflow.ellipsis,
@@ -1022,11 +1025,7 @@ class _BottomActions extends StatelessWidget {
             )
           : OutlinedButton.icon(
               onPressed: onTap,
-              icon: Icon(
-                icon,
-                size: 12.sp,
-                color: AppColors.primary,
-              ),
+              icon: Icon(icon, size: 12.sp, color: AppColors.primary),
               label: Text(
                 label,
                 overflow: TextOverflow.ellipsis,
@@ -1037,9 +1036,7 @@ class _BottomActions extends StatelessWidget {
                 ),
               ),
               style: OutlinedButton.styleFrom(
-                side: BorderSide(
-                  color: AppColors.border,
-                ),
+                side: BorderSide(color: AppColors.border),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(10.r),
                 ),

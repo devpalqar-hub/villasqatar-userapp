@@ -6,6 +6,7 @@ import 'package:get/get_instance/src/extension_instance.dart';
 import 'package:get/get_navigation/src/extension_navigation.dart';
 import 'package:get/get_navigation/src/routes/transitions_type.dart';
 import 'package:get/get_state_manager/src/simple/get_state.dart';
+import 'package:quill_html_editor/quill_html_editor.dart';
 import 'package:villas_qatar/Core/constants/app_colors.dart';
 import 'package:villas_qatar/modules/propertydetailscreen/propertydetailscreen.dart';
 import 'package:villas_qatar/modules/propertylist/model/myproperty_model.dart';
@@ -146,9 +147,15 @@ class _MyPropertiesScreenState extends State<MyPropertiesScreen> {
                                     return _PropertyCard(
                                       listing: listings[index],
                                       onTap: () async {
-                                        final searchController = Get.put(
-                                          PropertySearchController(),
-                                        );
+                                        final searchController =
+                                            Get.isRegistered<
+                                                    PropertySearchController>()
+                                                ? Get.find<
+                                                    PropertySearchController>()
+                                                : Get.put(
+                                                    PropertySearchController(),
+                                                    permanent: true,
+                                                  );
 
                                         await searchController
                                             .fetchPropertyDetails(
@@ -156,7 +163,9 @@ class _MyPropertiesScreenState extends State<MyPropertiesScreen> {
                                             );
 
                                         Get.to(
-                                          () => const PropertyDetailsScreen(),
+                                          () => PropertyDetailsScreen(
+                                            propertyId: listings[index].id,
+                                          ),
                                           transition: Transition.rightToLeft,
                                         );
                                       },
@@ -332,6 +341,12 @@ class _PropertyCard extends StatelessWidget {
                 Expanded(child: _buildInfo()),
               ],
             ),
+
+            if (_plainDescription.isNotEmpty) ...[
+              SizedBox(height: 8.h),
+              _buildDescription(context),
+            ],
+
             SizedBox(height: 10.h),
             Divider(height: 1, color: AppColors.fieldBorder),
             SizedBox(height: 5.h),
@@ -473,6 +488,69 @@ class _PropertyCard extends StatelessWidget {
     );
   }
 
+  //------------------------------------------------------------------
+  // DESCRIPTION (rendered from the quill rich-text HTML)
+  //------------------------------------------------------------------
+
+  /// Plain-text preview of [listing.description] with HTML tags stripped,
+  /// used for the truncated in-card preview.
+  String get _plainDescription => listing.description
+      .replaceAll(RegExp(r'<[^>]*>'), ' ')
+      .replaceAll(RegExp(r'\s+'), ' ')
+      .trim();
+
+  Widget _buildDescription(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          "Description".tr,
+          style: TextStyle(
+            fontWeight: FontWeight.w600,
+            fontSize: 11.sp,
+            color: Colors.black87,
+          ),
+        ),
+        SizedBox(height: 3.h),
+        Text(
+          _plainDescription,
+          maxLines: 2,
+          overflow: TextOverflow.ellipsis,
+          style: const TextStyle(color: AppColors.hintGrey, fontSize: 11),
+        ),
+        GestureDetector(
+          onTap: () => _showDescriptionSheet(context),
+          child: Padding(
+            padding: EdgeInsets.only(top: 3.h),
+            child: Text(
+              "Read more".tr,
+              style: TextStyle(
+                color: AppColors.primary,
+                fontWeight: FontWeight.w600,
+                fontSize: 10.5.sp,
+              ),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  void _showDescriptionSheet(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.white,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (_) => _DescriptionSheet(
+        title: listing.propertyName,
+        html: listing.description,
+      ),
+    );
+  }
+
   Widget _buildFooter() {
     return Row(
       children: [
@@ -511,10 +589,8 @@ class _PropertyCard extends StatelessWidget {
         .replaceAllMapped(RegExp(r'\B(?=(\d{3})+(?!\d))'), (match) => ",");
   }
 }
-void _showRejectedDialog(
-  Property listing,
-  VoidCallback onEdit,
-) {
+
+void _showRejectedDialog(Property listing, VoidCallback onEdit) {
   final review = listing.latestReview;
 
   Get.dialog(
@@ -530,7 +606,6 @@ void _showRejectedDialog(
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-
             Container(
               width: 62,
               height: 62,
@@ -549,10 +624,7 @@ void _showRejectedDialog(
 
             Text(
               "Listing Rejected".tr,
-              style: const TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.w700,
-              ),
+              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w700),
             ),
 
             const SizedBox(height: 8),
@@ -576,28 +648,19 @@ void _showRejectedDialog(
               decoration: BoxDecoration(
                 color: const Color(0xffFFF5F5),
                 borderRadius: BorderRadius.circular(14),
-                border: Border.all(
-                  color: const Color(0xffF7D4D4),
-                ),
+                border: Border.all(color: const Color(0xffF7D4D4)),
               ),
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-
-                  const Icon(
-                    Icons.info_outline,
-                    color: Colors.red,
-                    size: 18,
-                  ),
+                  const Icon(Icons.info_outline, color: Colors.red, size: 18),
 
                   const SizedBox(width: 10),
 
                   Expanded(
                     child: Column(
-                      crossAxisAlignment:
-                          CrossAxisAlignment.start,
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-
                         Text(
                           "Issue".tr,
                           style: const TextStyle(
@@ -640,7 +703,6 @@ void _showRejectedDialog(
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-
                     const Icon(
                       Icons.verified_user_outlined,
                       size: 16,
@@ -665,14 +727,12 @@ void _showRejectedDialog(
 
             Row(
               children: [
-
                 Expanded(
                   child: OutlinedButton(
                     style: OutlinedButton.styleFrom(
                       minimumSize: const Size.fromHeight(46),
                       shape: RoundedRectangleBorder(
-                        borderRadius:
-                            BorderRadius.circular(12),
+                        borderRadius: BorderRadius.circular(12),
                       ),
                     ),
                     onPressed: () => Get.back(),
@@ -690,18 +750,14 @@ void _showRejectedDialog(
                       elevation: 0,
                       minimumSize: const Size.fromHeight(46),
                       shape: RoundedRectangleBorder(
-                        borderRadius:
-                            BorderRadius.circular(12),
+                        borderRadius: BorderRadius.circular(12),
                       ),
                     ),
                     onPressed: () {
                       Get.back();
                       onEdit();
                     },
-                    icon: const Icon(
-                      Icons.edit_outlined,
-                      size: 18,
-                    ),
+                    icon: const Icon(Icons.edit_outlined, size: 18),
                     label: Text("Edit & Resubmit".tr),
                   ),
                 ),
@@ -714,6 +770,7 @@ void _showRejectedDialog(
     barrierDismissible: true,
   );
 }
+
 //===============================================================
 // STATUS BADGE (Active / Draft / Sold) — same pill language as
 // the WhatsApp Verified banner (colored bg + colored text)
@@ -820,6 +877,99 @@ class _EmptyState extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           children: [
             // your existing empty state UI
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+//======================================================
+// DESCRIPTION SHEET — renders the listing's rich-text
+// description (HTML from the quill editor) read-only,
+// using quill_html_editor.
+//======================================================
+class _DescriptionSheet extends StatefulWidget {
+  final String title;
+  final String html;
+
+  const _DescriptionSheet({required this.title, required this.html});
+
+  @override
+  State<_DescriptionSheet> createState() => _DescriptionSheetState();
+}
+
+class _DescriptionSheetState extends State<_DescriptionSheet> {
+  final QuillEditorController _controller = QuillEditorController();
+  double _editorHeight = 120.h;
+
+  @override
+  Widget build(BuildContext context) {
+    return SafeArea(
+      child: Container(
+        constraints: BoxConstraints(
+          maxHeight: MediaQuery.of(context).size.height * .75,
+        ),
+        padding: EdgeInsets.fromLTRB(20.w, 16.h, 20.w, 20.h),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Center(
+              child: Container(
+                width: 40.w,
+                height: 4.h,
+                decoration: BoxDecoration(
+                  color: Colors.grey.shade300,
+                  borderRadius: BorderRadius.circular(10.r),
+                ),
+              ),
+            ),
+            SizedBox(height: 16.h),
+            Text(
+              widget.title,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(fontSize: 16.sp, fontWeight: FontWeight.w700),
+            ),
+            SizedBox(height: 4.h),
+            Text(
+              "Description".tr,
+              style: TextStyle(
+                fontSize: 12.sp,
+                fontWeight: FontWeight.w500,
+                color: AppColors.hintGrey,
+              ),
+            ),
+            SizedBox(height: 10.h),
+            Flexible(
+              child: SingleChildScrollView(
+                child: QuillHtmlEditor(
+                  controller: _controller,
+                  text: widget.html,
+                  isEnabled: false,
+                  minHeight: _editorHeight,
+                  padding: EdgeInsets.zero,
+                  hintText: '',
+                  backgroundColor: Colors.white,
+                  loadingBuilder: (_) => SizedBox(
+                    height: _editorHeight,
+                    child: const Center(
+                      child: SizedBox(
+                        height: 18,
+                        width: 18,
+                        child: CircularProgressIndicator(strokeWidth: 2),
+                      ),
+                    ),
+                  ),
+                  onEditorResized: (height) {
+                    if (mounted && height != _editorHeight) {
+                      setState(() => _editorHeight = height);
+                    }
+                  },
+                ),
+              ),
+            ),
           ],
         ),
       ),

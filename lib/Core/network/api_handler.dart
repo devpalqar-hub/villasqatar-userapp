@@ -14,6 +14,14 @@ class ApiHandler {
 
   static const String baseUrl = "https://apivillas.palqar.cloud";
 
+  static const Duration _timeoutDuration = Duration(seconds: 20);
+
+  static Never _onTimeout() {
+    throw Exception(
+      "Request timed out. Please check your internet connection and try again.",
+    );
+  }
+
   static Future<dynamic> get(
     String endpoint, {
     Map<String, String>? headers,
@@ -33,7 +41,9 @@ class ApiHandler {
 
       debugPrint("================================");
 
-      final response = await http.get(Uri.parse(url), headers: requestHeaders);
+      final response = await http
+          .get(Uri.parse(url), headers: requestHeaders)
+          .timeout(_timeoutDuration, onTimeout: _onTimeout);
 
       debugPrint("========== GET RESPONSE ==========");
       debugPrint("URL: $url");
@@ -88,11 +98,13 @@ class ApiHandler {
 
       debugPrint("==================================");
 
-      final response = await http.post(
-        Uri.parse(url),
-        headers: requestHeaders,
-        body: body != null ? jsonEncode(body) : null,
-      );
+      final response = await http
+          .post(
+            Uri.parse(url),
+            headers: requestHeaders,
+            body: body != null ? jsonEncode(body) : null,
+          )
+          .timeout(_timeoutDuration, onTimeout: _onTimeout);
 
       // ========================= RESPONSE =========================
       debugPrint("========== POST RESPONSE ==========");
@@ -147,11 +159,13 @@ class ApiHandler {
         body: body,
       );
 
-      final response = await http.put(
-        Uri.parse(url),
-        headers: requestHeaders,
-        body: body != null ? jsonEncode(body) : null,
-      );
+      final response = await http
+          .put(
+            Uri.parse(url),
+            headers: requestHeaders,
+            body: body != null ? jsonEncode(body) : null,
+          )
+          .timeout(_timeoutDuration, onTimeout: _onTimeout);
 
       _printResponse(response);
 
@@ -182,11 +196,13 @@ class ApiHandler {
         body: body,
       );
 
-      final response = await http.patch(
-        Uri.parse(url),
-        headers: requestHeaders,
-        body: body != null ? jsonEncode(body) : null,
-      );
+      final response = await http
+          .patch(
+            Uri.parse(url),
+            headers: requestHeaders,
+            body: body != null ? jsonEncode(body) : null,
+          )
+          .timeout(_timeoutDuration, onTimeout: _onTimeout);
 
       _printResponse(response);
 
@@ -211,10 +227,9 @@ class ApiHandler {
 
       _printRequest(method: "DELETE", url: url, headers: requestHeaders);
 
-      final response = await http.delete(
-        Uri.parse(url),
-        headers: requestHeaders,
-      );
+      final response = await http
+          .delete(Uri.parse(url), headers: requestHeaders)
+          .timeout(_timeoutDuration, onTimeout: _onTimeout);
 
       _printResponse(response);
 

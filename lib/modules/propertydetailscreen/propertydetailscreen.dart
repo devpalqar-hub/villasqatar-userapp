@@ -27,7 +27,9 @@ import 'package:villas_qatar/modules/searchscreen/service/searchlist_screen.dart
 import 'package:villas_qatar/modules/support/service/support_ticket_controller.dart';
 
 class PropertyDetailsScreen extends StatefulWidget {
-  const PropertyDetailsScreen({super.key});
+  final String propertyId;
+
+  const PropertyDetailsScreen({super.key, required this.propertyId});
 
   @override
   State<PropertyDetailsScreen> createState() => _PropertyDetailsScreenState();
@@ -39,9 +41,9 @@ class _PropertyDetailsScreenState extends State<PropertyDetailsScreen> {
   late final FeaturedPropertiesController featuredController;
 
   final ScrollController featuredScrollController = ScrollController();
-
-  String? propertyId;
+  late final String propertyId;
   int selectedImageIndex = 0;
+
   @override
   void initState() {
     super.initState();
@@ -51,12 +53,9 @@ class _PropertyDetailsScreenState extends State<PropertyDetailsScreen> {
         ? Get.find<FeaturedPropertiesController>()
         : Get.put(FeaturedPropertiesController());
 
-    final arguments = Get.arguments;
+    propertyId = widget.propertyId;
 
-    if (arguments is Map) {
-      propertyId = arguments["propertyId"]?.toString();
-    }
-
+    debugPrint("DETAIL SCREEN PROPERTY ID: $propertyId");
     debugPrint("DETAIL SCREEN PROPERTY ID: $propertyId");
 
     featuredScrollController.addListener(_onFeaturedScroll);
@@ -716,24 +715,34 @@ class _PropertyDetailsScreenState extends State<PropertyDetailsScreen> {
 
                                             physics:
                                                 const BouncingScrollPhysics(),
-
                                             itemCount:
                                                 displayProperties.length +
-                                                (isLoadingMore ? 1 : 0),
+                                                (hasMore ? 1 : 0),
 
                                             separatorBuilder: (context, index) {
                                               return SizedBox(width: 8.w);
                                             },
 
                                             itemBuilder: (context, index) {
-                                              if (index >=
+                                              if (index ==
                                                   displayProperties.length) {
                                                 return SizedBox(
-                                                  width: 70.w,
-
-                                                  child: const Center(
-                                                    child:
-                                                        CircularProgressIndicator(),
+                                                  width: 55.w,
+                                                  child: Center(
+                                                    child: isLoadingMore
+                                                        ? SizedBox(
+                                                            width: 22.w,
+                                                            height: 22.w,
+                                                            child:
+                                                                const CircularProgressIndicator(
+                                                                  strokeWidth:
+                                                                      2,
+                                                                  color: Color(
+                                                                    0xFF8E123E,
+                                                                  ),
+                                                                ),
+                                                          )
+                                                        : const SizedBox.shrink(),
                                                   ),
                                                 );
                                               }
@@ -743,43 +752,29 @@ class _PropertyDetailsScreenState extends State<PropertyDetailsScreen> {
 
                                               final FeaturedListing listing =
                                                   featured.listing;
+
+                                              // ====================
+                                              // PROPERTY CARD
+                                              // ====================
                                               return GestureDetector(
-                                                behavior:
-                                                    HitTestBehavior.opaque,
+                                                onTap: () async {
+                                                  await controller
+                                                      .fetchPropertyDetails(
+                                                        listing.id,
+                                                      );
 
-                                                onTap: () {
-                                                  final String
-                                                  selectedPropertyId = listing
-                                                      .id
-                                                      .toString()
-                                                      .trim();
-                                                  debugPrint(
-                                                    "FEATURED CARD CLICKED",
-                                                  );
-                                                  debugPrint(
-                                                    "Property ID: $selectedPropertyId",
-                                                  );
+                                                  propertyId = listing.id;
 
-                                                  if (selectedPropertyId
-                                                      .isEmpty) {
-                                                    debugPrint(
-                                                      "FEATURED PROPERTY ID IS EMPTY",
-                                                    );
-                                                    return;
-                                                  }
-                                                  Get.to(
-                                                    () =>
-                                                        const PropertyDetailsScreen(),
-                                                    arguments: {
-                                                      "propertyId":
-                                                          selectedPropertyId,
-                                                    },
-                                                    transition:
-                                                        Transition.rightToLeft,
-                                                    duration: const Duration(
-                                                      milliseconds: 300,
-                                                    ),
-                                                  );
+                                                  selectedImageIndex = 0;
+
+                                                  featuredController
+                                                      .refreshFeatured(
+                                                        location: FeaturedLocation
+                                                            .propertyDetailPage,
+                                                        limit: 5,
+                                                      );
+
+                                                  setState(() {});
                                                 },
                                                 child: PropertyCard(
                                                   propertyId: listing.id,
@@ -800,8 +795,7 @@ class _PropertyDetailsScreenState extends State<PropertyDetailsScreen> {
                                                   isFeatured:
                                                       listing.isFeatured,
                                                 ),
-                                              );
-                                            },
+                                              );          },
                                           ),
                                         ),
                                       ],

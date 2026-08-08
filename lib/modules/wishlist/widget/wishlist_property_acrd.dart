@@ -16,21 +16,30 @@ class WishlistPropertyCard extends StatelessWidget {
 
   const WishlistPropertyCard({super.key, required this.property});
 
+  // Future<void> _openDetails() async {
+  //   final searchController = Get.isRegistered<PropertySearchController>()
+  //       ? Get.find<PropertySearchController>()
+  //       : Get.put(PropertySearchController());
+
+  //   await searchController.fetchPropertyDetails(property.id);
+
+  //   if (searchController.selectedProperty != null) {
+  //     Get.to(
+  //       () => const PropertyDetailsScreen(),
+  //       transition: Transition.rightToLeft,
+  //       duration: const Duration(milliseconds: 400),
+  //     );
+  //   }
+  // }
   Future<void> _openDetails() async {
-    final searchController = Get.isRegistered<PropertySearchController>()
-        ? Get.find<PropertySearchController>()
-        : Get.put(PropertySearchController());
-
-    await searchController.fetchPropertyDetails(property.id);
-
-    if (searchController.selectedProperty != null) {
-      Get.to(
-        () => const PropertyDetailsScreen(),
-        transition: Transition.rightToLeft,
-        duration: const Duration(milliseconds: 400),
-      );
-    }
-  }
+  Get.to(
+    () => PropertyDetailsScreen(
+      propertyId: property.id,
+    ),
+    transition: Transition.rightToLeft,
+    duration: const Duration(milliseconds: 400),
+  );
+}
 
   @override
   Widget build(BuildContext context) {

@@ -35,6 +35,19 @@ class LocationController extends GetxController {
   final int nearbyLimit = 12;
   bool hasMoreNearby = true;
 
+  @override
+  void onInit() {
+    super.onInit();
+
+    /// Restore the last saved location (if any) so it survives
+    /// app restarts instead of falling back to the Doha default.
+    AppLocation.restore();
+
+    if (AppLocation.hasLocation) {
+      fetchNearbyProperties(refresh: true);
+    }
+  }
+
   Future<bool> searchLocation(String keyword) async {
     try {
       isLoading = true;
@@ -52,6 +65,7 @@ class LocationController extends GetxController {
       AppLocation.formattedAddress = location?.data.formattedAddress ?? "";
       AppLocation.latitude = location?.data.latitude;
       AppLocation.longitude = location?.data.longitude;
+      await AppLocation.persist();
       await fetchNearbyProperties(refresh: true);
 
       update();
@@ -102,6 +116,7 @@ class LocationController extends GetxController {
     // If available in API
     // AppLocation.municipalityId = item.data.municipalityId ?? "";
     // AppLocation.municipalityName = item.data.municipalityName ?? "";
+    AppLocation.persist();
     fetchNearbyProperties(refresh: true);
     searchController.clear();
     results.clear();
@@ -170,6 +185,7 @@ class LocationController extends GetxController {
       AppLocation.latitude = location?.data.latitude;
 
       AppLocation.longitude = location?.data.longitude;
+      await AppLocation.persist();
       await fetchNearbyProperties(refresh: true);
 
       // If your API returns municipality
@@ -215,11 +231,11 @@ class LocationController extends GetxController {
     //     item.data.municipalityName ?? "";
   }
 
-  void clearLocation() {
+  Future<void> clearLocation() async {
     location = null;
     selectedLocation = null;
 
-    AppLocation.clear();
+    await AppLocation.clear();
 
     searchController.clear();
     results.clear();

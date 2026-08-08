@@ -366,25 +366,29 @@ class LocalityCard extends StatelessWidget {
   // Supports API network image while preserving same dimensions.
   // =============================================================
 
-  void _openPropertyDetails() {
-    final String id = propertyId.trim();
 
-    if (id.isEmpty) {
-      debugPrint("FEATURED PROPERTY ERROR: Property ID is empty");
+void _openPropertyDetails() {
+  final String id = propertyId.trim();
 
-      Get.snackbar(
-        "Error",
-        "Property details are not available",
-        snackPosition: SnackPosition.BOTTOM,
-      );
+  if (id.isEmpty) {
+    debugPrint("FEATURED PROPERTY ERROR: Property ID is empty");
 
-      return;
-    }
-
-    debugPrint("OPEN FEATURED PROPERTY DETAILS: $id");
-
-    Get.to(() => const PropertyDetailsScreen(), arguments: {"propertyId": id});
+    Get.snackbar(
+      "Error",
+      "Property details are not available",
+      snackPosition: SnackPosition.BOTTOM,
+    );
+    return;
   }
+
+  debugPrint("OPEN FEATURED PROPERTY DETAILS: $id");
+
+  Get.to(
+    () => PropertyDetailsScreen(
+      propertyId: id,
+    ),
+  );
+}
 
   Widget _buildImage() {
     final String url = image.trim();

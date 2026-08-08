@@ -18,6 +18,7 @@ class StorageService {
   static const String isLoggedInKey = 'is_logged_in';
   static const String profileKey = 'profile';
   static const String languageKey = 'language';
+  static const String locationKey = 'saved_location';
 
   /// ================= TOKEN =================
 
@@ -92,6 +93,24 @@ class StorageService {
 
   static String getLanguage() {
     return _prefs!.getString(languageKey) ?? "en";
+  }
+
+  /// ================= LOCATION =================
+
+  static Future<bool> saveLocation(Map<String, dynamic> location) async {
+    return await _prefs!.setString(locationKey, jsonEncode(location));
+  }
+
+  static Map<String, dynamic>? getLocation() {
+    final data = _prefs!.getString(locationKey);
+
+    if (data == null) return null;
+
+    return jsonDecode(data);
+  }
+
+  static Future<bool> removeLocation() async {
+    return await _prefs!.remove(locationKey);
   }
 
   /// ================= LOGOUT =================

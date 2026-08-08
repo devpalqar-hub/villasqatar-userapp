@@ -18,6 +18,10 @@ class ChatListScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final controller = Get.put(ChatListController());
+    // Controller instance persists across navigations (GetX reuses it),
+    // so onInit()'s one-time fetch won't pick up chats started elsewhere.
+    // Re-fetch every time this screen is entered.
+    controller.fetchConversations();
     return Scaffold(
       backgroundColor: AppColors.background,
       appBar: AppBar(

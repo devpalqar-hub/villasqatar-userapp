@@ -16,9 +16,9 @@ import '../../../core/theme/app_textstyles.dart';
 class SearchScreen extends StatelessWidget {
   SearchScreen({super.key});
 
-  final PropertySearchController controller = Get.put(
-    PropertySearchController(),
-  );
+  final PropertySearchController controller = Get.isRegistered<PropertySearchController>()
+      ? Get.find<PropertySearchController>()
+      : Get.put(PropertySearchController(), permanent: true);
 
   @override
   Widget build(BuildContext context) {

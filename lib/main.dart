@@ -4,6 +4,8 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:villas_qatar/Core/services/storage_service.dart';
+import 'package:villas_qatar/modules/home/service/UtilsController.dart';
+import 'package:villas_qatar/modules/home/service/loaction_controller.dart';
 import 'package:villas_qatar/modules/onboard/views/splash_screen.dart';
 
 // ADD YOUR DEEP LINK SERVICE IMPORT
@@ -17,6 +19,19 @@ Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   await StorageService.init();
+
+  // Register app-wide controllers permanently, up front, instead of
+  // relying on HomeScreen's State to lazily Get.put() them on first
+  // mount. Several `GetBuilder<Utilscontroller>` / `LocationController`
+  // usages (search filters, category chips) don't pass an `init:`
+  // fallback, so if Home was never actually built first in this
+  // session — e.g. MainScreen opened straight onto the Search tab, or
+  // an earlier Get.offAll() wiped a previous Home tab's registration —
+  // GetBuilder crashes with "Null check operator used on a null value".
+  // Registering permanently here removes that ordering dependency.
+  Get.put(Utilscontroller(), permanent: true);
+  Get.put(LocationController(), permanent: true);
+
   runApp(
     DevicePreview(
       enabled: false,

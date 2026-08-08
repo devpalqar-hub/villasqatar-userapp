@@ -147,19 +147,28 @@ class PropertyCard extends StatelessWidget {
     final photos = property.sortedPhotos;
     return InkWell(
       borderRadius: BorderRadius.circular(10.r),
-      onTap: () async {
-        final controller = Get.find<PropertySearchController>();
+      // onTap: () async {
+      //   final controller = Get.find<PropertySearchController>();
 
-        await controller.fetchPropertyDetails(property.id);
+      //   await controller.fetchPropertyDetails(property.id);
 
-        if (controller.selectedProperty != null) {
-          Get.to(
-            () => const PropertyDetailsScreen(),
-            transition: Transition.rightToLeft,
-            duration: const Duration(milliseconds: 250),
-          );
-        }
-      },
+      //   if (controller.selectedProperty != null) {
+      //     Get.to(
+      //       () => const PropertyDetailsScreen(),
+      //       transition: Transition.rightToLeft,
+      //       duration: const Duration(milliseconds: 250),
+      //     );
+      //   }
+      // },
+      onTap: () {
+  Get.to(
+    () => PropertyDetailsScreen(
+      propertyId: property.id,
+    ),
+    transition: Transition.rightToLeft,
+    duration: const Duration(milliseconds: 250),
+  );
+},
       child: Container(
         margin: EdgeInsets.only(bottom: 18.h),
         decoration: BoxDecoration(

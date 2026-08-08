@@ -251,24 +251,34 @@ class DeepLinkService {
                   PropertySearchController>()
               : Get.put(
                   PropertySearchController(),
+                  permanent: true,
                 );
 
-      propertyController.selectedProperty =
-          property;
+      // propertyController.selectedProperty =
+      //     property;
 
-      propertyController.isDetailsLoading =
-          false;
+      // propertyController.isDetailsLoading =
+      //     false;
 
-      propertyController.update();
+      // propertyController.update();
 
+      // debugPrint(
+      //   "Opening PropertyDetailsScreen",
+      // );
+
+      // Get.to(
+      //   () =>
+      //       const PropertyDetailsScreen(),
+      // );
       debugPrint(
-        "Opening PropertyDetailsScreen",
-      );
+  "Opening PropertyDetailsScreen: ${property.id}",
+);
 
-      Get.to(
-        () =>
-            const PropertyDetailsScreen(),
-      );
+Get.to(
+  () => PropertyDetailsScreen(
+    propertyId: property.id,
+  ),
+);
     } catch (e) {
       _lastHandledLink = null;
 

@@ -42,12 +42,23 @@ class MyPropertyController extends GetxController {
   bool hasMore = true;
   bool isMarkingAsSold = false;
   String markAsSoldError = "";
- 
+
+  // Bumped on every reload/loadMore call. Lets a request that resolves
+  // after a newer one has already started detect it's stale and skip
+  // applying its result / touching isLoading — otherwise a slow or
+  // interrupted call (e.g. the app backgrounded mid-request) can leave
+  // isLoading stuck "true" forever, since the old `if (isLoading) return;`
+  // guard would silently no-op any later, legitimate refresh call
+  // (e.g. the one fired right after successfully adding a property)
+  // instead of letting it actually run and reset the flag.
+  int _requestToken = 0;
+
 Future<void> fetchProperties({
   bool loadMore = false,
   bool showLoader = true,
 }) async {
-  // Prevent duplicate API calls
+  final int myToken = ++_requestToken;
+
   if (loadMore) {
     if (isLoadingMore || !hasMore) {
       return;
@@ -55,10 +66,6 @@ Future<void> fetchProperties({
 
     isLoadingMore = true;
   } else {
-    if (isLoading) {
-      return;
-    }
-
     if (showLoader) {
       isLoading = true;
     }
@@ -201,6 +208,14 @@ Future<void> fetchProperties({
       "MY PROPERTIES RECEIVED: ${model.data.length}",
     );
 
+    if (myToken != _requestToken) {
+      // A newer request has started since this one was fired; discard
+      // this now-stale response instead of letting it clobber fresher
+      // state (or, via the finally block below, incorrectly clear the
+      // loading flag for the request that's still in flight).
+      return;
+    }
+
     // ==========================================================
     // UPDATE LIST
     // ==========================================================
@@ -240,6 +255,11 @@ Future<void> fetchProperties({
 
     error = "";
   } catch (e, stackTrace) {
+    if (myToken != _requestToken) {
+      // Stale request — a newer one is already in charge of the state.
+      return;
+    }
+
     error = e
         .toString()
         .replaceFirst(
@@ -255,10 +275,12 @@ Future<void> fetchProperties({
       stackTrace.toString(),
     );
   } finally {
-    isLoading = false;
-    isLoadingMore = false;
+    if (myToken == _requestToken) {
+      isLoading = false;
+      isLoadingMore = false;
 
-    update();
+      update();
+    }
   }
 }
   Future<void> refreshProperties() async {

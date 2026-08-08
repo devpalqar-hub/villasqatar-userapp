@@ -521,6 +521,13 @@ class ListPropertyController extends GetxController {
         gravity: ToastGravity.BOTTOM,
       );
 
+      // Refresh "My Properties" list so the newly added property shows
+      // up immediately instead of the screen being stuck on its old
+      // (stale) state until the app is restarted.
+      if (Get.isRegistered<MyPropertyController>()) {
+        await Get.find<MyPropertyController>().refreshProperties();
+      }
+
       return true;
     } catch (e, stackTrace) {
       debugPrint("============== ERROR ==============");
