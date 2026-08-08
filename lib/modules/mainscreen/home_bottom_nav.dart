@@ -1,5 +1,5 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get_utils/src/extensions/internacionalization.dart';
 
@@ -20,30 +20,32 @@ class HomeBottomNav extends StatelessWidget {
     return SafeArea(
       top: false,
       child: Container(
-        height: 75.h,
+        height: 65.h,
+        margin: EdgeInsets.only(left: 8.w, right: 8.w, bottom: 10.h),
         decoration: BoxDecoration(
           color: AppColors.primary,
-          borderRadius: BorderRadius.only(
-            topLeft: Radius.circular(50.r),
-            topRight: Radius.circular(50.r),
-          ),
+          borderRadius: BorderRadius.all(Radius.circular(40.r)),
         ),
         child: Row(
           children: [
-            _navItem(icon: Icons.home_rounded, label: "Home".tr, index: 0),
-            _navItem(icon: Icons.search, label: "Search".tr, index: 1),
+            _navItem(icon: CupertinoIcons.home, label: "Home".tr, index: 0),
+            _navItem(icon: CupertinoIcons.search, label: "Search".tr, index: 1),
             _navItem(
-              icon: Icons.favorite_border,
-              label: "My Property".tr,
+              icon: CupertinoIcons.add_circled,
+              label: "Add".tr,
               index: 2,
             ),
             _navItem(
-              icon: Icons.chat_bubble_outline,
+              icon: CupertinoIcons.chat_bubble,
               label: "Chats".tr,
               index: 3,
               //showBadge: true,
             ),
-            _navItem(icon: Icons.person_outline, label: "Profile".tr, index: 4),
+            _navItem(
+              icon: CupertinoIcons.profile_circled,
+              label: "Profile".tr,
+              index: 4,
+            ),
           ],
         ),
       ),
@@ -60,12 +62,14 @@ class HomeBottomNav extends StatelessWidget {
 
     return Expanded(
       child: InkWell(
+        borderRadius: BorderRadius.circular(40.r),
         onTap: () => onChanged(index),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Stack(
               clipBehavior: Clip.none,
+              alignment: Alignment.center,
               children: [
                 Container(
                   width: 38.w,
@@ -76,42 +80,30 @@ class HomeBottomNav extends StatelessWidget {
                         : Colors.transparent,
                     shape: BoxShape.circle,
                   ),
-                  child: Icon(icon, color: Colors.white, size: 18.sp),
+                  child: Icon(icon, color: Colors.white, size: 22.sp),
                 ),
-
                 if (showBadge)
                   Positioned(
-                    right: -2,
-                    top: -2,
+                    top: -2.h,
+                    right: 4.w,
                     child: Container(
-                      width: 16.w,
-                      height: 16.w,
+                      width: 8.w,
+                      height: 8.w,
                       decoration: const BoxDecoration(
-                        color: Colors.red,
+                        color: Colors.redAccent,
                         shape: BoxShape.circle,
-                      ),
-                      alignment: Alignment.center,
-                      child: Text(
-                        "2",
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 9.sp,
-                          fontWeight: FontWeight.bold,
-                        ),
                       ),
                     ),
                   ),
               ],
             ),
-
-            SizedBox(height: 4.h),
-
+            SizedBox(height: 2.h),
             Text(
               label,
               style: TextStyle(
                 color: Colors.white,
                 fontSize: 10.sp,
-                fontWeight: selected ? FontWeight.w700 : FontWeight.w500,
+                fontWeight: FontWeight.w500,
               ),
             ),
           ],

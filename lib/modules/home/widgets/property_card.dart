@@ -1,3 +1,5 @@
+
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
@@ -25,6 +27,9 @@ class PropertyCard extends StatelessWidget {
   final int bathrooms;
   final double area;
 
+  /// Optional suffix shown after the price, e.g. "/mo" for rentals.
+  final String? priceSuffix;
+
   const PropertyCard({
     super.key,
     required this.image,
@@ -40,17 +45,17 @@ class PropertyCard extends StatelessWidget {
     this.slug,
     this.bathrooms = 0,
     this.area = 0,
+    this.priceSuffix,
   });
 
   @override
   Widget build(BuildContext context) {
-    /// Use already registered WishlistController.
-    ///
-    /// If it is not registered yet, create it once.
     final WishlistController wishlistController =
         Get.isRegistered<WishlistController>()
         ? Get.find<WishlistController>()
         : Get.put(WishlistController());
+        // ? Get.find<WishlistController>()
+        // : Get.put(WishlistController());
 
     return Container(
       width: 168.w,
@@ -351,7 +356,7 @@ class PropertyCard extends StatelessWidget {
     
                     SizedBox(width: 6.w),
     
-                    _buildDot(),
+                    // _buildDot(),
     
                     SizedBox(width: 6.w),
     
@@ -366,7 +371,7 @@ class PropertyCard extends StatelessWidget {
     
                     SizedBox(width: 6.w),
     
-                    _buildDot(),
+                    // _buildDot(),
     
                     SizedBox(width: 6.w),
     
@@ -407,21 +412,6 @@ class PropertyCard extends StatelessWidget {
   }
 
   // =============================================================
-  // DOT SEPARATOR
-  // =============================================================
-
-  Widget _buildDot() {
-    return Container(
-      width: 4.w,
-      height: 4.w,
-      decoration: const BoxDecoration(
-        color: Colors.grey,
-        shape: BoxShape.circle,
-      ),
-    );
-  }
-
-  // =============================================================
   // PROPERTY IMAGE
   // =============================================================
 
@@ -442,22 +432,28 @@ class PropertyCard extends StatelessWidget {
             return child;
           }
 
-          return _imagePlaceholder(showLoader: true);
-        },
-        errorBuilder: (context, error, stackTrace) {
-          return _imagePlaceholder();
-        },
-      );
-    }
+        return _imagePlaceholder(showLoader: true);
+      },
+      errorBuilder: (context, error, stackTrace) {
+        return _imagePlaceholder();
+      },
+    );
+  }
 
     /// LOCAL ASSET
-    if (cleanImage.startsWith('assets/')) {
+    if (cleanImage.startsWith(
+      'assets/',
+    )) {
       return Image.asset(
         cleanImage,
         height: 120.h,
         width: double.infinity,
         fit: BoxFit.cover,
-        errorBuilder: (context, error, stackTrace) {
+        errorBuilder: (
+          context,
+          error,
+          stackTrace,
+        ) {
           return _imagePlaceholder();
         },
       );
@@ -471,7 +467,9 @@ class PropertyCard extends StatelessWidget {
   // IMAGE PLACEHOLDER
   // =============================================================
 
-  Widget _imagePlaceholder({bool showLoader = false}) {
+  Widget _imagePlaceholder({
+    bool showLoader = false,
+  }) {
     return Container(
       height: 120.h,
       width: double.infinity,

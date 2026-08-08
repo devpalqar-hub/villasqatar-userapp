@@ -250,6 +250,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                         fontWeight: FontWeight.w400,
                                       ),
                                     ),
+                                   
                                   ],
                                 ),
                               ),
@@ -260,18 +261,11 @@ class _HomeScreenState extends State<HomeScreen> {
                   );
                 },
               ),
-
+            
+             
               Padding(
                 padding: EdgeInsets.symmetric(horizontal: 16.w),
-                child: SectionHeader(
-                  title: "Near You".tr,
-                  onSeeAllTap: () {
-                    Get.offAll(
-                      () => const MainScreen(initialIndex: 1),
-                      transition: Transition.rightToLeft,
-                    );
-                  },
-                ),
+                child: SectionHeader(title: "Near You".tr),
               ),
 
               Container(
@@ -300,7 +294,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   },
                 ),
               ),
-              EstimatorCard(),
+              // EstimatorCard(),
 
               _buildFeaturedPropertiesSection(),
 
