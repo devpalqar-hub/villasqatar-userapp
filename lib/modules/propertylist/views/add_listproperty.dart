@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:country_pickers/utils/utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -2926,7 +2927,15 @@ class _CountryCodeDropdown extends StatelessWidget {
 
   const _CountryCodeDropdown({required this.value, required this.onChanged});
 
-  static const List<String> codes = ['+974', '+971', '+91', '+1', '+44'];
+  // ISO code -> dial code, same set (and same flag source, via
+  // country_pickers) used by the login screen's country picker.
+  static const Map<String, String> _isoByCode = {
+    '+974': 'QA',
+    '+971': 'AE',
+    '+91': 'IN',
+    '+1': 'US',
+    '+44': 'GB',
+  };
 
   @override
   Widget build(BuildContext context) {
@@ -2940,21 +2949,23 @@ class _CountryCodeDropdown extends StatelessWidget {
       ),
       child: DropdownButtonHideUnderline(
         child: DropdownButton<String>(
-          value: value,
+          value: _isoByCode.containsKey(value) ? value : _isoByCode.keys.first,
           icon: const Icon(Icons.keyboard_arrow_down, size: 18),
-          items: codes
+          items: _isoByCode.entries
               .map(
-                (c) => DropdownMenuItem(
-                  value: c,
+                (entry) => DropdownMenuItem(
+                  value: entry.key,
                   child: Row(
                     children: [
-                      Container(
+                      SizedBox(
                         width: 20,
                         height: 14,
-                        color: AppColors.primary,
+                        child: CountryPickerUtils.getDefaultFlagImage(
+                          CountryPickerUtils.getCountryByIsoCode(entry.value),
+                        ),
                       ),
                       const SizedBox(width: 6),
-                      Text(c, style: const TextStyle(fontSize: 13)),
+                      Text(entry.key, style: const TextStyle(fontSize: 13)),
                     ],
                   ),
                 ),

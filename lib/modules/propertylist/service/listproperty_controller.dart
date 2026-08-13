@@ -155,9 +155,89 @@ class ListPropertyController extends GetxController {
     update();
   }
 
+  /// Message for whichever required field is missing on the current
+  /// step, set by [validateCurrentStep]. Null once everything's filled.
+  String? stepError;
+
+  /// Checks the required fields for [currentStep] (mirrors the
+  /// `required: true` markers on each step's `_fieldLabel` in the UI)
+  /// and reports the first thing that's missing. Called before
+  /// [nextStep] so the wizard can no longer be advanced past blank
+  /// required fields.
+  bool validateCurrentStep() {
+    stepError = null;
+
+    switch (currentStep) {
+      case 0: // Basic Info
+        if (fullNameController.text.trim().isEmpty) {
+          stepError = "Please enter your full name".tr;
+        } else if (phoneController.text.trim().isEmpty) {
+          stepError = "Please enter your contact number".tr;
+        } else if (descriptionController.text.trim().isEmpty) {
+          stepError = "Please enter a property description".tr;
+        }
+        break;
+
+      case 1: // Details
+        if (propertyNameController.text.trim().isEmpty) {
+          stepError = "Please enter the property name".tr;
+        } else if (propertyType.isEmpty) {
+          stepError = "Please select a property type".tr;
+        } else if (bedroomsController.text.trim().isEmpty) {
+          stepError = "Please enter the number of bedrooms".tr;
+        } else if (bathroomsController.text.trim().isEmpty) {
+          stepError = "Please enter the number of bathrooms".tr;
+        } else if (propertyPurpose.isEmpty) {
+          stepError = "Please select Sale or Rent".tr;
+        } else if (priceController.text.trim().isEmpty) {
+          stepError = "Please enter the price".tr;
+        } else if (areaController.text.trim().isEmpty) {
+          stepError = "Please enter the area".tr;
+        }
+        break;
+
+      case 2: // Features — nothing marked required
+        break;
+
+      case 3: // Location
+        if (addressController.text.trim().isEmpty) {
+          stepError = "Please enter the address".tr;
+        } else if (areaNameController.text.trim().isEmpty) {
+          stepError = "Please enter the area".tr;
+        } else if (selectedMunicipalityId.isEmpty) {
+          stepError = "Please select a municipality".tr;
+        } else if (latitudeController.text.trim().isEmpty ||
+            longitudeController.text.trim().isEmpty) {
+          stepError = "Please select the property location on the map".tr;
+        }
+        break;
+
+      case 4: // Media
+        if (coverImage.isEmpty) {
+          stepError = "Please add a cover image".tr;
+        } else if (images.isEmpty && existingPhotos.isEmpty) {
+          stepError = "Please add at least one property photo".tr;
+        }
+        break;
+    }
+
+    if (stepError != null) {
+      Fluttertoast.showToast(msg: stepError!);
+      update();
+      return false;
+    }
+
+    return true;
+  }
+
   void nextStep() {
     debugPrint("Current Step Before: $currentStep");
     debugPrint("Steps Length: ${steps.length}");
+
+    if (!validateCurrentStep()) {
+      debugPrint("Step $currentStep failed validation: $stepError");
+      return;
+    }
 
     if (currentStep < steps.length - 1) {
       currentStep++;

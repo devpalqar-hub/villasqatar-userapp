@@ -34,6 +34,14 @@ class AuthController extends GetxController {
   String? accessToken;
   Map<String, dynamic>? profile;
 
+  // Inline validation / server error state — surfaced under the
+  // relevant field in the UI in addition to the toast, so the error
+  // is visible even where a toast alone gets missed.
+  String? phoneError;
+  String? otpError;
+  String? nameError;
+  String? emailError;
+
   @override
   void onInit() {
   super.onInit();
@@ -66,6 +74,11 @@ selectedCountryCode = "+974";
     accessToken = null;
     profile = null;
 
+    phoneError = null;
+    otpError = null;
+    nameError = null;
+    emailError = null;
+
     update();
   }
 
@@ -87,6 +100,15 @@ selectedCountryCode = "+974";
     update();
   }
 
+  /// Strips the "Exception: " prefix ApiHandler wraps server errors in
+  /// (e.g. duplicate email / phone conflicts) so the real backend
+  /// message reaches the user instead of a generic fallback.
+  String _extractErrorMessage(Object e, String fallback) {
+    final text = e.toString();
+    if (text.isEmpty) return fallback;
+    return text.startsWith("Exception: ") ? text.substring(11) : text;
+  }
+
   /// ---------------- SEND OTP ----------------
   Future<bool> sendOtp() async {
   if (!validatePhone()) return false;
@@ -105,9 +127,11 @@ selectedCountryCode = "+974";
   } catch (e) {
     debugPrint("Send OTP Error: $e");
 
-    Fluttertoast.showToast(
-      msg: "Failed to send OTP".tr,
-    );
+    phoneError = _extractErrorMessage(e, "Failed to send OTP".tr);
+
+    Fluttertoast.showToast(msg: phoneError!);
+
+    update();
 
     return false;
   } finally {
@@ -137,9 +161,11 @@ selectedCountryCode = "+974";
   } catch (e) {
     debugPrint("Verify OTP Error: $e");
 
-    Fluttertoast.showToast(
-      msg: "Invalid OTP".tr,
-    );
+    otpError = _extractErrorMessage(e, "Invalid OTP. Please try again.".tr);
+
+    Fluttertoast.showToast(msg: otpError!);
+
+    update();
 
     return false;
   } finally {
@@ -307,8 +333,42 @@ selectedCountryCode = "+974";
   }
 
   //----------Comlete profile -------------
+
+  /// Client-side validation for the complete-profile form. Sets
+  /// [nameError] / [emailError] so the UI can show an inline message
+  /// under each field, in addition to a toast, and returns false
+  /// without hitting the network when anything required is blank or
+  /// malformed.
+  bool validateProfile() {
+    nameError = null;
+    emailError = null;
+
+    final name = nameController.text.trim();
+    final email = emailController.text.trim();
+
+    if (name.isEmpty) {
+      nameError = "Please enter your full name".tr;
+    }
+
+    if (email.isEmpty) {
+      emailError = "Please enter your email address".tr;
+    } else if (!RegExp(r'^[^@\s]+@[^@\s]+\.[^@\s]+$').hasMatch(email)) {
+      emailError = "Please enter a valid email address".tr;
+    }
+
+    if (nameError != null || emailError != null) {
+      Fluttertoast.showToast(msg: nameError ?? emailError!);
+      update();
+      return false;
+    }
+
+    return true;
+  }
+
   /// ---------------- COMPLETE PROFILE ----------------
   Future<bool> completeProfile() async {
+    if (!validateProfile()) return false;
+
     try {
       _setLoading(true);
 
@@ -345,6 +405,21 @@ selectedCountryCode = "+974";
       debugPrint("========== COMPLETE PROFILE ERROR ==========");
       debugPrint(e.toString());
       debugPrint(stackTrace.toString());
+
+      // Surface the real backend message (e.g. "Email already in use")
+      // instead of failing silently — previously this just returned
+      // false with no feedback to the user at all.
+      final message = _extractErrorMessage(
+        e,
+        "Failed to complete profile. Please try again.".tr,
+      );
+
+      emailError = message.toLowerCase().contains("email") ? message : null;
+
+      Fluttertoast.showToast(msg: message);
+
+      update();
+
       return false;
     } finally {
       _setLoading(false);
@@ -438,19 +513,20 @@ bool validatePhone() {
   final phone = phoneController.text.trim();
 
   if (phone.isEmpty) {
-    Fluttertoast.showToast(
-      msg: "Please enter your WhatsApp number".tr,
-    );
+    phoneError = "Please enter your WhatsApp number".tr;
+    Fluttertoast.showToast(msg: phoneError!);
+    update();
     return false;
   }
 
   if (!RegExp(r'^[0-9]{6,15}$').hasMatch(phone)) {
-    Fluttertoast.showToast(
-      msg: "Please enter a valid phone number".tr,
-    );
+    phoneError = "Please enter a valid phone number".tr;
+    Fluttertoast.showToast(msg: phoneError!);
+    update();
     return false;
   }
 
+  phoneError = null;
   phoneNumber = "$selectedCountryCode$phone";
   return true;
 }
@@ -461,19 +537,20 @@ bool validateOtp() {
   final otp = otpController.text.trim();
 
   if (otp.isEmpty) {
-    Fluttertoast.showToast(
-      msg: "Please enter the OTP".tr,
-    );
+    otpError = "Please enter the OTP".tr;
+    Fluttertoast.showToast(msg: otpError!);
+    update();
     return false;
   }
 
   if (otp.length != 6) {
-    Fluttertoast.showToast(
-      msg: "OTP must be 6 digits".tr,
-    );
+    otpError = "OTP must be 6 digits".tr;
+    Fluttertoast.showToast(msg: otpError!);
+    update();
     return false;
   }
 
+  otpError = null;
   return true;
 }
 }

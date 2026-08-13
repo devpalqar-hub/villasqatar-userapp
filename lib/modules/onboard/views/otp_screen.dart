@@ -96,6 +96,12 @@ class OtpScreen extends StatelessWidget {
                       controller: controller.otpController,
                       length: 6,
                       keyboardType: TextInputType.number,
+                      onChanged: (_) {
+                        if (controller.otpError != null) {
+                          controller.otpError = null;
+                          controller.update();
+                        }
+                      },
                       defaultPinTheme: PinTheme(
                         width: 45.w,
                         height: 55.h,
@@ -103,7 +109,11 @@ class OtpScreen extends StatelessWidget {
                         decoration: BoxDecoration(
                           color: Colors.white,
                           borderRadius: BorderRadius.circular(8.r),
-                          border: Border.all(color: AppColors.border),
+                          border: Border.all(
+                            color: controller.otpError != null
+                                ? AppColors.error
+                                : AppColors.border,
+                          ),
                         ),
                       ),
                       focusedPinTheme: PinTheme(
@@ -114,12 +124,26 @@ class OtpScreen extends StatelessWidget {
                           color: Colors.white,
                           borderRadius: BorderRadius.circular(8.r),
                           border: Border.all(
-                            color: AppColors.primary,
+                            color: controller.otpError != null
+                                ? AppColors.error
+                                : AppColors.primary,
                             width: 2,
                           ),
                         ),
                       ),
                     ),
+
+                    if (controller.otpError != null) ...[
+                      SizedBox(height: 10.h),
+                      Text(
+                        controller.otpError!,
+                        style: AppTextStyles.body13.copyWith(
+                          fontSize: 12.sp,
+                          color: AppColors.error,
+                        ),
+                      ),
+                    ],
+
                     SizedBox(height: 24.h),
 
                     /// Timer

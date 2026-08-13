@@ -96,6 +96,13 @@ class CompleteProfileScreen extends StatelessWidget {
                     AppTextField(
                       controller: controller.nameController,
                       hint: 'Enter your full name'.tr,
+                      errorText: controller.nameError,
+                      onChanged: (_) {
+                        if (controller.nameError != null) {
+                          controller.nameError = null;
+                          controller.update();
+                        }
+                      },
                     ),
 
                     SizedBox(height: 22.h),
@@ -125,6 +132,13 @@ class CompleteProfileScreen extends StatelessWidget {
                       controller: controller.emailController,
                       hint: 'Enter your email address'.tr,
                       keyboardType: TextInputType.emailAddress,
+                      errorText: controller.emailError,
+                      onChanged: (_) {
+                        if (controller.emailError != null) {
+                          controller.emailError = null;
+                          controller.update();
+                        }
+                      },
                     ),
 
                     SizedBox(height: 24.h),

@@ -683,7 +683,15 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
   Widget build(BuildContext context) {
     return StatefulBuilder(
       builder: (context, setState) {
-        return SafeArea(
+        // Push the sheet up above the keyboard instead of letting it stay
+        // pinned to the bottom of the screen — otherwise the fixed-height
+        // sheet (and the Apply/Reset row at its bottom) ends up hidden
+        // behind the keyboard whenever a price/bed/bath field is focused.
+        final keyboardInset = MediaQuery.of(context).viewInsets.bottom;
+
+        return Padding(
+          padding: EdgeInsets.only(bottom: keyboardInset),
+          child: SafeArea(
           child: Container(
             constraints: BoxConstraints(
               maxHeight: MediaQuery.of(context).size.height * .78,
@@ -1210,6 +1218,7 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
                 ),
               ],
             ),
+          ),
           ),
         );
       },
