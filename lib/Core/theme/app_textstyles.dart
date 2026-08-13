@@ -41,6 +41,16 @@ static TextStyle body12 = TextStyle(
     fontSize: 12.sp,
     fontWeight: FontWeight.w400,
   );
+static TextStyle body10= TextStyle(
+    fontFamily: AppFonts.currentFont,
+    fontSize: 12.sp,
+    fontWeight: FontWeight.w400,
+  );
+  static TextStyle body1 = TextStyle(
+    fontFamily: AppFonts.currentFont,
+    fontSize: 12.sp,
+    fontWeight: FontWeight.w400,
+  );
   /// Medium
   static TextStyle medium14 = TextStyle(
     fontFamily: AppFonts.currentFont,

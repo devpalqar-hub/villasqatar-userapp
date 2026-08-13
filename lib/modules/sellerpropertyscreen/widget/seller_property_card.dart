@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:get/get.dart';
 import 'package:villas_qatar/Core/constants/app_colors.dart';
 import 'package:villas_qatar/Core/theme/app_textstyles.dart';
+import 'package:villas_qatar/Core/utils/auth_guard.dart';
 import 'package:villas_qatar/modules/propertylist/model/myproperty_model.dart';
+import 'package:villas_qatar/modules/wishlist/service/wishlist_controller.dart';
 
 class SellerPropertyCard extends StatelessWidget {
   const SellerPropertyCard({super.key, required this.property, this.onTap});
@@ -85,21 +88,7 @@ class SellerPropertyCard extends StatelessWidget {
                   Positioned(
                     right: 10.w,
                     top: 10.h,
-                    child: Container(
-                      height: 34.w,
-                      width: 34.w,
-                      decoration: const BoxDecoration(
-                        color: Colors.white,
-                        shape: BoxShape.circle,
-                      ),
-                      child: Icon(
-                        property.isWishlisted
-                            ? Icons.favorite
-                            : Icons.favorite_border,
-                        color: AppColors.primary,
-                        size: 18.sp,
-                      ),
-                    ),
+                    child: _WishlistButton(propertyId: property.id),
                   ),
                 ],
               ),
@@ -185,6 +174,65 @@ class SellerPropertyCard extends StatelessWidget {
           ],
         ),
       ),
+    );
+  }
+}
+
+class _WishlistButton extends StatelessWidget {
+  const _WishlistButton({required this.propertyId});
+
+  final String propertyId;
+
+  @override
+  Widget build(BuildContext context) {
+    final wishlistController = Get.isRegistered<WishlistController>()
+        ? Get.find<WishlistController>()
+        : Get.put(WishlistController());
+
+    return GetBuilder<WishlistController>(
+      init: wishlistController,
+      builder: (controller) {
+        final isWishlisted = controller.isWishlisted(propertyId);
+        final isLoading = controller.isPropertyLoading(propertyId);
+
+        return GestureDetector(
+          behavior: HitTestBehavior.opaque,
+          onTap: isLoading
+              ? null
+              : () async {
+                  if (!AuthGuard.requireLogin(
+                    message: "Please login to save properties to your wishlist."
+                        .tr,
+                  )) {
+                    return;
+                  }
+                  await controller.toggleWishlist(propertyId);
+                },
+          child: Container(
+            height: 34.w,
+            width: 34.w,
+            alignment: Alignment.center,
+            decoration: const BoxDecoration(
+              color: Colors.white,
+              shape: BoxShape.circle,
+            ),
+            child: isLoading
+                ? SizedBox(
+                    width: 16.w,
+                    height: 16.w,
+                    child: const CircularProgressIndicator(
+                      strokeWidth: 1.8,
+                      color: AppColors.primary,
+                    ),
+                  )
+                : Icon(
+                    isWishlisted ? Icons.favorite : Icons.favorite_border,
+                    color: AppColors.primary,
+                    size: 18.sp,
+                  ),
+          ),
+        );
+      },
     );
   }
 }

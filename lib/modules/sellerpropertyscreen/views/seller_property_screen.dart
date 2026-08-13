@@ -3,6 +3,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:villas_qatar/Core/constants/app_colors.dart';
 import 'package:villas_qatar/Core/theme/app_textstyles.dart';
+import 'package:villas_qatar/modules/propertydetailscreen/propertydetailscreen.dart';
 import 'package:villas_qatar/modules/propertylist/model/myproperty_model.dart';
 import 'package:villas_qatar/modules/searchscreen/service/searchlist_screen.dart';
 import 'package:villas_qatar/modules/sellerpropertyscreen/widget/seller_property_card.dart';
@@ -24,6 +25,12 @@ class SellerPropertiesScreen extends StatefulWidget {
 class _SellerPropertiesScreenState extends State<SellerPropertiesScreen> {
   late final PropertySearchController controller;
 
+  // Preview mode shows only the first 2 properties (matches the seller
+  // summary design); "View all" expands the grid to show every listing.
+  static const int _previewCount = 2;
+
+  bool _showAll = false;
+
   @override
   void initState() {
     super.initState();
@@ -37,6 +44,34 @@ class _SellerPropertiesScreenState extends State<SellerPropertiesScreen> {
     });
   }
 
+  // --------------------------------------------------------------------
+  // Dynamic seller location — derived from the seller's own listings
+  // (municipality name + country) instead of a hardcoded "Doha, Qatar"
+  // string. Returns "" when nothing is available so the UI can hide
+  // the location row entirely instead of showing a stray ", ".
+  // --------------------------------------------------------------------
+  String _sellerLocation(List<Property> properties) {
+    final withArea = properties.where(
+      (e) => e.municipality.name.trim().isNotEmpty,
+    );
+
+    if (withArea.isEmpty) return "";
+
+    final municipality = withArea.first.municipality.name;
+    final country = withArea.first.country.trim();
+
+    return country.isEmpty ? municipality : "$municipality, $country";
+  }
+
+  // --------------------------------------------------------------------
+  // Dynamic seller verification — a seller is treated as verified when
+  // at least one of their listings has a verified contact, instead of
+  // always showing a hardcoded "Verified Seller" badge.
+  // --------------------------------------------------------------------
+  bool _sellerVerified(List<Property> properties) {
+    return properties.any((e) => e.contactVerified);
+  }
+
   @override
   Widget build(BuildContext context) {
     return GetBuilder<PropertySearchController>(
@@ -46,6 +81,12 @@ class _SellerPropertiesScreenState extends State<SellerPropertiesScreen> {
         final saleCount = properties.where((e) => e.purpose == "SALE").length;
 
         final rentCount = properties.where((e) => e.purpose == "RENT").length;
+
+        final visibleProperties = _showAll
+            ? properties
+            : properties.take(_previewCount).toList();
+
+        final hasMore = properties.length > visibleProperties.length;
 
         if (controller.isLoading) {
           return const Scaffold(
@@ -68,6 +109,8 @@ class _SellerPropertiesScreenState extends State<SellerPropertiesScreen> {
               SliverToBoxAdapter(
                 child: _SellerHeader(
                   sellerName: widget.sellerName,
+                  location: _sellerLocation(properties),
+                  verified: _sellerVerified(properties),
                   propertyCount: properties.length,
                   saleCount: saleCount,
                   rentCount: rentCount,
@@ -79,13 +122,38 @@ class _SellerPropertiesScreenState extends State<SellerPropertiesScreen> {
                   hasScrollBody: false,
                   child: Center(child: Text("No Properties Found".tr)),
                 )
-              else
+              else ...[
+                SliverPadding(
+                  padding: EdgeInsets.fromLTRB(16.w, 0, 16.w, 12.h),
+                  sliver: SliverToBoxAdapter(
+                    child: _SectionTitle(
+                      title: "Properties".tr,
+                      onViewAll: hasMore
+                          ? () => setState(() => _showAll = true)
+                          : null,
+                    ),
+                  ),
+                ),
+
                 SliverPadding(
                   padding: EdgeInsets.symmetric(horizontal: 16.w),
                   sliver: SliverGrid(
                     delegate: SliverChildBuilderDelegate((context, index) {
-                      return SellerPropertyCard(property: properties[index]);
-                    }, childCount: properties.length),
+                      final property = visibleProperties[index];
+
+                      return SellerPropertyCard(
+                        property: property,
+                        onTap: () {
+                          Get.to(
+                            () => PropertyDetailsScreen(
+                              propertyId: property.id,
+                            ),
+                            transition: Transition.rightToLeft,
+                            duration: const Duration(milliseconds: 500),
+                          );
+                        },
+                      );
+                    }, childCount: visibleProperties.length),
                     gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                       crossAxisCount: 2,
                       mainAxisSpacing: 13.h,
@@ -94,6 +162,13 @@ class _SellerPropertiesScreenState extends State<SellerPropertiesScreen> {
                     ),
                   ),
                 ),
+
+                if (!hasMore)
+                  SliverPadding(
+                    padding: EdgeInsets.fromLTRB(16.w, 16.h, 16.w, 0),
+                    sliver: const SliverToBoxAdapter(child: _NoMoreProperties()),
+                  ),
+              ],
 
               SliverToBoxAdapter(child: SizedBox(height: 30.h)),
             ],
@@ -104,15 +179,99 @@ class _SellerPropertiesScreenState extends State<SellerPropertiesScreen> {
   }
 }
 
+class _SectionTitle extends StatelessWidget {
+  const _SectionTitle({required this.title, required this.onViewAll});
+
+  final String title;
+  final VoidCallback? onViewAll;
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Text(title, style: AppTextStyles.title16),
+        if (onViewAll != null)
+          InkWell(
+            onTap: onViewAll,
+            child: Row(
+              children: [
+                Text(
+                  "View all".tr,
+                  style: AppTextStyles.body13.copyWith(
+                    color: AppColors.primary,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                Icon(Icons.arrow_forward, size: 16.sp, color: AppColors.primary),
+              ],
+            ),
+          ),
+      ],
+    );
+  }
+}
+
+class _NoMoreProperties extends StatelessWidget {
+  const _NoMoreProperties();
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: double.infinity,
+      padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 18.h),
+      decoration: BoxDecoration(
+        color: AppColors.primarySoft.withOpacity(.4),
+        borderRadius: BorderRadius.circular(12.r),
+      ),
+      child: Row(
+        children: [
+          Container(
+            width: 44.w,
+            height: 44.w,
+            decoration: BoxDecoration(
+              color: AppColors.primarySoft,
+              shape: BoxShape.circle,
+            ),
+            child: Icon(
+              Icons.home_work_outlined,
+              color: AppColors.primary,
+              size: 22.sp,
+            ),
+          ),
+          SizedBox(width: 12.w),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text("No more properties".tr, style: AppTextStyles.title14),
+                SizedBox(height: 2.h),
+                Text(
+                  "This seller has no more properties to show".tr,
+                  style: AppTextStyles.body13.copyWith(color: Colors.grey),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
 class _SellerHeader extends StatelessWidget {
   const _SellerHeader({
     required this.sellerName,
+    required this.location,
+    required this.verified,
     required this.propertyCount,
     required this.saleCount,
     required this.rentCount,
   });
 
   final String sellerName;
+  final String location;
+  final bool verified;
   final int propertyCount;
   final int saleCount;
   final int rentCount;
@@ -165,40 +324,50 @@ class _SellerHeader extends StatelessWidget {
                             ),
                           ),
 
-                          SizedBox(width: 6.w),
-
-                          Icon(
-                            Icons.verified,
-                            color: AppColors.primary,
-                            size: 16.sp,
-                          ),
+                          if (verified) ...[
+                            SizedBox(width: 6.w),
+                            Icon(
+                              Icons.verified,
+                              color: AppColors.primary,
+                              size: 16.sp,
+                            ),
+                          ],
                         ],
                       ),
 
-                      SizedBox(height: 2.h),
-
-                      Text(
-                        "Verified Seller".tr,
-                        style: AppTextStyles.body13.copyWith(
-                          color: Colors.grey,
+                      if (verified) ...[
+                        SizedBox(height: 2.h),
+                        Text(
+                          "Verified Seller".tr,
+                          style: AppTextStyles.body13.copyWith(
+                            color: Colors.grey,
+                          ),
                         ),
-                      ),
+                      ],
 
-                      SizedBox(height: 4.h),
+                      if (location.isNotEmpty) ...[
+                        SizedBox(height: 4.h),
+                        Row(
+                          children: [
+                            Icon(
+                              Icons.location_on,
+                              color: AppColors.primary,
+                              size: 12.sp,
+                            ),
 
-                      Row(
-                        children: [
-                          Icon(
-                            Icons.location_on,
-                            color: AppColors.primary,
-                            size: 12.sp,
-                          ),
+                            SizedBox(width: 5.w),
 
-                          SizedBox(width: 5.w),
-
-                          Text("Doha, Qatar".tr, style: AppTextStyles.body13),
-                        ],
-                      ),
+                            Expanded(
+                              child: Text(
+                                location,
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                style: AppTextStyles.body13,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
                     ],
                   ),
                 ),

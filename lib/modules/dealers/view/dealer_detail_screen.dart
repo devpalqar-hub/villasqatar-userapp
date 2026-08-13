@@ -4,9 +4,11 @@ import 'package:get/get.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:villas_qatar/Core/constants/app_colors.dart';
 import 'package:villas_qatar/Core/theme/app_textstyles.dart';
+import 'package:villas_qatar/Core/utils/app_transitions.dart';
 import 'package:villas_qatar/modules/dealers/service/dealer_controller.dart';
 import 'package:villas_qatar/modules/dealers/model/dealer_details_model.dart';
 import 'package:villas_qatar/modules/propertydetailscreen/propertydetailscreen.dart';
+import 'package:villas_qatar/modules/mainscreen/mainscreen.dart';
 
 class DealerDetailsScreen extends StatefulWidget {
   const DealerDetailsScreen({super.key});
@@ -66,21 +68,20 @@ class _DealerDetailsScreenState extends State<DealerDetailsScreen> {
                             children: [
                               SizedBox(height: 60.h),
                               _Identity(p, d),
-                              SizedBox(height: 20.h),
+                              SizedBox(height: 16.h),
                               _ContactCard(p, d),
                               SizedBox(height: 16.h),
                               _SubscriptionAndStats(d),
                               SizedBox(height: 16.h),
-                              // _AboutCard(
-                              //   p.description ?? "No description available",
-                              //   expanded: _expandAbout,
-                              //   onToggle: () =>
-                              //       setState(() => _expandAbout = !_expandAbout),
-                              // ),
-                              SizedBox(height: 20.h),
+                              SizedBox(height: 10.h),
                               _SectionTitle(
                                 title: "Properties".tr,
-                                onViewAll: () {},
+                                onViewAll: () {
+                                  Get.offAll(
+                                    () => const MainScreen(initialIndex: 1),
+                                    transition: AppTransitions.forward,
+                                  );
+                                },
                               ),
                               SizedBox(height: 12.h),
                             ],
@@ -91,7 +92,7 @@ class _DealerDetailsScreenState extends State<DealerDetailsScreen> {
                     ),
                   ),
                 ),
-               _BottomActions(d)
+                _BottomActions(d),
               ],
             ),
           ),
@@ -117,21 +118,41 @@ class _Header extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final hasCover = p.coverImage?.trim().isNotEmpty ?? false;
+
     return Stack(
       clipBehavior: Clip.none,
       children: [
+        // ---------------------------------------------------------
+        // COVER IMAGE
+        // ---------------------------------------------------------
         SizedBox(
-          height: 220.h,
+          height: 200.h,
           width: double.infinity,
-          child: Image.network(
-            p.coverImage ?? "",
-            fit: BoxFit.cover,
-            errorBuilder: (_, __, ___) =>
-                Container(color: AppColors.primarySoft),
+          child: ClipRRect(
+            borderRadius: BorderRadius.only(
+              bottomLeft: Radius.circular(24.r),
+              bottomRight: Radius.circular(24.r),
+            ),
+            child: hasCover
+                ? Image.network(
+                    p.coverImage!,
+                    fit: BoxFit.cover,
+                    width: double.infinity,
+                    height: double.infinity,
+                    errorBuilder: (_, __, ___) {
+                      return const _CoverPlaceholder();
+                    },
+                  )
+                : const _CoverPlaceholder(),
           ),
         ),
+
+        // ---------------------------------------------------------
+        // BACK BUTTON
+        // ---------------------------------------------------------
         Positioned(
-          top: 50.h,
+          top: 16.h,
           left: 16.w,
           child: _RoundIcon(
             icon: Icons.arrow_back_ios_new,
@@ -145,29 +166,123 @@ class _Header extends StatelessWidget {
           child: Container(
             width: 100.w,
             height: 100.w,
-            padding: EdgeInsets.all(6.w),
+            padding: EdgeInsets.all(5.w),
             decoration: BoxDecoration(
               color: Colors.white,
-              borderRadius: BorderRadius.circular(20.r),
+              borderRadius: BorderRadius.circular(22.r),
               boxShadow: [
-                BoxShadow(color: Colors.black.withOpacity(.1), blurRadius: 12),
+                BoxShadow(
+                  color: Colors.black.withOpacity(.10),
+                  blurRadius: 16,
+                  offset: const Offset(0, 6),
+                ),
               ],
             ),
             child: ClipRRect(
-              borderRadius: BorderRadius.circular(14.r),
-              child: Image.network(
-                p.coverImage ?? "",
-                fit: BoxFit.cover,
-                errorBuilder: (_, __, ___) => Icon(
-                  Icons.apartment,
-                  color: AppColors.primary,
-                  size: 36.sp,
-                ),
-              ),
+              borderRadius: BorderRadius.circular(17.r),
+              child: hasCover
+                  ? Image.network(
+                      p.coverImage!,
+                      fit: BoxFit.cover,
+                      errorBuilder: (_, __, ___) {
+                        return const _DealerPlaceholder();
+                      },
+                    )
+                  : const _DealerPlaceholder(),
             ),
           ),
         ),
       ],
+    );
+  }
+}
+
+class _CoverPlaceholder extends StatelessWidget {
+  const _CoverPlaceholder();
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: double.infinity,
+      height: double.infinity,
+      color: const Color(0xFFF4F5F7),
+      child: Stack(
+        alignment: Alignment.center,
+        children: [
+          // Subtle background building pattern
+          Positioned(
+            bottom: 0,
+            left: 0,
+            right: 0,
+            child: Icon(
+              Icons.location_city_outlined,
+              size: 150.sp,
+              color: const Color(0xFFE7E8EB),
+            ),
+          ),
+
+          Container(
+            width: 56.w,
+            height: 56.w,
+            decoration: BoxDecoration(
+              color: Colors.white,
+              shape: BoxShape.circle,
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(.06),
+                  blurRadius: 12,
+                ),
+              ],
+            ),
+            child: Icon(
+              Icons.business_outlined,
+              size: 28.sp,
+              color: AppColors.textHint,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+class _DealerPlaceholder extends StatelessWidget {
+  const _DealerPlaceholder();
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      color: const Color(0xFFF6F6F7),
+      alignment: Alignment.center,
+      child: Icon(
+        Icons.business_outlined,
+        size: 38.sp,
+        color: AppColors.primary,
+      ),
+    );
+  }
+}
+
+
+// A neutral "no image" indication used wherever a network image is
+// missing or fails to load, instead of a plain brand-tinted background.
+class _NoImagePlaceholder extends StatelessWidget {
+  final double? iconSize;
+
+  const _NoImagePlaceholder({this.iconSize});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      decoration: BoxDecoration(borderRadius: BorderRadius.all(Radius.circular(20.r))),
+      width: double.infinity,
+      height: double.infinity,
+      color: AppColors.divider,
+      alignment: Alignment.center,
+      child: Icon(
+        Icons.image_not_supported_outlined,
+        size: iconSize ?? 32.sp,
+        color: AppColors.textHint,
+      ),
     );
   }
 }
@@ -189,8 +304,8 @@ class _RoundIcon extends StatelessWidget {
       onTap: onTap,
       borderRadius: BorderRadius.circular(12.r),
       child: Container(
-        width: 40.w,
-        height: 40.w,
+        width: 30.w,
+        height: 30.w,
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(12.r),
@@ -198,7 +313,7 @@ class _RoundIcon extends StatelessWidget {
             BoxShadow(color: Colors.black.withOpacity(.08), blurRadius: 8),
           ],
         ),
-        child: Icon(icon, size: 18.sp, color: iconColor),
+        child: Icon(icon, size: 15.sp, color: iconColor),
       ),
     );
   }
@@ -225,8 +340,7 @@ class _Identity extends StatelessWidget {
                 overflow: TextOverflow.ellipsis,
               ),
             ),
-            SizedBox(width: 6.w),
-            Icon(Icons.verified, size: 18.sp, color: AppColors.primary),
+           
           ],
         ),
         if (p.tagline != null) ...[
@@ -239,46 +353,42 @@ class _Identity extends StatelessWidget {
           ),
         ],
         SizedBox(height: 8.h),
-       Row(
-  children: [
-    Container(
-      width: 8.w,
-      height: 8.w,
-      decoration: BoxDecoration(
-        color: d.isActive ? AppColors.success : Colors.grey,
-        shape: BoxShape.circle,
-      ),
-    ),
+        Row(
+          children: [
+            Container(
+              width: 8.w,
+              height: 8.w,
+              decoration: BoxDecoration(
+                color: d.isActive ? AppColors.success : Colors.grey,
+                shape: BoxShape.circle,
+              ),
+            ),
 
-    SizedBox(width: 6.w),
+            SizedBox(width: 6.w),
 
-    Text(
-      d.isActive ? "Active".tr : "Inactive".tr,
-      style: AppTextStyles.body13.copyWith(
-        color: AppColors.textSecondary,
-      ),
-    ),
+            Text(
+              d.isActive ? "Active".tr : "Inactive".tr,
+              style: AppTextStyles.body13.copyWith(
+                color: AppColors.textSecondary,
+              ),
+            ),
 
-    SizedBox(width: 8.w),
+            SizedBox(width: 8.w),
 
-    // Small vertical divider
-    Container(
-      width: 1,
-      height: 14.h,
-      color: Colors.grey.shade400,
-    ),
+            // Small vertical divider
+            Container(width: 1, height: 14.h, color: Colors.grey.shade400),
 
-    SizedBox(width: 8.w),
+            SizedBox(width: 8.w),
 
-    Text(
-      "${"Trade No".tr} ${p.tradeNumber ?? ""}",
-      style: AppTextStyles.body13.copyWith(
-        color: AppColors.textSecondary,
-      ),
-    ),
-  ],
-),
-        SizedBox(height: 10.h),
+            Text(
+              "${"Trade No".tr} ${p.tradeNumber ?? ""}",
+              style: AppTextStyles.body13.copyWith(
+                color: AppColors.textSecondary,
+              ),
+            ),
+          ],
+        ),
+        SizedBox(height: 6.h),
         Row(
           children: [
             Icon(
@@ -341,7 +451,11 @@ class _ContactCard extends StatelessWidget {
           Row(
             children: [
               Expanded(
-                child: _ContactTile(Icons.language, p.website ?? "", "Website".tr),
+                child: _ContactTile(
+                  Icons.language,
+                  p.website ?? "",
+                  "Website".tr,
+                ),
               ),
               SizedBox(width: 12.w),
               Expanded(
@@ -388,12 +502,12 @@ class _ContactTile extends StatelessWidget {
                 value,
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
-                style: AppTextStyles.bold12,
+                style: AppTextStyles.body14.copyWith(fontSize: 12.sp),
               ),
               Text(
                 label,
-                style: AppTextStyles.body12.copyWith(
-                  color: AppColors.textSecondary,
+                style: AppTextStyles.body10.copyWith(
+                  color: AppColors.textPrimary,
                   fontSize: 10.sp,
                 ),
               ),
@@ -443,14 +557,12 @@ class _SubscriptionAndStats extends StatelessWidget {
                   children: [
                     Text(
                       "Subscription Plan".tr,
-                      style: AppTextStyles.body13.copyWith(
-                        color: Colors.white70,
-                      ),
+                      style: AppTextStyles.body13.copyWith(color: Colors.white),
                     ),
                     const Icon(Icons.workspace_premium, color: Colors.amber),
                   ],
                 ),
-                SizedBox(height: 6.h),
+
                 Row(
                   children: [
                     Text(
@@ -479,7 +591,7 @@ class _SubscriptionAndStats extends StatelessWidget {
                     ),
                   ],
                 ),
-                SizedBox(height: 10.h),
+                SizedBox(height: 5.h),
                 Text(
                   "Valid Till".tr,
                   style: AppTextStyles.body12.copyWith(color: Colors.white70),
@@ -492,36 +604,40 @@ class _SubscriptionAndStats extends StatelessWidget {
                   padding: EdgeInsets.symmetric(vertical: 10.h),
                   child: Divider(color: Colors.white24, height: 1),
                 ),
-                ..._planFeatures(sub.plan).map(
-                  (f) => Padding(
-                    padding: EdgeInsets.only(bottom: 6.h),
-                    child: Row(
-                      children: [
-                        const Icon(
-                          Icons.check_circle,
-                          size: 15,
-                          color: Colors.white,
+                Wrap(
+                  spacing: 14.w,
+                  runSpacing: 8.h,
+                  children: _planFeatures(sub.plan)
+                      .map(
+                        (f) => Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            const Icon(
+                              Icons.check_circle,
+                              size: 15,
+                              color: Colors.white,
+                            ),
+                            SizedBox(width: 6.w),
+                            Text(
+                              f,
+                              style: AppTextStyles.body12.copyWith(
+                                color: Colors.white,
+                              ),
+                            ),
+                          ],
                         ),
-                        SizedBox(width: 8.w),
-                        Text(
-                          f,
-                          style: AppTextStyles.body12.copyWith(
-                            color: Colors.white,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
+                      )
+                      .toList(),
                 ),
               ],
             ),
           ),
-        SizedBox(height: 16.h),
+        if (sub != null) SizedBox(height: 16.h),
         _Card(
           title: "Statistics".tr,
-          child: Wrap(
-            spacing: 12.w,
-            runSpacing: 12.h,
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               _StatTile(
                 Icons.home_outlined,
@@ -541,7 +657,12 @@ class _SubscriptionAndStats extends StatelessWidget {
                 "Sold Properties".tr,
                 Colors.orange,
               ),
-              _StatTile(Icons.key_outlined, "$rent", "For Rent".tr, Colors.indigo),
+              _StatTile(
+                Icons.key_outlined,
+                "$rent",
+                "For Rent".tr,
+                Colors.indigo,
+              ),
             ],
           ),
         ),
@@ -590,41 +711,33 @@ class _StatTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      width: 140.w,
-      padding: EdgeInsets.all(12.w),
-      decoration: BoxDecoration(
-        color: AppColors.background,
-        borderRadius: BorderRadius.circular(12.r),
-      ),
-      child: Row(
-        children: [
-          Container(
-            padding: EdgeInsets.all(8.w),
-            decoration: BoxDecoration(
-              color: color.withOpacity(.12),
-              borderRadius: BorderRadius.circular(10.r),
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              padding: EdgeInsets.all(8.w),
+              decoration: BoxDecoration(
+                color: color.withOpacity(.12),
+                borderRadius: BorderRadius.circular(10.r),
+              ),
+              child: Icon(icon, size: 16.sp, color: color),
             ),
-            child: Icon(icon, size: 16.sp, color: color),
+            SizedBox(width: 8.w),
+            Text(value, style: AppTextStyles.bold16),
+          ],
+        ),
+        SizedBox(height: 6.h),
+        Text(
+          label,
+          style: AppTextStyles.body12.copyWith(
+            color: AppColors.textSecondary,
+            fontSize: 10.sp,
           ),
-          SizedBox(width: 8.w),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(value, style: AppTextStyles.bold16),
-                Text(
-                  label,
-                  style: AppTextStyles.body12.copyWith(
-                    color: AppColors.textSecondary,
-                    fontSize: 10.sp,
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 }
@@ -698,18 +811,18 @@ class _SectionTitle extends StatelessWidget {
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         Text(title, style: AppTextStyles.title18),
-        // InkWell(
-        //   onTap: onViewAll,
-        //   child: Row(
-        //     children: [
-        //       Text(
-        //         "View All",
-        //         style: AppTextStyles.body13.copyWith(color: AppColors.primary),
-        //       ),
-        //       Icon(Icons.chevron_right, size: 18.sp, color: AppColors.primary),
-        //     ],
-        //   ),
-        // ),
+        InkWell(
+          onTap: onViewAll,
+          child: Row(
+            children: [
+              Text(
+                "See all".tr,
+                style: AppTextStyles.body13.copyWith(color: AppColors.primary),
+              ),
+              Icon(Icons.chevron_right, size: 18.sp, color: AppColors.primary),
+            ],
+          ),
+        ),
       ],
     );
   }
@@ -725,10 +838,51 @@ class _PropertiesRow extends StatelessWidget {
   Widget build(BuildContext context) {
     if (listings.isEmpty) {
       return Padding(
-        padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 20.h),
-        child: Text(
-          "No properties yet".tr,
-          style: AppTextStyles.body13.copyWith(color: AppColors.textSecondary),
+        padding: EdgeInsets.symmetric(horizontal: 16.w),
+        child: Container(
+          width: double.infinity,
+          padding: EdgeInsets.symmetric(vertical: 32.h, horizontal: 20.w),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(12.r),
+            border: Border.all(color: AppColors.border),
+          ),
+          child: Column(
+            children: [
+              Container(
+                width: 54.w,
+                height: 54.w,
+                decoration: BoxDecoration(
+                  color: AppColors.primary.withOpacity(.08),
+                  shape: BoxShape.circle,
+                ),
+                child: Icon(
+                  Icons.home_work_outlined,
+                  color: AppColors.primary,
+                  size: 26.sp,
+                ),
+              ),
+              SizedBox(height: 12.h),
+              Text(
+                "No Properties Listed".tr,
+                textAlign: TextAlign.center,
+                style: AppTextStyles.title18.copyWith(
+                  fontSize: 14.sp,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+              SizedBox(height: 6.h),
+              Text(
+                "This dealer hasn't added any listings yet".tr,
+                textAlign: TextAlign.center,
+                style: AppTextStyles.body13.copyWith(
+                  fontSize: 11.sp,
+                  color: AppColors.textSecondary,
+                  height: 1.4,
+                ),
+              ),
+            ],
+          ),
         ),
       );
     }
@@ -763,7 +917,7 @@ class _PropertyCard extends StatelessWidget {
 
         Get.to(
           () => PropertyDetailsScreen(propertyId: listing.id),
-          transition: Transition.rightToLeft,
+          transition: AppTransitions.forward,
           duration: const Duration(milliseconds: 500),
         );
       },
@@ -797,22 +951,15 @@ class _PropertyCard extends StatelessWidget {
                             photo!,
                             fit: BoxFit.cover,
                             errorBuilder: (_, __, ___) =>
-                                Container(color: AppColors.primarySoft),
+                                const _NoImagePlaceholder(),
                           )
-                        : Container(
-                            color: AppColors.primarySoft,
-                            child: Icon(
-                              Icons.home_work_outlined,
-                              size: 40.sp,
-                              color: AppColors.primary,
-                            ),
-                          ),
+                        : const _NoImagePlaceholder(),
                   ),
                 ),
 
                 Positioned(
                   left: 8,
-                  bottom: 8,
+                  top: 8,
                   child: Container(
                     padding: EdgeInsets.symmetric(
                       horizontal: 8.w,
@@ -866,20 +1013,6 @@ class _PropertyCard extends StatelessWidget {
                       ),
                     ],
                   ),
-                  SizedBox(height: 6.h),
-                  Row(
-                    children: [
-                      _feature(
-                        Icons.bed_outlined,
-                        "${listing.bedrooms} ${"Beds".tr}",
-                      ),
-                      SizedBox(width: 8.w),
-                      _feature(
-                        Icons.bathtub_outlined,
-                        "${listing.bathrooms} ${"Baths".tr}",
-                      ),
-                    ],
-                  ),
                   SizedBox(height: 8.h),
                   Text(
                     "QAR ${listing.price.toStringAsFixed(0)}${forSale ? '' : '/month'}",
@@ -896,21 +1029,6 @@ class _PropertyCard extends StatelessWidget {
       ),
     );
   }
-
-  Widget _feature(IconData icon, String text) => Row(
-    mainAxisSize: MainAxisSize.min,
-    children: [
-      Icon(icon, size: 12.sp, color: AppColors.textSecondary),
-      SizedBox(width: 3.w),
-      Text(
-        text,
-        style: AppTextStyles.body12.copyWith(
-          color: AppColors.textSecondary,
-          fontSize: 10.sp,
-        ),
-      ),
-    ],
-  );
 }
 
 // -------------------------------------------------------------- Generic
@@ -933,7 +1051,7 @@ class _Card extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(title, style: AppTextStyles.bold16),
+          Text(title, style: AppTextStyles.body12),
           SizedBox(height: 12.h),
           child,
         ],
@@ -974,10 +1092,7 @@ class _BottomActions extends StatelessWidget {
 
                   if (phone.isEmpty) return;
 
-                  final uri = Uri(
-                    scheme: 'tel',
-                    path: phone,
-                  );
+                  final uri = Uri(scheme: 'tel', path: phone);
 
                   if (await canLaunchUrl(uri)) {
                     await launchUrl(uri);
@@ -992,25 +1107,20 @@ class _BottomActions extends StatelessWidget {
               child: _actionButton(
                 icon: Icons.chat_bubble_outline,
                 label: "WhatsApp".tr,
+                filled: true,
                 onTap: () async {
                   final phone = d.phone?.trim() ?? '';
 
                   if (phone.isEmpty) return;
 
-                  final cleanPhone =
-                      phone.replaceAll(RegExp(r'[^0-9]'), '');
+                  final cleanPhone = phone.replaceAll(RegExp(r'[^0-9]'), '');
 
                   if (cleanPhone.isEmpty) return;
 
-                  final uri = Uri.parse(
-                    'https://wa.me/$cleanPhone',
-                  );
+                  final uri = Uri.parse('https://wa.me/$cleanPhone');
 
                   if (await canLaunchUrl(uri)) {
-                    await launchUrl(
-                      uri,
-                      mode: LaunchMode.externalApplication,
-                    );
+                    await launchUrl(uri, mode: LaunchMode.externalApplication);
                   }
                 },
               ),
@@ -1034,17 +1144,13 @@ class _BottomActions extends StatelessWidget {
       child: filled
           ? ElevatedButton.icon(
               onPressed: onTap,
-              icon: Icon(
-                icon,
-                size: 12.sp,
-                color: Colors.white,
-              ),
+              icon: Icon(icon, size: 15.sp, color: Colors.white),
               label: Text(
                 label,
                 overflow: TextOverflow.ellipsis,
                 style: AppTextStyles.body12.copyWith(
                   color: Colors.white,
-                  fontSize: 10.sp,
+                  fontSize: 12.sp,
                   fontWeight: FontWeight.w500,
                 ),
               ),
@@ -1058,24 +1164,18 @@ class _BottomActions extends StatelessWidget {
             )
           : OutlinedButton.icon(
               onPressed: onTap,
-              icon: Icon(
-                icon,
-                size: 12.sp,
-                color: AppColors.primary,
-              ),
+              icon: Icon(icon, size: 15.sp, color: AppColors.primary),
               label: Text(
                 label,
                 overflow: TextOverflow.ellipsis,
                 style: AppTextStyles.body12.copyWith(
                   color: AppColors.primary,
                   fontWeight: FontWeight.w500,
-                  fontSize: 10.sp,
+                  fontSize: 12.sp,
                 ),
               ),
               style: OutlinedButton.styleFrom(
-                side: BorderSide(
-                  color: AppColors.border,
-                ),
+                side: BorderSide(color: AppColors.primary),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(10.r),
                 ),

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:villas_qatar/Core/theme/app_textstyles.dart';
+import 'package:villas_qatar/Core/utils/app_transitions.dart';
 import 'package:villas_qatar/modules/home/model/nearBypropertyResponse.dart';
 import 'package:villas_qatar/modules/propertydetailscreen/propertydetailscreen.dart';
 
@@ -18,7 +19,7 @@ class LocationCard extends StatelessWidget {
       onTap: () {
         Get.to(
           () => PropertyDetailsScreen(propertyId: property.id),
-          transition: Transition.rightToLeft,
+          transition: AppTransitions.forward,
           duration: const Duration(milliseconds: 600),
         );
       },

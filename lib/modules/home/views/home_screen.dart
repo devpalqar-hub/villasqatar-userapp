@@ -6,6 +6,7 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:villas_qatar/Core/constants/app_colors.dart';
 import 'package:villas_qatar/Core/theme/app_textstyles.dart';
 import 'package:villas_qatar/Core/utils/app_location.dart';
+import 'package:villas_qatar/Core/utils/app_transitions.dart';
 import 'package:villas_qatar/modules/PlansandFeatures/model/featured_property_model.dart';
 import 'package:villas_qatar/modules/PlansandFeatures/services/featured_properties_controller.dart';
 import 'package:villas_qatar/modules/dealers/service/dealer_controller.dart';
@@ -210,7 +211,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   onSeeAllTap: () {
                     Get.offAll(
                       () => const MainScreen(initialIndex: 1),
-                      transition: Transition.rightToLeft,
+                      transition: AppTransitions.forward,
                     );
                   },
                 ),
@@ -317,7 +318,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 onGetEstimate: () {
                   Get.to(
                     () => const PriceEstimatorScreen(),
-                    transition: Transition.rightToLeft,
+                    transition: AppTransitions.forward,
                   );
                 },
               ),
@@ -487,7 +488,7 @@ class _HomeScreenState extends State<HomeScreen> {
               onSeeAllTap: () {
                 Get.offAll(
                   () => const MainScreen(initialIndex: 1),
-                  transition: Transition.rightToLeft,
+                  transition: AppTransitions.forward,
                 );
               },
             ),
@@ -544,7 +545,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         () => PropertyDetailsScreen(
                           propertyId: property.id.toString(),
                         ),
-                        transition: Transition.rightToLeft,
+                        transition: AppTransitions.forward,
                       );
                     },
                     child: PropertyCard(

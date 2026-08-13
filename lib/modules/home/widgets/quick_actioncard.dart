@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:villas_qatar/Core/constants/app_colors.dart';
+import 'package:villas_qatar/Core/utils/app_transitions.dart';
 import 'package:villas_qatar/modules/wishlist/view/whishlist_screen.dart';
 
 class QuickActionsCard extends StatelessWidget {
@@ -38,7 +39,7 @@ class QuickActionsCard extends StatelessWidget {
         "onTap": () {
           Get.to(
             () => WishlistScreen(),
-            transition: Transition.rightToLeft,
+            transition: AppTransitions.forward,
             duration: const Duration(
               milliseconds: 250,
             ),

@@ -8,6 +8,7 @@ import 'package:get/get_state_manager/src/simple/get_state.dart';
 import 'package:get/get_utils/src/extensions/internacionalization.dart';
 import 'package:villas_qatar/Core/constants/app_colors.dart';
 import 'package:villas_qatar/Core/theme/app_textstyles.dart';
+import 'package:villas_qatar/Core/utils/app_transitions.dart';
 import 'package:villas_qatar/modules/propertydetailscreen/propertydetailscreen.dart';
 import 'package:villas_qatar/modules/propertylist/model/myproperty_model.dart';
 import 'package:villas_qatar/modules/searchscreen/service/searchlist_screen.dart';
@@ -155,7 +156,7 @@ class PropertyCard extends StatelessWidget {
       //   if (controller.selectedProperty != null) {
       //     Get.to(
       //       () => const PropertyDetailsScreen(),
-      //       transition: Transition.rightToLeft,
+      //       transition: AppTransitions.forward,
       //       duration: const Duration(milliseconds: 250),
       //     );
       //   }
@@ -165,7 +166,7 @@ class PropertyCard extends StatelessWidget {
     () => PropertyDetailsScreen(
       propertyId: property.id,
     ),
-    transition: Transition.rightToLeft,
+    transition: AppTransitions.forward,
     duration: const Duration(milliseconds: 250),
   );
 },

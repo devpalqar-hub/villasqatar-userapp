@@ -8,6 +8,7 @@ import 'package:get/get_navigation/src/routes/transitions_type.dart';
 import 'package:get/get_state_manager/src/simple/get_state.dart';
 import 'package:quill_html_editor/quill_html_editor.dart';
 import 'package:villas_qatar/Core/constants/app_colors.dart';
+import 'package:villas_qatar/Core/utils/app_transitions.dart';
 import 'package:villas_qatar/Core/utils/stripe_checkout_helper.dart';
 import 'package:villas_qatar/modules/propertydetailscreen/propertydetailscreen.dart';
 import 'package:villas_qatar/modules/propertylist/model/myproperty_model.dart';
@@ -170,7 +171,7 @@ class _MyPropertiesScreenState extends State<MyPropertiesScreen> {
                                           () => PropertyDetailsScreen(
                                             propertyId: listings[index].id,
                                           ),
-                                          transition: Transition.rightToLeft,
+                                          transition: AppTransitions.forward,
                                         );
                                       },
                                       onEdit: () {
@@ -179,7 +180,7 @@ class _MyPropertiesScreenState extends State<MyPropertiesScreen> {
                                             property: listings[index],
                                             isEdit: true,
                                           ),
-                                          transition: Transition.rightToLeft,
+                                          transition: AppTransitions.forward,
                                         );
                                       },
                                       isPaying:
@@ -202,7 +203,7 @@ class _MyPropertiesScreenState extends State<MyPropertiesScreen> {
         onPressed: () {
           Get.to(
             () => const ListYourPropertyScreen(),
-            transition: Transition.rightToLeft,
+            transition: AppTransitions.forward,
             duration: const Duration(milliseconds: 850),
             curve: Curves.easeOutCubic,
           );

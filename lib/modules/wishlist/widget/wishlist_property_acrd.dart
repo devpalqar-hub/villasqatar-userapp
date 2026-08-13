@@ -7,6 +7,7 @@ import 'package:get/get_navigation/src/routes/transitions_type.dart';
 import 'package:get/get_state_manager/src/simple/get_state.dart';
 import 'package:get/get_utils/src/extensions/internacionalization.dart';
 import 'package:villas_qatar/Core/constants/app_colors.dart';
+import 'package:villas_qatar/Core/utils/app_transitions.dart';
 import 'package:villas_qatar/modules/propertydetailscreen/propertydetailscreen.dart';
 import 'package:villas_qatar/modules/propertylist/model/myproperty_model.dart';
 import 'package:villas_qatar/modules/searchscreen/service/searchlist_screen.dart';
@@ -27,7 +28,7 @@ class WishlistPropertyCard extends StatelessWidget {
   //   if (searchController.selectedProperty != null) {
   //     Get.to(
   //       () => const PropertyDetailsScreen(),
-  //       transition: Transition.rightToLeft,
+  //       transition: AppTransitions.forward,
   //       duration: const Duration(milliseconds: 400),
   //     );
   //   }
@@ -37,7 +38,7 @@ class WishlistPropertyCard extends StatelessWidget {
     () => PropertyDetailsScreen(
       propertyId: property.id,
     ),
-    transition: Transition.rightToLeft,
+    transition: AppTransitions.forward,
     duration: const Duration(milliseconds: 400),
   );
 }

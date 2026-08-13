@@ -7,6 +7,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:share_plus/share_plus.dart';
 
 import 'package:villas_qatar/Core/constants/app_colors.dart';
+import 'package:villas_qatar/Core/utils/app_transitions.dart';
 import 'package:villas_qatar/modules/PlansandFeatures/model/myfeatured_property.dart';
 import 'package:villas_qatar/modules/PlansandFeatures/services/featured_properties_controller.dart';
 import 'package:villas_qatar/modules/PlansandFeatures/services/receipt_pdf_service.dart';
@@ -702,7 +703,7 @@ class _FeaturedEntryCardState extends State<_FeaturedEntryCard> {
                         () => PropertyDetailsScreen(
                           propertyId: entry.listingId,
                         ),
-                        transition: Transition.rightToLeft,
+                        transition: AppTransitions.forward,
                       );
                     },
               child: Row(

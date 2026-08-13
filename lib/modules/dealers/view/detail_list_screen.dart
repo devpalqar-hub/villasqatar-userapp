@@ -423,15 +423,7 @@ class _DealerActions extends StatelessWidget {
             onTap: () => launchWebsite(profile.website),
           ),
         ),
-        SizedBox(width: 8.w),
-        Expanded(
-          child: _ActionButton(
-            title: "Chat".tr,
-            onTap: () {
-              Get.toNamed("/chat", arguments: dealer.id);
-            },
-          ),
-        ),
+      
       ],
     );
   }
