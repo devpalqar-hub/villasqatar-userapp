@@ -154,7 +154,7 @@ class PropertyInfoCard extends StatelessWidget {
                     Expanded(
                       child: Center(
                         child: Text(
-                          "ID #${_shortId(property.id)}",
+                          "${"ID #".tr}${_shortId(property.id)}",
                           maxLines: 1,
                           style: TextStyle(
                             fontSize: 11.sp,
@@ -170,7 +170,7 @@ class PropertyInfoCard extends StatelessWidget {
                     Expanded(
                       child: _infoItem(
                         icon: Icons.near_me_outlined,
-                        text: "1.2 km away",
+                        text: "1.2 km ${"away".tr}",
                       ),
                     ),
 
@@ -179,7 +179,7 @@ class PropertyInfoCard extends StatelessWidget {
                     Expanded(
                       child: _infoItem(
                         icon: Icons.square_foot_outlined,
-                        text: "${property.area} sqm",
+                        text: "${property.area} ${"sqm".tr}",
                       ),
                     ),
                   ],
@@ -196,7 +196,7 @@ class PropertyInfoCard extends StatelessWidget {
                     Expanded(
                       child: _infoItem(
                         icon: Icons.bed_outlined,
-                        text: "${property.bedrooms} Beds",
+                        text: "${property.bedrooms} ${"Beds".tr}",
                       ),
                     ),
 
@@ -205,7 +205,7 @@ class PropertyInfoCard extends StatelessWidget {
                     Expanded(
                       child: _infoItem(
                         icon: Icons.bathtub_outlined,
-                        text: "${property.bathrooms} Baths",
+                        text: "${property.bathrooms} ${"Baths".tr}",
                       ),
                     ),
 
@@ -214,7 +214,7 @@ class PropertyInfoCard extends StatelessWidget {
                     Expanded(
                       child: _infoItem(
                         icon: Icons.home_work_outlined,
-                        text: propertyType,
+                        text: propertyType.tr,
                       ),
                     ),
                   ],

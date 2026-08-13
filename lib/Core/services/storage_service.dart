@@ -95,6 +95,13 @@ class StorageService {
     return _prefs!.getString(languageKey) ?? "en";
   }
 
+  /// Unlike [getLanguage], returns null when the user has never
+  /// explicitly picked a language - lets the caller fall back to
+  /// device-locale auto-detection instead of forcing "en".
+  static String? getSavedLanguageOrNull() {
+    return _prefs!.getString(languageKey);
+  }
+
   /// ================= LOCATION =================
 
   static Future<bool> saveLocation(Map<String, dynamic> location) async {

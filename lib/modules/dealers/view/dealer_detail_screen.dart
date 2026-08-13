@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'package:villas_qatar/Core/constants/app_colors.dart';
 import 'package:villas_qatar/Core/theme/app_textstyles.dart';
 import 'package:villas_qatar/modules/dealers/service/dealer_controller.dart';
-import 'package:villas_qatar/modules/dealers/service/model/dealer_details_model.dart';
+import 'package:villas_qatar/modules/dealers/model/dealer_details_model.dart';
 import 'package:villas_qatar/modules/propertydetailscreen/propertydetailscreen.dart';
 
 class DealerDetailsScreen extends StatefulWidget {
@@ -78,7 +79,7 @@ class _DealerDetailsScreenState extends State<DealerDetailsScreen> {
                               // ),
                               SizedBox(height: 20.h),
                               _SectionTitle(
-                                title: "Properties",
+                                title: "Properties".tr,
                                 onViewAll: () {},
                               ),
                               SizedBox(height: 12.h),
@@ -90,7 +91,7 @@ class _DealerDetailsScreenState extends State<DealerDetailsScreen> {
                     ),
                   ),
                 ),
-                _BottomActions(d),
+               _BottomActions(d)
               ],
             ),
           ),
@@ -238,25 +239,45 @@ class _Identity extends StatelessWidget {
           ),
         ],
         SizedBox(height: 8.h),
-        Row(
-          children: [
-            Container(
-              width: 8.w,
-              height: 8.w,
-              decoration: BoxDecoration(
-                color: d.isActive ? AppColors.success : Colors.grey,
-                shape: BoxShape.circle,
-              ),
-            ),
-            SizedBox(width: 6.w),
-            Text(
-              d.isActive ? "Active" : "Inactive",
-              style: AppTextStyles.body13.copyWith(
-                color: AppColors.textSecondary,
-              ),
-            ),
-          ],
-        ),
+       Row(
+  children: [
+    Container(
+      width: 8.w,
+      height: 8.w,
+      decoration: BoxDecoration(
+        color: d.isActive ? AppColors.success : Colors.grey,
+        shape: BoxShape.circle,
+      ),
+    ),
+
+    SizedBox(width: 6.w),
+
+    Text(
+      d.isActive ? "Active".tr : "Inactive".tr,
+      style: AppTextStyles.body13.copyWith(
+        color: AppColors.textSecondary,
+      ),
+    ),
+
+    SizedBox(width: 8.w),
+
+    // Small vertical divider
+    Container(
+      width: 1,
+      height: 14.h,
+      color: Colors.grey.shade400,
+    ),
+
+    SizedBox(width: 8.w),
+
+    Text(
+      "${"Trade No".tr} ${p.tradeNumber ?? ""}",
+      style: AppTextStyles.body13.copyWith(
+        color: AppColors.textSecondary,
+      ),
+    ),
+  ],
+),
         SizedBox(height: 10.h),
         Row(
           children: [
@@ -280,7 +301,7 @@ class _Identity extends StatelessWidget {
             ),
             SizedBox(width: 4.w),
             Text(
-              "Active Since ${d.createdAt.year}",
+              "${"Active Since".tr} ${d.createdAt.year}",
               style: AppTextStyles.body13.copyWith(
                 color: AppColors.textSecondary,
               ),
@@ -302,21 +323,17 @@ class _ContactCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return _Card(
-      title: "Contact Information",
+      title: "Contact Information".tr,
       child: Column(
         children: [
           Row(
             children: [
               Expanded(
-                child: _ContactTile(Icons.call_outlined, d.phone, "Phone"),
+                child: _ContactTile(Icons.call_outlined, d.phone, "Phone".tr),
               ),
               SizedBox(width: 12.w),
               Expanded(
-                child: _ContactTile(
-                  Icons.call_outlined,
-                  p.whatsapp ?? d.phone,
-                  "WhatsApp",
-                ),
+                child: _ContactTile(Icons.email_outlined, d.email, "Email".tr),
               ),
             ],
           ),
@@ -324,7 +341,7 @@ class _ContactCard extends StatelessWidget {
           Row(
             children: [
               Expanded(
-                child: _ContactTile(Icons.email_outlined, d.email, "Email"),
+                child: _ContactTile(Icons.language, p.website ?? "", "Website".tr),
               ),
               SizedBox(width: 12.w),
               Expanded(
@@ -332,22 +349,6 @@ class _ContactCard extends StatelessWidget {
                   Icons.location_on_outlined,
                   p.address ?? "",
                   p.city ?? "",
-                ),
-              ),
-            ],
-          ),
-          SizedBox(height: 14.h),
-          Row(
-            children: [
-              Expanded(
-                child: _ContactTile(Icons.language, p.website ?? "", "Website"),
-              ),
-              SizedBox(width: 12.w),
-              Expanded(
-                child: _ContactTile(
-                  Icons.confirmation_number_outlined,
-                  p.tradeNumber ?? "",
-                  "Trade No.",
                 ),
               ),
             ],
@@ -441,7 +442,7 @@ class _SubscriptionAndStats extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
-                      "Subscription Plan",
+                      "Subscription Plan".tr,
                       style: AppTextStyles.body13.copyWith(
                         color: Colors.white70,
                       ),
@@ -480,7 +481,7 @@ class _SubscriptionAndStats extends StatelessWidget {
                 ),
                 SizedBox(height: 10.h),
                 Text(
-                  "Valid Till",
+                  "Valid Till".tr,
                   style: AppTextStyles.body12.copyWith(color: Colors.white70),
                 ),
                 Text(
@@ -517,7 +518,7 @@ class _SubscriptionAndStats extends StatelessWidget {
           ),
         SizedBox(height: 16.h),
         _Card(
-          title: "Statistics",
+          title: "Statistics".tr,
           child: Wrap(
             spacing: 12.w,
             runSpacing: 12.h,
@@ -525,22 +526,22 @@ class _SubscriptionAndStats extends StatelessWidget {
               _StatTile(
                 Icons.home_outlined,
                 "$total",
-                "Total Properties",
+                "Total Properties".tr,
                 AppColors.primary,
               ),
               _StatTile(
                 Icons.check_circle_outline,
                 "$active",
-                "Active Listings",
+                "Active Listings".tr,
                 AppColors.success,
               ),
               _StatTile(
                 Icons.sell_outlined,
                 "$sold",
-                "Sold Properties",
+                "Sold Properties".tr,
                 Colors.orange,
               ),
-              _StatTile(Icons.key_outlined, "$rent", "For Rent", Colors.indigo),
+              _StatTile(Icons.key_outlined, "$rent", "For Rent".tr, Colors.indigo),
             ],
           ),
         ),
@@ -549,14 +550,15 @@ class _SubscriptionAndStats extends StatelessWidget {
   }
 
   List<String> _planFeatures(SubscriptionPlan plan) => [
-    if (plan.maxListings != null) "${plan.maxListings} Listings",
+    if (plan.maxListings != null) "${plan.maxListings} ${"Listings".tr}",
 
-    if (plan.validityDays != null) "Valid for ${plan.validityDays} Days",
+    if (plan.validityDays != null)
+      "${"Valid for".tr} ${plan.validityDays} ${"Days".tr}",
 
     if ((plan.boostDiscountPercent ?? 0) > 0)
-      "${plan.boostDiscountPercent}% Boost Discount",
+      "${plan.boostDiscountPercent}% ${"Boost Discount".tr}",
 
-    "Priority Support",
+    "Priority Support".tr,
   ];
 
   String _fmtDate(DateTime dt) =>
@@ -642,7 +644,7 @@ class _AboutCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return _Card(
-      title: "About Company",
+      title: "About Company".tr,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -663,7 +665,7 @@ class _AboutCard extends StatelessWidget {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Text(
-                    expanded ? "Show Less" : "Read More",
+                    expanded ? "Show Less".tr : "Read More".tr,
                     style: AppTextStyles.body13.copyWith(
                       color: AppColors.primary,
                     ),
@@ -725,7 +727,7 @@ class _PropertiesRow extends StatelessWidget {
       return Padding(
         padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 20.h),
         child: Text(
-          "No properties yet",
+          "No properties yet".tr,
           style: AppTextStyles.body13.copyWith(color: AppColors.textSecondary),
         ),
       );
@@ -807,7 +809,7 @@ class _PropertyCard extends StatelessWidget {
                           ),
                   ),
                 ),
-              
+
                 Positioned(
                   left: 8,
                   bottom: 8,
@@ -821,7 +823,7 @@ class _PropertyCard extends StatelessWidget {
                       borderRadius: BorderRadius.circular(6.r),
                     ),
                     child: Text(
-                      forSale ? "FOR SALE" : "FOR RENT",
+                      forSale ? "FOR SALE".tr : "FOR RENT".tr,
                       style: AppTextStyles.bold12.copyWith(
                         color: Colors.white,
                         fontSize: 9.sp,
@@ -867,11 +869,14 @@ class _PropertyCard extends StatelessWidget {
                   SizedBox(height: 6.h),
                   Row(
                     children: [
-                      _feature(Icons.bed_outlined, "${listing.bedrooms} Beds"),
+                      _feature(
+                        Icons.bed_outlined,
+                        "${listing.bedrooms} ${"Beds".tr}",
+                      ),
                       SizedBox(width: 8.w),
                       _feature(
                         Icons.bathtub_outlined,
-                        "${listing.bathrooms} Baths",
+                        "${listing.bathrooms} ${"Baths".tr}",
                       ),
                     ],
                   ),
@@ -963,8 +968,21 @@ class _BottomActions extends StatelessWidget {
             Expanded(
               child: _actionButton(
                 icon: Icons.call_outlined,
-                label: "Call",
-                onTap: () {},
+                label: "Call".tr,
+                onTap: () async {
+                  final phone = d.phone?.trim() ?? '';
+
+                  if (phone.isEmpty) return;
+
+                  final uri = Uri(
+                    scheme: 'tel',
+                    path: phone,
+                  );
+
+                  if (await canLaunchUrl(uri)) {
+                    await launchUrl(uri);
+                  }
+                },
               ),
             ),
 
@@ -973,21 +991,32 @@ class _BottomActions extends StatelessWidget {
             Expanded(
               child: _actionButton(
                 icon: Icons.chat_bubble_outline,
-                label: "WhatsApp",
-                onTap: () {},
+                label: "WhatsApp".tr,
+                onTap: () async {
+                  final phone = d.phone?.trim() ?? '';
+
+                  if (phone.isEmpty) return;
+
+                  final cleanPhone =
+                      phone.replaceAll(RegExp(r'[^0-9]'), '');
+
+                  if (cleanPhone.isEmpty) return;
+
+                  final uri = Uri.parse(
+                    'https://wa.me/$cleanPhone',
+                  );
+
+                  if (await canLaunchUrl(uri)) {
+                    await launchUrl(
+                      uri,
+                      mode: LaunchMode.externalApplication,
+                    );
+                  }
+                },
               ),
             ),
 
             SizedBox(width: 8.w),
-
-            Expanded(
-              child: _actionButton(
-                icon: Icons.chat,
-                label: "Chat",
-                filled: true,
-                onTap: () => Get.toNamed('/chat', arguments: d.id),
-              ),
-            ),
           ],
         ),
       ),
@@ -1005,7 +1034,11 @@ class _BottomActions extends StatelessWidget {
       child: filled
           ? ElevatedButton.icon(
               onPressed: onTap,
-              icon: Icon(icon, size: 12.sp, color: Colors.white),
+              icon: Icon(
+                icon,
+                size: 12.sp,
+                color: Colors.white,
+              ),
               label: Text(
                 label,
                 overflow: TextOverflow.ellipsis,
@@ -1025,7 +1058,11 @@ class _BottomActions extends StatelessWidget {
             )
           : OutlinedButton.icon(
               onPressed: onTap,
-              icon: Icon(icon, size: 12.sp, color: AppColors.primary),
+              icon: Icon(
+                icon,
+                size: 12.sp,
+                color: AppColors.primary,
+              ),
               label: Text(
                 label,
                 overflow: TextOverflow.ellipsis,
@@ -1036,7 +1073,9 @@ class _BottomActions extends StatelessWidget {
                 ),
               ),
               style: OutlinedButton.styleFrom(
-                side: BorderSide(color: AppColors.border),
+                side: BorderSide(
+                  color: AppColors.border,
+                ),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(10.r),
                 ),

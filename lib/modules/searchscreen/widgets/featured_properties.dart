@@ -191,7 +191,7 @@ class _FeaturedPropertiesState extends State<FeaturedProperties> {
                 height: 80.h,
                 child: Center(
                   child: Text(
-                    "Unable to load featured properties",
+                    "Unable to load featured properties".tr,
                     style: AppTextStyles.body14.copyWith(
                       fontSize: 12.sp,
                       color: const Color(0xff6E6E73),
@@ -374,8 +374,8 @@ void _openPropertyDetails() {
     debugPrint("FEATURED PROPERTY ERROR: Property ID is empty");
 
     Get.snackbar(
-      "Error",
-      "Property details are not available",
+      "Error".tr,
+      "Property details are not available".tr,
       snackPosition: SnackPosition.BOTTOM,
     );
     return;

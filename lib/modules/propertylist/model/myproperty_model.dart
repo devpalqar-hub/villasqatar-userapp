@@ -1,3 +1,5 @@
+import 'package:intl/intl.dart';
+
 class MyPropertyModel {
   final List<Property> data;
   final Meta meta;
@@ -87,6 +89,8 @@ class Property {
 
   final String? rejectionReason;
 
+  final PropertyInsights insights;
+
   const Property({
     required this.id,
     required this.referenceCode,
@@ -136,6 +140,7 @@ class Property {
     required this.isWishlisted,
     required this.isFeatured,
     required this.rejectionReason,
+    required this.insights,
   });
 
   factory Property.fromJson(Map<String, dynamic> json) {
@@ -221,6 +226,13 @@ class Property {
       isFeatured: json["isFeatured"] ?? false,
 
       rejectionReason: json["rejectionReason"],
+
+      insights: PropertyInsights.fromJson(
+        json["insights"] ??
+            json["viewsInsights"] ??
+            json["analytics"] ??
+            json["viewsAnalytics"],
+      ),
     );
   }
 
@@ -382,10 +394,16 @@ class CreatedBy {
 }
 
 class DealerProfile {
-  const DealerProfile();
+  final String dealerName;
+  final String coverImage;
+
+  const DealerProfile({this.dealerName = "", this.coverImage = ""});
 
   factory DealerProfile.fromJson(Map<String, dynamic> json) {
-    return const DealerProfile();
+    return DealerProfile(
+      dealerName: json["dealerName"] ?? "",
+      coverImage: json["coverImage"] ?? "",
+    );
   }
 }
 
@@ -489,5 +507,327 @@ class Meta {
       limit: json["limit"] ?? 10,
       totalPages: json["totalPages"] ?? 1,
     );
+  }
+}
+
+// ============================================================
+// PROPERTY INSIGHTS
+//
+// PER-DAY VIEW COUNTS FOR A LISTING, E.G.:
+// "insights": { "views": [ { "period": "2026-08-11", "views": 15 } ] }
+//
+// THE WRAPPER/ARRAY KEY NAMES ARE CHECKED AGAINST A FEW COMMON
+// VARIANTS SO THIS KEEPS WORKING EVEN IF THE BACKEND RENAMES THEM.
+// ============================================================
+
+class PropertyInsights {
+  final List<InsightPoint> viewsTrend;
+
+  /// Lifetime totals for the listing (Reach, Impressions, etc.).
+  /// Falls back to zeros until the backend sends a "totals"/"allTime"
+  /// object - `allTime.views` falls back to [totalViews] below.
+  final PropertyInsightsMetrics allTime;
+
+  /// Totals scoped to the returned date range only.
+  final PropertyInsightsMetrics period;
+
+  /// Views recorded in the equivalent period right before this one,
+  /// used for the "vs previous N days" comparison. Null when the
+  /// backend hasn't sent a comparison figure.
+  final int? previousPeriodViews;
+
+  const PropertyInsights({
+    required this.viewsTrend,
+    required this.allTime,
+    required this.period,
+    this.previousPeriodViews,
+  });
+
+  const PropertyInsights.empty()
+      : viewsTrend = const [],
+        allTime = const PropertyInsightsMetrics.empty(),
+        period = const PropertyInsightsMetrics.empty(),
+        previousPeriodViews = null;
+
+  factory PropertyInsights.fromJson(dynamic json) {
+    if (json is! Map) {
+      return const PropertyInsights.empty();
+    }
+
+    final Map<String, dynamic> map = Map<String, dynamic>.from(json);
+
+    final List rawList = _extractTrendList(map);
+
+    final List<InsightPoint> points = rawList
+        .whereType<Map>()
+        .map(
+          (e) => InsightPoint.fromJson(
+            Map<String, dynamic>.from(e),
+          ),
+        )
+        .toList();
+
+    final int trendTotalViews = points.fold<int>(
+      0,
+      (sum, point) => sum + point.views,
+    );
+
+    final allTimeJson = _firstMap(map, [
+      'totals',
+      'allTime',
+      'allTimeTotals',
+      'lifetime',
+    ]);
+
+    final periodJson = _firstMap(map, [
+      'periodSummary',
+      'thisPeriod',
+      'currentPeriod',
+      'summary',
+    ]);
+
+    PropertyInsightsMetrics allTime =
+        PropertyInsightsMetrics.fromJson(allTimeJson);
+
+    PropertyInsightsMetrics period =
+        PropertyInsightsMetrics.fromJson(periodJson);
+
+    // Neither wrapper present on the root "insights" object yet -
+    // use the daily trend total as the best available view count
+    // for both scopes so the UI still shows something meaningful.
+    if (allTimeJson == null && allTime.views == 0) {
+      allTime = allTime.copyWith(views: trendTotalViews);
+    }
+
+    if (periodJson == null && period.views == 0) {
+      period = period.copyWith(views: trendTotalViews);
+    }
+
+    final previousPeriodJson = _firstMap(map, [
+      'previousPeriod',
+      'previous',
+      'lastPeriod',
+    ]);
+
+    final int? previousPeriodViews = previousPeriodJson != null
+        ? _int(previousPeriodJson, ['views', 'totalViews'])
+        : _intOrNull(map, [
+            'previousPeriodViews',
+            'previousViews',
+            'prevPeriodViews',
+          ]);
+
+    return PropertyInsights(
+      viewsTrend: points,
+      allTime: allTime,
+      period: period,
+      previousPeriodViews: previousPeriodViews,
+    );
+  }
+
+  static Map<String, dynamic>? _firstMap(
+    Map<String, dynamic> json,
+    List<String> keys,
+  ) {
+    for (final key in keys) {
+      final value = json[key];
+
+      if (value is Map) {
+        return Map<String, dynamic>.from(value);
+      }
+    }
+
+    return null;
+  }
+
+  static List _extractTrendList(Map<String, dynamic> json) {
+    const candidateKeys = [
+      'views',
+      'viewsTrend',
+      'trend',
+      'timeline',
+      'history',
+      'data',
+      'viewsOverTime',
+      'dailyViews',
+    ];
+
+    for (final key in candidateKeys) {
+      final value = json[key];
+
+      if (value is List) {
+        return value;
+      }
+    }
+
+    return const [];
+  }
+
+  /// Sum of views across the returned trend period. Kept for
+  /// backward compatibility - prefer [period].views or
+  /// [allTime].views going forward.
+  int get totalViews {
+    return viewsTrend.fold<int>(
+      0,
+      (sum, point) => sum + point.views,
+    );
+  }
+
+  /// "11 Aug - 12 Aug" style label built from the first/last trend
+  /// points, used when the backend doesn't send an explicit range.
+  String get formattedTrendRange {
+    if (viewsTrend.isEmpty) {
+      return '';
+    }
+
+    if (viewsTrend.length == 1) {
+      return viewsTrend.first.formattedPeriod;
+    }
+
+    return '${viewsTrend.first.formattedPeriod} - '
+        '${viewsTrend.last.formattedPeriod}';
+  }
+
+  /// Percentage change of this period's views vs. the previous
+  /// period, when the backend provides a comparison figure.
+  double? get viewsChangePercent {
+    if (previousPeriodViews == null) {
+      return null;
+    }
+
+    if (previousPeriodViews == 0) {
+      return period.views > 0 ? 100 : 0;
+    }
+
+    return ((period.views - previousPeriodViews!) /
+            previousPeriodViews!) *
+        100;
+  }
+}
+
+// ============================================================
+// PROPERTY INSIGHTS METRICS
+//
+// ONE SET OF ENGAGEMENT NUMBERS (VIEWS, REACH, IMPRESSIONS, ...),
+// REUSED FOR BOTH THE "ALL TIME" AND "THIS PERIOD" SCOPES.
+// ============================================================
+
+class PropertyInsightsMetrics {
+  final int views;
+  final int reach;
+  final int impressions;
+  final int whatsappClicks;
+  final int messagesStarted;
+  final int usersEngaged;
+  final int visitRequests;
+
+  const PropertyInsightsMetrics({
+    required this.views,
+    required this.reach,
+    required this.impressions,
+    required this.whatsappClicks,
+    required this.messagesStarted,
+    required this.usersEngaged,
+    required this.visitRequests,
+  });
+
+  const PropertyInsightsMetrics.empty()
+      : views = 0,
+        reach = 0,
+        impressions = 0,
+        whatsappClicks = 0,
+        messagesStarted = 0,
+        usersEngaged = 0,
+        visitRequests = 0;
+
+  factory PropertyInsightsMetrics.fromJson(Map<String, dynamic>? json) {
+    if (json == null) {
+      return const PropertyInsightsMetrics.empty();
+    }
+
+    return PropertyInsightsMetrics(
+      views: _int(json, ['views', 'totalViews', 'viewCount']),
+      reach: _int(json, ['reach', 'uniqueReach', 'totalReach']),
+      impressions: _int(json, ['impressions', 'totalImpressions']),
+      whatsappClicks: _int(
+        json,
+        ['whatsappClicks', 'whatsAppClicks', 'waClicks'],
+      ),
+      messagesStarted: _int(
+        json,
+        ['messagesStarted', 'chatsStarted', 'conversationsStarted'],
+      ),
+      usersEngaged: _int(
+        json,
+        ['usersEngaged', 'engagedUsers', 'uniqueUsersEngaged'],
+      ),
+      visitRequests: _int(
+        json,
+        ['visitRequests', 'visitsRequested', 'scheduledVisits'],
+      ),
+    );
+  }
+
+  PropertyInsightsMetrics copyWith({int? views}) {
+    return PropertyInsightsMetrics(
+      views: views ?? this.views,
+      reach: reach,
+      impressions: impressions,
+      whatsappClicks: whatsappClicks,
+      messagesStarted: messagesStarted,
+      usersEngaged: usersEngaged,
+      visitRequests: visitRequests,
+    );
+  }
+}
+
+int _int(Map<String, dynamic> json, List<String> keys) {
+  return _intOrNull(json, keys) ?? 0;
+}
+
+int? _intOrNull(Map<String, dynamic> json, List<String> keys) {
+  for (final key in keys) {
+    final value = json[key];
+
+    if (value is num) {
+      return value.toInt();
+    }
+
+    if (value is String) {
+      final parsed = int.tryParse(value);
+
+      if (parsed != null) {
+        return parsed;
+      }
+    }
+  }
+
+  return null;
+}
+
+class InsightPoint {
+  final DateTime? period;
+  final int views;
+
+  const InsightPoint({
+    required this.period,
+    required this.views,
+  });
+
+  factory InsightPoint.fromJson(Map<String, dynamic> json) {
+    return InsightPoint(
+      period: json["period"] != null
+          ? DateTime.tryParse(json["period"].toString())
+          : null,
+      views: (json["views"] as num?)?.toInt() ?? 0,
+    );
+  }
+
+  String get formattedPeriod {
+    if (period == null) {
+      return '-';
+    }
+
+    return DateFormat('d MMM').format(period!);
   }
 }

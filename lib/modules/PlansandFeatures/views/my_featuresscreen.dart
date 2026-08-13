@@ -1,10 +1,16 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:share_plus/share_plus.dart';
 
 import 'package:villas_qatar/Core/constants/app_colors.dart';
 import 'package:villas_qatar/modules/PlansandFeatures/model/myfeatured_property.dart';
 import 'package:villas_qatar/modules/PlansandFeatures/services/featured_properties_controller.dart';
+import 'package:villas_qatar/modules/PlansandFeatures/services/receipt_pdf_service.dart';
+import 'package:villas_qatar/modules/propertydetailscreen/propertydetailscreen.dart';
 
 class MyFeaturedPropertiesScreen extends StatefulWidget {
   const MyFeaturedPropertiesScreen({
@@ -63,7 +69,7 @@ class _MyFeaturedPropertiesScreenState
         surfaceTintColor: Colors.white,
         
         title: Text(
-          'My Featured Properties'.tr,
+          'My Featured'.tr,
           style: TextStyle(
             fontSize: 18.sp,
             fontWeight: FontWeight.w500,
@@ -78,7 +84,7 @@ class _MyFeaturedPropertiesScreenState
 
       body: GetBuilder<FeaturedPropertiesController>(
         builder: (controller) {
-          final List<MyFeaturedProperty> properties =
+          final List<MyFeaturedProperty> entries =
               controller.filteredMyFeaturedProperties;
 
           return RefreshIndicator(
@@ -219,8 +225,8 @@ class _MyFeaturedPropertiesScreenState
                                         .start,
                                 children: [
                                   Text(
-                                    'Featured Properties'.tr,
-                                       
+                                    'Featured Plans'.tr,
+
                                     style: TextStyle(
                                       fontSize: 16.sp,
                                       fontWeight:
@@ -235,8 +241,8 @@ class _MyFeaturedPropertiesScreenState
                                   SizedBox(height: 3.h),
 
                                   Text(
-                                    'Manage your currently featured properties'.tr,
-                                        
+                                    'Manage your active and past featured property plans'.tr,
+
                                     style: TextStyle(
                                       fontSize: 11.5.sp,
                                       color: Colors
@@ -267,8 +273,8 @@ class _MyFeaturedPropertiesScreenState
                                   ),
                                 ),
                                 child: Text(
-                                  '${properties.length} '
-                                  '${properties.length == 1 ? 'Property'.tr : 'Properties'.tr}',
+                                  '${entries.length} '
+                                  '${entries.length == 1 ? 'Property'.tr : 'Properties'.tr}',
                                   style: TextStyle(
                                     fontSize: 10.5.sp,
                                     fontWeight:
@@ -317,7 +323,7 @@ class _MyFeaturedPropertiesScreenState
                 // EMPTY
                 // ==================================================
 
-                else if (properties.isEmpty)
+                else if (entries.isEmpty)
                   SliverFillRemaining(
                     hasScrollBody: false,
                     child:
@@ -344,8 +350,8 @@ class _MyFeaturedPropertiesScreenState
                           index,
                         ) {
                           final MyFeaturedProperty
-                              property =
-                              properties[index];
+                              entry =
+                              entries[index];
 
                           return Padding(
                             padding:
@@ -353,13 +359,13 @@ class _MyFeaturedPropertiesScreenState
                               bottom: 14.h,
                             ),
                             child:
-                                _FeaturedPropertyCard(
-                              property: property,
+                                _FeaturedEntryCard(
+                              entry: entry,
                             ),
                           );
                         },
                         childCount:
-                            properties.length,
+                            entries.length,
                       ),
                     ),
                   ),
@@ -557,20 +563,91 @@ class _MyFeaturedPropertiesScreenState
   }
 }
 
-class _FeaturedPropertyCard extends StatelessWidget {
-  final MyFeaturedProperty property;
+// ============================================================
+// FEATURED ENTRY CARD
+//
+// ONE CARD PER FEATURED-PROPERTY PURCHASE:
+// PLAN NAME + STATUS, PROPERTY NAME LINK, THEN
+// LOCATION / START DATE / END DATE / AMOUNT PAID ROWS.
+// ============================================================
 
-  const _FeaturedPropertyCard({
-    required this.property,
+class _FeaturedEntryCard extends StatefulWidget {
+  final MyFeaturedProperty entry;
+
+  const _FeaturedEntryCard({
+    required this.entry,
   });
 
   @override
+  State<_FeaturedEntryCard> createState() =>
+      _FeaturedEntryCardState();
+}
+
+class _FeaturedEntryCardState extends State<_FeaturedEntryCard> {
+  bool _isDownloadingReceipt = false;
+
+  MyFeaturedProperty get entry => widget.entry;
+
+  // ============================================================
+  // DOWNLOAD RECEIPT
+  //
+  // GENERATES THE RECEIPT PDF AND OPENS THE SHARE SHEET SO THE
+  // USER CAN SAVE / SEND THE FILE.
+  // ============================================================
+
+  Future<void> _downloadReceipt() async {
+    if (_isDownloadingReceipt) {
+      return;
+    }
+
+    setState(() {
+      _isDownloadingReceipt = true;
+    });
+
+    try {
+      final bytes = await ReceiptPdfService.build(entry);
+
+      final Directory dir = await getTemporaryDirectory();
+
+      final String fileName =
+          'VillasQatar_Receipt_${entry.receiptNumber.replaceAll('#', '')}.pdf';
+
+      final File file = File('${dir.path}/$fileName');
+
+      await file.writeAsBytes(bytes, flush: true);
+
+      await SharePlus.instance.share(
+        ShareParams(
+          files: [
+            XFile(file.path, mimeType: 'application/pdf'),
+          ],
+          subject: 'Villas Qatar Payment Receipt'.tr,
+        ),
+      );
+    } catch (_) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              'Unable to generate receipt. Please try again'.tr,
+            ),
+          ),
+        );
+      }
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isDownloadingReceipt = false;
+        });
+      }
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
-    final listing = property.listing;
-    final plan = property.plan;
+    final listing = entry.listing;
 
     return Container(
-      padding: EdgeInsets.all(12.w),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(12.r),
@@ -578,130 +655,261 @@ class _FeaturedPropertyCard extends StatelessWidget {
           color: const Color(0xFFEBEBEF),
         ),
       ),
-      child: Row(
-        children: [
-          // ICON
-          Container(
-            width: 42.w,
-            height: 42.w,
-            decoration: BoxDecoration(
-              color: AppColors.primary.withOpacity(.07),
-              borderRadius: BorderRadius.circular(10.r),
-            ),
-            child: Icon(
-              Icons.home_work_outlined,
-              size: 21.sp,
-              color: AppColors.primary,
-            ),
-          ),
+      child: Padding(
+        padding: EdgeInsets.all(14.w),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // ==========================================
+            // PLAN NAME + STATUS
+            // ==========================================
 
-          SizedBox(width: 11.w),
-
-          // DETAILS
-          Expanded(
-            child: Column(
+            Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  listing.propertyName.isNotEmpty
-                      ? listing.propertyName
-                      : 'Property',
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: TextStyle(
-                    fontSize: 13.sp,
-                    fontWeight: FontWeight.w500,
-                    color: const Color(0xFF202020),
+                Expanded(
+                  child: Text(
+                    entry.plan.name.isNotEmpty
+                        ? entry.plan.name
+                        : 'Plan'.tr,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(
+                      fontSize: 14.sp,
+                      fontWeight: FontWeight.w700,
+                      color: const Color(0xFF202020),
+                    ),
                   ),
                 ),
 
-                SizedBox(height: 4.h),
+                SizedBox(width: 8.w),
 
-                Text(
-                  plan.name.isNotEmpty
-                      ? plan.name
-                      : '-',
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: TextStyle(
-                    fontSize: 10.sp,
-                    color: Colors.grey.shade500,
-                  ),
-                ),
-
-                SizedBox(height: 5.h),
-
-                Row(
-                  children: [
-                    Icon(
-                      Icons.location_on_outlined,
-                      size: 12.sp,
-                      color: AppColors.primary,
-                    ),
-
-                    SizedBox(width: 3.w),
-
-                    Flexible(
-                      child: Text(
-                        property.locationLabel.isNotEmpty
-                            ? property.locationLabel
-                            : '-',
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: TextStyle(
-                          fontSize: 9.5.sp,
-                          color: Colors.grey.shade500,
-                        ),
-                      ),
-                    ),
-
-                    SizedBox(width: 8.w),
-
-                    if (property.isCurrentlyActive)
-                      Text(
-                        property.remainingDays > 0
-                            ? '${property.remainingDays} days left'
-                            : 'Ends today',
-                        style: TextStyle(
-                          fontSize: 9.sp,
-                          fontWeight: FontWeight.w500,
-                          color: AppColors.primary,
-                        ),
-                      ),
-                  ],
-                ),
+                _statusBadge(entry),
               ],
             ),
-          ),
 
-          SizedBox(width: 8.w),
+            SizedBox(height: 8.h),
 
-          // STATUS
-          _statusBadge(),
-        ],
+            // ==========================================
+            // PROPERTY NAME (TAPPABLE -> DETAIL PAGE)
+            // ==========================================
+
+            InkWell(
+              onTap: entry.listingId.isEmpty
+                  ? null
+                  : () {
+                      Get.to(
+                        () => PropertyDetailsScreen(
+                          propertyId: entry.listingId,
+                        ),
+                        transition: Transition.rightToLeft,
+                      );
+                    },
+              child: Row(
+                children: [
+                  Icon(
+                    Icons.open_in_new_rounded,
+                    size: 13.sp,
+                    color: AppColors.primary,
+                  ),
+
+                  SizedBox(width: 4.w),
+
+                  Expanded(
+                    child: Text(
+                      listing.propertyName.isNotEmpty
+                          ? listing.propertyName
+                          : 'Property'.tr,
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(
+                        fontSize: 12.5.sp,
+                        fontWeight: FontWeight.w600,
+                        color: AppColors.primary,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+
+            SizedBox(height: 12.h),
+
+            Divider(
+              height: 1,
+              thickness: 1,
+              color: const Color(0xFFEBEBEF),
+            ),
+
+            SizedBox(height: 10.h),
+
+            // ==========================================
+            // LOCATION / START / END / AMOUNT ROWS
+            // ==========================================
+
+            _infoRow(
+              'Location'.tr,
+              entry.locationLabel.isNotEmpty
+                  ? entry.locationLabel
+                  : '-',
+            ),
+
+            SizedBox(height: 8.h),
+
+            _infoRow(
+              'Start Date'.tr,
+              entry.formattedStartDate,
+            ),
+
+            SizedBox(height: 8.h),
+
+            _infoRow(
+              'End Date'.tr,
+              entry.formattedEndDate,
+            ),
+
+            SizedBox(height: 8.h),
+
+            _infoRow(
+              'Amount Paid'.tr,
+              entry.formattedPaidAmount,
+              valueColor: AppColors.primary,
+            ),
+
+            if (entry.isCurrentlyActive) ...[
+              SizedBox(height: 8.h),
+
+              Align(
+                alignment: Alignment.centerRight,
+                child: Text(
+                  entry.remainingDays > 0
+                      ? '${entry.remainingDays} days left'
+                      : 'Ends today'.tr,
+                  style: TextStyle(
+                    fontSize: 9.5.sp,
+                    fontWeight: FontWeight.w600,
+                    color: AppColors.primary,
+                  ),
+                ),
+              ),
+            ],
+
+            SizedBox(height: 14.h),
+
+            Divider(
+              height: 1,
+              thickness: 1,
+              color: const Color(0xFFEBEBEF),
+            ),
+
+            SizedBox(height: 12.h),
+
+            // ==========================================
+            // DOWNLOAD RECEIPT
+            // ==========================================
+
+            SizedBox(
+              width: double.infinity,
+              child: OutlinedButton.icon(
+                onPressed: _isDownloadingReceipt
+                    ? null
+                    : _downloadReceipt,
+                style: OutlinedButton.styleFrom(
+                  foregroundColor: const Color(0xFF202020),
+                  side: BorderSide(
+                    color: Colors.grey.shade300,
+                  ),
+                  padding: EdgeInsets.symmetric(
+                    vertical: 10.h,
+                  ),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8.r),
+                  ),
+                ),
+                icon: _isDownloadingReceipt
+                    ? SizedBox(
+                        width: 14.w,
+                        height: 14.w,
+                        child: const CircularProgressIndicator(
+                          strokeWidth: 2,
+                          color: AppColors.primary,
+                        ),
+                      )
+                    : Icon(
+                        Icons.download_rounded,
+                        size: 16.sp,
+                      ),
+                label: Text(
+                  'Download Receipt'.tr,
+                  style: TextStyle(
+                    fontSize: 11.5.sp,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
 
-  Widget _statusBadge() {
+  // ==========================================
+  // LABEL (LEFT) / VALUE (RIGHT) ROW
+  // ==========================================
+
+  Widget _infoRow(
+    String label,
+    String value, {
+    Color? valueColor,
+  }) {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          label,
+          style: TextStyle(
+            fontSize: 11.5.sp,
+            color: Colors.grey.shade600,
+          ),
+        ),
+
+        SizedBox(width: 8.w),
+
+        Expanded(
+          child: Text(
+            value,
+            textAlign: TextAlign.right,
+            style: TextStyle(
+              fontSize: 11.5.sp,
+              fontWeight: FontWeight.w700,
+              color: valueColor ?? const Color(0xFF202020),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _statusBadge(MyFeaturedProperty entry) {
     String text;
     Color color;
 
-    if (property.isExpired) {
+    if (entry.isExpired) {
       text = 'Expired';
       color = Colors.grey;
-    } else if (property.isCurrentlyActive) {
+    } else if (entry.isCurrentlyActive) {
       text = 'Active';
       color = const Color(0xFF258A57);
-    } else if (property.isFailed) {
+    } else if (entry.isFailed) {
       text = 'Failed';
       color = Colors.red;
-    } else if (property.isPaid) {
+    } else if (entry.isPaid) {
       text = 'Paid';
       color = const Color(0xFF258A57);
     } else {
-      text = property.paymentStatusLabel.isNotEmpty
-          ? property.paymentStatusLabel
+      text = entry.paymentStatusLabel.isNotEmpty
+          ? entry.paymentStatusLabel
           : 'Pending';
 
       color = Colors.orange;
@@ -709,7 +917,7 @@ class _FeaturedPropertyCard extends StatelessWidget {
 
     return Container(
       padding: EdgeInsets.symmetric(
-        horizontal: 8.w,
+        horizontal: 9.w,
         vertical: 4.h,
       ),
       decoration: BoxDecoration(
@@ -717,9 +925,9 @@ class _FeaturedPropertyCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(20.r),
       ),
       child: Text(
-        text,
+        text.tr,
         style: TextStyle(
-          fontSize: 8.5.sp,
+          fontSize: 9.sp,
           fontWeight: FontWeight.w700,
           color: color,
         ),

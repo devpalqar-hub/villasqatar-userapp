@@ -51,8 +51,8 @@ class _CompareBottomSheetState extends State<CompareBottomSheet> {
 
     if (selectedProperties.length >= 2) {
       Get.snackbar(
-        "Maximum Selection",
-        "You can compare only two properties.",
+        "Maximum Selection".tr,
+        "You can compare only two properties.".tr,
         snackPosition: SnackPosition.BOTTOM,
       );
       return;
@@ -120,7 +120,7 @@ class _CompareBottomSheetState extends State<CompareBottomSheet> {
                 children: [
                   Expanded(
                     child: Text(
-                      "Compare Properties",
+                      "Compare Properties".tr,
                       style: AppTextStyles.title18.copyWith(
                         fontWeight: FontWeight.w500,
                       ),
@@ -139,7 +139,7 @@ class _CompareBottomSheetState extends State<CompareBottomSheet> {
               child: Align(
                 alignment: Alignment.centerLeft,
                 child: Text(
-                  "Select up to 2 properties",
+                  "Select up to 2 properties".tr,
                   style: AppTextStyles.body13.copyWith(color: Colors.grey),
                 ),
               ),
@@ -156,7 +156,7 @@ class _CompareBottomSheetState extends State<CompareBottomSheet> {
                   style: AppTextStyles.body13,
                   textAlignVertical: TextAlignVertical.center,
                   decoration: InputDecoration(
-                    hintText: "Search Property",
+                    hintText: "Search Property".tr,
                     hintStyle: AppTextStyles.body13.copyWith(
                       color: Colors.grey.shade500,
                     ),
@@ -201,7 +201,7 @@ class _CompareBottomSheetState extends State<CompareBottomSheet> {
               child: controller.isLoading
                   ? const Center(child: CircularProgressIndicator())
                   : properties.isEmpty
-                  ? const Center(child: Text("No Properties Found"))
+                  ? Center(child: Text("No Properties Found".tr))
                   : ListView.separated(
                       controller: scrollController,
                       padding: EdgeInsets.symmetric(horizontal: 16.w),
@@ -241,7 +241,7 @@ class _CompareBottomSheetState extends State<CompareBottomSheet> {
                       ),
                     ),
                     child: Text(
-                      "Compare (${selectedProperties.length})",
+                      "${"Compare".tr} (${selectedProperties.length})",
                       style: const TextStyle(
                         color: Colors.white,
                         fontWeight: FontWeight.w500,
@@ -473,7 +473,7 @@ class ComparisonView extends StatelessWidget {
             children: [
               Expanded(
                 child: Text(
-                  "Property Comparison",
+                  "Property Comparison".tr,
                   style: AppTextStyles.title14.copyWith(
                     fontWeight: FontWeight.w500,
                   ),
@@ -503,45 +503,45 @@ class ComparisonView extends StatelessWidget {
                   Divider(),
 
                   _row(
-                    "Price",
+                    "Price".tr,
                     properties,
                     (e) => "QAR ${e.price.toStringAsFixed(0)}",
                   ),
 
-                  _row("Purpose", properties, (e) => e.purpose),
+                  _row("Purpose".tr, properties, (e) => e.purpose),
 
-                  _row("Property Type", properties, (e) => e.type.title),
+                  _row("Property Type".tr, properties, (e) => e.type.title),
 
                   _row(
-                    "Location",
+                    "Location".tr,
                     properties,
                     (e) => "${e.areaName}, ${e.municipality.name}",
                   ),
 
-                  _row("Bedrooms", properties, (e) => "${e.bedrooms}"),
+                  _row("Bedrooms".tr, properties, (e) => "${e.bedrooms}"),
 
-                  _row("Bathrooms", properties, (e) => "${e.bathrooms}"),
+                  _row("Bathrooms".tr, properties, (e) => "${e.bathrooms}"),
 
-                  _row("Area", properties, (e) => "${e.area} sqft"),
+                  _row("Area".tr, properties, (e) => "${e.area} sqft"),
 
-                  _row("Furnishing", properties, (e) => e.furnishing.title),
+                  _row("Furnishing".tr, properties, (e) => e.furnishing.title),
 
                   _row(
-                    "Price Negotiable",
+                    "Price Negotiable".tr,
                     properties,
-                    (e) => e.priceNegotiable ? "Yes" : "No",
+                    (e) => e.priceNegotiable ? "Yes".tr : "No".tr,
                   ),
 
                   _row(
-                    "Contact Verified",
+                    "Contact Verified".tr,
                     properties,
-                    (e) => e.contactVerified ? "Yes" : "No",
+                    (e) => e.contactVerified ? "Yes".tr : "No".tr,
                   ),
 
-                  _row("Status", properties, (e) => e.status),
+                  _row("Status".tr, properties, (e) => e.status),
 
                   _row(
-                    "Amenities",
+                    "Amenities".tr,
                     properties,
                     (e) => e.amenities.isEmpty
                         ? "-"
@@ -549,7 +549,7 @@ class ComparisonView extends StatelessWidget {
                   ),
 
                   _row(
-                    "Nearby Places",
+                    "Nearby Places".tr,
                     properties,
                     (e) => e.nearbyTags.isEmpty
                         ? "-"
@@ -557,7 +557,7 @@ class ComparisonView extends StatelessWidget {
                   ),
 
                   _row(
-                    "Other Features",
+                    "Other Features".tr,
                     properties,
                     (e) => e.otherFeatures.isEmpty ? "-" : e.otherFeatures,
                   ),
@@ -584,7 +584,7 @@ class ComparisonView extends StatelessWidget {
                   ),
                 ),
                 child: Text(
-                  "Change Selection",
+                  "Change Selection".tr,
                   style: TextStyle(color: AppColors.primary),
                 ),
               ),

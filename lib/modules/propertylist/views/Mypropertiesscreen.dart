@@ -8,6 +8,7 @@ import 'package:get/get_navigation/src/routes/transitions_type.dart';
 import 'package:get/get_state_manager/src/simple/get_state.dart';
 import 'package:quill_html_editor/quill_html_editor.dart';
 import 'package:villas_qatar/Core/constants/app_colors.dart';
+import 'package:villas_qatar/Core/utils/stripe_checkout_helper.dart';
 import 'package:villas_qatar/modules/propertydetailscreen/propertydetailscreen.dart';
 import 'package:villas_qatar/modules/propertylist/model/myproperty_model.dart';
 import 'package:villas_qatar/modules/propertylist/service/myproperties_listcontroller.dart';
@@ -85,7 +86,10 @@ class _MyPropertiesScreenState extends State<MyPropertiesScreen> {
 
           /// FILTER
 
-          if (activeFilter != "All".tr) {
+          // Compare against the untranslated key — `activeFilter` stores the
+          // canonical filter value, not display text, so it must never be
+          // compared against a `.tr`'d (locale-dependent) string.
+          if (activeFilter != "All") {
             listings = listings.where((e) {
               return e.status.toLowerCase() == activeFilter.toLowerCase();
             }).toList();
@@ -178,6 +182,11 @@ class _MyPropertiesScreenState extends State<MyPropertiesScreen> {
                                           transition: Transition.rightToLeft,
                                         );
                                       },
+                                      isPaying:
+                                          controller.activatingPropertyId ==
+                                          listings[index].id,
+                                      onPay: () =>
+                                          _handlePay(listings[index]),
                                     );
                                   },
                                 ),
@@ -269,6 +278,64 @@ class _MyPropertiesScreenState extends State<MyPropertiesScreen> {
     );
   }
 
+  /// ==========================================================
+  /// PAY (PENDING_PAYMENT -> go live)
+  /// ==========================================================
+  ///
+  /// POST /api/listings/make-payment. If free quota is available the
+  /// backend activates the listing immediately at no charge.
+  /// Otherwise it returns a Stripe PaymentIntent/Checkout Session,
+  /// which [StripeCheckoutHelper] pays via the native PaymentSheet
+  /// (preferred) or a webview fallback - same helper the featured/
+  /// boost checkout flow uses.
+  Future<void> _handlePay(Property listing) async {
+    try {
+      final result = await controller.makePayment(
+        listing.id,
+        successUrl: "villasqatar://listings/payment-success",
+        failedUrl: "villasqatar://listings/payment-failed",
+      );
+
+      if (result.activated) {
+        Get.snackbar(
+          "Listing Activated".tr,
+          "${listing.propertyName} is now live.".tr,
+          snackPosition: SnackPosition.BOTTOM,
+        );
+        return;
+      }
+
+      final StripePaymentOutcome outcome = await StripeCheckoutHelper.pay(
+        clientSecret: result.paymentIntentClientSecret,
+      );
+
+      switch (outcome) {
+        case StripePaymentOutcome.success:
+          Get.snackbar(
+            "Payment Successful".tr,
+            "${listing.propertyName} has been activated.".tr,
+            snackPosition: SnackPosition.BOTTOM,
+          );
+          await controller.fetchProperties(showLoader: false);
+          break;
+
+        case StripePaymentOutcome.cancelled:
+          Get.snackbar(
+            "Payment Cancelled".tr,
+            "You can try again anytime.".tr,
+            snackPosition: SnackPosition.BOTTOM,
+          );
+          break;
+      }
+    } catch (e) {
+      Get.snackbar(
+        "Payment Failed".tr,
+        e.toString().replaceFirst("Exception: ", ""),
+        snackPosition: SnackPosition.BOTTOM,
+      );
+    }
+  }
+
   Widget _buildEmptyState() {
     return Center(
       child: Padding(
@@ -311,11 +378,15 @@ class _PropertyCard extends StatelessWidget {
   final Property listing;
   final VoidCallback onTap;
   final VoidCallback onEdit;
+  final VoidCallback? onPay;
+  final bool isPaying;
 
   const _PropertyCard({
     required this.listing,
     required this.onTap,
     required this.onEdit,
+    this.onPay,
+    this.isPaying = false,
   });
 
   @override
@@ -342,10 +413,7 @@ class _PropertyCard extends StatelessWidget {
               ],
             ),
 
-            if (_plainDescription.isNotEmpty) ...[
-              SizedBox(height: 8.h),
-              _buildDescription(context),
-            ],
+            
 
             SizedBox(height: 10.h),
             Divider(height: 1, color: AppColors.fieldBorder),
@@ -477,7 +545,7 @@ class _PropertyCard extends StatelessWidget {
 
         Text(
           "QAR ${_formatPrice(listing.price)}"
-          "${listing.purpose == "RENT" ? " / month" : ""}",
+          "${listing.purpose == "RENT" ? " / month".tr : ""}",
           style: const TextStyle(
             fontWeight: FontWeight.w600,
             fontSize: 15,
@@ -555,18 +623,57 @@ class _PropertyCard extends StatelessWidget {
     return Row(
       children: [
         if (listing.bedrooms > 0) ...[
-          _statIcon(Icons.bed_outlined, "${listing.bedrooms} Beds"),
+          _statIcon(Icons.bed_outlined, "${listing.bedrooms} ${"Beds".tr}"),
           const SizedBox(width: 16),
         ],
 
-        _statIcon(Icons.bathtub_outlined, "${listing.bathrooms} Baths"),
+        _statIcon(Icons.bathtub_outlined, "${listing.bathrooms} ${"Baths".tr}"),
 
         const SizedBox(width: 16),
 
-        _statIcon(Icons.square_foot_outlined, "${listing.area.toInt()} sqft"),
+        _statIcon(
+          Icons.square_foot_outlined,
+          "${listing.area.toInt()} ${"sqft".tr}",
+        ),
 
         const Spacer(),
+
+        if (listing.status.toUpperCase() == "PENDING_PAYMENT") _payButton(),
       ],
+    );
+  }
+
+  Widget _payButton() {
+    return SizedBox(
+      height: 30,
+      child: ElevatedButton(
+        onPressed: isPaying ? null : onPay,
+        style: ElevatedButton.styleFrom(
+          backgroundColor: AppColors.primary,
+          foregroundColor: Colors.white,
+          elevation: 0,
+          padding: const EdgeInsets.symmetric(horizontal: 16),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20),
+          ),
+        ),
+        child: isPaying
+            ? SizedBox(
+                width: 14,
+                height: 14,
+                child: CircularProgressIndicator(
+                  strokeWidth: 2,
+                  color: Colors.white,
+                ),
+              )
+            : Text(
+                "Pay".tr,
+                style: const TextStyle(
+                  fontSize: 12,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+      ),
     );
   }
 
@@ -784,30 +891,53 @@ class _StatusBadge extends StatelessWidget {
   Widget build(BuildContext context) {
     Color bg;
     Color fg;
+    String label;
     switch (status.toUpperCase()) {
+      case "ACTIVE":
       case "APPROVED":
         bg = const Color(0xffEAF8EF);
         fg = Colors.green;
+        label = "Active";
         break;
 
       case "PENDING":
         bg = const Color(0xffFFF8E7);
         fg = Colors.orange;
+        label = "Pending";
+        break;
+      case "PENDING_PAYMENT":
+        bg = const Color(0xffFFF8E7);
+        fg = Colors.orange;
+        label = "Payment Pending";
+        break;
+      case "RESUBMITTED":
+        bg = const Color(0xffFFF8E7);
+        fg = Colors.orange;
+        label = "Resubmitted";
         break;
 
       case "REJECTED":
         bg = const Color(0xffFFECEC);
         fg = Colors.red;
+        label = "Rejected";
+        break;
+
+      case "INACTIVE":
+        bg = Colors.grey.shade200;
+        fg = Colors.grey.shade700;
+        label = "Inactive";
         break;
 
       case "SOLD":
         bg = Colors.blue.shade50;
         fg = Colors.blue;
+        label = "Sold";
         break;
 
       default:
         bg = Colors.grey.shade100;
-        fg = Colors.grey;
+        fg = Colors.black;
+        label = status;
     }
 
     return Container(
@@ -817,7 +947,7 @@ class _StatusBadge extends StatelessWidget {
         borderRadius: BorderRadius.circular(6),
       ),
       child: Text(
-        status,
+        label.tr,
         style: TextStyle(fontSize: 10, fontWeight: FontWeight.w700, color: fg),
       ),
     );

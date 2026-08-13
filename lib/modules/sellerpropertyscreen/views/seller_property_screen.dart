@@ -75,9 +75,9 @@ class _SellerPropertiesScreenState extends State<SellerPropertiesScreen> {
               ),
 
               if (properties.isEmpty)
-                const SliverFillRemaining(
+                SliverFillRemaining(
                   hasScrollBody: false,
-                  child: Center(child: Text("No Properties Found")),
+                  child: Center(child: Text("No Properties Found".tr)),
                 )
               else
                 SliverPadding(
@@ -196,7 +196,7 @@ class _SellerHeader extends StatelessWidget {
 
                           SizedBox(width: 5.w),
 
-                          Text("Doha, Qatar", style: AppTextStyles.body13),
+                          Text("Doha, Qatar".tr, style: AppTextStyles.body13),
                         ],
                       ),
                     ],
@@ -332,11 +332,11 @@ class SellerFilterBar extends StatelessWidget {
               scrollDirection: Axis.horizontal,
               child: Row(
                 children: [
-                  _chip("All", total),
+                  _chip("All".tr, total),
                   SizedBox(width: 8.w),
-                  _chip("Sale", sale),
+                  _chip("Sale".tr, sale),
                   SizedBox(width: 8.w),
-                  _chip("Rent", rent),
+                  _chip("Rent".tr, rent),
                 ],
               ),
             ),

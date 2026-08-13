@@ -3,7 +3,8 @@ import 'package:get/get.dart';
 
 import 'package:villas_qatar/Core/network/api_endpoints.dart';
 import 'package:villas_qatar/Core/network/api_handler.dart';
-import 'package:villas_qatar/modules/PlansandFeatures/model/featured_property_model.dart';
+import 'package:villas_qatar/modules/PlansandFeatures/model/featured_property_model.dart'
+    hide FeaturedListing;
 import 'package:villas_qatar/modules/PlansandFeatures/model/myfeatured_property.dart';
 
 
@@ -169,11 +170,11 @@ Future<void> getMyFeaturedProperties({
 
     if (response is! List) {
       throw Exception(
-        'Invalid featured properties response',
+        'Invalid featured properties response'.tr,
       );
     }
 
-    myFeaturedProperties = response
+    final List<MyFeaturedProperty> parsed = response
         .whereType<Map>()
         .map(
           (item) =>
@@ -183,9 +184,12 @@ Future<void> getMyFeaturedProperties({
         )
         .toList();
 
+    myFeaturedProperties = _dedupeMyFeaturedProperties(parsed);
+
     debugPrint(
       'PARSED COUNT: '
-      '${myFeaturedProperties.length}',
+      '${parsed.length} '
+      '(${myFeaturedProperties.length} after dedupe)',
     );
   } catch (e, stackTrace) {
     myFeaturedPropertiesError = e
@@ -209,6 +213,122 @@ Future<void> getMyFeaturedProperties({
     update();
   }
 }
+
+// ============================================================
+// DEDUPE MY FEATURED PROPERTIES
+//
+// The backend has occasionally returned two rows for the same
+// checkout (e.g. a retried Stripe webhook re-inserting instead of
+// updating), which showed up as the same boost purchase listed
+// twice. Collapse rows that share a Stripe session - that's an
+// unambiguous "same purchase attempt" key, unlike listingId/planId
+// which a genuine repeat purchase would also share. Falls back to
+// `id` for the (should-be-impossible) case of a row with no
+// stripeSessionId at all, so at least literal duplicate entries
+// still collapse.
+//
+// When a purchase has duplicate rows, keep the one that best
+// reflects its real outcome: PAID over anything else, otherwise
+// the most recently updated row.
+// ============================================================
+
+List<MyFeaturedProperty> _dedupeMyFeaturedProperties(
+  List<MyFeaturedProperty> entries,
+) {
+  final List<MyFeaturedProperty> bySession = _collapseByKey(
+    entries,
+    keyOf: (entry) => entry.stripeSessionId?.isNotEmpty == true
+        ? 'session:${entry.stripeSessionId}'
+        : 'id:${entry.id}',
+  );
+
+  // Second pass: a retried webhook can create a *different* Stripe
+  // session for the same purchase instead of reusing the first one,
+  // which the pass above can't catch. Rows for the same listing+plan
+  // created within a few minutes of each other are treated as the
+  // same purchase attempt - a genuine renewal of the same plan
+  // happens hours/days later, not seconds apart.
+  const Duration sameAttemptWindow = Duration(minutes: 15);
+
+  final List<MyFeaturedProperty> sorted = List.of(bySession)
+    ..sort(
+      (a, b) => (a.createdAt ?? DateTime(0))
+          .compareTo(b.createdAt ?? DateTime(0)),
+    );
+
+  final List<MyFeaturedProperty> result = [];
+
+  for (final entry in sorted) {
+    final int existingIndex = result.indexWhere((kept) {
+      if (kept.listingId != entry.listingId ||
+          kept.planId != entry.planId) {
+        return false;
+      }
+
+      final DateTime? a = kept.createdAt;
+      final DateTime? b = entry.createdAt;
+
+      if (a == null || b == null) {
+        // No timestamp to compare - treat missing-timestamp rows for
+        // the same listing+plan as the same attempt rather than risk
+        // showing an un-collapsible duplicate.
+        return true;
+      }
+
+      return b.difference(a).abs() <= sameAttemptWindow;
+    });
+
+    if (existingIndex == -1) {
+      result.add(entry);
+      continue;
+    }
+
+    final MyFeaturedProperty existing = result[existingIndex];
+
+    final bool entryIsBetter = entry.isPaid && !existing.isPaid ||
+        (entry.isPaid == existing.isPaid &&
+            (entry.updatedAt ?? DateTime(0))
+                .isAfter(existing.updatedAt ?? DateTime(0)));
+
+    if (entryIsBetter) {
+      result[existingIndex] = entry;
+    }
+  }
+
+  return result;
+}
+
+List<MyFeaturedProperty> _collapseByKey(
+  List<MyFeaturedProperty> entries, {
+  required String Function(MyFeaturedProperty entry) keyOf,
+}) {
+  final Map<String, MyFeaturedProperty> byKey = {};
+  final List<String> order = [];
+
+  for (final entry in entries) {
+    final String key = keyOf(entry);
+
+    final MyFeaturedProperty? existing = byKey[key];
+
+    if (existing == null) {
+      byKey[key] = entry;
+      order.add(key);
+      continue;
+    }
+
+    final bool entryIsBetter = entry.isPaid && !existing.isPaid ||
+        (entry.isPaid == existing.isPaid &&
+            (entry.updatedAt ?? DateTime(0))
+                .isAfter(existing.updatedAt ?? DateTime(0)));
+
+    if (entryIsBetter) {
+      byKey[key] = entry;
+    }
+  }
+
+  return order.map((key) => byKey[key]!).toList();
+}
+
   Future<void> fetchFeaturedProperties({
     required FeaturedLocation location,
     int limit = 5,
@@ -274,7 +394,7 @@ Future<void> getMyFeaturedProperties({
       if (response
           is! Map<String, dynamic>) {
         throw Exception(
-          'Invalid featured properties response',
+          'Invalid featured properties response'.tr,
         );
       }
 
@@ -475,6 +595,64 @@ List<MyFeaturedProperty> get filteredMyFeaturedProperties {
 }
 
   // ============================================================
+  // MY FEATURED PROPERTIES — GROUPED BY PLAN
+  //
+  // ONE ENTRY PER PLAN, EACH CARRYING EVERY PROPERTY THAT
+  // WAS FEATURED UNDER THAT PLAN.
+  // ============================================================
+
+  List<GroupedFeaturedPlan>
+      get groupedFilteredMyFeaturedProperties {
+    final List<MyFeaturedProperty> source =
+        filteredMyFeaturedProperties;
+
+    final Map<String, List<MyFeaturedProperty>> byPlan = {};
+
+    final List<String> order = [];
+
+    for (final property in source) {
+      final String key = property.plan.id.isNotEmpty
+          ? property.plan.id
+          : property.planId;
+
+      if (!byPlan.containsKey(key)) {
+        byPlan[key] = [];
+        order.add(key);
+      }
+
+      byPlan[key]!.add(property);
+    }
+
+    return order.map((key) {
+      final entries = byPlan[key]!;
+
+      return GroupedFeaturedPlan(
+        plan: entries.first.plan,
+        entries: entries,
+      );
+    }).toList();
+  }
+
+  // ============================================================
   // SEARCHED FEATURED PLANS
   // ============================================================
+}
+
+// ============================================================
+// GROUPED FEATURED PLAN
+//
+// ONE PLAN, WITH EVERY PROPERTY FEATURED UNDER IT.
+// ============================================================
+
+class GroupedFeaturedPlan {
+  final FeaturedPlan plan;
+  final List<MyFeaturedProperty> entries;
+
+  const GroupedFeaturedPlan({
+    required this.plan,
+    required this.entries,
+  });
+
+  bool get hasActivePlan =>
+      entries.any((entry) => entry.isCurrentlyActive);
 }

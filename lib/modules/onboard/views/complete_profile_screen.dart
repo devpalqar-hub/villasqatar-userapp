@@ -167,7 +167,7 @@ class CompleteProfileScreen extends StatelessWidget {
 
                     PrimaryButton(
                       title: controller.isLoading
-                          ? "Please wait..."
+                          ? "Please wait...".tr
                           : "Continue".tr,
                       suffix: controller.isLoading
                           ? SizedBox(

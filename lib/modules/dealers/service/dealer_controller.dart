@@ -4,8 +4,8 @@ import 'package:get/get.dart';
 
 import 'package:villas_qatar/Core/network/api_endpoints.dart';
 import 'package:villas_qatar/Core/network/api_handler.dart';
-import 'package:villas_qatar/modules/dealers/service/model/dealer_details_model.dart';
-import 'package:villas_qatar/modules/dealers/service/model/dealer_list_model.dart';
+import 'package:villas_qatar/modules/dealers/model/dealer_details_model.dart';
+import 'package:villas_qatar/modules/dealers/model/dealer_list_model.dart';
 
 
 class DealerController extends GetxController {
@@ -79,14 +79,14 @@ class DealerController extends GetxController {
 
       update();
     } catch (e) {
-      error = e.toString();
+      error = e.toString().replaceFirst("Exception: ", "");
 
-      Fluttertoast.showToast(
-        msg: error.replaceFirst(
-          "Exception: ",
-          "",
-        ),
-      );
+      // This runs automatically on Home screen load — including for guest
+      // sessions right after "Skip", who never send an auth token — so a
+      // failure here (e.g. "Unauthorized") must not pop a toast. The UI
+      // already renders a "No dealers found" empty state from `error`/
+      // an empty `dealers` list, so just log it.
+      debugPrint("FETCH DEALERS ERROR: $error");
     } finally {
       isLoading = false;
       isLoadingMore = false;

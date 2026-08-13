@@ -35,7 +35,7 @@ class DeepLinkController extends GetxController {
         return property;
       }
 
-      throw Exception("Invalid property response");
+      throw Exception("Invalid property response".tr);
     } catch (e) {
       error = e.toString().replaceFirst("Exception: ", "");
 

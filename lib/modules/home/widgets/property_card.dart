@@ -39,7 +39,7 @@ class PropertyCard extends StatelessWidget {
     required this.price,
     required this.sqm,
     required this.beds,
-    this.isFeatured = true,
+    this.isFeatured = false,
     this.verified = true,
     this.propertyId,
     this.slug,
@@ -89,22 +89,22 @@ class PropertyCard extends StatelessWidget {
               /// =================================================
               if (isFeatured)
                 Positioned(
-                  top: 10.h,
-                  left: 10.w,
+                  top: 8.h,
+                  left: 8.w,
                   child: Container(
                     padding: EdgeInsets.symmetric(
-                      horizontal: 10.w,
-                      vertical: 5.h,
+                      horizontal: 6.w,
+                      vertical: 2.h,
                     ),
                     decoration: BoxDecoration(
                       color: AppColors.primary,
-                      borderRadius: BorderRadius.circular(8.r),
+                      borderRadius: BorderRadius.circular(5.r),
                     ),
                     child: Text(
-                      "Featured",
+                      "Featured".tr,
                       style: AppTextStyles.medium13.copyWith(
                         color: Colors.white,
-                        fontSize: 10.sp,
+                        fontSize: 8.sp,
                       ),
                     ),
                   ),
@@ -145,9 +145,9 @@ class PropertyCard extends StatelessWidget {
                             : () async {
                                 if (id.isEmpty) {
                                   ScaffoldMessenger.of(context).showSnackBar(
-                                    const SnackBar(
+                                    SnackBar(
                                       content: Text(
-                                        "Property ID is not available",
+                                        "Property ID is not available".tr,
                                       ),
                                     ),
                                   );
@@ -204,69 +204,7 @@ class PropertyCard extends StatelessWidget {
               /// =================================================
               /// IMAGE BOTTOM INFO
               /// =================================================
-              Positioned(
-                bottom: 8.h,
-                left: 10.w,
-                right: 10.w,
-                child: Column(
-                  children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Row(
-                          children: [
-                            Icon(
-                              Icons.people,
-                              color: Colors.white,
-                              size: 14.sp,
-                            ),
-                            SizedBox(width: 4.w),
-                            Text(
-                              beds,
-                              style: AppTextStyles.medium13.copyWith(
-                                color: Colors.white,
-                                fontSize: 11.sp,
-                              ),
-                            ),
-                          ],
-                        ),
-    
-                        Row(
-                          children: [
-                            Icon(
-                              Icons.remove_red_eye_outlined,
-                              color: Colors.white,
-                              size: 14.sp,
-                            ),
-                            SizedBox(width: 4.w),
-                          ],
-                        ),
-                      ],
-                    ),
-    
-                    SizedBox(height: 6.h),
-    
-                    /// VERIFIED
-                    Row(
-                      children: [
-                        Icon(
-                          Icons.local_offer_outlined,
-                          size: 14.sp,
-                          color: verified ? Colors.green : Colors.red,
-                        ),
-                        SizedBox(width: 4.w),
-                        Text(
-                          verified ? "Negotiable".tr : "Non-Negotiable".tr,
-                          style: AppTextStyles.medium13.copyWith(
-                            color: Colors.white,
-                            fontSize: 10.sp,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-              ),
+             
             ],
           ),
     

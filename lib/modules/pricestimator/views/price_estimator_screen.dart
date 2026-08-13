@@ -3,6 +3,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
 import 'package:villas_qatar/Core/constants/app_colors.dart';
+import 'package:villas_qatar/Core/utils/guest_limter.dart';
 import 'package:villas_qatar/modules/pricestimator/service/ai_price_estimator_controller.dart';
 import 'package:villas_qatar/modules/propertylist/model/listing_options_model.dart';
 
@@ -218,7 +219,7 @@ class _PriceEstimatorScreenState extends State<PriceEstimatorScreen> {
                                               decimal: true,
                                             ),
                                         decoration: InputDecoration(
-                                          hintText: "e.g. 1200",
+                                          hintText: "e.g. 1200".tr,
                                           suffixText: "sqm".tr,
                                           border: InputBorder.none,
                                           isDense: true,
@@ -741,7 +742,7 @@ class _PriceEstimatorScreenState extends State<PriceEstimatorScreen> {
                               setSheetState(tempSelected.clear);
                             },
                             child: Text(
-                              "Clear All",
+                              "Clear All".tr,
                               style: TextStyle(
                                 color: AppColors.textSecondary,
                                 fontSize: 12.sp,
@@ -752,7 +753,7 @@ class _PriceEstimatorScreenState extends State<PriceEstimatorScreen> {
                         const Spacer(),
 
                         Text(
-                          "${tempSelected.length} selected",
+                          "${tempSelected.length} ${"selected".tr}",
                           style: TextStyle(
                             fontSize: 11.sp,
                             color: AppColors.textSecondary,
@@ -849,8 +850,8 @@ class _PriceEstimatorScreenState extends State<PriceEstimatorScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text(
-                'Estimated Price',
+              Text(
+                'Estimated Price'.tr,
                 style: TextStyle(
                   fontSize: 10.5,
                   color: AppColors.textSecondary,
@@ -976,7 +977,7 @@ class _PriceEstimatorScreenState extends State<PriceEstimatorScreen> {
                     ),
                     SizedBox(height: 8),
                     Text(
-                      _types[i].label,
+                      _types[i].label.tr,
                       textAlign: TextAlign.center,
                       style: TextStyle(
                         fontSize: 10.sp,
@@ -1018,9 +1019,9 @@ class _PriceEstimatorScreenState extends State<PriceEstimatorScreen> {
                     value: _selectedBhk?.toString() ?? "Select".tr,
                     onTap: () {
                       _showOptionSheet<int>(
-                        title: "Select BHK",
+                        title: "Select BHK".tr,
                         options: const [1, 2, 3, 4, 5, 6],
-                        labelBuilder: (value) => "$value BHK",
+                        labelBuilder: (value) => "$value ${"BHK".tr}",
                         selectedValue: _selectedBhk,
                         onSelected: (value) {
                           setState(() {
@@ -1042,7 +1043,7 @@ class _PriceEstimatorScreenState extends State<PriceEstimatorScreen> {
                         title: "Select Bathrooms".tr,
                         options: const [1, 2, 3, 4, 5, 6],
                         labelBuilder: (value) =>
-                            "$value Bathroom${value > 1 ? 's' : ''}",
+                            "$value ${value > 1 ? "Bathrooms".tr : "Bathroom".tr}",
                         selectedValue: _selectedBathrooms,
                         onSelected: (value) {
                           setState(() {
@@ -1134,7 +1135,7 @@ class _PriceEstimatorScreenState extends State<PriceEstimatorScreen> {
                         title: "Select Total Floors".tr,
                         options: List.generate(50, (index) => index + 1),
                         labelBuilder: (value) =>
-                            "$value Floor${value > 1 ? 's' : ''}",
+                            "$value ${value > 1 ? "Floors".tr : "Floor".tr}",
                         selectedValue: _selectedTotalFloors,
                         onSelected: (value) {
                           setState(() {
@@ -1478,6 +1479,17 @@ class _PriceEstimatorScreenState extends State<PriceEstimatorScreen> {
         msg: "Please select furnishing status.".tr,
         gravity: ToastGravity.BOTTOM,
       );
+      return;
+    }
+
+    // ============================================================
+    // GUEST LIMIT CHECK
+    // ============================================================
+
+    final bool allowed = await GuestLimiter.canUseEstimator();
+
+    if (!allowed) {
+      GuestLimiter.showLimitReachedDialog();
       return;
     }
 

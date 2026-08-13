@@ -216,28 +216,30 @@ class PropertyCard extends StatelessWidget {
                         ),
                 ),
 
-                // Positioned(
-                //   left: 14.w,
-                //   top: 14.h,
-                //   child: Container(
-                //     padding: EdgeInsets.symmetric(
-                //       horizontal: 12.w,
-                //       vertical: 6.h,
-                //     ),
-                //     decoration: BoxDecoration(
-                //       color: AppColors.primary,
-                //       borderRadius: BorderRadius.circular(5.r),
-                //     ),
-                //     child: Text(
-                //       "FEATURED".tr,
-                //       style: TextStyle(
-                //         color: Colors.white,
-                //         fontSize: 10.sp,
-                //         fontWeight: FontWeight.w700,
-                //       ),
-                //     ),
-                //   ),
-                // ),
+                /// Only properties actually flagged featured get the tag.
+                if (property.isFeatured)
+                  Positioned(
+                    left: 10.w,
+                    top: 10.h,
+                    child: Container(
+                      padding: EdgeInsets.symmetric(
+                        horizontal: 8.w,
+                        vertical: 3.h,
+                      ),
+                      decoration: BoxDecoration(
+                        color: AppColors.primary,
+                        borderRadius: BorderRadius.circular(5.r),
+                      ),
+                      child: Text(
+                        "Featured".tr,
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 9.sp,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                    ),
+                  ),
                 Positioned(
                   right: 14.w,
                   top: 14.h,

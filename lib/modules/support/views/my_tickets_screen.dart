@@ -41,7 +41,7 @@ class _MyTicketScreenState extends State<MyTicketScreen> {
         elevation: 0,
         centerTitle: true,
         title: Text(
-          "My Tickets",
+          "My Tickets".tr,
           style: TextStyle(
             fontSize: 18.sp,
             fontWeight: FontWeight.w500,

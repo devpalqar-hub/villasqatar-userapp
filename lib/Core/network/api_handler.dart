@@ -18,7 +18,8 @@ class ApiHandler {
 
   static Never _onTimeout() {
     throw Exception(
-      "Request timed out. Please check your internet connection and try again.",
+      "Request timed out. Please check your internet connection and try again."
+          .tr,
     );
   }
 
@@ -65,7 +66,7 @@ class ApiHandler {
       debugPrint("========== GET ERROR ==========");
       debugPrint("No Internet Connection");
       debugPrint("================================");
-      throw Exception("No Internet Connection");
+      throw Exception("No Internet Connection".tr);
     }
   }
 
@@ -127,7 +128,7 @@ class ApiHandler {
       debugPrint("========== POST ERROR ==========");
       debugPrint("No Internet Connection");
       debugPrint("================================");
-      throw Exception("No Internet Connection");
+      throw Exception("No Internet Connection".tr);
     } catch (e, stackTrace) {
       debugPrint("========== POST ERROR ==========");
       debugPrint("URL: $baseUrl$endpoint");
@@ -171,7 +172,7 @@ class ApiHandler {
 
       return await _handleResponse(response);
     } on SocketException {
-      throw Exception("No Internet Connection");
+      throw Exception("No Internet Connection".tr);
     }
   }
 
@@ -208,7 +209,7 @@ class ApiHandler {
 
       return await _handleResponse(response);
     } on SocketException {
-      throw Exception("No Internet Connection");
+      throw Exception("No Internet Connection".tr);
     }
   }
 
@@ -235,7 +236,7 @@ class ApiHandler {
 
       return await _handleResponse(response);
     } on SocketException {
-      throw Exception("No Internet Connection");
+      throw Exception("No Internet Connection".tr);
     }
   }
 
@@ -281,7 +282,7 @@ class ApiHandler {
         return null;
 
       case 400:
-        throw Exception(_getErrorMessage(data, "Bad Request"));
+        throw Exception(_getErrorMessage(data, "Bad Request".tr));
 
       case 401:
         final token = StorageService.getToken();
@@ -293,24 +294,24 @@ class ApiHandler {
         Get.offAll(() => WelcomeScreen());
         }
 
-        throw Exception(_getErrorMessage(data, "Unauthorized"));
+        throw Exception(_getErrorMessage(data, "Unauthorized".tr));
 
       case 403:
-        throw Exception(_getErrorMessage(data, "Forbidden"));
+        throw Exception(_getErrorMessage(data, "Forbidden".tr));
 
       case 404:
-        throw Exception(_getErrorMessage(data, "Not Found"));
+        throw Exception(_getErrorMessage(data, "Not Found".tr));
 
       case 409:
-        throw Exception(_getErrorMessage(data, "Conflict"));
+        throw Exception(_getErrorMessage(data, "Conflict".tr));
 
       case 422:
-        throw Exception(_getErrorMessage(data, "Invalid Data"));
+        throw Exception(_getErrorMessage(data, "Invalid Data".tr));
 
       case 500:
       case 502:
       case 503:
-        throw Exception(_getErrorMessage(data, "Server Error"));
+        throw Exception(_getErrorMessage(data, "Server Error".tr));
 
       default:
         throw Exception(_getErrorMessage(data, "Error ${response.statusCode}"));

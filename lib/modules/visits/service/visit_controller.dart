@@ -54,8 +54,8 @@ class VisitController extends GetxController {
       await fetchVisitorVisits(showLoading: false);
 
       Get.snackbar(
-        "Success",
-        "Visit scheduled successfully",
+        "Success".tr,
+        "Visit scheduled successfully".tr,
         snackPosition: SnackPosition.BOTTOM,
       );
 
@@ -64,7 +64,7 @@ class VisitController extends GetxController {
       debugPrint("Schedule Visit Error: $e");
 
       Get.snackbar(
-        "Error",
+        "Error".tr,
         e.toString().replaceFirst("Exception: ", ""),
         snackPosition: SnackPosition.BOTTOM,
       );
@@ -87,7 +87,7 @@ class VisitController extends GetxController {
       await fetchOwnerVisits(showLoading: false);
 
       Fluttertoast.showToast(
-        msg: "Visit scheduled successfully",
+        msg: "Visit scheduled successfully".tr,
         toastLength: Toast.LENGTH_SHORT,
         gravity: ToastGravity.BOTTOM,
         backgroundColor: Colors.green.shade700,
@@ -98,7 +98,7 @@ class VisitController extends GetxController {
       debugPrint("Accept Visit Error: $e");
 
       Get.snackbar(
-        "Error",
+        "Error".tr,
         e.toString().replaceFirst("Exception: ", ""),
         snackPosition: SnackPosition.BOTTOM,
       );
@@ -183,7 +183,7 @@ class VisitController extends GetxController {
       debugPrint("Reject Visit: Visit ID is empty");
 
       Get.rawSnackbar(
-        message: "Visit ID is missing",
+        message: "Visit ID is missing".tr,
         snackPosition: SnackPosition.BOTTOM,
         backgroundColor: Colors.red,
         margin: const EdgeInsets.all(16),

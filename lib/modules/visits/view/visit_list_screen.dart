@@ -198,7 +198,7 @@ class _VisitListScreenState extends State<VisitListScreen> {
       return _emptyView(
         icon: Icons.event_busy_outlined,
         title: "No visit requests".tr,
-        subtitle: "Visit requests for your properties will appear here.".tr,
+        subtitle: "Visit requests for your properties will appear here".tr,
       );
     }
 
@@ -236,7 +236,7 @@ class _VisitListScreenState extends State<VisitListScreen> {
       return _emptyView(
         icon: Icons.calendar_month_outlined,
         title: "No scheduled visits".tr,
-        subtitle: "Properties you schedule for a visit will appear here.".tr,
+        subtitle: "Properties you schedule for a visit will appear here".tr,
       );
     }
 
@@ -942,7 +942,7 @@ class _VisitListScreenState extends State<VisitListScreen> {
   }
 
   String _formatStatus(String status) {
-    if (status.isEmpty) return "Pending";
+    if (status.isEmpty) return "Pending".tr;
 
     return status
         .toLowerCase()

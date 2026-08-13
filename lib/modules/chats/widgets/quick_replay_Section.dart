@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:get/get.dart';
 import 'package:villas_qatar/Core/constants/app_colors.dart';
 
 class QuickReplySection extends StatelessWidget {
@@ -10,11 +11,11 @@ class QuickReplySection extends StatelessWidget {
     required this.onTap,
   });
 
-  static const List<String> replies = [
-    "Can we schedule a visit?",
-    "What is the payment plan?",
-    "Is the price negotiable?",
-    "Is this property still available?",
+  static List<String> get replies => [
+    "Can we schedule a visit?".tr,
+    "What is the payment plan?".tr,
+    "Is the price negotiable?".tr,
+    "Is this property still available?".tr,
   ];
 
   @override

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:get/get.dart';
 
 import '../../../core/constants/app_colors.dart';
 import '../../../core/theme/app_textstyles.dart';
@@ -24,7 +25,7 @@ class SectionHeader extends StatelessWidget {
         GestureDetector(
           onTap: onViewAll,
           child: Text(
-            "View All",
+            "View All".tr,
             style: AppTextStyles.body13.copyWith(
               color: AppColors.primary,
               fontWeight: FontWeight.w600,

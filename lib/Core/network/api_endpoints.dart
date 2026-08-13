@@ -6,10 +6,9 @@ class ApiEndpoints {
 
   static const String verifyOtp = "/api/auth/otp/verify";
 
-  // Social Login
-  static const String googleLogin = "/api/auth/google";
-
-  static const String appleLogin = "/api/auth/apple";
+  // Social login
+  static const String googleAuth = "/api/auth/google";
+  static const String appleAuth = "/api/auth/apple";
 
   // Profile
   static const String completeProfile = "/api/auth/complete-profile";
@@ -50,9 +49,18 @@ class ApiEndpoints {
   static const String featuredPlans = "/api/featured-plans";
   static const String featuredProperties = "/api/featured";
   static const String myfeaturedProperties = "/api/featured/my";
+  static const String featuredCheckout = "/api/featured/checkout";
   static String markPropertyAsSold(String propertyId) {
     return "/api/listings/$propertyId/sold";
   }
+
+  /// PENDING_PAYMENT -> live activation gate.
+  ///
+  /// If free quota is available, activates the listing immediately
+  /// (`activated: true`); otherwise returns a Stripe Checkout Session
+  /// (`price`, `stripeSessionId`, `paymentUrl`, `paymentIntentClientSecret`).
+  /// Same mechanics as [featuredCheckout].
+  static const String makeListingPayment = "/api/listings/make-payment";
 
   static String closeVisit(String visitId) => "/api/visits/$visitId/close";
   static const String myfeaturedPlans = '/api/featured-plans';
@@ -78,5 +86,6 @@ class ApiEndpoints {
   static const String verifyPhoneCheck = "/api/listings/verify-phone/check";
   static const String verifyPhoneSendOtp = "/api/listings/verify-phone/send-otp";
   static const String verifyPhoneVerifyOtp =  "/api/listings/verify-phone/verify-otp";
-   
+  static const String fcmToken = "/api/users/fcm-token";
+
 }

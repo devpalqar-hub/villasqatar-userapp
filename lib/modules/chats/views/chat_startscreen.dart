@@ -383,7 +383,7 @@ class ChatStartScreen extends StatelessWidget {
                                     e.substring(1).toLowerCase(),
                         )
                         .join(" ") ??
-                    "Property Consultant",
+                    "Property Consultant".tr,
                 style: TextStyle(
                   fontSize: 12.sp,
                   color: AppColors.textSecondary,
@@ -488,7 +488,7 @@ class ChatStartScreen extends StatelessWidget {
 
      if (reportedUserId.isEmpty) {
     Fluttertoast.showToast(
-      msg: "Unable to identify the user",
+      msg: "Unable to identify the user".tr,
       toastLength: Toast.LENGTH_SHORT,
       gravity: ToastGravity.BOTTOM,
     );
@@ -626,7 +626,7 @@ class _ReportUserBottomSheetState
       WidgetsBinding.instance.addPostFrameCallback(
         (_) {
           Fluttertoast.showToast(
-            msg: "Report submitted successfully".toLowerCase(),
+            msg: "Report submitted successfully".tr,
             toastLength: Toast.LENGTH_SHORT,
             gravity: ToastGravity.BOTTOM,
           );

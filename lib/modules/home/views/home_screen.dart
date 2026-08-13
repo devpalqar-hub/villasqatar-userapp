@@ -9,14 +9,14 @@ import 'package:villas_qatar/Core/utils/app_location.dart';
 import 'package:villas_qatar/modules/PlansandFeatures/model/featured_property_model.dart';
 import 'package:villas_qatar/modules/PlansandFeatures/services/featured_properties_controller.dart';
 import 'package:villas_qatar/modules/dealers/service/dealer_controller.dart';
-import 'package:villas_qatar/modules/dealers/service/view/dealer_detail_screen.dart';
-import 'package:villas_qatar/modules/dealers/service/view/detail_list_screen.dart';
+import 'package:villas_qatar/modules/dealers/view/dealer_detail_screen.dart';
+import 'package:villas_qatar/modules/dealers/view/detail_list_screen.dart';
 import 'package:villas_qatar/modules/home/service/UtilsController.dart';
 import 'package:villas_qatar/modules/home/service/banner_controller.dart';
 import 'package:villas_qatar/modules/home/service/loaction_controller.dart';
 import 'package:villas_qatar/modules/home/widgets/agent_card.dart';
 import 'package:villas_qatar/modules/home/widgets/category_card.dart';
-import 'package:villas_qatar/modules/home/widgets/estimator_card.dart';
+import 'package:villas_qatar/modules/home/widgets/villa_valuation_card.dart';
 import 'package:villas_qatar/modules/home/widgets/hero_banner.dart';
 import 'package:villas_qatar/modules/home/widgets/location_card.dart';
 import 'package:villas_qatar/modules/home/widgets/property_card.dart';
@@ -25,11 +25,14 @@ import 'package:villas_qatar/modules/home/widgets/sponser_banner.dart';
 import 'package:villas_qatar/modules/home/widgets/why_choose_card.dart';
 import 'package:villas_qatar/modules/mainscreen/home_bottom_nav.dart';
 import 'package:villas_qatar/modules/mainscreen/mainscreen.dart';
+import 'package:villas_qatar/modules/pricestimator/views/price_estimator_screen.dart';
 import 'package:villas_qatar/modules/propertydetailscreen/propertydetailscreen.dart';
 import 'package:villas_qatar/modules/searchscreen/view/search_screen.dart';
 
 class HomeScreen extends StatefulWidget {
-  final void Function(String propertyName) onSearch;
+  /// Fired when the AI search bar's arrow is tapped — carries the typed
+  /// query plus which Rent/Sale toggle was active ("RENT" / "SALE").
+  final void Function(String propertyName, String purpose) onSearch;
   final void Function(String type) onCategorySelected;
   final void Function(String purpose) onPurposeSelected;
 
@@ -190,7 +193,14 @@ class _HomeScreenState extends State<HomeScreen> {
             children: [
               //SizedBox(height: 20),
               // HomeHeader(),
-              HomeBanner(onSearch: (propertyName, type) {}),
+              HomeBanner(
+                onSearch: (propertyName, type) {
+                  widget.onSearch(
+                    propertyName,
+                    type == PropertySearchType.rent ? "RENT" : "SALE",
+                  );
+                },
+              ),
 
               // QuickActionsCard(onPurposeSelected: widget.onPurposeSelected),
               Padding(
@@ -263,38 +273,54 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
             
              
-              Padding(
-                padding: EdgeInsets.symmetric(horizontal: 16.w),
-                child: SectionHeader(title: "Near You".tr),
+              GetBuilder<LocationController>(
+                builder: (controller) {
+                  // Nothing nearby (and not still loading) — drop the whole
+                  // "Near You" section instead of showing an empty header
+                  // over a "No nearby properties" placeholder.
+                  if (!controller.isNearbyLoading &&
+                      controller.nearbyProperties.isEmpty) {
+                    return const SizedBox.shrink();
+                  }
+
+                  return Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Padding(
+                        padding: EdgeInsets.symmetric(horizontal: 16.w),
+                        child: SectionHeader(title: "Near You".tr),
+                      ),
+
+                      Container(
+                        padding: EdgeInsets.symmetric(horizontal: 16.w),
+                        height: 100.h,
+                        child: controller.isNearbyLoading
+                            ? const Center(child: CircularProgressIndicator())
+                            : ListView.separated(
+                                scrollDirection: Axis.horizontal,
+                                itemCount: controller.nearbyProperties.length,
+                                separatorBuilder: (_, __) =>
+                                    SizedBox(width: 10.w),
+                                itemBuilder: (context, index) {
+                                  final property =
+                                      controller.nearbyProperties[index];
+
+                                  return LocationCard(property: property);
+                                },
+                              ),
+                      ),
+                    ],
+                  );
+                },
               ),
-
-              Container(
-                padding: EdgeInsets.symmetric(horizontal: 16.w),
-                height: 100.h,
-                child: GetBuilder<LocationController>(
-                  builder: (controller) {
-                    if (controller.isNearbyLoading) {
-                      return const Center(child: CircularProgressIndicator());
-                    }
-
-                    if (controller.nearbyProperties.isEmpty) {
-                      return const Center(child: Text("No nearby properties"));
-                    }
-
-                    return ListView.separated(
-                      scrollDirection: Axis.horizontal,
-                      itemCount: controller.nearbyProperties.length,
-                      separatorBuilder: (_, __) => SizedBox(width: 10.w),
-                      itemBuilder: (context, index) {
-                        final property = controller.nearbyProperties[index];
-
-                        return LocationCard(property: property);
-                      },
-                    );
-                  },
-                ),
+              VillaValuationCard(
+                onGetEstimate: () {
+                  Get.to(
+                    () => const PriceEstimatorScreen(),
+                    transition: Transition.rightToLeft,
+                  );
+                },
               ),
-              // EstimatorCard(),
 
               _buildFeaturedPropertiesSection(),
 
@@ -346,7 +372,7 @@ class _HomeScreenState extends State<HomeScreen> {
                               : dealer.name,
                           designation:
                               dealer.dealerProfile.tagline ??
-                              "Property Consultant",
+                              "Property Consultant".tr,
                           phone: dealer.dealerProfile.contactPhone,
                           onTap: () {
                             Get.to(
@@ -427,7 +453,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     SizedBox(height: 6.h),
 
                     Text(
-                      "Unable to load featured properties",
+                      "Unable to load featured properties".tr,
                       style: TextStyle(fontSize: 10.sp, color: Colors.grey),
                     ),
 
@@ -437,10 +463,10 @@ class _HomeScreenState extends State<HomeScreen> {
                       onPressed: () {
                         controller.refreshFeatured(
                           location: FeaturedLocation.homePage,
-                          limit: 5,
+                          limit: 10,
                         );
                       },
-                      child: const Text("Try Again"),
+                      child: Text("Try Again".tr),
                     ),
                   ],
                 ),
@@ -457,7 +483,7 @@ class _HomeScreenState extends State<HomeScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             SectionHeader(
-              title: "Featured Properties",
+              title: "Featured Properties".tr,
               onSeeAllTap: () {
                 Get.offAll(
                   () => const MainScreen(initialIndex: 1),
@@ -530,7 +556,12 @@ class _HomeScreenState extends State<HomeScreen> {
                       sqm: '${property.area.toStringAsFixed(0)} SQM',
                       beds: property.bedrooms.toString(),
                       verified: property.contactVerified,
-                      isFeatured: property.isFeatured,
+
+                      /// Every card in this carousel comes from the
+                      /// featured-properties endpoint itself, so it's
+                      /// always featured - don't rely on the listing's
+                      /// own `isFeatured` flag, which can lag/be unset.
+                      isFeatured: true,
                       propertyId: property.id,
                       slug: property.slug,
                       bathrooms: property.bathrooms,

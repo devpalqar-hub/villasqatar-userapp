@@ -138,7 +138,7 @@ class OtpScreen extends StatelessWidget {
 
                     PrimaryButton(
                       title: controller.isLoading
-                          ? "Verifying..."
+                          ? "Verifying...".tr
                           : "Verify OTP".tr,
                       suffix: controller.isLoading
                           ? SizedBox(

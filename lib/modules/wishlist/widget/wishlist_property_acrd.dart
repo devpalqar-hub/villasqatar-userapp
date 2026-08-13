@@ -5,6 +5,7 @@ import 'package:get/get_instance/src/extension_instance.dart';
 import 'package:get/get_navigation/src/extension_navigation.dart';
 import 'package:get/get_navigation/src/routes/transitions_type.dart';
 import 'package:get/get_state_manager/src/simple/get_state.dart';
+import 'package:get/get_utils/src/extensions/internacionalization.dart';
 import 'package:villas_qatar/Core/constants/app_colors.dart';
 import 'package:villas_qatar/modules/propertydetailscreen/propertydetailscreen.dart';
 import 'package:villas_qatar/modules/propertylist/model/myproperty_model.dart';
@@ -234,7 +235,7 @@ class WishlistPropertyCard extends StatelessWidget {
       parts.add(property.municipality.name);
     }
 
-    return parts.isEmpty ? "Qatar" : parts.join(", ");
+    return parts.isEmpty ? "Qatar".tr : parts.join(", ");
   }
 
   String _formatPrice(num value) {

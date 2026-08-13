@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get_core/src/get_main.dart';
 import 'package:get/get_navigation/src/extension_navigation.dart';
 import 'package:get/get_state_manager/src/simple/get_controllers.dart';
+import 'package:get/get_utils/src/extensions/internacionalization.dart';
 
 import 'package:villas_qatar/Core/network/api_endpoints.dart';
 import 'package:villas_qatar/Core/network/api_handler.dart';
@@ -26,6 +27,16 @@ class ProfileController extends GetxController {
   }
 
   Future<void> fetchProfile() async {
+    // Guest sessions (right after Skip on the welcome screen) have no
+    // token/userId, and SettingsScreen - hence this controller - gets
+    // constructed eagerly by MainScreen even while the user is still
+    // on the Home tab. There's no profile to fetch for a guest, so
+    // don't call the API (it would just 401) and never surface that
+    // as an error toast.
+    if (!StorageService.isLoggedIn()) {
+      return;
+    }
+
     try {
       isLoading = true;
       update();
@@ -41,7 +52,7 @@ class ProfileController extends GetxController {
 
       await StorageService.saveProfile(response);
     } catch (e) {
-      Get.snackbar("Error", e.toString());
+      debugPrint("FETCH PROFILE ERROR: $e");
     } finally {
       isLoading = false;
       update();
@@ -69,9 +80,9 @@ class ProfileController extends GetxController {
 
       await StorageService.saveProfile(response);
 
-      Get.snackbar("Success", "Profile updated successfully");
+      Get.snackbar("Success".tr, "Profile updated successfully".tr);
     } catch (e) {
-      Get.snackbar("Error", e.toString());
+      Get.snackbar("Error".tr, e.toString());
     } finally {
       isSaving = false;
       update();

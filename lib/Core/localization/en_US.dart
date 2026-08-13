@@ -111,689 +111,903 @@ const Map<String, String> enUS = {
   "Market Trends": "Market Trends",
   "Stay updated": "Stay updated",
   // English
-"Find your": "Find your",
-"dream villa": "dream Villa",
+  "Find your": "Find your",
+  "dream villa": "dream Villa",
 
-// ================= SEARCH / PROPERTY LISTING =================
+  // ================= SEARCH / PROPERTY LISTING =================
+  "Search property name": "Search property name",
+  "Near You": "Near You",
+  "Wishlist": "Wishlist",
+  "Saved": "Saved",
+  "Featured Dealers": "Featured Dealers",
 
-"Search property name": "Search property name",
-"Near You": "Near You",
-"Wishlist": "Wishlist",
-"Saved": "Saved",
-"Featured Dealers": "Featured Dealers",
+  "No Properties Found": "No Properties Found",
+  "No properties found": "No properties found",
+  "Try changing your search or filters": "Try changing your search or filters",
 
+  "Filter Properties": "Filter Properties",
+  "Refine your search results": "Refine your search results",
 
+  "Min Price": "Min Price",
+  "Max Price": "Max Price",
 
-"No Properties Found": "No Properties Found",
-"No properties found": "No properties found",
-"Try changing your search or filters":
-    "Try changing your search or filters",
+  // ================= PROPERTY DETAILS =================
+  "Property Details": "Property Details",
+  "Beds": "Beds",
+  "Baths": "Baths",
+  "Area": "Area",
+  "Furnishing": "Furnishing",
 
-"Filter Properties": "Filter Properties",
-"Refine your search results": "Refine your search results",
+  "Furnished": "Furnished",
+  "Semi-Furnished": "Semi-Furnished",
+  "Unfurnished": "Unfurnished",
 
+  "Reset": "Reset",
+  "Apply Filters": "Apply Filters",
 
-"Min Price": "Min Price",
-"Max Price": "Max Price",
+  // ================= MY PROPERTIES =================
+  "My Properties": "My Properties",
+  "Search by property name or location": "Search by property name or location",
 
-// ================= PROPERTY DETAILS =================
+  "Try a different search or filter, or list a new property":
+      "Try a different search or filter, or list a new property",
 
-"Property Details": "Property Details",
-"Beds": "Beds",
-"Baths": "Baths",
-"Area": "Area",
-"Furnishing": "Furnishing",
+  "ACTIVE": "ACTIVE",
+  "PENDING": "PENDING",
+  "INACTIVE": "INACTIVE",
 
-"Furnished": "Furnished",
-"Semi-Furnished": "Semi-Furnished",
-"Unfurnished": "Unfurnished",
+  "For Rent": "For Rent",
 
-"Reset": "Reset",
-"Apply Filters": "Apply Filters",
+  "List Property": "List Property",
+  "All": "All",
 
-// ================= MY PROPERTIES =================
+  // ================= PROPERTY STEPS =================
+  "Basic Info": "Basic Info",
+  "Details": "Details",
+  "Features": "Features",
+  "Location": "Location",
+  "Media": "Media",
 
-"My Properties": "My Properties",
-"Search by property name or location":
-    "Search by property name or location",
+  "List Your Property": "List Your Property",
 
-"Try a different search or filter, or list a new property":
-    "Try a different search or filter, or list a new property",
+  // ================= OWNER DETAILS =================
+  "Property Owner Details": "Property Owner Details",
 
-"ACTIVE": "ACTIVE",
-"PENDING": "PENDING",
-"INACTIVE": "INACTIVE",
+  "Enter your details to get started": "Enter your details to get started",
 
+  "Enter your full name": "Enter your full name",
 
-"For Rent": "For Rent",
+  "Contact Number": "Contact Number",
+  "Enter mobile number": "Enter mobile number",
 
-"List Property": "List Property",
-"All": "All",
+  "Send OTP": "Send OTP",
 
-// ================= PROPERTY STEPS =================
+  "Verification Code": "Verification Code",
+  "Enter 6-digit OTP": "Enter 6-digit OTP",
+  "Resend OTP": "Resend OTP",
 
-"Basic Info": "Basic Info",
-"Details": "Details",
-"Features": "Features",
-"Location": "Location",
-"Media": "Media",
+  "Enter your email address": "Enter your email address",
 
-"List Your Property": "List Your Property",
+  "Short Description": "Short Description",
 
-// ================= OWNER DETAILS =================
+  "Write a short description about your property":
+      "Write a short description about your property",
 
-"Property Owner Details": "Property Owner Details",
+  "WhatsApp Verification": "WhatsApp Verification",
 
-"Enter your details to get started":
-    "Enter your details to get started",
+  "Your contact number is verified": "Your contact number is verified",
 
+  "Your contact number is not verified": "Your contact number is not verified",
 
-"Enter your full name": "Enter your full name",
+  // ================= PROPERTY INFORMATION =================
+  "Tell us about your property": "Tell us about your property",
 
-"Contact Number": "Contact Number",
-"Enter mobile number": "Enter mobile number",
+  "Property Name": "Property Name",
+  "Enter property name": "Enter property name",
 
-"Send OTP": "Send OTP",
+  "Select property type": "Select property type",
 
-"Verification Code": "Verification Code",
-"Enter 6-digit OTP": "Enter 6-digit OTP",
-"Resend OTP": "Resend OTP",
+  "Bedrooms": "Bedrooms",
+  "e.g. 4": "e.g. 4",
 
-"Enter your email address": "Enter your email address",
+  "Bathrooms": "Bathrooms",
+  "e.g. 3": "e.g. 3",
 
-"Short Description": "Short Description",
+  "Living Rooms": "Living Rooms",
+  "e.g. 2": "e.g. 2",
 
-"Write a short description about your property":
-    "Write a short description about your property",
+  "Parking Spaces": "Parking Spaces",
 
-"WhatsApp Verification": "WhatsApp Verification",
+  "Property For": "Property For",
 
-"Your contact number is verified":
-    "Your contact number is verified",
+  "Sale": "Sale",
 
-"Your contact number is not verified":
-    "Your contact number is not verified",
+  "Price": "Price",
+  "Enter price": "Enter price",
 
-// ================= PROPERTY INFORMATION =================
+  "Area (sqm)": "Area (sqm)",
+  "Enter property area": "Enter property area",
 
-"Tell us about your property": "Tell us about your property",
+  "Year Built": "Year Built",
+  "e.g. 2024": "e.g. 2024",
 
-"Property Name": "Property Name",
-"Enter property name": "Enter property name",
+  "Floor Number": "Floor Number",
+  "e.g. 5": "e.g. 5",
 
-"Select property type": "Select property type",
+  "Total Floors": "Total Floors",
+  "e.g. 20": "e.g. 20",
 
-"Bedrooms": "Bedrooms",
-"e.g. 4": "e.g. 4",
+  // ================= FEATURES & AMENITIES =================
+  "Features & Amenities": "Features & Amenities",
 
-"Bathrooms": "Bathrooms",
-"e.g. 3": "e.g. 3",
+  "Select the amenities and nearby facilities":
+      "Select the amenities and nearby facilities",
 
-"Living Rooms": "Living Rooms",
-"e.g. 2": "e.g. 2",
+  "Other Features": "Other Features",
 
-"Parking Spaces": "Parking Spaces",
+  "Add any additional features not listed above":
+      "Add any additional features not listed above",
 
-"Property For": "Property For",
+  "Other (Please specify)": "Other (Please specify)",
+  "Enter other features": "Enter other features",
+  "Amenities": "Amenities",
+  "Nearby Tags": "Nearby Tags",
 
-"Sale": "Sale",
+  "Add": "Add",
 
+  "No amenities selected": "No amenities selected",
 
-"Price": "Price",
-"Enter price": "Enter price",
+  "Select Amenities": "Select Amenities",
 
-"Area (sqm)": "Area (sqm)",
-"Enter property area": "Enter property area",
+  "Choose the amenities available in your property.":
+      "Choose the amenities available in your property.",
 
-"Year Built": "Year Built",
-"e.g. 2024": "e.g. 2024",
+  "Done": "Done",
 
-"Floor Number": "Floor Number",
-"e.g. 5": "e.g. 5",
+  "No nearby tags selected": "No nearby tags selected",
 
-"Total Floors": "Total Floors",
-"e.g. 20": "e.g. 20",
+  "No furnishing option selected": "No furnishing option selected",
 
-// ================= FEATURES & AMENITIES =================
+  // ================= LOCATION =================
+  "Property Location": "Property Location",
 
-"Features & Amenities": "Features & Amenities",
+  "Tell buyers where your property is located":
+      "Tell buyers where your property is located",
 
-"Select the amenities and nearby facilities":
-    "Select the amenities and nearby facilities",
+  "Address Line 1": "Address Line 1",
+  "Enter address": "Enter address",
 
-"Other Features": "Other Features",
+  "Address Line 2": "Address Line 2",
 
-"Add any additional features not listed above":
-    "Add any additional features not listed above",
+  "Apartment / Building / Street": "Apartment / Building / Street",
+  "Name of Area": "Name of Area",
 
-"Other (Please specify)": "Other (Please specify)",
-"Enter other features": "Enter other features",
-"Amenities": "Amenities",
-"Nearby Tags": "Nearby Tags",
+  "Municipality / City": "Municipality / City",
+  "Enter municipality": "Enter municipality",
 
-"Add": "Add",
+  "Landmark": "Landmark",
+  "Nearby landmark": "Nearby landmark",
 
-"No amenities selected": "No amenities selected",
+  "Latitude": "Latitude",
+  "Longitude": "Longitude",
 
-"Select Amenities": "Select Amenities",
+  "Google Map integration can be added here for selecting the exact location.":
+      "Google Map integration can be added here for selecting the exact location.",
 
-"Choose the amenities available in your property.":
-    "Choose the amenities available in your property.",
+  // ================= PHOTOS & VIDEOS =================
+  "Photos & Videos": "Photos & Videos",
 
-"Done": "Done",
+  "Add high quality photos and videos to attract more buyers":
+      "Add high quality photos and videos to attract more buyers",
 
-"No nearby tags selected":
-    "No nearby tags selected",
+  "Property Photos": "Property Photos",
 
-"No furnishing option selected":
-    "No furnishing option selected",
+  "Upload clear and attractive photos (Max 20 photos)":
+      "Upload clear and attractive photos (Max 20 photos)",
 
-// ================= LOCATION =================
+  "Add Photos": "Add Photos",
 
-"Property Location": "Property Location",
+  "JPG, PNG up to 10MB each": "JPG, PNG up to 10MB each",
+
+  "Property Videos": "Property Videos",
+  "(Optional)": "(Optional)",
 
-"Tell buyers where your property is located":
-    "Tell buyers where your property is located",
+  "Upload video tour of your property (Max 3 videos)":
+      "Upload video tour of your property (Max 3 videos)",
 
-"Address Line 1": "Address Line 1",
-"Enter address": "Enter address",
+  "Add Video": "Add Video",
+  "Video Selected": "Video Selected",
 
-"Address Line 2": "Address Line 2",
+  "MP4, MOV up to 50MB each": "MP4, MOV up to 50MB each",
 
-"Apartment / Building / Street":
-    "Apartment / Building / Street",
-"Name of Area": "Name of Area",
+  "Video Guidelines": "Video Guidelines",
 
-"Municipality / City": "Municipality / City",
-"Enter municipality": "Enter municipality",
+  "Tip: Properties with photos get 10x more interest!":
+      "Tip: Properties with photos get 10x more interest!",
 
-"Landmark": "Landmark",
-"Nearby landmark": "Nearby landmark",
+  "Make sure to add high quality photos and videos":
+      "Make sure to add high quality photos and videos",
 
-"Latitude": "Latitude",
-"Longitude": "Longitude",
+  // ================= REVIEW / SUBMIT =================
+  "Review & Publish": "Review & Publish",
+  "Save & Continue": "Save & Continue",
+  // Chat Screen
+  "Can we schedule a visit?": "Can we schedule a visit?",
+  "Is the price negotiable?": "Is the price negotiable?",
+  "What is the payment plan?": "What is the payment plan?",
+  "Seller": "Seller",
+  "Typing...": "Typing...",
+  "Online": "Online",
+  "No Messages Yet": "No Messages Yet",
+  "Type a message...": "Type a message...",
+  "Gallery": "Gallery",
+  "Camera": "Camera",
+  // Chat List Screen
+  "Search by property or seller": "Search by property or seller",
+  "No Conversations": "No Conversations",
+  "My Chats": "My Chats",
+  "My Visits": "My Visits",
+  "Property": "Property",
+  "No messages yet": "No messages yet",
+  "Chat with ": "Chat with ",
+  "Yesterday": "Yesterday",
+  // Chat Start Screen
+  "Image unavailable": "Image unavailable",
+  "Property Consultant": "Property Consultant",
+
+  // Report User
+  "Report User": "Report User",
+  "Unable to identify the user": "Unable to identify the user",
+  "Please select a reason": "Please select a reason",
+  "Report submitted successfully": "Report submitted successfully",
+  "Unable to submit report": "Unable to submit report",
+
+  // Report Reasons
+  "Fake profile": "Fake profile",
+  "Fraud or scam": "Fraud or scam",
+  "Inappropriate behavior": "Inappropriate behavior",
+  "Spam or unwanted messages": "Spam or unwanted messages",
+  "Misleading information": "Misleading information",
+  "Other": "Other",
+
+  // Report Form
+  "Tell us why you're reporting this user.":
+      "Tell us why you're reporting this user.",
+  "Reason for Report": "Reason for Report",
+  "Additional Details": "Additional Details",
+
+  "Describe the issue": "Describe the issue",
+  "Your report will be reviewed by our support team.":
+      "Your report will be reviewed by our support team.",
+  "Submit Report": "Submit Report",
+  // Empty Conversation
+  "Start Conversation": "Start Conversation",
+  "Ask anything about this property.\nThe property consultant will reply as soon as possible.":
+      "Ask anything about this property.\nThe property consultant will reply as soon as possible.",
+  "You can ask about": "You can ask about",
+  "Price Negotiation": "Price Negotiation",
+  "Payment Plans": "Payment Plans",
+  "Property Availability": "Property Availability",
 
-"Google Map integration can be added here for selecting the exact location.":
-    "Google Map integration can be added here for selecting the exact location.",
+  // Interested Property Card
+  "I can pay up to ": "I can pay up to ",
+  "Is this property still available?": "Is this property still available?",
+  "Pending": "Pending",
+  "Accepted": "Accepted",
+  "Confirmed": "Confirmed",
+  "Rejected": "Rejected",
+  "Cancelled": "Cancelled",
+  "Completed": "Completed",
+  "My Wishlist": "My Wishlist",
+  "Saved Properties": "Saved Properties",
+  "properties saved": "properties saved",
+  "Search saved properties": "Search saved properties",
+  "Your wishlist is empty": "Your wishlist is empty",
+  "Save properties you love and find them easily here.":
+      "Save properties you love and find them easily here.",
+  "No saved properties found": "No saved properties found",
+  "Visit Requests": "Visit Requests",
+  "My Property": "My Property",
 
-// ================= PHOTOS & VIDEOS =================
+  // ================= PROPERTY DETAILS SCREEN =================
+  "Property Owner": "Property Owner",
+  "Call": "Call",
 
-"Photos & Videos": "Photos & Videos",
+  "Reviews": "Reviews",
 
-"Add high quality photos and videos to attract more buyers":
-    "Add high quality photos and videos to attract more buyers",
+  "Overview": "Overview",
 
-"Property Photos": "Property Photos",
+  "Built-up Area": "Built-up Area",
+  "Floor": "Floor",
+  "Floors": "Floors",
 
-"Upload clear and attractive photos (Max 20 photos)":
-    "Upload clear and attractive photos (Max 20 photos)",
+  "Listed On": "Listed On",
 
-"Add Photos": "Add Photos",
+  "View on Maps": "View on Maps",
 
-"JPG, PNG up to 10MB each":
-    "JPG, PNG up to 10MB each",
+  "Verified": "Verified",
+  "Not Verified": "Not Verified",
+  "away": "away",
+  "sqm": "sqm",
 
-"Property Videos": "Property Videos",
-"(Optional)": "(Optional)",
+  // ================= NEARBY TAGS =================
+  "School": "School",
+  "Metro": "Metro",
+  "Hospital": "Hospital",
+  "Clinic": "Clinic",
+  "Mall": "Mall",
+  "Airport": "Airport",
+  "Beach": "Beach",
+  "Pharmacy": "Pharmacy",
+  "Mosque": "Mosque",
+  "Church": "Church",
+  "Boost Property": "Boost Property",
 
-"Upload video tour of your property (Max 3 videos)":
-    "Upload video tour of your property (Max 3 videos)",
+  "Parking": "Parking",
+  "Purpose": "Purpose",
 
-"Add Video": "Add Video",
-"Video Selected": "Video Selected",
+  "Mark as Sold": "Mark as Sold",
+  "Make an Offer": "Make an Offer",
+  "Property Price": "Property Price",
+  "Review the listed price before making your offer":
+      "Review the listed price before making your offer",
+  "Your Offer": "Your Offer",
+  "Enter the amount you would like to offer":
+      "Enter the amount you would like to offer",
+  "Listed Price": "Listed Price",
+  "Schedule": "Schedule",
+  "Send Offer": "Send Offer",
+  "Chat Seller": "Chat Seller",
+  "Offer Amount": "Offer Amount",
 
-"MP4, MOV up to 50MB each":
-    "MP4, MOV up to 50MB each",
+  "Schedule a Visit": "Schedule a Visit",
+  "Select Visit Date": "Select Visit Date",
+  "Available Time": "Available Time",
+  "Add a note (Optional)": "Add a note (Optional)",
+  "Book Visit": "Book Visit",
 
-"Video Guidelines": "Video Guidelines",
+  "Choose Boost Plan": "Choose Boost Plan",
+  "Select how you want to promote your listing":
+      "Select how you want to promote your listing",
 
-"Tip: Properties with photos get 10x more interest!":
-    "Tip: Properties with photos get 10x more interest!",
+  "Search boost plans": "Search boost plans",
 
-"Make sure to add high quality photos and videos":
-    "Make sure to add high quality photos and videos",
+  "Loading boost plans...": "Loading boost plans...",
 
-// ================= REVIEW / SUBMIT =================
+  "No plans found": "No plans found",
+  "Try searching with another keyword": "Try searching with another keyword",
 
-"Review & Publish": "Review & Publish",
-"Save & Continue": "Save & Continue",
-// Chat Screen
-"Can we schedule a visit?": "Can we schedule a visit?",
-"Is the price negotiable?": "Is the price negotiable?",
-"What is the payment plan?": "What is the payment plan?",
-"Seller": "Seller",
-"Typing...": "Typing...",
-"Online": "Online",
-"No Messages Yet": "No Messages Yet",
-"Type a message...": "Type a message...",
-"Gallery": "Gallery",
-"Camera": "Camera",
-// Chat List Screen
-"Search by property or seller": "Search by property or seller",
-"No Conversations": "No Conversations",
-"My Chats": "My Chats",
-"My Visits": "My Visits",
-"Property": "Property",
-"No messages yet": "No messages yet",
-"Chat with ": "Chat with ",
-"Yesterday": "Yesterday",
-// Chat Start Screen
-"Image unavailable": "Image unavailable",
-"Property Consultant": "Property Consultant",
+  "POPULAR": "POPULAR",
 
-// Report User
-"Report User": "Report User",
-"Unable to identify the user": "Unable to identify the user",
-"Please select a reason": "Please select a reason",
-"Report submitted successfully": "Report submitted successfully",
-"Unable to submit report": "Unable to submit report",
+  "Secure payment powered by Stripe": "Secure payment powered by Stripe",
 
-// Report Reasons
-"Fake profile": "Fake profile",
-"Fraud or scam": "Fraud or scam",
-"Inappropriate behavior": "Inappropriate behavior",
-"Spam or unwanted messages": "Spam or unwanted messages",
-"Misleading information": "Misleading information",
-"Other": "Other",
+  "Total": "Total",
 
-// Report Form
-"Tell us why you're reporting this user.":
-    "Tell us why you're reporting this user.",
-"Reason for Report": "Reason for Report",
-"Additional Details": "Additional Details",
+  "Unable to load boost plans": "Unable to load boost plans",
 
-"Describe the issue": "Describe the issue",
-"Your report will be reviewed by our support team.":
-    "Your report will be reviewed by our support team.",
-"Submit Report": "Submit Report",
-// Empty Conversation
-"Start Conversation": "Start Conversation",
-"Ask anything about this property.\nThe property consultant will reply as soon as possible.":
-    "Ask anything about this property.\nThe property consultant will reply as soon as possible.",
-"You can ask about": "You can ask about",
-"Price Negotiation": "Price Negotiation",
-"Payment Plans": "Payment Plans",
-"Property Availability": "Property Availability",
+  "Try Again": "Try Again",
 
+  "No boost plans available": "No boost plans available",
 
+  "Please check again later.": "Please check again later.",
 
-// Interested Property Card
-"I can pay up to ": "I can pay up to ",
-"Is this property still available?": "Is this property still available?",
-"Pending": "Pending",
-"Accepted": "Accepted",
-"Confirmed": "Confirmed",
-"Rejected": "Rejected",
-"Cancelled": "Cancelled",
-"Completed": "Completed",
-"My Wishlist": "My Wishlist",
-"Saved Properties": "Saved Properties",
-"properties saved": "properties saved",
-"Search saved properties": "Search saved properties",
-"Your wishlist is empty": "Your wishlist is empty",
-"Save properties you love and find them easily here.":
-    "Save properties you love and find them easily here.",
-"No saved properties found": "No saved properties found",
-"Visit Requests": "Visit Requests",
-"My Property": "My Property",
-// ================= PROPERTY DETAILS SCREEN =================
+  "Unable to Boost": "Unable to Boost",
+  "Property ID is missing.": "Property ID is missing.",
 
-"Property Owner": "Property Owner",
-"Call": "Call",
+  "Ready for Payment": "Ready for Payment",
 
-"Reviews": "Reviews",
+  "Requested by": "Requested by",
+  // ================= SETTINGS SCREEN =================
+  // Account
+  "Account": "Account",
 
-"Overview": "Overview",
+  "My Featured Properties": "My Featured Properties",
 
+  // Preferences
+  "Preferences": "Preferences",
 
-"Built-up Area": "Built-up Area",
-"Floor": "Floor",
+  "Notifications": "Notifications",
 
-"Listed On": "Listed On",
+  // Support
+  "Support": "Support",
+  "Help Center": "Help Center",
+  "Contact Us": "Contact Us",
+  "About": "About",
 
+  // Profile
+  "View Profile": "View Profile",
 
-"View on Maps": "View on Maps",
+  "Are you sure you want to logout from your account?":
+      "Are you sure you want to logout from your account?",
 
-"Verified": "Verified",
-"Not Verified": "Not Verified",
-"away": "away",
-"sqm": "sqm",
+  "My Tickets": "My Tickets",
 
-// ================= NEARBY TAGS =================
+  "How can we help?": "How can we help?",
+  "Send us your issue and our support team will assist you.":
+      "Send us your issue and our support team will assist you.",
 
-"School": "School",
-"Metro": "Metro",
-"Hospital": "Hospital",
-"Clinic": "Clinic",
-"Mall": "Mall",
-"Airport": "Airport",
-"Beach": "Beach",
-"Pharmacy": "Pharmacy",
-"Mosque": "Mosque",
-"Church": "Church",
-"Boost Property": "Boost Property",
+  "What can we help you with?": "What can we help you with?",
 
+  // ================= SUPPORT CATEGORIES =================
+  "General Support": "General Support",
+  "Questions, account help or any general issue.":
+      "Questions, account help or any general issue.",
 
+  "Payment Issue": "Payment Issue",
+  "Payment, billing, transaction or subscription issues.":
+      "Payment, billing, transaction or subscription issues.",
 
-"Parking": "Parking",
-"Purpose": "Purpose",
+  // ================= ISSUE FORM =================
+  "Tell us about the issue": "Tell us about the issue",
 
-"Mark as Sold": "Mark as Sold",
-"Make an Offer": "Make an Offer",
-"Property Price": "Property Price",
-"Review the listed price before making your offer":
-    "Review the listed price before making your offer",
-"Your Offer": "Your Offer",
-"Enter the amount you would like to offer":
-    "Enter the amount you would like to offer",
-"Listed Price": "Listed Price",
-"Schedule": "Schedule",
-"Send Offer": "Send Offer",
-"Chat Seller": "Chat Seller",
-"Offer Amount": "Offer Amount",
+  "Subject": "Subject",
+  "e.g. Payment failed": "e.g. Payment failed",
+  "Briefly describe your issue": "Briefly describe your issue",
 
-"Schedule a Visit": "Schedule a Visit",
-"Select Visit Date": "Select Visit Date",
-"Available Time": "Available Time",
-"Add a note (Optional)": "Add a note (Optional)",
-"Book Visit": "Book Visit",
+  "Description": "Description",
 
+  "Explain the payment issue, transaction details, or what went wrong...":
+      "Explain the payment issue, transaction details, or what went wrong...",
 
-"Choose Boost Plan": "Choose Boost Plan",
-"Select how you want to promote your listing":
-    "Select how you want to promote your listing",
+  "Tell us what happened and how we can help...":
+      "Tell us what happened and how we can help...",
 
-"Search boost plans": "Search boost plans",
+  "Please provide enough details so our support team can understand and resolve your issue.":
+      "Please provide enough details so our support team can understand and resolve your issue.",
 
-"Loading boost plans...": "Loading boost plans...",
+  "Submit Request": "Submit Request",
 
-"No plans found": "No plans found",
-"Try searching with another keyword":
-    "Try searching with another keyword",
+  // ================= VALIDATION / MESSAGES =================
+  "Please enter a subject for your request.":
+      "Please enter a subject for your request.",
 
-"POPULAR": "POPULAR",
+  "Please describe the issue.": "Please describe the issue.",
 
-"Secure payment powered by Stripe":
-    "Secure payment powered by Stripe",
+  "Unable to identify the logged-in user.":
+      "Unable to identify the logged-in user.",
 
-"Total": "Total",
+  "Your support request has been submitted successfully.":
+      "Your support request has been submitted successfully.",
 
+  "Unable to submit. Please try again.": "Unable to submit. Please try again.",
 
-"Unable to load boost plans":
-    "Unable to load boost plans",
+  // ================= SUPPORT TICKET DETAILS =================
+  "Ticket Details": "Ticket Details",
 
-"Try Again": "Try Again",
+  "Ticket Information": "Ticket Information",
+  "Submitted By": "Submitted By",
+  "Assigned To": "Assigned To",
+  "Your Request": "Your Request",
+  "Support Replies": "Support Replies",
 
-"No boost plans available":
-    "No boost plans available",
+  "Reply": "Reply",
+  "Replies": "Replies",
 
-"Please check again later.":
-    "Please check again later.",
+  // ================= TICKET INFORMATION =================
+  "Ticket ID": "Ticket ID",
+  "Category": "Category",
+  "Status": "Status",
+  "Listing ID": "Listing ID",
+  "Reported User ID": "Reported User ID",
+  "Reference ID": "Reference ID",
+  "Created": "Created",
+  "Last Updated": "Last Updated",
 
-"Unable to Boost": "Unable to Boost",
-"Property ID is missing.":
-    "Property ID is missing.",
+  // ================= CATEGORIES =================
+  "Reported User": "Reported User",
+  "Reported Listing": "Reported Listing",
 
-"Ready for Payment": "Ready for Payment",
+  // ================= STATUS =================
+  "OPEN": "OPEN",
+  "IN PROGRESS": "IN PROGRESS",
+  "RESOLVED": "RESOLVED",
+  "CLOSED": "CLOSED",
 
-"Requested by": "Requested by",
-// ================= SETTINGS SCREEN =================
-// Account
-"Account": "Account",
+  // ================= REPLIES / USERS =================
+  "Support Team": "Support Team",
 
-"My Featured Properties": "My Featured Properties",
+  "Support Agent": "Support Agent",
+  "User": "User",
 
-// Preferences
-"Preferences": "Preferences",
+  "No replies yet": "No replies yet",
+  "Our support team will respond here.": "Our support team will respond here.",
 
-"Notifications": "Notifications",
+  "No description provided.": "No description provided.",
 
-// Support
-"Support": "Support",
-"Help Center": "Help Center",
-"Contact Us": "Contact Us",
-"About": "About",
+  // ================= USER INFORMATION =================
+  "User ID": "User ID",
+  "Email": "Email",
 
-// Profile
-"View Profile": "View Profile",
+  "Submitter information is not available.":
+      "Submitter information is not available.",
 
+  "Not available": "Not available",
 
-"Are you sure you want to logout from your account?":
-    "Are you sure you want to logout from your account?",
+  // ================= ACTIONS =================
+  "Retry": "Retry",
 
-"My Tickets": "My Tickets",
+  "Open": "Open",
+  "In Progress": "In Progress",
+  "Resolved": "Resolved",
+  "Closed": "Closed",
 
-"How can we help?": "How can we help?",
-"Send us your issue and our support team will assist you.":
-    "Send us your issue and our support team will assist you.",
+  // Empty state
+  "No Support Tickets": "No Support Tickets",
+  "Your submitted support requests will appear here.":
+      "Your submitted support requests will appear here.",
+  "Search featured properties": "Search featured properties",
+  "Manage your currently featured properties":
+      "Manage your currently featured properties",
 
-"What can we help you with?":
-    "What can we help you with?",
+  // ================= AI PRICE ESTIMATOR =================
+  "AI Price Estimator": "AI Price Estimator",
 
-// ================= SUPPORT CATEGORIES =================
-
-"General Support": "General Support",
-"Questions, account help or any general issue.":
-    "Questions, account help or any general issue.",
-
-"Payment Issue": "Payment Issue",
-"Payment, billing, transaction or subscription issues.":
-    "Payment, billing, transaction or subscription issues.",
-
-// ================= ISSUE FORM =================
-
-"Tell us about the issue": "Tell us about the issue",
-
-"Subject": "Subject",
-"e.g. Payment failed": "e.g. Payment failed",
-"Briefly describe your issue":
-    "Briefly describe your issue",
-
-"Description": "Description",
-
-"Explain the payment issue, transaction details, or what went wrong...":
-    "Explain the payment issue, transaction details, or what went wrong...",
-
-"Tell us what happened and how we can help...":
-    "Tell us what happened and how we can help...",
-
-"Please provide enough details so our support team can understand and resolve your issue.":
-    "Please provide enough details so our support team can understand and resolve your issue.",
-
-"Submit Request": "Submit Request",
-
-// ================= VALIDATION / MESSAGES =================
-
-"Please enter a subject for your request.":
-    "Please enter a subject for your request.",
-
-"Please describe the issue.":
-    "Please describe the issue.",
-
-"Unable to identify the logged-in user.":
-    "Unable to identify the logged-in user.",
-
-"Your support request has been submitted successfully.":
-    "Your support request has been submitted successfully.",
-
-"Unable to submit. Please try again.":
-    "Unable to submit. Please try again.",
-
-// ================= SUPPORT TICKET DETAILS =================
-
-"Ticket Details": "Ticket Details",
-
-"Ticket Information": "Ticket Information",
-"Submitted By": "Submitted By",
-"Assigned To": "Assigned To",
-"Your Request": "Your Request",
-"Support Replies": "Support Replies",
-
-"Reply": "Reply",
-"Replies": "Replies",
-
-// ================= TICKET INFORMATION =================
-
-"Ticket ID": "Ticket ID",
-"Category": "Category",
-"Status": "Status",
-"Listing ID": "Listing ID",
-"Reported User ID": "Reported User ID",
-"Reference ID": "Reference ID",
-"Created": "Created",
-"Last Updated": "Last Updated",
-
-// ================= CATEGORIES =================
-
-
-"Reported User": "Reported User",
-"Reported Listing": "Reported Listing",
-
-// ================= STATUS =================
-
-"OPEN": "OPEN",
-"IN PROGRESS": "IN PROGRESS",
-"RESOLVED": "RESOLVED",
-"CLOSED": "CLOSED",
-
-// ================= REPLIES / USERS =================
-
-"Support Team": "Support Team",
-
-"Support Agent": "Support Agent",
-"User": "User",
-
-"No replies yet": "No replies yet",
-"Our support team will respond here.":
-    "Our support team will respond here.",
-
-"No description provided.":
-    "No description provided.",
-
-// ================= USER INFORMATION =================
-
-"User ID": "User ID",
-"Email": "Email",
-
-"Submitter information is not available.":
-    "Submitter information is not available.",
-
-"Not available": "Not available",
-
-// ================= ACTIONS =================
-
-"Retry": "Retry",
-
-"Open": "Open",
-"In Progress": "In Progress",
-"Resolved": "Resolved",
-"Closed": "Closed",
-
-// Empty state
-"No Support Tickets": "No Support Tickets",
-"Your submitted support requests will appear here.":
-    "Your submitted support requests will appear here.",
-"Search featured properties": "Search featured properties",
-"Manage your currently featured properties":
-    "Manage your currently featured properties",
-// ================= AI PRICE ESTIMATOR =================
-
-"AI Price Estimator": "AI Price Estimator",
-
-"Estimate Smarter": "Estimate Smarter",
-"Price Better.": "Price Better.",
-"Get an AI-powered estimate of your\n property value in seconds.":
-    "Get an AI-powered estimate of your\n property value in seconds.",
-
-
-"Enter city, locality or area": "Enter city, locality or area",
-"Area (sqft)": "Area (sqft)",
-"e.g. 1200": "e.g. 1200",
-"sqft": "sqft",
-
-
-"Villa / House": "Villa / House",
-"Plot": "Plot",
-
-"Select amenities": "Select amenities",
-
-"You can select multiple amenities":
-    "You can select multiple amenities",
-"Amenities are not available.":
-    "Amenities are not available.",
-"Clear All": "Clear All",
-"selected": "selected",
-"Apply": "Apply",
-
-// Highlights
-"Share some highlights (Optional)":
-    "Share some highlights (Optional)",
-"e.g. Sea view, Near metro, Gated community...":
-    "e.g. Sea view, Near metro, Gated community...",
-
-// Estimate Card
-"Estimated Price": "Estimated Price",
-"Get an estimate": "Get an estimate",
-"Enter property details below":
-    "Enter property details below",
-
-// Property Details
-"BHK": "BHK",
-"Select": "Select",
-"Select BHK": "Select BHK",
-
-"Select Bathrooms": "Select Bathrooms",
-"Bathroom": "Bathroom",
-
-"Select Furnishing": "Select Furnishing",
-"Furnishing options are not available.":
-    "Furnishing options are not available.",
-"Select Floor": "Select Floor",
-"Ground Floor": "Ground Floor",
-
-"Select Total Floors": "Select Total Floors",
-
-"Age of Property": "Age of Property",
-"Select Property Age": "Select Property Age",
-"New / Under 1 Year": "New / Under 1 Year",
-"1 - 5 Years": "1 - 5 Years",
-"5 - 10 Years": "5 - 10 Years",
-"10+ Years": "10+ Years",
-
-"Any": "Any",
-
-
-"Select Parking Availability":
-    "Select Parking Availability",
-"Available": "Available",
-"Not Available": "Not Available",
-
-// CTA
-"Get AI Estimate": "Get AI Estimate",
-"View estimated price & range":
-    "View estimated price & range",
-
-// Validation
-"Please enter the property location.":
-    "Please enter the property location.",
-"Please enter a valid property area.":
-    "Please enter a valid property area.",
-"Please select BHK.":
-    "Please select BHK.",
-"Please select bathrooms.":
-    "Please select bathrooms.",
-"Please select furnishing status.":
-    "Please select furnishing status.",
-"Unable to estimate price.":
-    "Unable to estimate price.",
-
-// Result
-"AI Estimated Value": "AI Estimated Value",
-"Minimum": "Minimum",
-"Maximum": "Maximum",
-
-
-// Footer
-"Your information is secure and private":
-    "Your information is secure and private",
+  "Estimate Smarter": "Estimate Smarter",
+  "Price Better.": "Price Better.",
+  "Get an AI-powered estimate of your\n property value in seconds.":
+      "Get an AI-powered estimate of your\n property value in seconds.",
+
+  "Enter city, locality or area": "Enter city, locality or area",
+  "Area (sqft)": "Area (sqft)",
+  "e.g. 1200": "e.g. 1200",
+  "sqft": "sqft",
+
+  "Villa / House": "Villa / House",
+  "Plot": "Plot",
+
+  "Select amenities": "Select amenities",
+
+  "You can select multiple amenities": "You can select multiple amenities",
+  "Amenities are not available.": "Amenities are not available.",
+  "Clear All": "Clear All",
+  "selected": "selected",
+  "Apply": "Apply",
+
+  // Highlights
+  "Share some highlights (Optional)": "Share some highlights (Optional)",
+  "e.g. Sea view, Near metro, Gated community...":
+      "e.g. Sea view, Near metro, Gated community...",
+
+  // Estimate Card
+  "Estimated Price": "Estimated Price",
+  "Get an estimate": "Get an estimate",
+  "Enter property details below": "Enter property details below",
+
+  // Property Details
+  "BHK": "BHK",
+  "Select": "Select",
+  "Select BHK": "Select BHK",
+
+  "Select Bathrooms": "Select Bathrooms",
+  "Bathroom": "Bathroom",
+
+  "Select Furnishing": "Select Furnishing",
+  "Furnishing options are not available.":
+      "Furnishing options are not available.",
+  "Select Floor": "Select Floor",
+  "Ground Floor": "Ground Floor",
+
+  "Select Total Floors": "Select Total Floors",
+
+  "Age of Property": "Age of Property",
+  "Select Property Age": "Select Property Age",
+  "New / Under 1 Year": "New / Under 1 Year",
+  "1 - 5 Years": "1 - 5 Years",
+  "5 - 10 Years": "5 - 10 Years",
+  "10+ Years": "10+ Years",
+
+  "Any": "Any",
+
+  "Select Parking Availability": "Select Parking Availability",
+  "Available": "Available",
+  "Not Available": "Not Available",
+
+  // CTA
+  "Get AI Estimate": "Get AI Estimate",
+  "View estimated price & range": "View estimated price & range",
+
+  // Validation
+  "Please enter the property location.": "Please enter the property location.",
+  "Please enter a valid property area.": "Please enter a valid property area.",
+  "Please select BHK.": "Please select BHK.",
+  "Please select bathrooms.": "Please select bathrooms.",
+  "Please select furnishing status.": "Please select furnishing status.",
+  "Unable to estimate price.": "Unable to estimate price.",
+
+  // Result
+  "AI Estimated Value": "AI Estimated Value",
+  "Minimum": "Minimum",
+  "Maximum": "Maximum",
+
+  // Footer
+  "Your information is secure and private":
+      "Your information is secure and private",
+
+  // --- i18n sweep additions ---
+  "Success": "Success",
+  "Visit scheduled successfully": "Visit scheduled successfully",
+  "Error": "Error",
+  "Visit ID is missing": "Visit ID is missing",
+  "Invalid price estimation response": "Invalid price estimation response",
+  "Property ID is missing": "Property ID is missing",
+  "Invalid featured properties response":
+      "Invalid featured properties response",
+  "Unable to load featured properties": "Unable to load featured properties",
+  "Property details are not available": "Property details are not available",
+  "Plan": "Plan",
+  "Select Property": "Select Property",
+  "Choose the property you want to promote":
+      "Choose the property you want to promote",
+  "Reach more buyers": "Reach more buyers",
+  "Boost your property to increase visibility and get more enquiries.":
+      "Boost your property to increase visibility and get more enquiries.",
+  "Loading your properties...": "Loading your properties...",
+  "Couldn't load properties": "Couldn't load properties",
+  "Please check your connection and try again.":
+      "Please check your connection and try again.",
+  "Add a property before creating a boost.":
+      "Add a property before creating a boost.",
+  "Load more properties": "Load more properties",
+  "Price not available": "Price not available",
+  "Please select a property to boost": "Please select a property to boost",
+  "Review": "Review",
+  "Draft saved successfully": "Draft saved successfully",
+  "Some images could not be uploaded.": "Some images could not be uploaded.",
+  "Property listed successfully.": "Property listed successfully.",
+  "Image upload failed": "Image upload failed",
+  "Failed to upload cover image": "Failed to upload cover image",
+  "Failed to upload image": "Failed to upload image",
+  "OTP sent successfully": "OTP sent successfully",
+  "Phone verified successfully": "Phone verified successfully",
+  " / month": " / month",
+  "Your contact number has been verified.":
+      "Your contact number has been verified.",
+  "Verify your WhatsApp number before publishing this property.":
+      "Verify your WhatsApp number before publishing this property.",
+  "Search location": "Search location",
+  "Upload Cover Image": "Upload Cover Image",
+  "JPG, PNG up to 10MB": "JPG, PNG up to 10MB",
+  "Cover": "Cover",
+  "Phone": "Phone",
+  "WhatsApp Verified": "WhatsApp Verified",
+  "Yes": "Yes",
+  "No": "No",
+  "Municipality": "Municipality",
+  "Photos & Media": "Photos & Media",
+  "Cover Image": "Cover Image",
+  "Total Photos": "Total Photos",
+  "Basic Information": "Basic Information",
+  "Edit": "Edit",
+  "Min Area": "Min Area",
+  "Max Area": "Max Area",
+  "Please login to manage your properties.":
+      "Please login to manage your properties.",
+  "Please login to access your chats.": "Please login to access your chats.",
+  "Please enable location services.": "Please enable location services.",
+  "Permission": "Permission",
+  "Location permission denied.": "Location permission denied.",
+  "Unable to detect current location.": "Unable to detect current location.",
+  "Featured": "Featured",
+  "Property ID is not available": "Property ID is not available",
+  "Boost Your Property": "Boost Your Property",
+  "Get more views and reach more buyers":
+      "Get more views and reach more buyers",
+  "Explore Now": "Explore Now",
+  "What's your": "What's your",
+  "villa worth?": "villa worth?",
+  "Find out in 30 seconds with our AI-powered valuation.":
+      "Find out in 30 seconds with our AI-powered valuation.",
+  "Get my free estimate": "Get my free estimate",
+  "100% secure": "100% secure",
+  "AI-powered valuation": "AI-powered valuation",
+  "Real market insights": "Real market insights",
+  "No nearby properties": "No nearby properties",
+  "Profile updated successfully": "Profile updated successfully",
+  "Version 1.0.0": "Version 1.0.0",
+  "Please login to edit your profile.": "Please login to edit your profile.",
+  "Please login to view your saved properties.":
+      "Please login to view your saved properties.",
+  "Please login to view your featured properties.":
+      "Please login to view your featured properties.",
+  "Please login to contact support.": "Please login to contact support.",
+  "Guest": "Guest",
+  "No Email": "No Email",
+  "USER": "USER",
+  "No review message available": "No review message available",
+  "Issue: ": "Issue: ",
+  "Edit and Resubmit": "Edit and Resubmit",
+  "Unable to report": "Unable to report",
+  "Property information is not available.":
+      "Property information is not available.",
+  "Maximum Selection": "Maximum Selection",
+  "You can compare only two properties.":
+      "You can compare only two properties.",
+  "Select up to 2 properties": "Select up to 2 properties",
+  "Search Property": "Search Property",
+  "Price Negotiable": "Price Negotiable",
+  "Contact Verified": "Contact Verified",
+  "Nearby Places": "Nearby Places",
+  "Compare": "Compare",
+  "Property Comparison": "Property Comparison",
+  "Change Selection": "Change Selection",
+  "Invalid OTP": "Invalid OTP",
+  "Please enter your WhatsApp number": "Please enter your WhatsApp number",
+  "Please enter a valid phone number": "Please enter a valid phone number",
+  "Please enter the OTP": "Please enter the OTP",
+  "OTP must be 6 digits": "OTP must be 6 digits",
+  "Failed to send OTP": "Failed to send OTP",
+  "Search dealers": "Search dealers",
+  "No dealers found": "No dealers found",
+  "No matching dealers": "No matching dealers",
+  "Website": "Website",
+  "Chat": "Chat",
+  "Active": "Active",
+  "Inactive": "Inactive",
+  "Trade No": "Trade No",
+  "Active Since": "Active Since",
+  "Contact Information": "Contact Information",
+  "Subscription Plan": "Subscription Plan",
+  "Valid Till": "Valid Till",
+  "Statistics": "Statistics",
+  "Total Properties": "Total Properties",
+  "Active Listings": "Active Listings",
+  "Sold Properties": "Sold Properties",
+  "Listings": "Listings",
+  "Valid for": "Valid for",
+  "Days": "Days",
+  "Boost Discount": "Boost Discount",
+  "Priority Support": "Priority Support",
+  "About Company": "About Company",
+  "Show Less": "Show Less",
+  "Read More": "Read More",
+  "No properties yet": "No properties yet",
+  "FOR SALE": "FOR SALE",
+  "FOR RENT": "FOR RENT",
+  "Please wait...": "Please wait...",
+  "Sending...": "Sending...",
+  "Verifying...": "Verifying...",
+  "Google": "Google",
+  "Apple": "Apple",
+  "Discover premium villas and properties\\nin the best locations across Qatar":
+      "Discover premium villas and properties\\nin the best locations across Qatar",
+  "Login Required": "Login Required",
+  "Please sign in to use this feature.": "Please sign in to use this feature.",
+  "Not Now": "Not Now",
+  "Login": "Login",
+  "Bad Request": "Bad Request",
+  "Unauthorized": "Unauthorized",
+  "Forbidden": "Forbidden",
+  "Not Found": "Not Found",
+  "Conflict": "Conflict",
+  "Invalid Data": "Invalid Data",
+  "Server Error": "Server Error",
+  "No Internet Connection": "No Internet Connection",
+  "Request timed out. Please check your internet connection and try again.":
+      "Request timed out. Please check your internet connection and try again.",
+  "Property unavailable": "Property unavailable",
+  "Unable to open this property": "Unable to open this property",
+  "Something went wrong": "Something went wrong",
+  "Upload Failed": "Upload Failed",
+  "Not Connected": "Not Connected",
+  "Please wait for chat to connect.": "Please wait for chat to connect.",
+  "Location Disabled": "Location Disabled",
+  "Permission Denied": "Permission Denied",
+  "Location permission is required.": "Location permission is required.",
+  "Enable location permission from settings.":
+      "Enable location permission from settings.",
+  "Location Error": "Location Error",
+  "Invalid support tickets response": "Invalid support tickets response",
+  "Invalid create ticket response": "Invalid create ticket response",
+  "Ticket ID is missing": "Ticket ID is missing",
+  "Invalid support ticket details response":
+      "Invalid support ticket details response",
+  "Choose Location": "Choose Location",
+  "Office Building": "Office Building",
+  "Commercial Building": "Commercial Building",
+  "Use Current Location": "Use Current Location",
+  "Detect location using GPS": "Detect Location Using GPS",
+  "Search city, area or landmark": "Search City, Area or Landmark",
+  "Search for a location": "Search for a Location",
+  "No locations found": "No Locations Found",
+  "Search by city, area or landmark": "Search by City, Area or Landmark",
+  "Try another keyword": "Try Another Keyword",
+  "Browse by Category": "Browse by Category",
+  "dream villas": "dream villas",
+  "Amenities & Features": "Amenities & Features",
+  "Insights": "Insights",
+  "Negotiable": "Negotiable",
+  "View on Google Maps": "View on Google Maps",
+  "Compare Properties": "Compare Properties",
+  "Compare this property with similar listings":
+      "Compare this property with similar listings",
+  "Nearby": "Nearby",
+  "Sort": "Sort",
+  "Newest": "Newest",
+  "Oldest": "Oldest",
+  "Price: Low to High": "Price: Low to High",
+  "Price: High to Low": "Price: High to Low",
+  "Area: Low to High": "Area: Low to High",
+  "Area: High to Low": "Area: High to Low",
+
+  "VILLA": "VILLA",
+  "APARTMENT": "APARTMENT",
+  "TOWNHOUSE": "TOWNHOUSE",
+  "PENTHOUSE": "PENTHOUSE",
+  "STUDIO": "STUDIO",
+  "COMMERCIAL": "COMMERCIAL",
+  "LAND": "LAND",
+  "All Locations": "All Locations",
+  "Area (SQM)": "Area (SQM)",
+  "Read less": "Read less",
+  "Read more": "Read more",
+
+  "Property Insights": "Property Insights",
+  "Track how people are discovering and engaging with your property.":
+      "Track how people are discovering and engaging with your property.",
+  "Last": "Last",
+  "days": "days",
+  "Totals": "Totals",
+  "All Time": "All Time",
+  "This Period Summary": "This Period Summary",
+  "Views": "Views",
+  "Reach": "Reach",
+  "Impressions": "Impressions",
+  "WhatsApp Clicks": "WhatsApp Clicks",
+  "Messages Started": "Messages Started",
+  "Users Engaged": "Users Engaged",
+  
+  "You received ": "You received ",
+  "more": "more",
+  "fewer": "fewer",
+  "views": "views",
+  "than the previous period.": "than the previous period.",
+  "Views Over Time": "Views Over Time",
+  "Data is updated daily. All times are in your local timezone.":
+      "Data is updated daily. All times are in your local timezone.",
+  "Insights will start appearing here once your property gets activity.":
+      "Insights will start appearing here once your property gets activity.",
+  "My Featured": "My Featured",
+"Password": "Password",
+// "Account": "Account",
+"Update your account information": "Update your account information",
+"Featured Plans": "Featured Plans",
+"Manage your active and past featured property plans": "Manage your active and past featured property plans",
+// "Unable to load featured properties": "Unable to load featured properties",
+// "Try Again": "Try Again",
+"No matching properties found": "No matching properties found",
+"No featured properties available": "No featured properties available",
+"Try searching with another property name": "Try searching with another property name",
+"Your featured properties will appear here": "Your featured properties will appear here",
+"Clear Search": "Clear Search",
+"Villas Qatar Payment Receipt": "Villas Qatar Payment Receipt",
+"Unable to generate receipt. Please try again": "Unable to generate receipt. Please try again",
+"Select Language": "Select Language",
+"Ask AI to find your villa...": "Ask AI to find your villa...",
+// "100% secure": "100% secure",
+// "AI-powered valuation": "AI-powered valuation",
+// "Real market insights": "Real market insights",
+"Your offer will be sent directly to the property owner. You can continue the conversation through chat": "Your offer will be sent directly to the property owner. You can continue the conversation through chat",
+"Share Property": "Share Property",
+"Share on WhatsApp": "Share on WhatsApp",
+"Unable to share": "Unable to share",
+"Could not open WhatsApp": "Could not open WhatsApp",
+"Copy Link": "Copy Link",
+"Property Description": "Property Description",
+"Muncipality": "Muncipality",
+"Review Listing": "Review Listing",
+"Verify all details before submitting": "Verify all details before submitting",
+"Are you sure you want to mark this property as sold?": "Are you sure you want to mark this property as sold?",
+"This property will be updated as sold and will no longer be available as an active listing": "This property will be updated as sold and will no longer be available as an active listing",
+"No visit requests": "No visit requests",
+"Visit requests for your properties will appear here": "Visit requests for your properties will appear here",
+"No scheduled visits": "No scheduled visits",
+"Properties you schedule for a visit will appear here": "Properties you schedule for a visit will appear here",
+"Skip": "Skip",
+"Premium living Prime locations\nThe lifestyle you deserve":
+    "Premium living Prime locations\nThe lifestyle you deserve",
+"or continue with": "or continue with",
+"By continuing, you agree to our\n":
+    "By continuing, you agree to our\n",
+"Terms of Use": "Terms of Use",
+"Privacy Policy": "Privacy Policy",
 };

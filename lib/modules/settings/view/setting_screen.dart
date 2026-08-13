@@ -68,7 +68,7 @@ class SettingsScreen extends StatelessWidget {
 
           Center(
             child: Text(
-              "Version 1.0.0",
+              "Version 1.0.0".tr,
               style: TextStyle(color: Colors.grey, fontSize: 12.sp),
             ),
           ),
@@ -87,7 +87,7 @@ class SettingsScreen extends StatelessWidget {
       title: "Edit Profile".tr,
       onTap: () {
         if (!AuthGuard.requireLogin(
-          message: "Please login to edit your profile.",
+          message: "Please login to edit your profile.".tr,
         )) {
           return;
         }
@@ -105,7 +105,7 @@ class SettingsScreen extends StatelessWidget {
       title: "Saved Properties".tr,
       onTap: () {
         if (!AuthGuard.requireLogin(
-          message: "Please login to view your saved properties.",
+          message: "Please login to view your saved properties.".tr,
         )) {
           return;
         }
@@ -115,10 +115,10 @@ class SettingsScreen extends StatelessWidget {
     ),
     SettingItem(
       icon: Icons.home_work_outlined,
-      title: "My Featured Properties".tr,
+      title: "My Featured".tr,
       onTap: () {
         if (!AuthGuard.requireLogin(
-          message: "Please login to view your featured properties.",
+          message: "Please login to view your featured properties.".tr,
         )) {
           return;
         }
@@ -134,11 +134,11 @@ class SettingsScreen extends StatelessWidget {
       title: "Language".tr,
       onTap: () => Get.to(() => const LanguageScreen()),
     ),
-    SettingItem(
-      icon: Icons.notifications_none,
-      title: "Notifications".tr,
-      onTap: () {},
-    ),
+    // SettingItem(
+    //   icon: Icons.notifications_none,
+    //   title: "Notifications".tr,
+    //   onTap: () {},
+    // ),
   ];
 
   List<SettingItem> get supportItems => [
@@ -157,7 +157,7 @@ class SettingsScreen extends StatelessWidget {
       title: "Support".tr,
       onTap: () {
         if (!AuthGuard.requireLogin(
-          message: "Please login to contact support.",
+          message: "Please login to contact support.".tr,
         )) {
           return;
         }
@@ -357,7 +357,7 @@ class ProfileHeader extends StatelessWidget {
                     Text(
                       profile?.name.isNotEmpty == true
                           ? profile!.name
-                          : "Guest",
+                          : "Guest".tr,
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                       style: TextStyle(
@@ -372,7 +372,7 @@ class ProfileHeader extends StatelessWidget {
                     Text(
                       profile?.email.isNotEmpty == true
                           ? profile!.email
-                          : "No Email",
+                          : "No Email".tr,
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                       style: TextStyle(color: Colors.white70, fontSize: 11.sp),
@@ -390,7 +390,7 @@ class ProfileHeader extends StatelessWidget {
                         borderRadius: BorderRadius.circular(30.r),
                       ),
                       child: Text(
-                        profile?.role ?? "USER",
+                        profile?.role ?? "USER".tr,
                         style: TextStyle(
                           color: Colors.white,
                           fontSize: 10.sp,
@@ -539,8 +539,9 @@ class LogoutButton extends StatelessWidget {
   void _showLogoutDialog() {
     Get.dialog(
       Dialog(
+        backgroundColor: Colors.white,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(24.r),
+          borderRadius: BorderRadius.circular(20.r),
         ),
         child: Padding(
           padding: EdgeInsets.all(24.w),
@@ -548,16 +549,16 @@ class LogoutButton extends StatelessWidget {
             mainAxisSize: MainAxisSize.min,
             children: [
               Container(
-                width: 72.w,
-                height: 72.w,
+                width: 60.w,
+                height: 60.w,
                 decoration: BoxDecoration(
-                  color: Colors.red.shade50,
+                  color: Colors.red.shade100,
                   shape: BoxShape.circle,
                 ),
                 child: Icon(
                   Icons.logout_rounded,
                   color: Colors.red.shade600,
-                  size: 34.sp,
+                  size: 30.sp,
                 ),
               ),
 

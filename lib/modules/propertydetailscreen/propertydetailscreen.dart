@@ -13,6 +13,7 @@ import 'package:villas_qatar/modules/home/widgets/property_card.dart';
 import 'package:villas_qatar/modules/propertydetailscreen/widget/agent_conatct_card.dart';
 import 'package:villas_qatar/modules/propertydetailscreen/widget/boost_plan_bottomsheet.dart';
 import 'package:villas_qatar/modules/propertydetailscreen/widget/bottom_actioncard.dart';
+import 'package:villas_qatar/modules/propertydetailscreen/widget/property_insights_bottomsheet.dart';
 import 'package:villas_qatar/modules/propertydetailscreen/widget/compare_card_widget.dart';
 import 'package:villas_qatar/modules/propertydetailscreen/widget/herocard.dart';
 import 'package:villas_qatar/modules/propertydetailscreen/widget/property_details_card.dart';
@@ -124,10 +125,7 @@ class _PropertyDetailsScreenState extends State<PropertyDetailsScreen> {
             ? property.latestReview!.message
             : (property.rejectionReason?.trim().isNotEmpty ?? false)
             ? property.rejectionReason!
-            : "No review message available";
-        print(property.latestReview);
-        print(property.latestReview?.message);
-        print(property.rejectionReason);
+            : "No review message available".tr;
 
         final String loggedInUserId = StorageService.getUserId();
 
@@ -277,9 +275,9 @@ class _PropertyDetailsScreenState extends State<PropertyDetailsScreen> {
                                                     height: 1.4,
                                                   ),
                                                   children: [
-                                                    const TextSpan(
-                                                      text: "Issue: ",
-                                                      style: TextStyle(
+                                                    TextSpan(
+                                                      text: "Issue: ".tr,
+                                                      style: const TextStyle(
                                                         fontWeight:
                                                             FontWeight.w600,
                                                       ),
@@ -335,7 +333,7 @@ class _PropertyDetailsScreenState extends State<PropertyDetailsScreen> {
                                                   ),
                                                   SizedBox(width: 4.w),
                                                   Text(
-                                                    "Edit and Resubmit",
+                                                    "Edit and Resubmit".tr,
                                                     style: TextStyle(
                                                       color: AppColors.primary,
                                                       fontSize: 10.sp,
@@ -354,52 +352,107 @@ class _PropertyDetailsScreenState extends State<PropertyDetailsScreen> {
                                 PropertyInfoCard(property: property),
 
                                 SizedBox(height: 5.h),
-                                if (isMyProperty)
-                                  Padding(
-                                    padding: EdgeInsets.fromLTRB(
-                                      0.w,
-                                      12.h,
-                                      0.w,
-                                      4.h,
-                                    ),
-                                    child: SizedBox(
-                                      width: double.infinity,
-                                      height: 40.h,
-                                      child: ElevatedButton(
-                                        onPressed: () {
-                                          _onBoostProperty(property);
-                                        },
-                                        style: ElevatedButton.styleFrom(
-                                          backgroundColor: AppColors.primary,
-                                          foregroundColor: Colors.white,
-                                          elevation: 0,
-                                          shape: RoundedRectangleBorder(
-                                            borderRadius: BorderRadius.circular(
-                                              10.r,
+
+                                Padding(
+                                  padding: EdgeInsets.fromLTRB(
+                                    0.w,
+                                    12.h,
+                                    0.w,
+                                    4.h,
+                                  ),
+                                  child: Row(
+                                    children: [
+                                      // ==================================
+                                      // INSIGHTS
+                                      // (Instagram-style secondary action
+                                      // next to Boost)
+                                      // ==================================
+                                      Expanded(
+                                        child: SizedBox(
+                                          height: 40.h,
+                                          child: OutlinedButton(
+                                            onPressed: () {
+                                              _onViewInsights(property);
+                                            },
+                                            style: OutlinedButton.styleFrom(
+                                              foregroundColor:
+                                                  AppColors.primary,
+                                              side: BorderSide(
+                                                color: AppColors.primary,
+                                              ),
+                                              shape: RoundedRectangleBorder(
+                                                borderRadius:
+                                                    BorderRadius.circular(10.r),
+                                              ),
+                                            ),
+                                            child: Row(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.center,
+                                              children: [
+                                                Icon(
+                                                  Icons.insights_rounded,
+                                                  size: 18.sp,
+                                                ),
+                                                SizedBox(width: 6.w),
+                                                Text(
+                                                  "Insights".tr,
+                                                  style: TextStyle(
+                                                    fontSize: 13.sp,
+                                                    fontWeight: FontWeight.w600,
+                                                  ),
+                                                ),
+                                              ],
                                             ),
                                           ),
                                         ),
-                                        child: Row(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.center,
-                                          children: [
-                                            Icon(
-                                              Icons.rocket_launch_outlined,
-                                              size: 19.sp,
-                                            ),
-                                            SizedBox(width: 8.w),
-                                            Text(
-                                              "Boost Property".tr,
-                                              style: TextStyle(
-                                                fontSize: 14.sp,
-                                                fontWeight: FontWeight.w600,
+                                      ),
+
+                                      SizedBox(width: 10.w),
+
+                                      // ==================================
+                                      // BOOST PROPERTY
+                                      // ==================================
+                                      Expanded(
+                                        child: SizedBox(
+                                          height: 40.h,
+                                          child: ElevatedButton(
+                                            onPressed: () {
+                                              _onBoostProperty(property);
+                                            },
+                                            style: ElevatedButton.styleFrom(
+                                              backgroundColor:
+                                                  AppColors.primary,
+                                              foregroundColor: Colors.white,
+                                              elevation: 0,
+                                              shape: RoundedRectangleBorder(
+                                                borderRadius:
+                                                    BorderRadius.circular(10.r),
                                               ),
                                             ),
-                                          ],
+                                            child: Row(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.center,
+                                              children: [
+                                                Icon(
+                                                  Icons.rocket_launch_outlined,
+                                                  size: 18.sp,
+                                                ),
+                                                SizedBox(width: 6.w),
+                                                Text(
+                                                  "Boost Property".tr,
+                                                  style: TextStyle(
+                                                    fontSize: 13.sp,
+                                                    fontWeight: FontWeight.w600,
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          ),
                                         ),
                                       ),
-                                    ),
+                                    ],
                                   ),
+                                ),
                                 SizedBox(height: 12.h),
                                 OverviewCard(property: property),
                                 SizedBox(height: 12.h),
@@ -795,7 +848,8 @@ class _PropertyDetailsScreenState extends State<PropertyDetailsScreen> {
                                                   isFeatured:
                                                       listing.isFeatured,
                                                 ),
-                                              );          },
+                                              );
+                                            },
                                           ),
                                         ),
                                       ],
@@ -999,7 +1053,7 @@ class _PropertyDetailsScreenState extends State<PropertyDetailsScreen> {
 
                     Expanded(
                       child: Text(
-                        "This property will be updated as sold and will no longer be available as an active listing."
+                        "This property will be updated as sold and will no longer be available as an active listing"
                             .tr,
                         style: TextStyle(
                           fontSize: 10.sp,
@@ -1014,11 +1068,11 @@ class _PropertyDetailsScreenState extends State<PropertyDetailsScreen> {
 
               SizedBox(height: 22.h),
 
-              /// ACTION BUTTONS
               Row(
                 children: [
                   /// CANCEL
                   Expanded(
+                    flex: 1,
                     child: SizedBox(
                       height: 46.h,
                       child: OutlinedButton(
@@ -1048,26 +1102,22 @@ class _PropertyDetailsScreenState extends State<PropertyDetailsScreen> {
 
                   /// MARK AS SOLD
                   Expanded(
-                    flex: 2,
+                    flex: 1,
                     child: SizedBox(
                       height: 46.h,
                       child: ElevatedButton(
                         onPressed: () async {
-                          /// Close confirmation dialog
                           Get.back();
 
                           final MyPropertyController myPropertyController =
                               Get.isRegistered<MyPropertyController>()
                               ? Get.find<MyPropertyController>()
                               : Get.put(MyPropertyController());
+
                           final bool success = await myPropertyController
                               .markAsSold(propertyId);
 
                           if (success) {
-                            /// IMPORTANT:
-                            /// Fetch updated property from API.
-                            /// Now response should contain:
-                            /// status: "SOLD"
                             await controller.fetchPropertyDetails(propertyId);
 
                             Fluttertoast.showToast(
@@ -1078,8 +1128,6 @@ class _PropertyDetailsScreenState extends State<PropertyDetailsScreen> {
                               textColor: Colors.white,
                               fontSize: 14.sp,
                             );
-
-                            /// DO NOT call Get.back() here
                           } else {
                             Fluttertoast.showToast(
                               msg:
@@ -1111,9 +1159,7 @@ class _PropertyDetailsScreenState extends State<PropertyDetailsScreen> {
                               Icons.check_circle_outline_rounded,
                               size: 17.sp,
                             ),
-
                             SizedBox(width: 6.w),
-
                             Text(
                               "Mark as Sold".tr,
                               style: TextStyle(
@@ -1149,6 +1195,19 @@ class _PropertyDetailsScreenState extends State<PropertyDetailsScreen> {
 
     Get.bottomSheet(
       BoostPlanBottomSheet(propertyId: id),
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      barrierColor: Colors.black.withOpacity(.45),
+      isDismissible: true,
+      enableDrag: true,
+    );
+  }
+
+  void _onViewInsights(Property property) {
+    final String id = property.id.trim();
+
+    Get.bottomSheet(
+      PropertyInsightsBottomSheet(propertyId: id, insights: property.insights),
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
       barrierColor: Colors.black.withOpacity(.45),
@@ -1197,8 +1256,8 @@ class _PropertyDetailsScreenState extends State<PropertyDetailsScreen> {
 
     if (listingId.isEmpty) {
       Get.snackbar(
-        "Unable to report",
-        "Property information is not available.",
+        "Unable to report".tr,
+        "Property information is not available.".tr,
         snackPosition: SnackPosition.BOTTOM,
       );
       return;

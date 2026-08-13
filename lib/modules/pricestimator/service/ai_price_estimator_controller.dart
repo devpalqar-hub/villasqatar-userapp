@@ -114,7 +114,7 @@ class AiPriceEstimatorController extends GetxController {
 
       if (response is! Map<String, dynamic>) {
         throw Exception(
-          "Invalid price estimation response",
+          "Invalid price estimation response".tr,
         );
       }
 

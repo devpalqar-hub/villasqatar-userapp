@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:get/get_utils/src/extensions/internacionalization.dart';
 
 import 'package:villas_qatar/modules/home/model/banner_model.dart';
 
@@ -123,7 +124,7 @@ class InvestmentBanner extends StatelessWidget {
                         SizedBox(width: 3.w),
 
                         Text(
-                          "Featured",
+                          "Featured".tr,
                           style: TextStyle(
                             color: const Color(
                               0xff8C1437,
@@ -225,7 +226,7 @@ class InvestmentBanner extends StatelessWidget {
                                 MainAxisSize.min,
                             children: [
                               Text(
-                                "Explore Now",
+                                "Explore Now".tr,
                                 style: TextStyle(
                                   color: Colors.white,
                                   fontSize: 11.sp,

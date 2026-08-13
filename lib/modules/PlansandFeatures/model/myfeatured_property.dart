@@ -1,3 +1,5 @@
+import 'package:intl/intl.dart';
+
 class MyFeaturedProperty {
   final String id;
   final String listingId;
@@ -155,8 +157,49 @@ class MyFeaturedProperty {
     return _formatEnum(location);
   }
 
+  String get formattedStartDate {
+    if (startDate == null) {
+      return '-';
+    }
+
+    return DateFormat('dd MMM yyyy').format(startDate!);
+  }
+
+  String get formattedEndDate {
+    if (endDate == null) {
+      return '-';
+    }
+
+    return DateFormat('dd MMM yyyy').format(endDate!);
+  }
+
   String get paymentStatusLabel {
     return _formatEnum(paymentStatus);
+  }
+
+  /// Short, receipt-friendly reference derived from the record id.
+  String get receiptNumber {
+    if (id.isEmpty) {
+      return '-';
+    }
+
+    final String clean = id.replaceAll('-', '').toUpperCase();
+
+    return '#${clean.substring(0, clean.length < 8 ? clean.length : 8)}';
+  }
+
+  /// Best available payment reference for the receipt.
+  String get transactionId {
+    if (stripePaymentIntentId != null &&
+        stripePaymentIntentId!.isNotEmpty) {
+      return stripePaymentIntentId!;
+    }
+
+    if (stripeSessionId != null && stripeSessionId!.isNotEmpty) {
+      return stripeSessionId!;
+    }
+
+    return '-';
   }
 
   String get formattedPaidAmount {
@@ -251,6 +294,15 @@ class FeaturedPlan {
 
   String get durationLabel {
     return _formatEnum(duration);
+  }
+
+  /// Comma separated, human readable list of the places this
+  /// plan's properties are displayed (e.g. "Home Page, Listing Page").
+  String get displayLocationsLabel {
+    return locations
+        .map(_formatEnum)
+        .where((label) => label.isNotEmpty)
+        .join(', ');
   }
 
   String get formattedPrice {

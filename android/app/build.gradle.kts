@@ -3,6 +3,10 @@ plugins {
     id("kotlin-android")
     // The Flutter Gradle Plugin must be applied after the Android and Kotlin Gradle plugins.
     id("dev.flutter.flutter-gradle-plugin")
+    // Push notifications (Firebase Cloud Messaging) - needs
+    // android/app/google-services.json to actually build; see that
+    // file's TODO note if it's missing.
+    id("com.google.gms.google-services")
 }
 
 android {

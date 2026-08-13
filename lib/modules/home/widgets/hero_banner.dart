@@ -87,7 +87,7 @@ class _HomeBannerState extends State<HomeBanner> {
                   Row(
                     children: [
                       Text(
-                        "Find your".tr + " dream villas".tr,
+                        "Find your".tr + "dream villas".tr,
                         style: TextStyle(
                           fontFamily: "Rubik",
                           fontSize: 20.sp,

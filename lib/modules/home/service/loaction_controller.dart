@@ -131,7 +131,7 @@ class LocationController extends GetxController {
 
       bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
       if (!serviceEnabled) {
-        Get.snackbar("Location", "Please enable location services.");
+        Get.snackbar("Location".tr, "Please enable location services.".tr);
         return;
       }
 
@@ -143,7 +143,7 @@ class LocationController extends GetxController {
 
       if (permission == LocationPermission.denied ||
           permission == LocationPermission.deniedForever) {
-        Get.snackbar("Permission", "Location permission denied.");
+        Get.snackbar("Permission".tr, "Location permission denied.".tr);
         return;
       }
 
@@ -204,7 +204,7 @@ class LocationController extends GetxController {
       debugPrint(e.toString());
       debugPrint(stackTrace.toString());
 
-      Get.snackbar("Error", "Unable to detect current location.");
+      Get.snackbar("Error".tr, "Unable to detect current location.".tr);
     } finally {
       isLoading = false;
       update();

@@ -9,6 +9,7 @@ import 'package:get/get_navigation/src/extension_navigation.dart';
 import 'package:get/get_state_manager/src/simple/get_state.dart';
 import 'package:get/get_utils/src/extensions/internacionalization.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:quill_html_editor/quill_html_editor.dart';
 import 'package:villas_qatar/Core/constants/app_colors.dart';
 import 'package:villas_qatar/Core/theme/app_textstyles.dart';
 import 'package:villas_qatar/Core/widgets/primary_button.dart';
@@ -38,11 +39,25 @@ class _ListYourPropertyScreenState extends State<ListYourPropertyScreen> {
     }
   }
 
+  @override
+  void dispose() {
+    _descriptionQuillController.dispose();
+    super.dispose();
+  }
+
   final ListPropertyController controller = Get.put(ListPropertyController());
   final Utilscontroller utilsController = Get.put(Utilscontroller());
   final ImagePicker _picker = ImagePicker();
 
-  final descriptionCtrl = TextEditingController();
+  // Rich-text description editor. `controller.descriptionController`
+  // (a plain TextEditingController) stays the single source of truth
+  // that submission/review/edit-loading already read and write -
+  // this just keeps its `.text` in sync with the Quill editor's HTML
+  // output instead of being bound to a plain TextField.
+  final QuillEditorController _descriptionQuillController =
+      QuillEditorController();
+  double _descriptionEditorHeight = 160;
+
   String currency = 'QAR';
 
   String? zoneArea;
@@ -66,6 +81,28 @@ class _ListYourPropertyScreenState extends State<ListYourPropertyScreen> {
 
   void _goBack() {
     controller.previousStep();
+  }
+
+  // ============================================================
+  // BACK ARROW ON STEP 0
+  // ============================================================
+  //
+  // Prefer a normal pop back to whatever screen pushed this one
+  // (usually MyPropertiesScreen, still alive underneath). Using
+  // Get.offAll() here unconditionally used to tear down the entire
+  // navigation stack - including that still-mounted screen - while
+  // a brand new MainScreen was being built at the same time, which
+  // could race with in-flight work on the old screen (e.g. a
+  // fetchProperties() callback or the search field's controller)
+  // and throw "used after being disposed". Only fall back to
+  // rebuilding MainScreen when there's genuinely nothing to pop
+  // back to (e.g. this screen was opened via a deep link).
+  void _goBackOrHome() {
+    if (Get.key.currentState?.canPop() ?? false) {
+      Get.back();
+    } else {
+      Get.offAll(() => const MainScreen(initialIndex: 2));
+    }
   }
 
   @override
@@ -133,9 +170,7 @@ class _ListYourPropertyScreenState extends State<ListYourPropertyScreen> {
             icon: const Icon(Icons.arrow_back, color: AppColors.primary),
             onPressed: controller.currentStep > 0
                 ? _goBack
-                : () {
-                    Get.offAll(() => const MainScreen(initialIndex: 2));
-                  },
+                : _goBackOrHome,
           ),
           Expanded(
             child: Text(
@@ -332,7 +367,7 @@ Row(
             ),
             SizedBox(width: 6),
             Text(
-              "Verified",
+              "Verified".tr,
               style: TextStyle(
                 fontSize: 10.sp,
                 color: Colors.green,
@@ -418,15 +453,96 @@ if (controller.phoneChecked && !controller.whatsappVerified) ...[
 
       const SizedBox(height: 8),
 
-      _AppTextField(
-        controller: controller.descriptionController,
-        hint: "Describe your property".tr,
-        prefixIcon: Icons.description_outlined,
-        maxLines: 4,
-        maxLength: 250,
-        showCounter: true,
-      ),
+      _buildDescriptionEditor(),
     ],
+  );
+}
+
+//------------------------------------------------------------------
+// DESCRIPTION EDITOR (rich text, quill_html_editor)
+//
+// Same package already used to render descriptions read-only
+// elsewhere (Mypropertiesscreen.dart's _DescriptionSheet), so the
+// HTML this produces round-trips cleanly through the rest of the
+// app.
+//------------------------------------------------------------------
+
+Widget _buildDescriptionEditor() {
+  return Container(
+    decoration: BoxDecoration(
+      color: AppColors.fieldBg,
+      borderRadius: BorderRadius.circular(12),
+      border: Border.all(color: AppColors.fieldBorder),
+    ),
+    clipBehavior: Clip.antiAlias,
+    child: Column(
+      children: [
+        ToolBar(
+          controller: _descriptionQuillController,
+          toolBarColor: AppColors.fieldBg,
+          iconColor: AppColors.hintGrey,
+          activeIconColor: AppColors.primary,
+          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 4),
+          iconSize: 18,
+          toolBarConfig: const [
+            ToolBarStyle.bold,
+            ToolBarStyle.italic,
+            ToolBarStyle.underline,
+            ToolBarStyle.listBullet,
+            ToolBarStyle.listOrdered,
+            ToolBarStyle.clean,
+          ],
+        ),
+
+        Divider(height: 1, color: AppColors.fieldBorder),
+
+        Padding(
+          padding: const EdgeInsets.all(10),
+          child: QuillHtmlEditor(
+            controller: _descriptionQuillController,
+            hintText: "Describe your property".tr,
+            minHeight: _descriptionEditorHeight,
+            isEnabled: true,
+            padding: EdgeInsets.zero,
+            hintTextPadding: EdgeInsets.zero,
+            backgroundColor: AppColors.fieldBg,
+            textStyle: const TextStyle(fontSize: 14, color: Colors.black87),
+            hintTextStyle: const TextStyle(
+              color: AppColors.hintGrey,
+              fontSize: 14,
+            ),
+            loadingBuilder: (_) => const SizedBox(
+              height: 60,
+              child: Center(
+                child: SizedBox(
+                  height: 18,
+                  width: 18,
+                  child: CircularProgressIndicator(strokeWidth: 2),
+                ),
+              ),
+            ),
+            onEditorCreated: () {
+              // Edit mode: controller.loadProperty() already put the
+              // existing HTML description into descriptionController
+              // before the editor finished loading - push it in now.
+              final existing = controller.descriptionController.text;
+
+              if (existing.isNotEmpty) {
+                _descriptionQuillController.setText(existing);
+              }
+            },
+            onTextChanged: (text) {
+              controller.descriptionController.text = text;
+            },
+            onEditorResized: (height) {
+              if (mounted && height != _descriptionEditorHeight) {
+                setState(() => _descriptionEditorHeight = height);
+              }
+            },
+          ),
+        ),
+      ],
+    ),
   );
 }
 
@@ -484,8 +600,9 @@ Widget _buildWhatsAppVerifiedBanner() {
 
               Text(
                 verified
-                    ? "Your contact number has been verified."
-                    : "Verify your WhatsApp number before publishing this property.",
+                    ? "Your contact number has been verified.".tr
+                    : "Verify your WhatsApp number before publishing this property."
+                        .tr,
                 style: const TextStyle(fontSize: 12),
               ),
             ],
@@ -1294,8 +1411,8 @@ Widget _buildWhatsAppVerifiedBanner() {
 
                     const SizedBox(height: 18),
 
-                    const Text(
-                      "Furnishing",
+                    Text(
+                      "Furnishing".tr,
                       style: TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.w700,
@@ -1332,7 +1449,7 @@ Widget _buildWhatsAppVerifiedBanner() {
                     const SizedBox(height: 12),
 
                     PrimaryButton(
-                      title: "Done",
+                      title: "Done".tr,
                       onTap: () {
                         controller.update();
                         Navigator.pop(context);
@@ -1673,7 +1790,7 @@ Widget _buildWhatsAppVerifiedBanner() {
                       TextField(
                         controller: location.searchController,
                         decoration: InputDecoration(
-                          hintText: "Search location",
+                          hintText: "Search location".tr,
                           prefixIcon: Icon(Icons.search),
                         ),
                         onChanged: location.onSearchChanged,
@@ -1738,10 +1855,10 @@ Widget _buildWhatsAppVerifiedBanner() {
         (controller.coverImage.isEmpty && controller.existingPhotos.isEmpty)
             ? GestureDetector(
                 onTap: _pickCoverImage,
-                child: const _DashedUploadBox(
+                child: _DashedUploadBox(
                   icon: Icons.image_outlined,
-                  title: "Upload Cover Image",
-                  subtitle: "JPG, PNG up to 10MB",
+                  title: "Upload Cover Image".tr,
+                  subtitle: "JPG, PNG up to 10MB".tr,
                   filled: true,
                 ),
               )
@@ -1794,8 +1911,8 @@ Widget _buildWhatsAppVerifiedBanner() {
                         color: AppColors.primary,
                         borderRadius: BorderRadius.circular(20),
                       ),
-                      child: const Text(
-                        "Cover",
+                      child: Text(
+                        "Cover".tr,
                         style: TextStyle(
                           color: Colors.white,
                           fontWeight: FontWeight.w600,
@@ -1994,81 +2111,86 @@ Widget _buildWhatsAppVerifiedBanner() {
           const SizedBox(height: 24),
 
           _reviewSection(
-            title: "Basic Information",
+            title: "Basic Information".tr,
             step: 0,
             children: [
-              _reviewTile("Full Name", controller.fullNameController.text),
+              _reviewTile("Full Name".tr, controller.fullNameController.text),
               _reviewTile(
-                "Phone",
+                "Phone".tr,
                 "${controller.countryCode} ${controller.phoneController.text}",
               ),
-              _reviewTile("Email", controller.emailController.text),
+              _reviewTile("Email".tr, controller.emailController.text),
               _reviewTile(
-                "WhatsApp Verified",
-                controller.whatsappVerified ? "Yes" : "No",
+                "WhatsApp Verified".tr,
+                controller.whatsappVerified ? "Yes".tr : "No".tr,
               ),
-              _reviewTile("Description", controller.descriptionController.text),
+              _reviewTile(
+                "Description".tr,
+                _plainDescriptionPreview(
+                  controller.descriptionController.text,
+                ),
+              ),
             ],
           ),
 
           _reviewSection(
-            title: "Property Details",
+            title: "Property Details".tr,
             step: 1,
             children: [
               _reviewTile(
-                "Property Name",
+                "Property Name".tr,
                 controller.propertyNameController.text,
               ),
 
-              _reviewTile("Property Type", controller.propertyType),
+              _reviewTile("Property Type".tr, controller.propertyType),
 
-              _reviewTile("Purpose", controller.propertyPurpose),
+              _reviewTile("Purpose".tr, controller.propertyPurpose),
 
-              _reviewTile("Price", "QAR ${controller.priceController.text}"),
+              _reviewTile("Price".tr, "QAR ${controller.priceController.text}"),
 
-              _reviewTile("Area", "${controller.areaController.text} sqm"),
+              _reviewTile("Area".tr, "${controller.areaController.text} sqm"),
 
-              _reviewTile("Bedrooms", controller.bedroomsController.text),
+              _reviewTile("Bedrooms".tr, controller.bedroomsController.text),
 
-              _reviewTile("Bathrooms", controller.bathroomsController.text),
+              _reviewTile("Bathrooms".tr, controller.bathroomsController.text),
 
               _reviewTile(
-                "Living Rooms",
+                "Living Rooms".tr,
                 controller.livingRoomsController.text,
               ),
 
               _reviewTile(
-                "Parking Spaces",
+                "Parking Spaces".tr,
                 controller.parkingSpacesController.text,
               ),
 
               _reviewTile(
-                "Floor Number",
+                "Floor Number".tr,
                 controller.floorNumberController.text,
               ),
 
               _reviewTile(
-                "Total Floors",
+                "Total Floors".tr,
                 controller.totalFloorsController.text,
               ),
 
-              _reviewTile("Year Built", controller.yearBuiltController.text),
+              _reviewTile("Year Built".tr, controller.yearBuiltController.text),
             ],
           ),
 
           _reviewSection(
-            title: "Features & Amenities",
+            title: "Features & Amenities".tr,
             step: 2,
             children: [
               _reviewTile(
-                "Other Features",
+                "Other Features".tr,
                 controller.otherFeatureController.text,
               ),
 
               const SizedBox(height: 12),
 
-              const Text(
-                "Furnishing",
+              Text(
+                "Furnishing".tr,
                 style: TextStyle(fontWeight: FontWeight.bold),
               ),
 
@@ -2078,8 +2200,8 @@ Widget _buildWhatsAppVerifiedBanner() {
 
               const SizedBox(height: 16),
 
-              const Text(
-                "Amenities",
+              Text(
+                "Amenities".tr,
                 style: TextStyle(fontWeight: FontWeight.bold),
               ),
 
@@ -2089,8 +2211,8 @@ Widget _buildWhatsAppVerifiedBanner() {
 
               const SizedBox(height: 16),
 
-              const Text(
-                "Nearby Tags",
+              Text(
+                "Nearby Tags".tr,
                 style: TextStyle(fontWeight: FontWeight.bold),
               ),
 
@@ -2100,35 +2222,35 @@ Widget _buildWhatsAppVerifiedBanner() {
             ],
           ),
           _reviewSection(
-            title: "Location",
+            title: "Location".tr,
             step: 3,
             children: [
-              _reviewTile("Address Line 1", controller.addressController.text),
+              _reviewTile("Address Line 1".tr, controller.addressController.text,),
 
-              _reviewTile("Address Line 2", controller.streetController.text),
+              _reviewTile("Address Line 2".tr, controller.streetController.text),
 
-              _reviewTile("Area", controller.areaNameController.text),
+              _reviewTile("Area".tr, controller.areaNameController.text),
 
-              _reviewTile("Municipality", controller.cityController.text),
+              _reviewTile("Municipality".tr, controller.cityController.text),
 
-              _reviewTile("Landmark", controller.landmarkController.text),
+              _reviewTile("Landmark".tr, controller.landmarkController.text),
 
-              _reviewTile("Latitude", controller.latitudeController.text),
+              _reviewTile("Latitude".tr, controller.latitudeController.text),
 
-              _reviewTile("Longitude", controller.longitudeController.text),
+              _reviewTile("Longitude".tr, controller.longitudeController.text),
             ],
           ),
 
           _reviewSection(
-            title: "Photos & Media",
+            title: "Photos & Media".tr,
             step: 4,
             children: [
               if (controller.coverImage.isNotEmpty)
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text(
-                      "Cover Image",
+                    Text(
+                      "Cover Image".tr,
                       style: TextStyle(fontWeight: FontWeight.bold),
                     ),
 
@@ -2148,8 +2270,8 @@ Widget _buildWhatsAppVerifiedBanner() {
 
               const SizedBox(height: 20),
 
-              const Text(
-                "Gallery",
+              Text(
+                "Gallery".tr,
                 style: TextStyle(fontWeight: FontWeight.bold),
               ),
 
@@ -2173,7 +2295,7 @@ Widget _buildWhatsAppVerifiedBanner() {
 
               const SizedBox(height: 12),
 
-              _reviewTile("Total Photos", controller.images.length.toString()),
+              _reviewTile("Total Photos".tr, controller.images.length.toString()),
             ],
           ),
         ],
@@ -2211,11 +2333,11 @@ Widget _buildWhatsAppVerifiedBanner() {
                   controller.currentStep = step;
                   controller.update();
                 },
-                child: const Row(
+                child: Row(
                   children: [
-                    Icon(Icons.edit, size: 18),
-                    SizedBox(width: 4),
-                    Text("Edit"),
+                    const Icon(Icons.edit, size: 18),
+                    const SizedBox(width: 4),
+                    Text("Edit".tr),
                   ],
                 ),
               ),
@@ -2230,20 +2352,44 @@ Widget _buildWhatsAppVerifiedBanner() {
     );
   }
 
-  Widget _reviewTile(String title, String value) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 6),
-      child: Row(
-        children: [
-          Expanded(child: Text(title)),
-          Text(
-            value.isEmpty ? "-" : value,
-            style: const TextStyle(fontWeight: FontWeight.w600),
-          ),
-        ],
-      ),
-    );
+  /// Strips the Quill editor's HTML tags for the plain-text preview
+  /// shown on the review step - same approach as the read-only
+  /// description preview in Mypropertiesscreen.dart.
+  String _plainDescriptionPreview(String html) {
+    return html
+        .replaceAll(RegExp(r'<[^>]*>'), ' ')
+        .replaceAll(RegExp(r'\s+'), ' ')
+        .trim();
   }
+
+  Widget _reviewTile(String title, String value) {
+  return Padding(
+    padding: const EdgeInsets.symmetric(vertical: 6),
+    child: Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Expanded(
+          flex: 2,
+          child: Text(
+            title,
+          ),
+        ),
+        const SizedBox(width: 12),
+        Expanded(
+          flex: 3,
+          child: Text(
+            value.isEmpty ? "-" : value,
+            style: const TextStyle(
+              fontWeight: FontWeight.w600,
+            ),
+            textAlign: TextAlign.right,
+            softWrap: true,
+          ),
+        ),
+      ],
+    ),
+  );
+}
 
   Future<void> _pickCoverImage() async {
     final ImagePicker picker = ImagePicker();

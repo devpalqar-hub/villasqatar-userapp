@@ -435,7 +435,7 @@ class _HeroImageCardState extends State<HeroImageCard> {
 
               Text(
                 "Share Property".tr,
-                style: TextStyle(fontSize: 18.sp, fontWeight: FontWeight.w700),
+                style: TextStyle(fontSize: 18.sp, fontWeight: FontWeight.w500),
               ),
 
               SizedBox(height: 18.h),

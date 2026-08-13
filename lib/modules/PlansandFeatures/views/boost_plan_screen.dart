@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 
+import 'package:villas_qatar/Core/utils/stripe_checkout_helper.dart';
 import 'package:villas_qatar/modules/PlansandFeatures/model/featured_palnmodel.dart';
 import 'package:villas_qatar/modules/PlansandFeatures/services/plan_controller.dart';
 import 'package:villas_qatar/modules/propertylist/model/myproperty_model.dart';
@@ -72,7 +73,7 @@ class _BoostPropertyScreenState extends State<BoostPropertyScreen> {
         ),
 
         title: Text(
-          "Boost Property",
+          "Boost Property".tr,
           style: TextStyle(
             fontSize: 17.sp,
             fontWeight: FontWeight.w700,
@@ -106,8 +107,8 @@ class _BoostPropertyScreenState extends State<BoostPropertyScreen> {
                     SizedBox(height: 24.h),
 
                     _sectionTitle(
-                      "Select Property",
-                      subtitle: "Choose the property you want to promote",
+                      "Select Property".tr,
+                      subtitle: "Choose the property you want to promote".tr,
                       step: "1",
                     ),
 
@@ -118,8 +119,8 @@ class _BoostPropertyScreenState extends State<BoostPropertyScreen> {
                     SizedBox(height: 26.h),
 
                     _sectionTitle(
-                      "Choose Boost Plan",
-                      subtitle: "Select how you want to promote your listing",
+                      "Choose Boost Plan".tr,
+                      subtitle: "Select how you want to promote your listing".tr,
                       step: "2",
                     ),
 
@@ -128,7 +129,7 @@ class _BoostPropertyScreenState extends State<BoostPropertyScreen> {
                     GetBuilder<FeaturedPlanController>(
                       builder: (controller) {
                         if (controller.isLoading) {
-                          return _buildLoadingBox("Loading boost plans...");
+                          return _buildLoadingBox("Loading boost plans...".tr);
                         }
 
                         if (controller.error.isNotEmpty) {
@@ -211,7 +212,7 @@ class _BoostPropertyScreenState extends State<BoostPropertyScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  "Reach more buyers",
+                  "Reach more buyers".tr,
                   style: TextStyle(
                     fontSize: 14.sp,
                     fontWeight: FontWeight.w700,
@@ -222,7 +223,8 @@ class _BoostPropertyScreenState extends State<BoostPropertyScreen> {
                 SizedBox(height: 4.h),
 
                 Text(
-                  "Boost your property to increase visibility and get more enquiries.",
+                  "Boost your property to increase visibility and get more enquiries."
+                      .tr,
                   style: TextStyle(
                     fontSize: 10.sp,
                     height: 1.45,
@@ -307,15 +309,15 @@ class _BoostPropertyScreenState extends State<BoostPropertyScreen> {
     return GetBuilder<MyPropertyController>(
       builder: (controller) {
         if (controller.isLoading && controller.properties.isEmpty) {
-          return _buildLoadingBox("Loading your properties...");
+          return _buildLoadingBox("Loading your properties...".tr);
         }
 
         if (controller.error.isNotEmpty && controller.properties.isEmpty) {
           return _buildMessageBox(
             icon: Icons.error_outline_rounded,
-            title: "Couldn't load properties",
-            message: "Please check your connection and try again.",
-            buttonText: "Try Again",
+            title: "Couldn't load properties".tr,
+            message: "Please check your connection and try again.".tr,
+            buttonText: "Try Again".tr,
             onPressed: controller.fetchProperties,
           );
         }
@@ -323,8 +325,8 @@ class _BoostPropertyScreenState extends State<BoostPropertyScreen> {
         if (controller.properties.isEmpty) {
           return _buildMessageBox(
             icon: Icons.home_work_outlined,
-            title: "No properties found",
-            message: "Add a property before creating a boost.",
+            title: "No properties found".tr,
+            message: "Add a property before creating a boost.".tr,
           );
         }
 
@@ -388,7 +390,7 @@ class _BoostPropertyScreenState extends State<BoostPropertyScreen> {
                           ),
                         )
                       : Text(
-                          "Load more properties",
+                          "Load more properties".tr,
                           style: TextStyle(
                             fontSize: 10.sp,
                             fontWeight: FontWeight.w600,
@@ -409,7 +411,7 @@ class _BoostPropertyScreenState extends State<BoostPropertyScreen> {
   }) {
     final String imageUrl = _getPropertyImage(property);
 
-    final String propertyName = property.propertyName?.toString() ?? "Property";
+    final String propertyName = property.propertyName?.toString() ?? "Property".tr;
 
     final String location = _getPropertyLocation(property);
 
@@ -626,7 +628,7 @@ class _BoostPropertyScreenState extends State<BoostPropertyScreen> {
       }
     } catch (_) {}
 
-    return "Price not available";
+    return "Price not available".tr;
   }
 
   // ============================================================
@@ -724,7 +726,7 @@ class _BoostPropertyScreenState extends State<BoostPropertyScreen> {
                             ),
 
                             child: Text(
-                              "POPULAR",
+                              "POPULAR".tr,
                               style: TextStyle(
                                 fontSize: 6.5.sp,
                                 fontWeight: FontWeight.w700,
@@ -851,7 +853,7 @@ class _BoostPropertyScreenState extends State<BoostPropertyScreen> {
           SizedBox(height: 8.h),
 
           Text(
-            "Unable to load boost plans",
+            "Unable to load boost plans".tr,
             style: TextStyle(fontSize: 12.sp, fontWeight: FontWeight.w700),
           ),
 
@@ -870,7 +872,7 @@ class _BoostPropertyScreenState extends State<BoostPropertyScreen> {
             onPressed: () {
               controller.retry();
             },
-            child: const Text("Try Again"),
+            child: Text("Try Again".tr),
           ),
         ],
       ),
@@ -902,14 +904,14 @@ class _BoostPropertyScreenState extends State<BoostPropertyScreen> {
           SizedBox(height: 8.h),
 
           Text(
-            "No boost plans available",
+            "No boost plans available".tr,
             style: TextStyle(fontSize: 12.sp, fontWeight: FontWeight.w600),
           ),
 
           SizedBox(height: 3.h),
 
           Text(
-            "Please check again later.",
+            "Please check again later.".tr,
             style: TextStyle(fontSize: 10.sp, color: Colors.grey),
           ),
         ],
@@ -936,7 +938,7 @@ class _BoostPropertyScreenState extends State<BoostPropertyScreen> {
           SizedBox(width: 5.w),
 
           Text(
-            "Secure payment powered by Stripe",
+            "Secure payment powered by Stripe".tr,
             style: TextStyle(fontSize: 9.sp, color: const Color(0xff777777)),
           ),
         ],
@@ -977,7 +979,7 @@ class _BoostPropertyScreenState extends State<BoostPropertyScreen> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        "Total",
+                        "Total".tr,
                         style: TextStyle(
                           fontSize: 9.sp,
                           color: const Color(0xff777777),
@@ -1013,14 +1015,18 @@ class _BoostPropertyScreenState extends State<BoostPropertyScreen> {
                   width: 190.w,
 
                   child: ElevatedButton(
-                    onPressed: () {
-                      _continueToPayment(plan);
-                    },
+                    onPressed: controller.isCheckoutLoading
+                        ? null
+                        : () {
+                            _continueToPayment(plan);
+                          },
 
                     style: ElevatedButton.styleFrom(
                       backgroundColor: primaryColor,
 
                       foregroundColor: Colors.white,
+
+                      disabledBackgroundColor: primaryColor.withOpacity(.6),
 
                       elevation: 0,
 
@@ -1029,22 +1035,31 @@ class _BoostPropertyScreenState extends State<BoostPropertyScreen> {
                       ),
                     ),
 
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Text(
-                          "Continue",
-                          style: TextStyle(
-                            fontSize: 11.sp,
-                            fontWeight: FontWeight.w700,
+                    child: controller.isCheckoutLoading
+                        ? SizedBox(
+                            width: 18.w,
+                            height: 18.w,
+                            child: const CircularProgressIndicator(
+                              strokeWidth: 2,
+                              color: Colors.white,
+                            ),
+                          )
+                        : Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Text(
+                                "Continue".tr,
+                                style: TextStyle(
+                                  fontSize: 11.sp,
+                                  fontWeight: FontWeight.w700,
+                                ),
+                              ),
+
+                              SizedBox(width: 7.w),
+
+                              Icon(Icons.arrow_forward_rounded, size: 17.sp),
+                            ],
                           ),
-                        ),
-
-                        SizedBox(width: 7.w),
-
-                        Icon(Icons.arrow_forward_rounded, size: 17.sp),
-                      ],
-                    ),
                   ),
                 ),
               ],
@@ -1153,24 +1168,24 @@ class _BoostPropertyScreenState extends State<BoostPropertyScreen> {
     );
   }
 
-  void _continueToPayment(FeaturedPlanModel plan) {
+  Future<void> _continueToPayment(FeaturedPlanModel plan) async {
     if (selectedProperty == null) {
       Get.snackbar(
-        "Select Property",
-        "Please select a property to boost",
+        "Select Property".tr,
+        "Please select a property to boost".tr,
         snackPosition: SnackPosition.BOTTOM,
       );
 
       return;
     }
 
-    // final String listingId = selectedProperty.id.toString();
+    final String listingId = selectedProperty!.id.toString();
 
     final String planId = plan.id;
 
     debugPrint("========== BOOST CHECKOUT ==========");
 
-    //debugPrint("Listing ID: $listingId");
+    debugPrint("Listing ID: $listingId");
 
     debugPrint("Plan ID: $planId");
 
@@ -1191,10 +1206,43 @@ class _BoostPropertyScreenState extends State<BoostPropertyScreen> {
     ///   "planId": planId
     /// }
 
-    Get.snackbar(
-      "Ready for Payment",
-      "${plan.name} - ${plan.formattedPrice}",
-      snackPosition: SnackPosition.BOTTOM,
-    );
+    try {
+      final BoostCheckoutSession session = await planController.checkout(
+        listingId: listingId,
+        planId: planId,
+      );
+
+      final StripePaymentOutcome outcome = await StripeCheckoutHelper.pay(
+        clientSecret: session.paymentIntentClientSecret,
+      );
+
+      switch (outcome) {
+        case StripePaymentOutcome.success:
+          Get.snackbar(
+            "Payment Successful".tr,
+            "${plan.name} has been activated for your property.".tr,
+            snackPosition: SnackPosition.BOTTOM,
+          );
+
+          Get.back();
+
+          break;
+
+        case StripePaymentOutcome.cancelled:
+          Get.snackbar(
+            "Payment Cancelled".tr,
+            "You can try again anytime.".tr,
+            snackPosition: SnackPosition.BOTTOM,
+          );
+
+          break;
+      }
+    } catch (e) {
+      Get.snackbar(
+        "Checkout Failed".tr,
+        e.toString().replaceFirst("Exception: ", ""),
+        snackPosition: SnackPosition.BOTTOM,
+      );
+    }
   }
 }

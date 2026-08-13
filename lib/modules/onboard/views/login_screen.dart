@@ -175,7 +175,7 @@ class LoginScreen extends StatelessWidget {
 
                       PrimaryButton(
                         title: controller.isLoading
-                            ? "Sending..."
+                            ? "Sending...".tr
                             : "Send OTP".tr,
                         suffix: controller.isLoading
                             ? SizedBox(

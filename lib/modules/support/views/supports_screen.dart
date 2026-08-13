@@ -147,7 +147,7 @@ class _SupportScreenState extends State<SupportScreen> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        "Subject",
+                        "Subject".tr,
                         style: TextStyle(
                           fontSize: 12.sp,
                           fontWeight: FontWeight.w600,

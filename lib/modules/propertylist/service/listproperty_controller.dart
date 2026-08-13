@@ -21,12 +21,12 @@ class ListPropertyController extends GetxController {
   int currentStep = 0;
 
   final List<String> steps = [
-    "Basic Info",
-    "Details",
-    "Features",
-    "Location",
-    "Media",
-    "Review",
+    "Basic Info".tr,
+    "Details".tr,
+    "Features".tr,
+    "Location".tr,
+    "Media".tr,
+    "Review".tr,
   ];
 
   ListPropertyController() {
@@ -252,8 +252,8 @@ class ListPropertyController extends GetxController {
 
   void saveDraft() {
     Get.snackbar(
-      "Saved",
-      "Draft saved successfully",
+      "Saved".tr,
+      "Draft saved successfully".tr,
       snackPosition: SnackPosition.BOTTOM,
     );
   }
@@ -432,7 +432,7 @@ class ListPropertyController extends GetxController {
           images.length + (coverImage.isNotEmpty ? 1 : 0);
 
       if (uploadedImageUrls.length != expectedImageCount) {
-        throw Exception("Some images could not be uploaded.");
+        throw Exception("Some images could not be uploaded.".tr);
       }
       final body = {
         "propertyName": propertyNameController.text.trim(),
@@ -516,7 +516,7 @@ class ListPropertyController extends GetxController {
       debugPrint("======================================");
 
       Fluttertoast.showToast(
-        msg: "Property listed successfully.",
+        msg: "Property listed successfully.".tr,
         toastLength: Toast.LENGTH_SHORT,
         gravity: ToastGravity.BOTTOM,
       );
@@ -587,7 +587,7 @@ class ListPropertyController extends GetxController {
 
       final error = jsonDecode(response.body);
 
-      throw Exception(error["message"] ?? "Image upload failed");
+      throw Exception(error["message"] ?? "Image upload failed".tr);
     } catch (e) {
       debugPrint("PROPERTY IMAGE UPLOAD ERROR: $e");
       rethrow;
@@ -604,7 +604,7 @@ class ListPropertyController extends GetxController {
       final coverUrl = await uploadPropertyImage(File(coverImage));
 
       if (coverUrl == null || coverUrl.isEmpty) {
-        throw Exception("Failed to upload cover image");
+        throw Exception("Failed to upload cover image".tr);
       }
 
       photos.add({"url": coverUrl, "sortOrder": 0, "caption": ""});
@@ -619,7 +619,7 @@ class ListPropertyController extends GetxController {
       final imageUrl = await uploadPropertyImage(File(images[i]));
 
       if (imageUrl == null || imageUrl.isEmpty) {
-        throw Exception("Failed to upload image ${i + 1}");
+        throw Exception("${"Failed to upload image".tr} ${i + 1}");
       }
 
       photos.add({"url": imageUrl, "sortOrder": i + 1, "caption": ""});
@@ -845,7 +845,7 @@ Future<bool> sendOtp() async {
     showOtpField = true;
 
     Fluttertoast.showToast(
-      msg: response["message"] ?? "OTP sent successfully",
+      msg: response["message"] ?? "OTP sent successfully".tr,
     );
 
     update();
@@ -882,7 +882,7 @@ Future<bool> verifyOtp() async {
     otpController.clear();
 
     Fluttertoast.showToast(
-      msg: response["message"] ?? "Phone verified successfully",
+      msg: response["message"] ?? "Phone verified successfully".tr,
     );
 
     update();

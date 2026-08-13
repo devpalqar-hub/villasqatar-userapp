@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:villas_qatar/Core/services/storage_service.dart';
 
 class LanguageScreen extends StatelessWidget {
   const LanguageScreen({super.key});
@@ -18,6 +19,7 @@ class LanguageScreen extends StatelessWidget {
                 : null,
             onTap: () {
               Get.updateLocale(const Locale('en', 'US'));
+              StorageService.saveLanguage('en');
               Get.back(); // go back after selection
             },
           ),
@@ -32,6 +34,7 @@ class LanguageScreen extends StatelessWidget {
                 : null,
             onTap: () {
               Get.updateLocale(const Locale('ar', 'QA'));
+              StorageService.saveLanguage('ar');
               Get.back(); // go back after selection
             },
           ),

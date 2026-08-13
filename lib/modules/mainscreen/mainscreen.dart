@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get_core/src/get_main.dart';
 import 'package:get/get_instance/src/extension_instance.dart';
+import 'package:get/get_utils/src/extensions/internacionalization.dart';
 import 'package:villas_qatar/Core/utils/auth_guard.dart';
 import 'package:villas_qatar/modules/chats/views/chatlistscreen.dart';
 import 'package:villas_qatar/modules/home/views/home_screen.dart';
@@ -35,7 +36,14 @@ class MainScreen extends StatefulWidget {
 class _MainScreenState extends State<MainScreen> {
   late int currentIndex;
 
-  late final List<Widget> pages;
+  /// Built lazily, one tab at a time, in [_pageFor] — some tab widgets
+  /// (e.g. SettingsScreen) fire off API calls from a field initializer
+  /// the moment they're constructed. Building all 5 up front in
+  /// initState() used to construct every tab (including ones a guest
+  /// never visits) right after Skip, which fired those calls before the
+  /// user ever left Home. Caching by index still keeps each tab's state
+  /// alive across switches, just without building tabs nobody opened.
+  final Map<int, Widget> _pageCache = {};
 
   @override
   void initState() {
@@ -74,25 +82,6 @@ class _MainScreenState extends State<MainScreen> {
       controller.filter.type = widget.initialCategory!.trim();
     }
 
-    /// Create pages AFTER controller values are set
-    pages = [
-      HomeScreen(
-        onSearch: _handleHomeSearch,
-
-        onCategorySelected: _handleCategorySearch,
-
-        onPurposeSelected: _handlePurposeSearch,
-      ),
-
-      SearchScreen(),
-
-      MyPropertiesScreen(),
-
-      ChatListScreen(),
-
-      SettingsScreen(),
-    ];
-
     /// If MainScreen was opened directly on Search,
     /// fetch using the initial filters.
     if (widget.initialIndex == 1) {
@@ -100,6 +89,28 @@ class _MainScreenState extends State<MainScreen> {
         controller.fetchProperties();
       });
     }
+  }
+
+  Widget _pageFor(int index) {
+    return _pageCache.putIfAbsent(index, () {
+      switch (index) {
+        case 0:
+          return HomeScreen(
+            onSearch: _handleHomeSearch,
+            onCategorySelected: _handleCategorySearch,
+            onPurposeSelected: _handlePurposeSearch,
+          );
+        case 1:
+          return SearchScreen();
+        case 2:
+          return MyPropertiesScreen();
+        case 3:
+          return ChatListScreen();
+        case 4:
+        default:
+          return SettingsScreen();
+      }
+    });
   }
 
   @override
@@ -123,7 +134,7 @@ class _MainScreenState extends State<MainScreen> {
         },
         child: KeyedSubtree(
           key: ValueKey(currentIndex),
-          child: pages[currentIndex],
+          child: _pageFor(currentIndex),
         ),
       ),
       bottomNavigationBar: HomeBottomNav(
@@ -131,7 +142,7 @@ class _MainScreenState extends State<MainScreen> {
         onChanged: (index) {
           if (index == 2 &&
               !AuthGuard.requireLogin(
-                message: "Please login to manage your properties.",
+                message: "Please login to manage your properties.".tr,
               )) {
             return;
           }
@@ -139,7 +150,7 @@ class _MainScreenState extends State<MainScreen> {
          
           if (index == 3 &&
               !AuthGuard.requireLogin(
-                message: "Please login to access your chats.",
+                message: "Please login to access your chats.".tr,
               )) {
             return;
           }
@@ -172,15 +183,22 @@ class _MainScreenState extends State<MainScreen> {
     });
   }
 
-  void _handleHomeSearch(String propertyName) {
-    debugPrint("MAIN RECEIVED SEARCH: $propertyName");
+  void _handleHomeSearch(String propertyName, String purpose) {
+    debugPrint("MAIN RECEIVED SEARCH: $propertyName ($purpose)");
 
     final controller = Get.isRegistered<PropertySearchController>()
         ? Get.find<PropertySearchController>()
         : Get.put(PropertySearchController(), permanent: true);
 
-    controller.searchProperty(propertyName);
+    controller.searchTextController.text = propertyName;
 
+    // Apply the query and the Rent/Sale toggle together in one fetch,
+    // so the Search screen (and its filter chips) opens already matching
+    // what was picked on the home banner.
+    controller.applyFilters(search: propertyName, purpose: purpose);
+
+    // Switch the EXISTING MainScreen to the Search tab — bottomNavigationBar
+    // stays put since it's outside the AnimatedSwitcher that swaps pages.
     setState(() {
       currentIndex = 1;
     });

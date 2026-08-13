@@ -58,7 +58,7 @@ class _SupportTicketDetailsScreenState
         ),
 
         title: Text(
-          "Ticket Details",
+          "Ticket Details".tr,
           style: TextStyle(
             fontSize: 18.sp,
             fontWeight: FontWeight.w700,
@@ -110,21 +110,21 @@ class _SupportTicketDetailsScreenState
                   SizedBox(height: 18.h),
 
                   /// TICKET INFORMATION
-                  _sectionTitle("Ticket Information"),
+                  _sectionTitle("Ticket Information".tr),
                   SizedBox(height: 10.h),
                   _ticketInformationCard(ticket),
 
                   SizedBox(height: 22.h),
 
                   /// SUBMITTER
-                  _sectionTitle("Submitted By"),
+                  _sectionTitle("Submitted By".tr),
                   SizedBox(height: 10.h),
                   _submitterCard(ticket),
 
                   /// ASSIGNED TO - only when available
                   if (ticket.assignedTo != null) ...[
                     SizedBox(height: 22.h),
-                    _sectionTitle("Assigned To"),
+                    _sectionTitle("Assigned To".tr),
                     SizedBox(height: 10.h),
                     _assignedToCard(ticket),
                   ],
@@ -132,7 +132,7 @@ class _SupportTicketDetailsScreenState
                   SizedBox(height: 22.h),
 
                   /// ORIGINAL REQUEST
-                  _sectionTitle("Your Request"),
+                  _sectionTitle("Your Request".tr),
                   SizedBox(height: 10.h),
                   _messageCard(ticket),
 
@@ -141,7 +141,7 @@ class _SupportTicketDetailsScreenState
                   /// REPLIES HEADER
                   Row(
                     children: [
-                      _sectionTitle("Support Replies"),
+                      _sectionTitle("Support Replies".tr),
                       const Spacer(),
 
                       Container(
@@ -155,7 +155,7 @@ class _SupportTicketDetailsScreenState
                         ),
                         child: Text(
                           "${ticket.replies.length} "
-                          "${ticket.replies.length == 1 ? 'Reply' : 'Replies'}",
+                          "${ticket.replies.length == 1 ? 'Reply'.tr : 'Replies'.tr}",
                           style: TextStyle(
                             fontSize: 10.sp,
                             fontWeight: FontWeight.w600,
@@ -644,7 +644,7 @@ Widget _ticketInformationCard(SupportTicketDetails ticket) {
       children: [
         _detailRow(
           icon: Icons.confirmation_number_outlined,
-          label: "Ticket ID.tr",
+          label: "Ticket ID".tr,
           value: ticket.id,
         ),
 
@@ -749,7 +749,7 @@ Widget _detailRow({
             SizedBox(height: 3.h),
 
             Text(
-              value.isNotEmpty ? value : "Not available",
+              value.isNotEmpty ? value : "Not available".tr,
               style: TextStyle(
                 fontSize: 11.5.sp,
                 fontWeight: FontWeight.w600,
@@ -773,7 +773,7 @@ Widget _divider() {
 
 String _formatDateTime(DateTime? date) {
   if (date == null) {
-    return "Not available";
+    return "Not available".tr;
   }
 
   final local = date.toLocal();
@@ -949,7 +949,7 @@ Widget _submitterCard(SupportTicketDetails ticket) {
 
         if (submitter.email?.trim().isNotEmpty == true) ...[
           SizedBox(height: 9.h),
-          _smallInfoRow("Email", submitter.email!),
+          _smallInfoRow("Email".tr, submitter.email!),
         ],
       ],
     ),

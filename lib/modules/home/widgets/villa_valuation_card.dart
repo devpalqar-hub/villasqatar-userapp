@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:get/get_utils/src/extensions/internacionalization.dart';
 import 'package:villas_qatar/Core/constants/app_colors.dart';
 import 'package:villas_qatar/Core/utils/auth_guard.dart';
 import 'package:villas_qatar/Core/utils/guest_limter.dart';
@@ -14,12 +15,16 @@ class VillaValuationCard extends StatelessWidget {
     this.imageUrl =
         'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80',
     this.brandLabel = 'VILLAS QATAR',
-    this.titleLine1 = "What's your",
-    this.titleLine2 = 'villa worth?',
-    this.subtitle = 'Find out in 30 seconds with our AI-powered valuation.',
-
-    this.ctaLabel = 'Get my free estimate',
-  });
+    String? titleLine1,
+    String? titleLine2,
+    String? subtitle,
+    String? ctaLabel,
+  }) : titleLine1 = titleLine1 ?? "What's your".tr,
+       titleLine2 = titleLine2 ?? 'villa worth?'.tr,
+       subtitle =
+           subtitle ??
+           'Find out in 30 seconds with our AI-powered valuation.'.tr,
+       ctaLabel = ctaLabel ?? 'Get my free estimate'.tr;
 
   final VoidCallback onGetEstimate;
   final String imageUrl;
@@ -283,10 +288,10 @@ class _GradientCta extends StatelessWidget {
 class _TrustBadgeRow extends StatelessWidget {
   const _TrustBadgeRow();
 
-  static const _badges = [
-    (icon: Icons.verified_user_outlined, label: '100% secure'),
-    (icon: Icons.check_circle, label: 'AI-powered valuation'),
-    (icon: Icons.bar_chart, label: 'Real market insights'),
+  static final _badges = [
+    (icon: Icons.verified_user_outlined, label: '100% secure'.tr),
+    (icon: Icons.check_circle, label: 'AI-powered valuation'.tr),
+    (icon: Icons.bar_chart, label: 'Real market insights'.tr),
   ];
 
   @override

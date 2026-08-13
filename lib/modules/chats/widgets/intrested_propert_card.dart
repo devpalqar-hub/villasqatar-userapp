@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:get/get.dart';
 import 'package:villas_qatar/Core/constants/app_colors.dart';
 import 'package:villas_qatar/modules/propertylist/model/myproperty_model.dart';
 
@@ -135,8 +136,8 @@ class InterestedPropertyCard extends StatelessWidget {
                             color: AppColors.textSecondary,
                           ),
                           children: [
-                            const TextSpan(
-                              text: "I can pay up to ",
+                            TextSpan(
+                              text: "I can pay up to ".tr,
                             ),
                             TextSpan(
                               text:

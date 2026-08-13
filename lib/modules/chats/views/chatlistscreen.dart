@@ -249,9 +249,9 @@ class _ConversationTile extends StatelessWidget {
                                 maxLines: 1,
                                 overflow: TextOverflow.ellipsis,
                                 style: TextStyle(
-                                  fontSize: 13.5.sp,
+                                  fontSize: 13.sp,
                                   height: 1.2,
-                                  fontWeight: FontWeight.w700,
+                                  fontWeight: FontWeight.w500,
                                   color: const Color(0xff202020),
                                 ),
                               ),
@@ -447,7 +447,7 @@ class _ConversationTile extends StatelessWidget {
 
     // Yesterday
     if (difference == 1) {
-      return 'Yesterday';
+      return 'Yesterday'.tr;
     }
 
     // Within last 7 days

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:get/get.dart';
 import 'package:villas_qatar/Core/constants/app_colors.dart';
 import 'package:villas_qatar/modules/chats/service/chat_controller.dart';
 
@@ -55,7 +56,7 @@ class InputBar extends StatelessWidget {
                 minLines: 1,
                 maxLines: 5,
                 decoration: InputDecoration(
-                  hintText: "Type a message...",
+                  hintText: "Type a message...".tr,
                   hintStyle: TextStyle(
                     fontSize: 13.sp,
                     color: AppColors.textSecondary,
@@ -125,7 +126,7 @@ class InputBar extends StatelessWidget {
                 children: [
                   _AttachmentItem(
                     icon: Icons.photo,
-                    title: "Gallery",
+                    title: "Gallery".tr,
                     onTap: () {
                       Navigator.pop(context);
                       controller.pickImageFromGallery();
@@ -133,7 +134,7 @@ class InputBar extends StatelessWidget {
                   ),
                   _AttachmentItem(
                     icon: Icons.camera_alt,
-                    title: "Camera",
+                    title: "Camera".tr,
                     onTap: () {
                       Navigator.pop(context);
                       controller.pickImageFromCamera();
@@ -141,7 +142,7 @@ class InputBar extends StatelessWidget {
                   ),
                   _AttachmentItem(
                     icon: Icons.location_on,
-                    title: "Location",
+                    title: "Location".tr,
                     onTap: () {
                       Navigator.pop(context);
                       controller.sendLocation();

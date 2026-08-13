@@ -29,26 +29,27 @@ class Utilscontroller extends GetxController {
     errorMessage = null;
     update();
 
-    final response = await ApiHandler.get("/api/listings/options");
+    try {
+      final response = await ApiHandler.get("/api/listings/options");
 
-    // ApiHandler responses commonly expose either `.body` (raw string)
-    // or `.data` (already-decoded map). Handle both so this compiles
-    // regardless of your ApiHandler's exact return type.
-    ;
+      final options = ListingOptions.fromJson(response);
 
-    final options = ListingOptions.fromJson(response);
-
-    amenities = options.amenities;
-    nearbyTags = options.nearbyTags;
-    furnishingOptions = options.furnishingOptions;
-    listingTypes = options.listingTypes;
-    municipalities = options.municipalities;
-
-    //   errorMessage = "Failed to load listing options: $e";
-    // } finally {
-    isLoading = false;
-    update();
-    // }
+      amenities = options.amenities;
+      nearbyTags = options.nearbyTags;
+      furnishingOptions = options.furnishingOptions;
+      listingTypes = options.listingTypes;
+      municipalities = options.municipalities;
+    } catch (e) {
+      // This runs unawaited from onInit() (including for guest sessions
+      // right after Skip), so a network hiccup here must never surface
+      // as an unhandled-exception snackbar — just note it and let the
+      // screen render with empty option lists.
+      debugPrint("FETCH LISTING OPTIONS ERROR: $e");
+      errorMessage = "Failed to load listing options: $e";
+    } finally {
+      isLoading = false;
+      update();
+    }
   }
 
   /// Convenience: municipalities flagged as popular.

@@ -26,37 +26,40 @@ class _SearchFilterCardState extends State<SearchFilterCard> {
 
   final List<String> tabs = ["Buy".tr, "Rent".tr];
 
-  String selectedPropertyType = "Property Type";
-  String selectedPrice = "Price Range";
+  String selectedPropertyType = "Property Type".tr;
+  String selectedPrice = "Price Range".tr;
 
   final List<String> propertyTypes = [
-    "Property Type",
-    "VILLA",
-    "APARTMENT",
-    "TOWNHOUSE",
-    "PENTHOUSE",
-    "STUDIO",
-    "COMMERCIAL",
-    "LAND",
+    "Property Type".tr,
+    "VILLA".tr,
+    "APARTMENT".tr,
+    "TOWNHOUSE".tr,
+    "PENTHOUSE".tr,
+    "STUDIO".tr,
+    "COMMERCIAL".tr,
+    "LAND".tr,
   ];
 
 
+  // Canonical (untranslated) keys — used for value/business-logic comparisons.
+  // Display text is derived via `.tr` at render time so it stays correct
+  // when the locale changes.
   final List<String> sortOptions = [
-  "Sort".tr,
-  "Newest".tr,
-  "Oldest".tr,
-  "Price: Low to High".tr,
-  "Price: High to Low".tr,
-  "Area: Low to High".tr,
-  "Area: High to Low".tr,
-];
+    "Sort".tr,
+    "Newest".tr,
+    "Oldest".tr,
+    "Price: Low to High".tr,
+    "Price: High to Low".tr,
+    "Area: Low to High".tr,
+    "Area: High to Low".tr,
+  ];
 
 String selectedSort = "Sort".tr;
   
 
   @override
   Widget build(BuildContext context) {
-    final int selectedTab = widget.controller.filter.purpose == "RENT" ? 1 : 0;
+    final int selectedTab = widget.controller.filter.purpose == "RENT".tr ? 1 : 0;
     return Container(
       width: double.infinity,
       padding: EdgeInsets.only(top: 5.h, left: 16.w, right: 16.w, bottom: 5.h),
@@ -84,8 +87,8 @@ String selectedSort = "Sort".tr;
                     borderRadius: BorderRadius.circular(8.r),
                     onTap: () {
                       widget.controller.filter.purpose = index == 0
-                          ? "SALE"
-                          : "RENT";
+                          ? "SALE".tr
+                          : "RENT".tr;
 
                       widget.controller.update();
                     },
@@ -366,7 +369,7 @@ String selectedSort = "Sort".tr;
                   (e) => DropdownMenuItem(
                     value: e,
                     child: Text(
-                      e == "Property Type"
+                      e == "Property Type".tr
                           ? "Property Type".tr
                           : e,
                       style: TextStyle(fontSize: 10.sp),
@@ -382,7 +385,7 @@ String selectedSort = "Sort".tr;
               });
 
               widget.controller.filter.type =
-                  value == "Property Type" ? "" : value;
+                  value == "Property Type".tr? "" : value;
 
               widget.controller.fetchProperties();
             },
@@ -412,7 +415,7 @@ String selectedSort = "Sort".tr;
               return DropdownMenuItem(
                 value: e,
                 child: Text(
-                  e,
+                  e.tr,
                   style: TextStyle(fontSize: 10.sp),
                 ),
               );
@@ -426,33 +429,33 @@ String selectedSort = "Sort".tr;
 
               switch (value) {
                 case "Newest":
-                  widget.controller.filter.sortBy = "createdAt";
-                  widget.controller.filter.sortOrder = "desc";
+                  widget.controller.filter.sortBy = "createdAt".tr;
+                  widget.controller.filter.sortOrder = "desc".tr;
                   break;
 
                 case "Oldest":
-                  widget.controller.filter.sortBy = "createdAt";
-                  widget.controller.filter.sortOrder = "asc";
+                  widget.controller.filter.sortBy = "createdAt".tr;
+                  widget.controller.filter.sortOrder = "asc".tr;
                   break;
 
                 case "Price: Low to High":
-                  widget.controller.filter.sortBy = "price";
-                  widget.controller.filter.sortOrder = "asc";
+                  widget.controller.filter.sortBy = "price".tr;
+                  widget.controller.filter.sortOrder = "asc".tr;
                   break;
 
                 case "Price: High to Low":
-                  widget.controller.filter.sortBy = "price";
-                  widget.controller.filter.sortOrder = "desc";
+                  widget.controller.filter.sortBy = "price".tr;
+                  widget.controller.filter.sortOrder = "desc".tr;
                   break;
 
                 case "Area: Low to High":
-                  widget.controller.filter.sortBy = "area";
-                  widget.controller.filter.sortOrder = "asc";
+                  widget.controller.filter.sortBy = "area".tr;
+                  widget.controller.filter.sortOrder = "asc".tr;
                   break;
 
                 case "Area: High to Low":
-                  widget.controller.filter.sortBy = "area";
-                  widget.controller.filter.sortOrder = "desc";
+                  widget.controller.filter.sortBy = "area".tr;
+                  widget.controller.filter.sortOrder = "desc".tr;
                   break;
 
                 default:
@@ -470,37 +473,67 @@ String selectedSort = "Sort".tr;
     SizedBox(width: 10.w),
 
     /// Filters
-    InkWell(
-      onTap: _showFilterBottomSheet,
-      borderRadius: BorderRadius.circular(8.r),
-      child: Container(
-        height: 42.h,
-        padding: EdgeInsets.symmetric(horizontal: 12.w),
-        decoration: BoxDecoration(
-          color: const Color(0xffF8F9FB),
-          borderRadius: BorderRadius.circular(5.r),
-          border: Border.all(color: const Color(0xffE6E9EF)),
-        ),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(
-              Icons.tune_rounded,
-              color: AppColors.primary,
-              size: 20.sp,
-            ),
-            SizedBox(width: 6.w),
-            Text(
-              "Filters".tr,
-              style: AppTextStyles.body13.copyWith(
-                fontSize: 11.sp,
-                fontWeight: FontWeight.w600,
-                color: const Color(0xff32354A),
+    Builder(
+      builder: (context) {
+        final activeCount = widget.controller.filter.activeFilterCount;
+
+        return InkWell(
+          onTap: _showFilterBottomSheet,
+          borderRadius: BorderRadius.circular(8.r),
+          child: Container(
+            height: 42.h,
+            padding: EdgeInsets.symmetric(horizontal: 12.w),
+            decoration: BoxDecoration(
+              color: const Color(0xffF8F9FB),
+              borderRadius: BorderRadius.circular(5.r),
+              border: Border.all(
+                color: activeCount > 0
+                    ? AppColors.primary
+                    : const Color(0xffE6E9EF),
               ),
             ),
-          ],
-        ),
-      ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(
+                  Icons.tune_rounded,
+                  color: AppColors.primary,
+                  size: 20.sp,
+                ),
+                SizedBox(width: 6.w),
+                Text(
+                  "Filters".tr,
+                  style: AppTextStyles.body13.copyWith(
+                    fontSize: 11.sp,
+                    fontWeight: FontWeight.w600,
+                    color: const Color(0xff32354A),
+                  ),
+                ),
+                if (activeCount > 0) ...[
+                  SizedBox(width: 6.w),
+                  Container(
+                    padding: EdgeInsets.symmetric(horizontal: 6.w, vertical: 1.h),
+                    constraints: BoxConstraints(minWidth: 18.w),
+                    decoration: BoxDecoration(
+                      color: AppColors.primary,
+                      borderRadius: BorderRadius.circular(20.r),
+                    ),
+                    child: Text(
+                      "$activeCount",
+                      textAlign: TextAlign.center,
+                      style: AppTextStyles.body13.copyWith(
+                        fontSize: 10.sp,
+                        fontWeight: FontWeight.w700,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ),
+                ],
+              ],
+            ),
+          ),
+        );
+      },
     ),
   ],
 ),
@@ -527,8 +560,8 @@ String selectedSort = "Sort".tr;
                 );
 
                 setState(() {
-                  selectedPropertyType = "Property Type";
-                  selectedPrice = "Price Range";
+                  selectedPropertyType = "Property Type".tr;
+                  selectedPrice = "Price Range".tr;
                 });
               },
               style: ElevatedButton.styleFrom(
@@ -564,8 +597,8 @@ String selectedSort = "Sort".tr;
     );
   }
 
-  void _showFilterBottomSheet() {
-    showModalBottomSheet(
+  Future<void> _showFilterBottomSheet() async {
+    await showModalBottomSheet(
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.white,
@@ -576,6 +609,10 @@ String selectedSort = "Sort".tr;
         return FilterBottomSheet(controller: widget.controller);
       },
     );
+
+    // Refresh so the Filters button count badge reflects any changes made
+    // inside the bottom sheet (Apply, Reset, or swipe-to-dismiss).
+    if (mounted) setState(() {});
   }
 }
 
@@ -786,7 +823,7 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
                                     (m) => DropdownMenuItem<String>(
                                       value: m.id,
                                       child: Text(
-                                        m.name,
+                                        m.name.tr,
                                         style: TextStyle(fontSize: 13.sp),
                                       ),
                                     ),
@@ -808,7 +845,7 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
                             children: [
                               Expanded(
                                 child: NumberSpinnerField(
-                                  hint: "Min Price",
+                                  hint: "Min Price".tr,
                                   value:
                                       widget.controller.filter.minPrice
                                           ?.toInt() ??
@@ -826,7 +863,7 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
                               SizedBox(width: 12),
                               Expanded(
                                 child: NumberSpinnerField(
-                                  hint: "Max Price",
+                                  hint: "Max Price".tr,
                                   value:
                                       widget.controller.filter.maxPrice
                                           ?.toInt() ??
@@ -1052,7 +1089,7 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
                           children: [
                             Expanded(
                               child: NumberSpinnerField(
-                                hint: "Min Area",
+                                hint: "Min Area".tr,
                                 value:
                                     widget.controller.filter.minArea?.toInt() ??
                                     0,
@@ -1067,7 +1104,7 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
                             SizedBox(width: 12),
                             Expanded(
                               child: NumberSpinnerField(
-                                hint: "Max Area",
+                                hint: "Max Area".tr,
                                 value:
                                     widget.controller.filter.maxArea?.toInt() ??
                                     0,
@@ -1155,8 +1192,6 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
                                 minArea: widget.controller.filter.minArea,
                                 maxArea: widget.controller.filter.maxArea,
                               );
-
-                              widget.controller.resetFilterUi();
 
                               minPriceCtrl.clear();
                               maxPriceCtrl.clear();

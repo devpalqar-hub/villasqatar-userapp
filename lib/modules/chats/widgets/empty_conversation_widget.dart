@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:get/get.dart';
 import 'package:villas_qatar/Core/constants/app_colors.dart';
 
 class EmptyConversationWidget extends StatelessWidget {
@@ -32,7 +33,7 @@ class EmptyConversationWidget extends StatelessWidget {
             
 
             Text(
-              "Start Conversation",
+              "Start Conversation".tr,
               textAlign: TextAlign.center,
               style: TextStyle(
                 fontSize: 18.sp,
@@ -44,7 +45,8 @@ class EmptyConversationWidget extends StatelessWidget {
             SizedBox(height: 12.h),
 
             Text(
-              "Ask anything about this property.\nThe property consultant will reply as soon as possible.",
+              "Ask anything about this property.\nThe property consultant will reply as soon as possible."
+                  .tr,
               textAlign: TextAlign.center,
               style: TextStyle(
                 fontSize: 13.sp,
@@ -86,7 +88,7 @@ class EmptyConversationWidget extends StatelessWidget {
                   SizedBox(height: 5.h),
 
                   Text(
-                    "You can ask about",
+                    "You can ask about".tr,
                     style: TextStyle(
                       fontWeight: FontWeight.w600,
                       fontSize: 14.sp,
@@ -96,16 +98,16 @@ class EmptyConversationWidget extends StatelessWidget {
 
                   SizedBox(height: 10.h),
 
-                  _item(Icons.attach_money, "Price Negotiation"),
+                  _item(Icons.attach_money, "Price Negotiation".tr),
                   SizedBox(height: 5.h),
 
-                 
+
 
                   _item(Icons.account_balance_wallet_outlined,
-                      "Payment Plans"),
+                      "Payment Plans".tr),
                   SizedBox(height: 8.h),
 
-                  _item(Icons.home_work_outlined, "Property Availability"),
+                  _item(Icons.home_work_outlined, "Property Availability".tr),
                 ],
               ),
             ),

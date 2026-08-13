@@ -431,7 +431,7 @@ class _MakeOfferBottomSheetState extends State<MakeOfferBottomSheet> {
 
           Expanded(
             child: Text(
-              "Your offer will be sent directly to the property owner. You can continue the conversation through chat.".tr,
+              "Your offer will be sent directly to the property owner. You can continue the conversation through chat".tr,
               style: TextStyle(
                 fontSize: 9.5.sp,
                 height: 1.45,

@@ -4,6 +4,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get_core/src/get_main.dart';
 import 'package:get/get_instance/src/extension_instance.dart';
 import 'package:get/get_navigation/src/extension_navigation.dart';
+import 'package:get/get_utils/src/extensions/internacionalization.dart';
 import 'package:villas_qatar/Core/theme/app_textstyles.dart';
 import 'package:villas_qatar/core/constants/app_colors.dart';
 import 'package:villas_qatar/modules/propertylist/service/myproperties_listcontroller.dart';
@@ -112,7 +113,7 @@ void showFilterBottomSheet(BuildContext context) {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                "Filter Properties",
+                                "Filter Properties".tr,
                                 style: AppTextStyles.title14.copyWith(
                                   fontWeight: FontWeight.w500,
                                 ),
@@ -121,7 +122,7 @@ void showFilterBottomSheet(BuildContext context) {
                               SizedBox(height: 3.h),
 
                               Text(
-                                "Refine your search results",
+                                "Refine your search results".tr,
                                 style: AppTextStyles.body12.copyWith(
                                   color: AppColors.hintGrey,
                                 ),
@@ -161,7 +162,7 @@ void showFilterBottomSheet(BuildContext context) {
                         children: [
                           SizedBox(height: 10.h),
 
-                          sectionTitle("Furnishing"),
+                          sectionTitle("Furnishing".tr),
 
                           card(
                             child: Wrap(
@@ -240,13 +241,13 @@ void showFilterBottomSheet(BuildContext context) {
                           ///=========================================================
                           /// PRICE RANGE
                           ///=========================================================
-                          sectionTitle("Price Range"),
+                          sectionTitle("Price Range".tr),
 
                           card(
                             child: Row(
                               children: [
                                 field(
-                                  "Min Price",
+                                  "Min Price".tr,
                                   Icons.currency_exchange,
                                   minPriceCtrl,
                                 ),
@@ -254,7 +255,7 @@ void showFilterBottomSheet(BuildContext context) {
                                 SizedBox(width: 12.w),
 
                                 field(
-                                  "Max Price",
+                                  "Max Price".tr,
                                   Icons.currency_exchange,
                                   maxPriceCtrl,
                                 ),
@@ -312,7 +313,7 @@ void showFilterBottomSheet(BuildContext context) {
                                 Get.back();
                               },
                               child: Text(
-                                "Reset",
+                                "Reset".tr,
                                 style: AppTextStyles.body14.copyWith(
                                   color: AppColors.primary,
                                   fontWeight: FontWeight.w700,
@@ -366,7 +367,7 @@ void showFilterBottomSheet(BuildContext context) {
                                 Get.back();
                               },
                               child: Text(
-                                "Apply Filters",
+                                "Apply Filters".tr,
                                 style: AppTextStyles.body14.copyWith(
                                   color: Colors.white,
                                   fontWeight: FontWeight.w700,

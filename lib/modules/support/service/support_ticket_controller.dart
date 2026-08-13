@@ -136,7 +136,7 @@ String ticketDetailsError = '';
       final response = await ApiHandler.get(endpoint);
 
       if (response is! Map<String, dynamic>) {
-        throw Exception('Invalid support tickets response');
+        throw Exception('Invalid support tickets response'.tr);
       }
 
       // ========================================================
@@ -333,7 +333,7 @@ Future<SupportTicket?> createTicket({
 
     if (response is! Map<String, dynamic>) {
       throw Exception(
-        'Invalid create ticket response',
+        'Invalid create ticket response'.tr,
       );
     }
 
@@ -409,7 +409,7 @@ Future<SupportTicketDetails?> fetchTicketDetails(
   final String id = ticketId.trim();
 
   if (id.isEmpty) {
-    ticketDetailsError = 'Ticket ID is missing';
+    ticketDetailsError = 'Ticket ID is missing'.tr;
     update();
     return null;
   }
@@ -483,7 +483,7 @@ Future<SupportTicketDetails?> fetchTicketDetails(
 
     if (response is! Map<String, dynamic>) {
       throw Exception(
-        'Invalid support ticket details response',
+        'Invalid support ticket details response'.tr,
       );
     }
 

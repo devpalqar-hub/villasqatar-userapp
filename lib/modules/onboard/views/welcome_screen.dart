@@ -2,10 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:villas_qatar/Core/constants/app_colors.dart';
+import 'package:villas_qatar/Core/services/storage_service.dart';
 import 'package:villas_qatar/Core/theme/app_textstyles.dart';
 import 'package:villas_qatar/modules/mainscreen/mainscreen.dart';
 import 'package:villas_qatar/modules/onboard/controller/auth_controller.dart';
-import 'package:villas_qatar/modules/onboard/views/complete_profile_screen.dart';
 import 'package:villas_qatar/modules/onboard/views/login_screen.dart';
 
 class WelcomeScreen extends StatelessWidget {
@@ -19,7 +19,6 @@ class WelcomeScreen extends StatelessWidget {
         return Scaffold(
           body: Stack(
             children: [
-              /// Background
               Positioned.fill(
                 child: Image.asset('assets/bg1.png', fit: BoxFit.cover),
               ),
@@ -30,55 +29,39 @@ class WelcomeScreen extends StatelessWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Align(
-          alignment: Alignment.centerRight,
-          child: TextButton.icon(
-            style: TextButton.styleFrom(
-              foregroundColor: AppColors.primary,
-              padding: EdgeInsets.symmetric(
-                horizontal: 8.w,
-                vertical: 4.h,
-              ),
-            ),
-            onPressed: () {
-              Get.offAll(() => MainScreen());
-            },
-            iconAlignment: IconAlignment.end,
-            icon: Icon(
-              Icons.arrow_forward_rounded,
-              size: 18.sp,
-            ),
-            label: Text(
-              "Skip".tr,
-              style: AppTextStyles.medium14.copyWith(
-                color: AppColors.primary,
-              ),
-            ),
-          ),
-        ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          _buildLanguageToggle(),
+                          TextButton.icon(
+                            style: TextButton.styleFrom(
+                              foregroundColor: AppColors.primary,
+                              padding: EdgeInsets.symmetric(
+                                horizontal: 8.w,
+                                vertical: 4.h,
+                              ),
+                            ),
+                            onPressed: () {
+                              Get.offAll(() => MainScreen());
+                            },
+                            iconAlignment: IconAlignment.end,
+                            icon: Icon(
+                              Icons.arrow_forward_rounded,
+                              size: 18.sp,
+                            ),
+                            label: Text(
+                              "Skip".tr,
+                              style: AppTextStyles.medium14.copyWith(
+                                color: AppColors.primary,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
                       SizedBox(height: 40.h),
 
                       /// Logo
                       Image.asset('assets/Logo/homeLogo.png', width: 180.w),
-
-                      SizedBox(height: 10.h),
-
-                      /// Heading
-                      // Text(
-                      //   'Find your dream villa'.tr,
-                      //   style: AppTextStyles.title18.copyWith(
-                      //     color: const Color(0xFF222222),
-                      //     fontSize: 21.sp,
-                      //   ),
-                      // ),
-
-                      // Text(
-                      //   'in Qatar'.tr,
-                      //   style: AppTextStyles.title18.copyWith(
-                      //     color: AppColors.primary,
-                      //     fontSize: 21.sp,
-                      //   ),
-                      // ),
                       SizedBox(height: 10.h),
 
                       Container(
@@ -100,13 +83,8 @@ class WelcomeScreen extends StatelessWidget {
                       ),
 
                       SizedBox(height: 20.h),
-
-                      /// WhatsApp Button
                       _buildWhatsAppButton(),
-
                       SizedBox(height: 20.h),
-
-                      /// Divider
                       Row(
                         children: [
                           const Expanded(child: Divider()),
@@ -122,16 +100,14 @@ class WelcomeScreen extends StatelessWidget {
                           const Expanded(child: Divider()),
                         ],
                       ),
-
                       SizedBox(height: 20.h),
-
                       /// Social Buttons
                       Row(
                         children: [
                           Expanded(
                             child: _buildSocialButton(
                               image: "assets/google.png",
-                              text: "Google",
+                              text: "Google".tr,
                               onTap: () async {
                                 final success = await controller
                                     .signInWithGoogle();
@@ -141,12 +117,11 @@ class WelcomeScreen extends StatelessWidget {
                                   "Is New User: ${controller.isNewUser}",
                                 );
 
+                                // Google already gives us name + email, so
+                                // there's nothing left to collect - skip
+                                // Complete Profile even for new users.
                                 if (success) {
-                                  if (controller.isNewUser) {
-                                    Get.off(() => CompleteProfileScreen());
-                                  } else {
-                                    Get.off(() => MainScreen());
-                                  }
+                                  Get.off(() => MainScreen());
                                 }
                               },
                             ),
@@ -155,17 +130,22 @@ class WelcomeScreen extends StatelessWidget {
                           Expanded(
                             child: _buildSocialButton(
                               image: "assets/mac.png",
-                              text: "Apple",
+                              text: "Apple".tr,
                               onTap: () async {
                                 final success = await controller
                                     .signInWithApple();
 
+                                debugPrint("Apple Success: $success");
+                                debugPrint(
+                                  "Is New User: ${controller.isNewUser}",
+                                );
+
+                                // Apple already gives us name + email (on
+                                // first sign-in), so there's nothing left
+                                // to collect - skip Complete Profile even
+                                // for new users.
                                 if (success) {
-                                  if (controller.isNewUser) {
-                                    // Get.offNamed(AppRoutes.completeProfile);
-                                  } else {
-                                    // Get.offNamed(AppRoutes.home);
-                                  }
+                                  Get.off(() => MainScreen());
                                 }
                               },
                             ),
@@ -213,6 +193,77 @@ class WelcomeScreen extends StatelessWidget {
     );
   }
 
+  // ============================================================
+  // LANGUAGE TOGGLE (EN / AR)
+  // ============================================================
+  //
+  // Switches Get's locale immediately (GetMaterialApp rebuilds the
+  // whole app, so every `.tr` string and the RTL/LTR direction set
+  // in main.dart's Directionality both update right away) and
+  // persists the choice so it survives an app restart.
+
+  Widget _buildLanguageToggle() {
+    final bool isArabic = (Get.locale?.languageCode ?? 'en') == 'ar';
+
+    return Container(
+      padding: EdgeInsets.all(3.w),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(20.r),
+        border: Border.all(color: AppColors.primary.withOpacity(.25)),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          _langOption(
+            label: 'EN',
+            selected: !isArabic,
+            onTap: () => _changeLanguage('en'),
+          ),
+          _langOption(
+            label: 'عربي',
+            selected: isArabic,
+            onTap: () => _changeLanguage('ar'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _langOption({
+    required String label,
+    required bool selected,
+    required VoidCallback onTap,
+  }) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(16.r),
+      child: Container(
+        padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 6.h),
+        decoration: BoxDecoration(
+          color: selected ? AppColors.primary : Colors.transparent,
+          borderRadius: BorderRadius.circular(16.r),
+        ),
+        child: Text(
+          label,
+          style: AppTextStyles.medium13.copyWith(
+            color: selected ? Colors.white : AppColors.primary,
+          ),
+        ),
+      ),
+    );
+  }
+
+  void _changeLanguage(String code) {
+    final Locale locale = code == 'ar'
+        ? const Locale('ar', 'QA')
+        : const Locale('en', 'US');
+
+    Get.updateLocale(locale);
+
+    StorageService.saveLanguage(code);
+  }
+
   Widget _buildWhatsAppButton() {
     return InkWell(
       onTap: () {
@@ -230,12 +281,11 @@ class WelcomeScreen extends StatelessWidget {
             Icon(Icons.chat, color: Colors.white, size: 16.sp),
 
             SizedBox(width: 15.w),
-   
+
             Text(
-                'Continue with WhatsApp'.tr,
-                style: AppTextStyles.body14.copyWith(color: Colors.white),
-              ),
-           
+              'Continue with WhatsApp'.tr,
+              style: AppTextStyles.body14.copyWith(color: Colors.white),
+            ),
 
             Icon(Icons.arrow_forward_ios, color: Colors.white, size: 16.sp),
           ],

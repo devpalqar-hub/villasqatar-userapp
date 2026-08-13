@@ -7,9 +7,11 @@ import 'package:villas_qatar/modules/onboard/views/welcome_screen.dart';
 
 class AuthGuard {
   static bool requireLogin({
-    String title = "Login Required",
-    String message = "Please sign in to use this feature.",
+    String? title,
+    String? message,
   }) {
+    title ??= "Login Required".tr;
+    message ??= "Please sign in to use this feature.".tr;
     final token = StorageService.getToken();
 
     if (token != null && token.isNotEmpty) {
@@ -21,10 +23,10 @@ class AuthGuard {
         backgroundColor: Colors.white,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         title: Row(
-          children: const [
-            Icon(Icons.lock_outline, color: AppColors.primary),
-            SizedBox(width: 8),
-            Text("Login Required"),
+          children: [
+            const Icon(Icons.lock_outline, color: AppColors.primary),
+            const SizedBox(width: 8),
+            Text(title),
           ],
         ),
         content: Text(message),
@@ -43,7 +45,7 @@ class AuthGuard {
             ),
             onPressed: () => Get.back(),
             child: Text(
-              "Not Now",
+              "Not Now".tr,
               style: TextStyle(
                 color: AppColors.primary,
                 fontWeight: FontWeight.w600,
@@ -71,8 +73,8 @@ class AuthGuard {
               Get.back();
               Get.to(() => WelcomeScreen());
             },
-            child: const Text(
-              "Login",
+            child: Text(
+              "Login".tr,
               style: TextStyle(
                 fontWeight: FontWeight.w600,
               ),

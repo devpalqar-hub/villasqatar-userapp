@@ -5,8 +5,8 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:villas_qatar/Core/constants/app_colors.dart';
 import 'package:villas_qatar/Core/theme/app_textstyles.dart';
 import 'package:villas_qatar/modules/dealers/service/dealer_controller.dart';
-import 'package:villas_qatar/modules/dealers/service/model/dealer_list_model.dart';
-import 'package:villas_qatar/modules/dealers/service/view/dealer_detail_screen.dart';
+import 'package:villas_qatar/modules/dealers/model/dealer_list_model.dart';
+import 'package:villas_qatar/modules/dealers/view/dealer_detail_screen.dart';
 
 class DealerListScreen extends StatefulWidget {
   const DealerListScreen({super.key});
@@ -71,7 +71,7 @@ class _DealerListScreenState extends State<DealerListScreen> {
         elevation: 0,
         backgroundColor: Colors.white,
         centerTitle: true,
-        title: Text("Featured Dealers", style: AppTextStyles.title18),
+        title: Text("Featured Dealers".tr, style: AppTextStyles.title18),
       ),
       // IMPORTANT: AppBar + search bar live OUTSIDE GetBuilder now.
       // Only the list/body below reacts to controller.update(), so the
@@ -144,7 +144,7 @@ class _SearchBar extends StatelessWidget {
       child: TextField(
         onChanged: onChanged,
         decoration: InputDecoration(
-          hintText: "Search dealers",
+          hintText: "Search dealers".tr,
           prefixIcon: Icon(
             Icons.search,
             color: AppColors.textSecondary,
@@ -186,7 +186,7 @@ class _EmptyState extends StatelessWidget {
             color: AppColors.textSecondary,
           ),
           SizedBox(height: 10.h),
-          Text("No dealers found", style: AppTextStyles.body13),
+          Text("No dealers found".tr, style: AppTextStyles.body13),
         ],
       ),
     );
@@ -208,7 +208,7 @@ class _NoSearchResultsState extends StatelessWidget {
             color: AppColors.textSecondary,
           ),
           SizedBox(height: 10.h),
-          Text("No matching dealers", style: AppTextStyles.body13),
+          Text("No matching dealers".tr, style: AppTextStyles.body13),
         ],
       ),
     );
@@ -247,7 +247,7 @@ class _ErrorState extends StatelessWidget {
                 foregroundColor: AppColors.primary,
                 side: BorderSide(color: AppColors.primary),
               ),
-              child: const Text("Retry"),
+              child: Text("Retry".tr),
             ),
           ],
         ),
@@ -399,14 +399,14 @@ class _DealerActions extends StatelessWidget {
       children: [
         Expanded(
           child: _ActionButton(
-            title: "Call",
+            title: "Call".tr,
             onTap: () => launchPhone(dealer.phone),
           ),
         ),
         SizedBox(width: 8.w),
         Expanded(
           child: _ActionButton(
-            title: "WhatsApp",
+            title: "WhatsApp".tr,
             onTap: () {
               launchWhatsapp(
                 (profile.whatsapp != null && profile.whatsapp!.isNotEmpty)
@@ -419,14 +419,14 @@ class _DealerActions extends StatelessWidget {
         SizedBox(width: 8.w),
         Expanded(
           child: _ActionButton(
-            title: "Website",
+            title: "Website".tr,
             onTap: () => launchWebsite(profile.website),
           ),
         ),
         SizedBox(width: 8.w),
         Expanded(
           child: _ActionButton(
-            title: "Chat",
+            title: "Chat".tr,
             onTap: () {
               Get.toNamed("/chat", arguments: dealer.id);
             },
@@ -541,7 +541,7 @@ class _StatusBadge extends StatelessWidget {
           Icon(icon, size: 12.sp, color: text),
           SizedBox(width: 4.w),
           Text(
-            isActive ? "Active" : "Inactive",
+            isActive ? "Active".tr : "Inactive".tr,
             style: AppTextStyles.body12.copyWith(
               fontSize: 10.sp,
               fontWeight: FontWeight.w600,

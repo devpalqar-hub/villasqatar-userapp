@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/route_manager.dart';
+import 'package:get/get_utils/src/extensions/internacionalization.dart';
 import 'package:villas_qatar/Core/constants/app_colors.dart';
 import 'package:villas_qatar/modules/PlansandFeatures/views/boost_plan_screen.dart';
 
@@ -52,7 +53,7 @@ class BoostPropertyBanner extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      "Boost Your Property",
+                      "Boost Your Property".tr,
                       style: TextStyle(
                         color: Colors.white,
                         fontSize: 18.sp,
@@ -63,7 +64,7 @@ class BoostPropertyBanner extends StatelessWidget {
                     SizedBox(height: 5.h),
 
                     Text(
-                      "Get more views and reach more buyers",
+                      "Get more views and reach more buyers".tr,
                       style: TextStyle(
                         color: Colors.white.withOpacity(.85),
                         fontSize: 12.sp,

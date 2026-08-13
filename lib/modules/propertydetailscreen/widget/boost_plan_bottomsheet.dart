@@ -2,8 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 
+import 'package:villas_qatar/Core/utils/stripe_checkout_helper.dart';
 import 'package:villas_qatar/modules/PlansandFeatures/model/featured_palnmodel.dart';
+import 'package:villas_qatar/modules/PlansandFeatures/services/featured_properties_controller.dart';
 import 'package:villas_qatar/modules/PlansandFeatures/services/plan_controller.dart';
+import 'package:villas_qatar/modules/propertylist/service/myproperties_listcontroller.dart';
 
 class BoostPlanBottomSheet extends StatefulWidget {
   final String propertyId;
@@ -20,6 +23,13 @@ class _BoostPlanBottomSheetState extends State<BoostPlanBottomSheet> {
   late final FeaturedPlanController planController;
   final TextEditingController searchController = TextEditingController();
   String searchQuery = '';
+
+  // Guards against double-tapping "Continue" while a checkout is
+  // already in flight - without this, a fast double tap fires two
+  // POST /api/featured/checkout calls and, once both get paid,
+  // produces two duplicate entries in "My Featured Properties" for
+  // the same purchase.
+  bool _isProcessingPayment = false;
 
   @override
   void initState() {
@@ -638,7 +648,7 @@ class _BoostPlanBottomSheetState extends State<BoostPlanBottomSheet> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        "Total",
+                        "Total".tr,
                         style: TextStyle(
                           fontSize: 9.sp,
                           color: const Color(0xff777777),
@@ -673,33 +683,45 @@ class _BoostPlanBottomSheetState extends State<BoostPlanBottomSheet> {
                   height: 48.h,
                   width: 190.w,
                   child: ElevatedButton(
-                    onPressed: () {
-                      _continueToPayment(plan);
-                    },
+                    onPressed: _isProcessingPayment
+                        ? null
+                        : () {
+                            _continueToPayment(plan);
+                          },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: primaryColor,
                       foregroundColor: Colors.white,
+                      disabledBackgroundColor: primaryColor.withOpacity(.6),
                       elevation: 0,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12.r),
                       ),
                     ),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Text(
-                          "Continue".tr,
-                          style: TextStyle(
-                            fontSize: 11.sp,
-                            fontWeight: FontWeight.w700,
+                    child: _isProcessingPayment
+                        ? SizedBox(
+                            width: 18.w,
+                            height: 18.w,
+                            child: const CircularProgressIndicator(
+                              strokeWidth: 2,
+                              color: Colors.white,
+                            ),
+                          )
+                        : Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Text(
+                                "Continue".tr,
+                                style: TextStyle(
+                                  fontSize: 11.sp,
+                                  fontWeight: FontWeight.w700,
+                                ),
+                              ),
+
+                              SizedBox(width: 7.w),
+
+                              Icon(Icons.arrow_forward_rounded, size: 17.sp),
+                            ],
                           ),
-                        ),
-
-                        SizedBox(width: 7.w),
-
-                        Icon(Icons.arrow_forward_rounded, size: 17.sp),
-                      ],
-                    ),
                   ),
                 ),
               ],
@@ -829,8 +851,17 @@ class _BoostPlanBottomSheetState extends State<BoostPlanBottomSheet> {
   // CONTINUE
   // PROPERTY ID COMES DIRECTLY FROM DETAILS PAGE
   // ============================================================
+  //
+  // POST /api/featured/checkout, then pay via Stripe's native
+  // PaymentSheet (preferred) or the webview-hosted checkout page
+  // fallback - same [StripeCheckoutHelper] used by the standalone
+  // boost screen and the PENDING_PAYMENT "Pay" flow.
 
-  void _continueToPayment(FeaturedPlanModel plan) {
+  Future<void> _continueToPayment(FeaturedPlanModel plan) async {
+    if (_isProcessingPayment) {
+      return;
+    }
+
     final String listingId = widget.propertyId.trim();
 
     if (listingId.isEmpty) {
@@ -842,6 +873,10 @@ class _BoostPlanBottomSheetState extends State<BoostPlanBottomSheet> {
 
       return;
     }
+
+    setState(() {
+      _isProcessingPayment = true;
+    });
 
     final String planId = plan.id;
 
@@ -857,18 +892,70 @@ class _BoostPlanBottomSheetState extends State<BoostPlanBottomSheet> {
 
     debugPrint("Duration: ${plan.formattedDuration}");
 
-    // POST /api/featured/checkout
-    //
-    // body:
-    // {
-    //   "listingId": listingId,
-    //   "planId": planId,
-    // }
+    try {
+      final BoostCheckoutSession session = await planController.checkout(
+        listingId: listingId,
+        planId: planId,
+      );
 
-    Get.snackbar(
-      "Ready for Payment".tr,
-      "${plan.name} - ${plan.formattedPrice}",
-      snackPosition: SnackPosition.BOTTOM,
-    );
+      final StripePaymentOutcome outcome = await StripeCheckoutHelper.pay(
+        clientSecret: session.paymentIntentClientSecret,
+      );
+
+      switch (outcome) {
+        case StripePaymentOutcome.success:
+          // Close the sheet first - calling Get.back() after the
+          // snackbar risked the snackbar's own overlay route eating
+          // the pop instead of the bottom sheet's route.
+          Get.back();
+
+          Get.snackbar(
+            "Payment Successful".tr,
+            "${plan.name} has been activated for your property.".tr,
+            snackPosition: SnackPosition.BOTTOM,
+          );
+
+          // Refresh the controllers that show boost/featured state so
+          // the "My Features" list and this property's card reflect
+          // the purchase immediately instead of on next app open.
+          if (Get.isRegistered<FeaturedPropertiesController>()) {
+            Get.find<FeaturedPropertiesController>().getMyFeaturedProperties(
+              forceRefresh: true,
+            );
+          }
+
+          if (Get.isRegistered<MyPropertyController>()) {
+            Get.find<MyPropertyController>().fetchProperties(
+              showLoader: false,
+            );
+          }
+
+          break;
+
+        case StripePaymentOutcome.cancelled:
+          Get.snackbar(
+            "Payment Cancelled".tr,
+            "You can try again anytime.".tr,
+            snackPosition: SnackPosition.BOTTOM,
+          );
+
+          break;
+      }
+    } catch (e) {
+      Get.snackbar(
+        "Checkout Failed".tr,
+        e.toString().replaceFirst("Exception: ", ""),
+        snackPosition: SnackPosition.BOTTOM,
+      );
+    } finally {
+      // The sheet may already be closed/disposed by now on the
+      // success path (Get.back() above) - only touch state if it's
+      // still mounted.
+      if (mounted) {
+        setState(() {
+          _isProcessingPayment = false;
+        });
+      }
+    }
   }
 }

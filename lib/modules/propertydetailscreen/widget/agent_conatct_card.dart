@@ -6,6 +6,7 @@ import 'package:get/get_utils/src/extensions/internacionalization.dart';
 import 'package:get/utils.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:villas_qatar/Core/constants/app_colors.dart';
+import 'package:villas_qatar/modules/dealers/view/dealer_detail_screen.dart';
 import 'package:villas_qatar/modules/propertylist/model/myproperty_model.dart';
 import 'package:villas_qatar/modules/sellerpropertyscreen/views/seller_property_screen.dart';
 
@@ -18,13 +19,24 @@ class AgentContactCard extends StatelessWidget {
     return InkWell(
        borderRadius: BorderRadius.circular(16.r),
   onTap: () {
-    debugPrint("Seller tapped");
-    Get.to(
-      () => SellerPropertiesScreen(
-        sellerId: property.createdBy.id,
-        sellerName: property.createdBy.name,
-      ),
-    );
+    final bool isDealer =
+        property.createdBy.role.toUpperCase() == "DEALER";
+
+    if (isDealer) {
+      debugPrint("Dealer tapped");
+      Get.to(
+        () => const DealerDetailsScreen(),
+        arguments: property.createdBy.id,
+      );
+    } else {
+      debugPrint("Seller tapped");
+      Get.to(
+        () => SellerPropertiesScreen(
+          sellerId: property.createdBy.id,
+          sellerName: property.createdBy.name,
+        ),
+      );
+    }
   },
       child: Container(
         width: double.infinity,
@@ -46,11 +58,33 @@ class AgentContactCard extends StatelessWidget {
         child: Row(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-      // Avatar
-      CircleAvatar(
-        radius: 30.r,
-        backgroundColor: const Color(0xffF3F4F6),
-        backgroundImage: const AssetImage("assets/agent.png"),
+      // Avatar — real photo when the dealer has one, default avatar otherwise.
+      Builder(
+        builder: (context) {
+          final String coverImage =
+              property.createdBy.dealerProfile?.coverImage ?? "";
+
+          if (coverImage.isEmpty) {
+            return CircleAvatar(
+              radius: 30.r,
+              backgroundColor: const Color(0xffF3F4F6),
+              backgroundImage: const AssetImage("assets/agent.png"),
+            );
+          }
+
+          return CircleAvatar(
+            radius: 30.r,
+            backgroundColor: const Color(0xffF3F4F6),
+            foregroundImage: NetworkImage(coverImage),
+            // If the network image fails to load, fall back to the
+            // default avatar instead of showing a broken image.
+            onForegroundImageError: (_, __) {},
+            child: const CircleAvatar(
+              radius: 30,
+              backgroundImage: AssetImage("assets/agent.png"),
+            ),
+          );
+        },
       ),
       
       SizedBox(width: 14.w),
@@ -139,7 +173,7 @@ class AgentContactCard extends StatelessWidget {
               ),
             ),
             Text(
-              " (150 Reviews)",
+              " (150 Reviews)".tr,
               style: TextStyle(
                 fontSize: 10.sp,
                 color: Colors.grey.shade600,
@@ -165,7 +199,7 @@ class AgentContactCard extends StatelessWidget {
                 Icons.call_outlined,
                 color: Colors.white,
               ),
-              label: "Call",
+              label: "Call".tr,
             ),
           ),
           SizedBox(width: 10.w),
@@ -177,7 +211,7 @@ class AgentContactCard extends StatelessWidget {
                 FontAwesomeIcons.whatsapp,
                 color: Colors.white,
               ),
-              label: "WhatsApp",
+              label: "WhatsApp".tr,
             ),
           ),
         ],

@@ -353,7 +353,7 @@ class ChatController extends GetxController {
     debugPrint(data.toString());
     debugPrint("═══════════════════════════════════");
 
-    Get.snackbar("Chat", data["message"] ?? "Something went wrong");
+    Get.snackbar("Chat".tr, data["message"] ?? "Something went wrong".tr);
   }
 
   ///---------------------------------------------------
@@ -561,11 +561,11 @@ class ChatController extends GetxController {
 
       final error = jsonDecode(response.body);
 
-      throw Exception(error["message"] ?? "Image upload failed");
+      throw Exception(error["message"] ?? "Image upload failed".tr);
     } catch (e) {
       debugPrint("UPLOAD IMAGE ERROR : $e");
 
-      Get.snackbar("Upload Failed", e.toString());
+      Get.snackbar("Upload Failed".tr, e.toString());
 
       return null;
     }
@@ -626,7 +626,10 @@ class ChatController extends GetxController {
   Future<void> sendLocation() async {
     try {
       if (!isConnected) {
-        Get.snackbar("Not Connected", "Please wait for chat to connect.");
+        Get.snackbar(
+          "Not Connected".tr,
+          "Please wait for chat to connect.".tr,
+        );
         return;
       }
 
@@ -635,7 +638,10 @@ class ChatController extends GetxController {
       bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
 
       if (!serviceEnabled) {
-        Get.snackbar("Location Disabled", "Please enable location services.");
+        Get.snackbar(
+          "Location Disabled".tr,
+          "Please enable location services.".tr,
+        );
         return;
       }
 
@@ -646,14 +652,17 @@ class ChatController extends GetxController {
       }
 
       if (permission == LocationPermission.denied) {
-        Get.snackbar("Permission Denied", "Location permission is required.");
+        Get.snackbar(
+          "Permission Denied".tr,
+          "Location permission is required.".tr,
+        );
         return;
       }
 
       if (permission == LocationPermission.deniedForever) {
         Get.snackbar(
-          "Permission Denied",
-          "Enable location permission from settings.",
+          "Permission Denied".tr,
+          "Enable location permission from settings.".tr,
         );
         return;
       }
@@ -673,7 +682,7 @@ class ChatController extends GetxController {
     } catch (e) {
       debugPrint("Send Location Error: $e");
 
-      Get.snackbar("Location Error", e.toString());
+      Get.snackbar("Location Error".tr, e.toString());
     }
   }
 

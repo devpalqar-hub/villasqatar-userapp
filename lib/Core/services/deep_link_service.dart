@@ -111,9 +111,13 @@ class DeepLinkService {
         return;
       }
 
-      /// Only accept our domain
+      /// Only accept our domain - this must match the App Link host
+      /// registered in AndroidManifest.xml (<data android:host=.../>),
+      /// which is the web/share domain, NOT the API backend host
+      /// (apivillas.palqar.cloud). A mismatch here silently drops
+      /// every real shared link before it ever reaches _openProperty.
       if (uri.host.toLowerCase() !=
-          "apivillas.palqar.cloud") {
+          "villas.palqar.cloud") {
         debugPrint(
           "Ignored: Invalid host ${uri.host}",
         );
@@ -133,7 +137,7 @@ class DeepLinkService {
 
       /// Expected:
       ///
-      /// https://apivillas.palqar.cloud/
+      /// https://villas.palqar.cloud/
       /// property/luxury-villas-tx44ux
 
       if (uri.pathSegments.length < 2) {
@@ -224,10 +228,10 @@ class DeepLinkService {
         _lastHandledLink = null;
 
         Get.snackbar(
-          "Property unavailable",
+          "Property unavailable".tr,
           deepLinkController.error.isNotEmpty
               ? deepLinkController.error
-              : "Unable to open this property",
+              : "Unable to open this property".tr,
           snackPosition:
               SnackPosition.BOTTOM,
         );
@@ -287,8 +291,8 @@ Get.to(
       );
 
       Get.snackbar(
-        "Error",
-        "Unable to open this property",
+        "Error".tr,
+        "Unable to open this property".tr,
         snackPosition:
             SnackPosition.BOTTOM,
       );

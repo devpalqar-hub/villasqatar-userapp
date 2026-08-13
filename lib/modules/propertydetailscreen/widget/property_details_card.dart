@@ -55,7 +55,7 @@ class PropertyDetailsCard extends StatelessWidget {
       {
         "icon": Icons.sell_outlined,
         "title": "Purpose".tr,
-        "value": property.purpose == "SALE".tr ? "For Sale".tr : "For Rent".tr,
+        "value": property.purpose == "SALE" ? "For Sale".tr : "For Rent".tr,
       },
       {
         "icon": Icons.calendar_today_outlined,
