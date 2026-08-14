@@ -6,6 +6,7 @@ import 'package:get/get.dart';
 import 'package:get/get_core/src/get_main.dart';
 import 'package:intl/intl.dart';
 import 'package:villas_qatar/Core/constants/app_colors.dart';
+import 'package:villas_qatar/Core/theme/app_motion.dart';
 import 'package:villas_qatar/Core/utils/auth_guard.dart';
 import 'package:villas_qatar/modules/offerscreen/view/make_offerscreen.dart';
 import 'package:villas_qatar/modules/visits/service/visit_controller.dart';
@@ -342,7 +343,9 @@ void _showScheduleVisitSheet(
                                     selectedSlot = i;
                                   });
                                 },
-                          child: Container(
+                          child: AnimatedContainer(
+                            duration: AppMotion.normal,
+                            curve: AppMotion.smooth,
                             padding: EdgeInsets.symmetric(
                               horizontal: 16.w,
                               vertical: 10.h,
@@ -358,14 +361,16 @@ void _showScheduleVisitSheet(
                                     : AppColors.fieldBorder,
                               ),
                             ),
-                            child: Text(
-                              slots[i],
+                            child: AnimatedDefaultTextStyle(
+                              duration: AppMotion.normal,
+                              curve: AppMotion.smooth,
                               style: TextStyle(
                                 color: selected
                                     ? AppColors.primary
                                     : Colors.black87,
                                 fontWeight: FontWeight.w600,
                               ),
+                              child: Text(slots[i]),
                             ),
                           ),
                         );
@@ -468,25 +473,34 @@ void _showScheduleVisitSheet(
                                   isLoading = false;
                                 });
                               },
-                        child: isLoading
-                            ? SizedBox(
-                                width: 22.w,
-                                height: 22.w,
-                                child: const CircularProgressIndicator(
-                                  strokeWidth: 2,
-                                  valueColor: AlwaysStoppedAnimation<Color>(
-                                    Colors.white,
+                        child: AnimatedSwitcher(
+                          duration: AppMotion.fast,
+                          switchInCurve: AppMotion.curve,
+                          switchOutCurve: AppMotion.curve,
+                          transitionBuilder: (child, animation) =>
+                              FadeTransition(opacity: animation, child: child),
+                          child: isLoading
+                              ? SizedBox(
+                                  key: const ValueKey('loading'),
+                                  width: 22.w,
+                                  height: 22.w,
+                                  child: const CircularProgressIndicator(
+                                    strokeWidth: 2,
+                                    valueColor: AlwaysStoppedAnimation<Color>(
+                                      Colors.white,
+                                    ),
+                                  ),
+                                )
+                              : Text(
+                                  "Book Visit".tr,
+                                  key: const ValueKey('title'),
+                                  style: TextStyle(
+                                    fontSize: 15.sp,
+                                    fontWeight: FontWeight.w700,
+                                    color: Colors.white,
                                   ),
                                 ),
-                              )
-                            : Text(
-                                "Book Visit".tr,
-                                style: TextStyle(
-                                  fontSize: 15.sp,
-                                  fontWeight: FontWeight.w700,
-                                  color: Colors.white,
-                                ),
-                              ),
+                        ),
                       ),
                     ),
                   ],

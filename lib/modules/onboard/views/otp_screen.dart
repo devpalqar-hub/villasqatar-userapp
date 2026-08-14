@@ -79,10 +79,10 @@ class OtpScreen extends StatelessWidget {
 
                     SizedBox(height: 10.h),
 
-                    /// Description
                     Text(
-                      'Enter the 6-digit code sent to\n${controller.phoneNumber}'
-                          .tr,
+                      'Enter the 6-digit code sent to\n@phone'.trParams({
+                        'phone': controller.phoneNumber,
+                      }),
                       style: AppTextStyles.body13.copyWith(
                         fontSize: 14.sp,
                         color: AppColors.textSecondary,

@@ -1848,7 +1848,7 @@ Widget _buildWhatsAppVerifiedBanner() {
         Padding(
           padding: const EdgeInsets.only(top: 2, bottom: 12),
           child: Text(
-            "This image will be shown first in listings.".tr,
+            "This image will be shown first in listings".tr,
             style: TextStyle(color: AppColors.hintGrey, fontSize: 12),
           ),
         ),

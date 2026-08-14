@@ -7,6 +7,8 @@ import 'package:villas_qatar/Core/constants/app_colors.dart';
 import 'package:villas_qatar/Core/theme/app_textstyles.dart';
 import 'package:villas_qatar/Core/utils/app_location.dart';
 import 'package:villas_qatar/Core/utils/app_transitions.dart';
+import 'package:villas_qatar/Core/widgets/motion/app_shimmer.dart';
+import 'package:villas_qatar/Core/widgets/motion/staggered_entrance_column.dart';
 import 'package:villas_qatar/modules/PlansandFeatures/model/featured_property_model.dart';
 import 'package:villas_qatar/modules/PlansandFeatures/services/featured_properties_controller.dart';
 import 'package:villas_qatar/modules/dealers/service/dealer_controller.dart';
@@ -189,7 +191,7 @@ class _HomeScreenState extends State<HomeScreen> {
       body: SafeArea(
         child: SingleChildScrollView(
           //  padding: EdgeInsets.symmetric(horizontal: 24.w),
-          child: Column(
+          child: StaggeredEntranceColumn(
             spacing: 12.h,
             children: [
               //SizedBox(height: 20),
@@ -261,7 +263,6 @@ class _HomeScreenState extends State<HomeScreen> {
                                         fontWeight: FontWeight.w400,
                                       ),
                                     ),
-                                   
                                   ],
                                 ),
                               ),
@@ -272,8 +273,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   );
                 },
               ),
-            
-             
+
               GetBuilder<LocationController>(
                 builder: (controller) {
                   // Nothing nearby (and not still loading) — drop the whole
@@ -296,7 +296,20 @@ class _HomeScreenState extends State<HomeScreen> {
                         padding: EdgeInsets.symmetric(horizontal: 16.w),
                         height: 100.h,
                         child: controller.isNearbyLoading
-                            ? const Center(child: CircularProgressIndicator())
+                            ? AppShimmer(
+                                child: ListView.separated(
+                                  scrollDirection: Axis.horizontal,
+                                  physics: const NeverScrollableScrollPhysics(),
+                                  itemCount: 3,
+                                  separatorBuilder: (_, __) =>
+                                      SizedBox(width: 10.w),
+                                  itemBuilder: (_, __) => ShimmerBox(
+                                    width: 130.w,
+                                    height: 100.h,
+                                    borderRadius: BorderRadius.circular(10.r),
+                                  ),
+                                ),
+                              )
                             : ListView.separated(
                                 scrollDirection: Axis.horizontal,
                                 itemCount: controller.nearbyProperties.length,
@@ -339,7 +352,20 @@ class _HomeScreenState extends State<HomeScreen> {
                   if (controller.isLoading && controller.dealers.isEmpty) {
                     return SizedBox(
                       height: 165.h,
-                      child: const Center(child: CircularProgressIndicator()),
+                      child: AppShimmer(
+                        child: ListView.separated(
+                          padding: EdgeInsets.symmetric(horizontal: 16.w),
+                          scrollDirection: Axis.horizontal,
+                          physics: const NeverScrollableScrollPhysics(),
+                          itemCount: 3,
+                          separatorBuilder: (_, __) => SizedBox(width: 12.w),
+                          itemBuilder: (_, __) => ShimmerBox(
+                            width: 140.w,
+                            height: 165.h,
+                            borderRadius: BorderRadius.circular(12.r),
+                          ),
+                        ),
+                      ),
                     );
                   }
 
@@ -422,8 +448,16 @@ class _HomeScreenState extends State<HomeScreen> {
 
               SizedBox(
                 height: 225.h,
-                child: const Center(
-                  child: CircularProgressIndicator(color: Color(0xFF8E123E)),
+                child: AppShimmer(
+                  child: ListView.separated(
+                    padding: EdgeInsets.symmetric(horizontal: 16.w),
+                    scrollDirection: Axis.horizontal,
+                    physics: const NeverScrollableScrollPhysics(),
+                    itemCount: 3,
+                    separatorBuilder: (_, __) => SizedBox(width: 10.w),
+                    itemBuilder: (_, __) =>
+                        const ShimmerListingCard(width: 168),
+                  ),
                 ),
               ),
             ],

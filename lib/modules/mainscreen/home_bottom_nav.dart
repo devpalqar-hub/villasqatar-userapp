@@ -4,6 +4,8 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get_utils/src/extensions/internacionalization.dart';
 
 import 'package:villas_qatar/Core/constants/app_colors.dart';
+import 'package:villas_qatar/Core/theme/app_motion.dart';
+import 'package:villas_qatar/Core/widgets/motion/pressable_scale.dart';
 
 class HomeBottomNav extends StatelessWidget {
   final int currentIndex;
@@ -61,52 +63,56 @@ class HomeBottomNav extends StatelessWidget {
     final selected = currentIndex == index;
 
     return Expanded(
-      child: InkWell(
-        borderRadius: BorderRadius.circular(40.r),
-        onTap: () => onChanged(index),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Stack(
-              clipBehavior: Clip.none,
-              alignment: Alignment.center,
-              children: [
-                Container(
-                  width: 38.w,
-                  height: 38.w,
-                  decoration: BoxDecoration(
-                    color: selected
-                        ? const Color(0xffA71A46)
-                        : Colors.transparent,
-                    shape: BoxShape.circle,
+      child: PressableScale(
+        child: InkWell(
+          borderRadius: BorderRadius.circular(40.r),
+          onTap: () => onChanged(index),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Stack(
+                clipBehavior: Clip.none,
+                alignment: Alignment.center,
+                children: [
+                  AnimatedContainer(
+                    duration: AppMotion.fast,
+                    curve: AppMotion.smooth,
+                    width: 38.w,
+                    height: 38.w,
+                    decoration: BoxDecoration(
+                      color: selected
+                          ? const Color(0xffA71A46)
+                          : Colors.transparent,
+                      shape: BoxShape.circle,
+                    ),
+                    child: Icon(icon, color: Colors.white, size: 22.sp),
                   ),
-                  child: Icon(icon, color: Colors.white, size: 22.sp),
-                ),
-                if (showBadge)
-                  Positioned(
-                    top: -2.h,
-                    right: 4.w,
-                    child: Container(
-                      width: 8.w,
-                      height: 8.w,
-                      decoration: const BoxDecoration(
-                        color: Colors.redAccent,
-                        shape: BoxShape.circle,
+                  if (showBadge)
+                    Positioned(
+                      top: -2.h,
+                      right: 4.w,
+                      child: Container(
+                        width: 8.w,
+                        height: 8.w,
+                        decoration: const BoxDecoration(
+                          color: Colors.redAccent,
+                          shape: BoxShape.circle,
+                        ),
                       ),
                     ),
-                  ),
-              ],
-            ),
-            SizedBox(height: 2.h),
-            Text(
-              label,
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: 10.sp,
-                fontWeight: FontWeight.w500,
+                ],
               ),
-            ),
-          ],
+              SizedBox(height: 2.h),
+              Text(
+                label,
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 10.sp,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );

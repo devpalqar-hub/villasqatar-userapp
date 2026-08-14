@@ -5,6 +5,8 @@ import 'package:get/get.dart';
 
 import 'package:villas_qatar/Core/constants/app_colors.dart';
 import 'package:villas_qatar/Core/theme/app_textstyles.dart';
+import 'package:villas_qatar/Core/widgets/motion/app_shimmer.dart';
+import 'package:villas_qatar/Core/widgets/motion/pressable_scale.dart';
 import 'package:villas_qatar/modules/PlansandFeatures/model/featured_property_model.dart';
 import 'package:villas_qatar/modules/PlansandFeatures/services/featured_properties_controller.dart';
 import 'package:villas_qatar/modules/propertydetailscreen/propertydetailscreen.dart';
@@ -182,7 +184,19 @@ class _FeaturedPropertiesState extends State<FeaturedProperties> {
             if (isLoading && featuredProperties.isEmpty)
               SizedBox(
                 height: 80.h,
-                child: const Center(child: CircularProgressIndicator()),
+                child: AppShimmer(
+                  child: ListView.separated(
+                    scrollDirection: Axis.horizontal,
+                    physics: const NeverScrollableScrollPhysics(),
+                    itemCount: 3,
+                    separatorBuilder: (_, __) => SizedBox(width: 14.w),
+                    itemBuilder: (_, __) => ShimmerBox(
+                      width: 160.w,
+                      height: 80.h,
+                      borderRadius: BorderRadius.circular(8.r),
+                    ),
+                  ),
+                ),
               )
             // =====================================================
             // ERROR
@@ -290,8 +304,7 @@ class LocalityCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      behavior: HitTestBehavior.opaque,
+    return PressableScale(
       onTap: _openPropertyDetails,
       child: Container(
         width: 160.w,
@@ -367,27 +380,20 @@ class LocalityCard extends StatelessWidget {
   // Supports API network image while preserving same dimensions.
   // =============================================================
 
+  void _openPropertyDetails() {
+    final String id = propertyId.trim();
 
-void _openPropertyDetails() {
-  final String id = propertyId.trim();
+    if (id.isEmpty) {
+      debugPrint("FEATURED PROPERTY ERROR: Property ID is empty");
 
-  if (id.isEmpty) {
-    debugPrint("FEATURED PROPERTY ERROR: Property ID is empty");
+      Fluttertoast.showToast(msg: "Property details are not available".tr);
+      return;
+    }
 
-    Fluttertoast.showToast(
-      msg: "Property details are not available".tr,
-    );
-    return;
+    debugPrint("OPEN FEATURED PROPERTY DETAILS: $id");
+
+    Get.to(() => PropertyDetailsScreen(propertyId: id));
   }
-
-  debugPrint("OPEN FEATURED PROPERTY DETAILS: $id");
-
-  Get.to(
-    () => PropertyDetailsScreen(
-      propertyId: id,
-    ),
-  );
-}
 
   Widget _buildImage() {
     final String url = image.trim();

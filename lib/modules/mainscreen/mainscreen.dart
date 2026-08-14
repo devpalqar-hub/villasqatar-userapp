@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get_core/src/get_main.dart';
 import 'package:get/get_instance/src/extension_instance.dart';
 import 'package:get/get_utils/src/extensions/internacionalization.dart';
+import 'package:villas_qatar/Core/theme/app_motion.dart';
 import 'package:villas_qatar/Core/utils/auth_guard.dart';
 import 'package:villas_qatar/modules/chats/views/chatlistscreen.dart';
 import 'package:villas_qatar/modules/home/views/home_screen.dart';
@@ -117,9 +118,9 @@ class _MainScreenState extends State<MainScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: AnimatedSwitcher(
-        duration: const Duration(milliseconds: 660),
-
-        switchOutCurve: Curves.easeIn,
+        duration: AppMotion.slow,
+        switchInCurve: AppMotion.curve,
+        switchOutCurve: AppMotion.smooth,
         transitionBuilder: (child, animation) {
           return FadeTransition(
             opacity: animation,
@@ -147,7 +148,6 @@ class _MainScreenState extends State<MainScreen> {
             return;
           }
 
-         
           if (index == 3 &&
               !AuthGuard.requireLogin(
                 message: "Please login to access your chats.".tr,

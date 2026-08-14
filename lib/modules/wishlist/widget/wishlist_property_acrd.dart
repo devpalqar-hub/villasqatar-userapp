@@ -7,7 +7,9 @@ import 'package:get/get_navigation/src/routes/transitions_type.dart';
 import 'package:get/get_state_manager/src/simple/get_state.dart';
 import 'package:get/get_utils/src/extensions/internacionalization.dart';
 import 'package:villas_qatar/Core/constants/app_colors.dart';
+import 'package:villas_qatar/Core/theme/app_motion.dart';
 import 'package:villas_qatar/Core/utils/app_transitions.dart';
+import 'package:villas_qatar/Core/widgets/motion/pressable_scale.dart';
 import 'package:villas_qatar/modules/propertydetailscreen/propertydetailscreen.dart';
 import 'package:villas_qatar/modules/propertylist/model/myproperty_model.dart';
 import 'package:villas_qatar/modules/searchscreen/service/searchlist_screen.dart';
@@ -34,18 +36,16 @@ class WishlistPropertyCard extends StatelessWidget {
   //   }
   // }
   Future<void> _openDetails() async {
-  Get.to(
-    () => PropertyDetailsScreen(
-      propertyId: property.id,
-    ),
-    transition: AppTransitions.forward,
-    duration: const Duration(milliseconds: 400),
-  );
-}
+    Get.to(
+      () => PropertyDetailsScreen(propertyId: property.id),
+      transition: AppTransitions.forward,
+      duration: const Duration(milliseconds: 400),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
-    return Container(
+    return PressableScale(
       child: Material(
         color: Colors.white,
         child: InkWell(
@@ -293,35 +293,50 @@ class _WishlistButton extends StatelessWidget {
 
             final isLoading = wishlistController.isPropertyLoading(propertyId);
 
-            return GestureDetector(
-              behavior: HitTestBehavior.opaque,
-              onTap: isLoading
-                  ? null
-                  : () async {
-                      await wishlistController.toggleWishlist(propertyId);
-                    },
-              child: Container(
-                width: 28.w,
-                height: 28.w,
-                alignment: Alignment.center,
-                decoration: const BoxDecoration(
-                  color: Color(0xffFFF1F4),
-                  shape: BoxShape.circle,
+            return PressableScale(
+              child: GestureDetector(
+                behavior: HitTestBehavior.opaque,
+                onTap: isLoading
+                    ? null
+                    : () async {
+                        await wishlistController.toggleWishlist(propertyId);
+                      },
+                child: Container(
+                  width: 28.w,
+                  height: 28.w,
+                  alignment: Alignment.center,
+                  decoration: const BoxDecoration(
+                    color: Color(0xffFFF1F4),
+                    shape: BoxShape.circle,
+                  ),
+                  child: AnimatedSwitcher(
+                    duration: AppMotion.fast,
+                    switchInCurve: AppMotion.curve,
+                    switchOutCurve: AppMotion.curve,
+                    transitionBuilder: (child, animation) => ScaleTransition(
+                      scale: animation,
+                      child: FadeTransition(opacity: animation, child: child),
+                    ),
+                    child: isLoading
+                        ? SizedBox(
+                            key: const ValueKey('loading'),
+                            width: 13.w,
+                            height: 13.w,
+                            child: const CircularProgressIndicator(
+                              strokeWidth: 1.5,
+                              color: AppColors.primary,
+                            ),
+                          )
+                        : Icon(
+                            isWishlisted
+                                ? Icons.favorite
+                                : Icons.favorite_border,
+                            key: ValueKey(isWishlisted),
+                            color: AppColors.primary,
+                            size: 16.sp,
+                          ),
+                  ),
                 ),
-                child: isLoading
-                    ? SizedBox(
-                        width: 13.w,
-                        height: 13.w,
-                        child: const CircularProgressIndicator(
-                          strokeWidth: 1.5,
-                          color: AppColors.primary,
-                        ),
-                      )
-                    : Icon(
-                        isWishlisted ? Icons.favorite : Icons.favorite_border,
-                        color: AppColors.primary,
-                        size: 16.sp,
-                      ),
               ),
             );
           },

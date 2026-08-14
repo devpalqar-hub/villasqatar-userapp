@@ -1,4 +1,3 @@
-
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -6,7 +5,9 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
 
 import 'package:villas_qatar/Core/constants/app_colors.dart';
+import 'package:villas_qatar/Core/theme/app_motion.dart';
 import 'package:villas_qatar/Core/theme/app_textstyles.dart';
+import 'package:villas_qatar/Core/widgets/motion/pressable_scale.dart';
 import 'package:villas_qatar/modules/propertydetailscreen/propertydetailscreen.dart';
 import 'package:villas_qatar/modules/wishlist/service/wishlist_controller.dart';
 
@@ -55,8 +56,8 @@ class PropertyCard extends StatelessWidget {
         Get.isRegistered<WishlistController>()
         ? Get.find<WishlistController>()
         : Get.put(WishlistController());
-        // ? Get.find<WishlistController>()
-        // : Get.put(WishlistController());
+    // ? Get.find<WishlistController>()
+    // : Get.put(WishlistController());
 
     return Container(
       width: 168.w,
@@ -74,7 +75,7 @@ class PropertyCard extends StatelessWidget {
         ],
       ),
       clipBehavior: Clip.antiAlias,
-    
+
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -84,7 +85,7 @@ class PropertyCard extends StatelessWidget {
           Stack(
             children: [
               _buildImage(),
-    
+
               /// =================================================
               /// FEATURED TAG
               /// =================================================
@@ -110,101 +111,117 @@ class PropertyCard extends StatelessWidget {
                     ),
                   ),
                 ),
-    
+
               /// =================================================
               /// WISHLIST BUTTON
               /// =================================================
               Positioned(
                 top: 10.h,
                 right: 10.w,
-    
+
                 /// GetBuilder rebuilds the heart whenever
                 /// WishlistController calls update().
                 child: GetBuilder<WishlistController>(
                   init: wishlistController,
                   builder: (controller) {
                     final String id = propertyId?.trim() ?? '';
-    
+
                     final bool wishlisted =
                         id.isNotEmpty && controller.isWishlisted(id);
-    
+
                     final bool wishlistLoading =
                         id.isNotEmpty && controller.isPropertyLoading(id);
-    
+
                     /// Material + InkWell gives this button
                     /// its own tap target.
                     ///
                     /// Tapping here calls wishlist API.
                     /// Tapping rest of card opens details.
-                    return Material(
-                      color: Colors.transparent,
-                      child: InkWell(
-                        customBorder: const CircleBorder(),
-    
-                        onTap: wishlistLoading
-                            ? null
-                            : () async {
-                                if (id.isEmpty) {
-                                  Fluttertoast.showToast(
-                                    msg: "Property ID is not available".tr,
-                                  );
+                    return PressableScale(
+                      child: Material(
+                        color: Colors.transparent,
+                        child: InkWell(
+                          customBorder: const CircleBorder(),
 
-                                  return;
-                                }
-    
-                                /// Calls:
-                                /// WishlistController
-                                ///     .toggleWishlist(id)
-                                ///
-                                /// which internally calls:
-                                ///
-                                /// POST wishlistByProperty(id)
-                                await controller.toggleWishlist(id);
-                              },
-    
-                        child: Container(
-                          width: 32.w,
-                          height: 32.w,
-                          alignment: Alignment.center,
-                          decoration: const BoxDecoration(
-                            color: Colors.white,
-                            shape: BoxShape.circle,
-                          ),
-    
-                          /// Show loader only for the
-                          /// property currently being toggled.
-                          child: wishlistLoading
-                              ? SizedBox(
-                                  width: 15.w,
-                                  height: 15.w,
-                                  child: const CircularProgressIndicator(
-                                    strokeWidth: 2,
-                                    color: AppColors.primary,
+                          onTap: wishlistLoading
+                              ? null
+                              : () async {
+                                  if (id.isEmpty) {
+                                    Fluttertoast.showToast(
+                                      msg: "Property ID is not available".tr,
+                                    );
+
+                                    return;
+                                  }
+
+                                  /// Calls:
+                                  /// WishlistController
+                                  ///     .toggleWishlist(id)
+                                  ///
+                                  /// which internally calls:
+                                  ///
+                                  /// POST wishlistByProperty(id)
+                                  await controller.toggleWishlist(id);
+                                },
+
+                          child: Container(
+                            width: 32.w,
+                            height: 32.w,
+                            alignment: Alignment.center,
+                            decoration: const BoxDecoration(
+                              color: Colors.white,
+                              shape: BoxShape.circle,
+                            ),
+
+                            /// Show loader only for the
+                            /// property currently being toggled.
+                            child: AnimatedSwitcher(
+                              duration: AppMotion.fast,
+                              switchInCurve: AppMotion.curve,
+                              switchOutCurve: AppMotion.curve,
+                              transitionBuilder: (child, animation) =>
+                                  ScaleTransition(
+                                    scale: animation,
+                                    child: FadeTransition(
+                                      opacity: animation,
+                                      child: child,
+                                    ),
                                   ),
-                                )
-                              : Icon(
-                                  wishlisted
-                                      ? Icons.favorite
-                                      : Icons.favorite_border,
-                                  size: 18.sp,
-                                  color: wishlisted
-                                      ? AppColors.primary
-                                      : Colors.black87,
-                                ),
+                              child: wishlistLoading
+                                  ? SizedBox(
+                                      key: const ValueKey('loading'),
+                                      width: 15.w,
+                                      height: 15.w,
+                                      child: const CircularProgressIndicator(
+                                        strokeWidth: 2,
+                                        color: AppColors.primary,
+                                      ),
+                                    )
+                                  : Icon(
+                                      wishlisted
+                                          ? Icons.favorite
+                                          : Icons.favorite_border,
+                                      key: ValueKey(wishlisted),
+                                      size: 18.sp,
+                                      color: wishlisted
+                                          ? AppColors.primary
+                                          : Colors.black87,
+                                    ),
+                            ),
+                          ),
                         ),
                       ),
                     );
                   },
                 ),
               ),
-    
+
               /// =================================================
               /// IMAGE BOTTOM INFO
               /// =================================================
-             
             ],
           ),
-    
+
           /// ===================================================
           /// PROPERTY INFORMATION
           /// ===================================================
@@ -223,9 +240,9 @@ class PropertyCard extends StatelessWidget {
                     color: AppColors.textPrimary,
                   ),
                 ),
-    
+
                 SizedBox(height: 6.h),
-    
+
                 /// LOCATION
                 Row(
                   children: [
@@ -234,9 +251,9 @@ class PropertyCard extends StatelessWidget {
                       size: 12.sp,
                       color: Colors.grey,
                     ),
-    
+
                     SizedBox(width: 4.w),
-    
+
                     Expanded(
                       child: Text(
                         location,
@@ -248,7 +265,7 @@ class PropertyCard extends StatelessWidget {
                         ),
                       ),
                     ),
-    
+
                     if (distance.isNotEmpty)
                       Text(
                         distance,
@@ -259,9 +276,9 @@ class PropertyCard extends StatelessWidget {
                       ),
                   ],
                 ),
-    
+
                 SizedBox(height: 5.h),
-    
+
                 /// PRICE
                 Text(
                   price,
@@ -272,9 +289,9 @@ class PropertyCard extends StatelessWidget {
                     color: AppColors.textPrimary,
                   ),
                 ),
-    
+
                 SizedBox(height: 5.h),
-    
+
                 /// =================================================
                 /// BEDS / BATHS / AREA
                 /// =================================================
@@ -288,13 +305,12 @@ class PropertyCard extends StatelessWidget {
                         style: TextStyle(color: Colors.grey, fontSize: 10.sp),
                       ),
                     ),
-    
+
                     SizedBox(width: 6.w),
-    
+
                     // _buildDot(),
-    
                     SizedBox(width: 6.w),
-    
+
                     Flexible(
                       child: Text(
                         "$bathrooms Baths",
@@ -303,13 +319,12 @@ class PropertyCard extends StatelessWidget {
                         style: TextStyle(color: Colors.grey, fontSize: 10.sp),
                       ),
                     ),
-    
+
                     SizedBox(width: 6.w),
-    
+
                     // _buildDot(),
-    
                     SizedBox(width: 6.w),
-    
+
                     Flexible(
                       child: Text(
                         _areaText(),
@@ -363,32 +378,33 @@ class PropertyCard extends StatelessWidget {
         width: double.infinity,
         fit: BoxFit.cover,
         loadingBuilder: (context, child, loadingProgress) {
-          if (loadingProgress == null) {
-            return child;
-          }
+          final bool loaded = loadingProgress == null;
 
-        return _imagePlaceholder(showLoader: true);
-      },
-      errorBuilder: (context, error, stackTrace) {
-        return _imagePlaceholder();
-      },
-    );
-  }
+          return AnimatedSwitcher(
+            duration: AppMotion.medium,
+            switchInCurve: AppMotion.curve,
+            child: loaded
+                ? KeyedSubtree(key: const ValueKey('loaded'), child: child)
+                : KeyedSubtree(
+                    key: const ValueKey('loading'),
+                    child: _imagePlaceholder(showLoader: true),
+                  ),
+          );
+        },
+        errorBuilder: (context, error, stackTrace) {
+          return _imagePlaceholder();
+        },
+      );
+    }
 
     /// LOCAL ASSET
-    if (cleanImage.startsWith(
-      'assets/',
-    )) {
+    if (cleanImage.startsWith('assets/')) {
       return Image.asset(
         cleanImage,
         height: 120.h,
         width: double.infinity,
         fit: BoxFit.cover,
-        errorBuilder: (
-          context,
-          error,
-          stackTrace,
-        ) {
+        errorBuilder: (context, error, stackTrace) {
           return _imagePlaceholder();
         },
       );
@@ -402,9 +418,7 @@ class PropertyCard extends StatelessWidget {
   // IMAGE PLACEHOLDER
   // =============================================================
 
-  Widget _imagePlaceholder({
-    bool showLoader = false,
-  }) {
+  Widget _imagePlaceholder({bool showLoader = false}) {
     return Container(
       height: 120.h,
       width: double.infinity,

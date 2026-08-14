@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:villas_qatar/Core/constants/app_colors.dart';
+import 'package:villas_qatar/Core/theme/app_motion.dart';
+import 'package:villas_qatar/Core/widgets/motion/pressable_scale.dart';
 
 class PrimaryButton extends StatelessWidget {
   final String title;
@@ -37,45 +39,49 @@ class PrimaryButton extends StatelessWidget {
             ),
           ],
         ),
-        child: Material(
-          color: Colors.transparent,
-          child: InkWell(
-            borderRadius: BorderRadius.circular(8.r),
-            onTap: isLoading ? null : onTap,
-            child: Padding(
-              padding: EdgeInsets.symmetric(horizontal: 20.w),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  if (prefix != null) ...[
-                    prefix!,
-                    SizedBox(width: 10.w),
-                  ],
+        child: PressableScale(
+          child: Material(
+            color: Colors.transparent,
+            child: InkWell(
+              borderRadius: BorderRadius.circular(8.r),
+              onTap: isLoading ? null : onTap,
+              child: Padding(
+                padding: EdgeInsets.symmetric(horizontal: 20.w),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    if (prefix != null) ...[prefix!, SizedBox(width: 10.w)],
 
-                  if (isLoading)
-                    SizedBox(
-                      width: 20.w,
-                      height: 20.w,
-                      child: const CircularProgressIndicator(
-                        color: Colors.white,
-                        strokeWidth: 2,
-                      ),
-                    )
-                  else
-                    Text(
-                      title,
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 16.sp,
-                        fontWeight: FontWeight.w400,
-                      ),
+                    AnimatedSwitcher(
+                      duration: AppMotion.fast,
+                      switchInCurve: AppMotion.curve,
+                      switchOutCurve: AppMotion.curve,
+                      transitionBuilder: (child, animation) =>
+                          FadeTransition(opacity: animation, child: child),
+                      child: isLoading
+                          ? SizedBox(
+                              key: const ValueKey('loading'),
+                              width: 20.w,
+                              height: 20.w,
+                              child: const CircularProgressIndicator(
+                                color: Colors.white,
+                                strokeWidth: 2,
+                              ),
+                            )
+                          : Text(
+                              title,
+                              key: const ValueKey('title'),
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 16.sp,
+                                fontWeight: FontWeight.w400,
+                              ),
+                            ),
                     ),
 
-                  if (suffix != null) ...[
-                    SizedBox(width: 10.w),
-                    suffix!,
+                    if (suffix != null) ...[SizedBox(width: 10.w), suffix!],
                   ],
-                ],
+                ),
               ),
             ),
           ),

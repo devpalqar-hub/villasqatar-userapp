@@ -40,9 +40,18 @@ const Map<String, String> arQA = {
 
   "Continue with WhatsApp": "المتابعة عبر واتساب",
   "Login with WhatsApp": "تسجيل الدخول عبر واتساب",
-
+  "Login with ": "تسجيل الدخول عبر ",
   "WhatsApp": "واتساب",
+  "Enter your WhatsApp number to\nreceive an OTP":
+      "أدخل رقم واتساب الخاص بك\nلتلقي رمز التحقق",
+  "We will send an OTP to your WhatsApp to verify your account":
+      "سنرسل رمز التحقق (OTP) إلى واتساب الخاص بك للتحقق من حسابك",
   "WhatsApp Number": "رقم واتساب",
+  "Verify ": "تحقق",
+  "OTP": "رمز التحقق",
+  "Enter the 6-digit code sent to\n@phone":
+      "أدخل الرمز المكون من 6 أرقام المرسل إلى\n@phone",
+  "Resend OTP in 00:25": "إعادة إرسال رمز التحقق خلال 00:25",
 
   "Full Name": "الاسم الكامل",
   "Email Address": "البريد الإلكتروني",
@@ -117,7 +126,7 @@ const Map<String, String> arQA = {
       "اشترِ أو استأجر واكتشف أفضل العقارات من حولك",
 
   "No Properties Found": "لم يتم العثور على عقارات",
-  "No properties found": "لم يتم العثور على عقارات",
+   "No more properties": "لا توجد عقارات أخرى",
   "Try changing your search or filters": "حاول تغيير البحث أو الفلاتر",
 
   "Filter Properties": "تصفية العقارات",
@@ -996,10 +1005,9 @@ const Map<String, String> arQA = {
   'No Properties Listed': 'No Properties Listed',
   'This dealer hasn\'t added any listings yet':
       'This dealer hasn\'t added any listings yet',
-  'Seller Properties': 'Seller Properties',
-  'No more properties': 'No more properties',
-  'This seller has no more properties to show':
-      'This seller has no more properties to show',
+  "Seller Properties": "عقارات البائع",
+ 
+   "This seller has no more properties to show": "لا يملك هذا البائع المزيد من العقارات لعرضها",
   'View all': 'View all',
   "This period": "هذه الفترة",
   "Performance Trend": "اتجاه الأداء",
@@ -1094,12 +1102,9 @@ const Map<String, String> arQA = {
       "بوابة الوسطاء مخصصة للوكالات لإدارة العقارات والعملاء المحتملين والتحليلات الخاصة بفريقهم.",
 
   "Invoice Details": "تفاصيل الفاتورة",
-  "PDF is not available for this invoice":
-      "ملف PDF غير متوفر لهذه الفاتورة",
-  "Please login to download the invoice.":
-      "يرجى تسجيل الدخول لتنزيل الفاتورة.",
-  "Unable to download invoice PDF":
-      "تعذر تنزيل ملف PDF الخاص بالفاتورة",
+  "PDF is not available for this invoice": "ملف PDF غير متوفر لهذه الفاتورة",
+  "Please login to download the invoice.": "يرجى تسجيل الدخول لتنزيل الفاتورة.",
+  "Unable to download invoice PDF": "تعذر تنزيل ملف PDF الخاص بالفاتورة",
 
   "Invoice Number": "رقم الفاتورة",
   "Total Amount": "المبلغ الإجمالي",
@@ -1115,7 +1120,6 @@ const Map<String, String> arQA = {
 
   "Emailed At": "تاريخ إرسال البريد الإلكتروني",
 
-
   "Line Items": "بنود الفاتورة",
 
   "Item": "البند",
@@ -1126,7 +1130,6 @@ const Map<String, String> arQA = {
   "Subtotal": "المجموع الفرعي",
   "VAT (@rate%)": "ضريبة القيمة المضافة (@rate%)",
 
-  
   "PDF": "ملف PDF",
   "Created At": "تاريخ الإنشاء",
   "Updated At": "تاريخ التحديث",
@@ -1135,18 +1138,26 @@ const Map<String, String> arQA = {
 
   "Paid": "مدفوعة",
   "Unknown": "غير معروف",
-
-  
+  "Login as Dealer": "تسجيل الدخول كتاجر",
 
   "My Invoices": "فواتيري",
   "Search invoices": "البحث في الفواتير",
-
 
   "No invoices found": "لم يتم العثور على فواتير",
   "Your invoices will appear here once available":
       "ستظهر فواتيرك هنا عند توفرها",
 
   "Invoice": "فاتورة",
-  "Invoices": "فواتير"
+  "Invoices": "فواتير",
+  
+  "Enter your email": "أدخل بريدك الإلكتروني",
+  "Select Municipality": "اختر البلدية",
+  "Use GPS": "استخدام نظام تحديد المواقع",
+  "This image will be shown first in listings": "ستظهر هذه الصورة أولاً في القوائم",
+  "Submit Property": "إرسال العقار",
+ 
+  
+  
+  "Download Receipt": "تنزيل الإيصال"
 
 };

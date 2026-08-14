@@ -324,7 +324,7 @@ const Map<String, String> enUS = {
 
   "Tip: Properties with photos get 10x more interest!":
       "Tip: Properties with photos get 10x more interest!",
-
+ 
   "Make sure to add high quality photos and videos":
       "Make sure to add high quality photos and videos",
 
@@ -940,7 +940,17 @@ const Map<String, String> enUS = {
   "Area (SQM)": "Area (SQM)",
   "Read less": "Read less",
   "Read more": "Read more",
-
+  "Login as Dealer": "Login as Dealer",
+  "Login with ": "Login with ",
+  "Enter your WhatsApp number to\nreceive an OTP":
+      "Enter your WhatsApp number to\nreceive an OTP",
+  "We will send an OTP to your WhatsApp to verify your account":
+      "We will send an OTP to your WhatsApp to verify your account",
+  "Verify ": "Verify ",
+  "OTP": "OTP",
+  "Enter the 6-digit code sent to\n@phone":
+      "Enter the 6-digit code sent to\n@phone",
+  "Resend OTP in 00:25": "Resend OTP in 00:25",
   "Property Insights": "Property Insights",
   "Track how people are discovering and engaging with your property.":
       "Track how people are discovering and engaging with your property.",
@@ -955,7 +965,7 @@ const Map<String, String> enUS = {
   "WhatsApp Clicks": "WhatsApp Clicks",
   "Messages Started": "Messages Started",
   "Users Engaged": "Users Engaged",
-  
+
   "You received ": "You received ",
   "more": "more",
   "fewer": "fewer",
@@ -967,55 +977,66 @@ const Map<String, String> enUS = {
   "Insights will start appearing here once your property gets activity.":
       "Insights will start appearing here once your property gets activity.",
   "My Featured": "My Featured",
-"Password": "Password",
-// "Account": "Account",
-"Update your account information": "Update your account information",
-"Featured Plans": "Featured Plans",
-"Manage your active and past featured property plans": "Manage your active and past featured property plans",
-// "Unable to load featured properties": "Unable to load featured properties",
-// "Try Again": "Try Again",
-"No matching properties found": "No matching properties found",
-"No featured properties available": "No featured properties available",
-"Try searching with another property name": "Try searching with another property name",
-"Your featured properties will appear here": "Your featured properties will appear here",
-"Clear Search": "Clear Search",
-"Villas Qatar Payment Receipt": "Villas Qatar Payment Receipt",
-"Unable to generate receipt. Please try again": "Unable to generate receipt. Please try again",
-"Select Language": "Select Language",
-"Ask AI to find your villa...": "Ask AI to find your villa...",
-// "100% secure": "100% secure",
-// "AI-powered valuation": "AI-powered valuation",
-// "Real market insights": "Real market insights",
-"Your offer will be sent directly to the property owner. You can continue the conversation through chat": "Your offer will be sent directly to the property owner. You can continue the conversation through chat",
-"Share Property": "Share Property",
-"Share on WhatsApp": "Share on WhatsApp",
-"Unable to share": "Unable to share",
-"Could not open WhatsApp": "Could not open WhatsApp",
-"Copy Link": "Copy Link",
-"Property Description": "Property Description",
-"Muncipality": "Muncipality",
-"Review Listing": "Review Listing",
-"Verify all details before submitting": "Verify all details before submitting",
-"Are you sure you want to mark this property as sold?": "Are you sure you want to mark this property as sold?",
-"This property will be updated as sold and will no longer be available as an active listing": "This property will be updated as sold and will no longer be available as an active listing",
-"No visit requests": "No visit requests",
-"Visit requests for your properties will appear here": "Visit requests for your properties will appear here",
-"No scheduled visits": "No scheduled visits",
-"Properties you schedule for a visit will appear here": "Properties you schedule for a visit will appear here",
-"Skip": "Skip",
-"Premium living Prime locations\nThe lifestyle you deserve":
-    "Premium living Prime locations\nThe lifestyle you deserve",
-"or continue with": "or continue with",
-"By continuing, you agree to our\n":
-    "By continuing, you agree to our\n",
-"Terms of Use": "Terms of Use",
-"Privacy Policy": "Privacy Policy",
-'No Properties Listed': 'No Properties Listed',
-'This dealer hasn\'t added any listings yet': 'This dealer hasn\'t added any listings yet',
-'Seller Properties': 'Seller Properties',
-'No more properties': 'No more properties',
-'This seller has no more properties to show': 'This seller has no more properties to show',
-'View all': 'View all',
+  "Password": "Password",
+  // "Account": "Account",
+  "Update your account information": "Update your account information",
+  "Featured Plans": "Featured Plans",
+  "Manage your active and past featured property plans":
+      "Manage your active and past featured property plans",
+  // "Unable to load featured properties": "Unable to load featured properties",
+  // "Try Again": "Try Again",
+  "No matching properties found": "No matching properties found",
+  "No featured properties available": "No featured properties available",
+  "Try searching with another property name":
+      "Try searching with another property name",
+  "Your featured properties will appear here":
+      "Your featured properties will appear here",
+  "Clear Search": "Clear Search",
+  "Villas Qatar Payment Receipt": "Villas Qatar Payment Receipt",
+  "Unable to generate receipt. Please try again":
+      "Unable to generate receipt. Please try again",
+  "Select Language": "Select Language",
+  "Ask AI to find your villa...": "Ask AI to find your villa...",
+  // "100% secure": "100% secure",
+  // "AI-powered valuation": "AI-powered valuation",
+  // "Real market insights": "Real market insights",
+  "Your offer will be sent directly to the property owner. You can continue the conversation through chat":
+      "Your offer will be sent directly to the property owner. You can continue the conversation through chat",
+  "Share Property": "Share Property",
+  "Share on WhatsApp": "Share on WhatsApp",
+  "Unable to share": "Unable to share",
+  "Could not open WhatsApp": "Could not open WhatsApp",
+  "Copy Link": "Copy Link",
+  "Property Description": "Property Description",
+  "Muncipality": "Muncipality",
+  "Review Listing": "Review Listing",
+  "Verify all details before submitting":
+      "Verify all details before submitting",
+  "Are you sure you want to mark this property as sold?":
+      "Are you sure you want to mark this property as sold?",
+  "This property will be updated as sold and will no longer be available as an active listing":
+      "This property will be updated as sold and will no longer be available as an active listing",
+  "No visit requests": "No visit requests",
+  "Visit requests for your properties will appear here":
+      "Visit requests for your properties will appear here",
+  "No scheduled visits": "No scheduled visits",
+  "Properties you schedule for a visit will appear here":
+      "Properties you schedule for a visit will appear here",
+  "Skip": "Skip",
+  "Premium living Prime locations\nThe lifestyle you deserve":
+      "Premium living Prime locations\nThe lifestyle you deserve",
+  "or continue with": "or continue with",
+  "By continuing, you agree to our\n": "By continuing, you agree to our\n",
+  "Terms of Use": "Terms of Use",
+  "Privacy Policy": "Privacy Policy",
+  'No Properties Listed': 'No Properties Listed',
+  'This dealer hasn\'t added any listings yet':
+      'This dealer hasn\'t added any listings yet',
+  'Seller Properties': 'Seller Properties',
+  'No more properties': 'No more properties',
+  'This seller has no more properties to show':
+      'This seller has no more properties to show',
+  'View all': 'View all',
 
   "This period": "This period",
   "Performance Trend": "Performance Trend",
@@ -1046,7 +1067,7 @@ const Map<String, String> enUS = {
   "Units Sold": "Units Sold",
   "Site Visits": "Site Visits",
   "Sold": "Sold",
- 
+
   "in this period": "in this period",
   "reach": "reach",
   "this period": "this period",
@@ -1088,9 +1109,8 @@ const Map<String, String> enUS = {
   "SOLD": "SOLD",
   "PENDING_PAYMENT": "PENDING PAYMENT",
 
-
   "Penthouse": "Penthouse",
-  
+
   "Login as ": "Login as ",
 
   "Enter your dealer account email and\npassword to continue":
@@ -1102,10 +1122,11 @@ const Map<String, String> enUS = {
   "The dealer portal is for agencies managing listings, leads and analytics for their team.":
       "The dealer portal is for agencies managing listings, leads and analytics for their team.",
 
-
   "Invoice Details": "Invoice Details",
-  "PDF is not available for this invoice": "PDF is not available for this invoice",
-  "Please login to download the invoice.": "Please login to download the invoice.",
+  "PDF is not available for this invoice":
+      "PDF is not available for this invoice",
+  "Please login to download the invoice.":
+      "Please login to download the invoice.",
   "Unable to download invoice PDF": "Unable to download invoice PDF",
 
   "Invoice Number": "Invoice Number",
@@ -1119,9 +1140,8 @@ const Map<String, String> enUS = {
 
   "Payment Method": "Payment Method",
   "Paid At": "Paid At",
-  
-  "Emailed At": "Emailed At",
 
+  "Emailed At": "Emailed At",
 
   "Line Items": "Line Items",
 
@@ -1142,18 +1162,22 @@ const Map<String, String> enUS = {
   "Paid": "Paid",
   "Unknown": "Unknown",
 
-
-
   "My Invoices": "My Invoices",
   "Search invoices": "Search invoices",
 
- 
   "No invoices found": "No invoices found",
   "Your invoices will appear here once available":
       "Your invoices will appear here once available",
 
   "Invoice": "Invoice",
-  "Invoices": "Invoices"
-
+  "Invoices": "Invoices",
+  
+  "Enter your email": "Enter your email",
+  "Select Municipality": "Select Municipality",
+  "Use GPS": "Use GPS",
+  "This image will be shown first in listings": "This image will be shown first in listings",
+  "Submit Property": "Submit Property",
+ 
+  "Download Receipt": "Download Receipt"
 
 };

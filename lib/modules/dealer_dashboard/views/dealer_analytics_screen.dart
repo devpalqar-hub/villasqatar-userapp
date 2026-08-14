@@ -5,6 +5,10 @@ import 'package:intl/intl.dart';
 import 'package:villas_qatar/Core/constants/app_colors.dart';
 import 'package:villas_qatar/Core/services/storage_service.dart';
 import 'package:villas_qatar/Core/theme/app_textstyles.dart';
+import 'package:villas_qatar/Core/widgets/motion/animated_counter.dart';
+import 'package:villas_qatar/Core/widgets/motion/app_shimmer.dart';
+import 'package:villas_qatar/Core/widgets/motion/pressable_scale.dart';
+import 'package:villas_qatar/Core/widgets/motion/staggered_entrance_column.dart';
 import 'package:villas_qatar/modules/dealer_dashboard/model/dealer_analytics_model.dart';
 import 'package:villas_qatar/modules/dealer_dashboard/service/dealer_analytics_controller.dart';
 import 'package:villas_qatar/modules/dealer_dashboard/widgets/dealer_filter_sheet.dart';
@@ -99,10 +103,35 @@ class _DealerAnalyticsScreenState extends State<DealerAnalyticsScreen> {
   }
 
   Widget _loadingState() {
-    return Padding(
-      padding: EdgeInsets.symmetric(vertical: 80.h),
-      child: const Center(
-        child: CircularProgressIndicator(color: AppColors.primary),
+    return AppShimmer(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          ShimmerBox(
+            width: double.infinity,
+            height: 130.h,
+            borderRadius: BorderRadius.circular(20.r),
+          ),
+          SizedBox(height: 18.h),
+          GridView.count(
+            crossAxisCount: 2,
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            crossAxisSpacing: 10.w,
+            mainAxisSpacing: 10.h,
+            childAspectRatio: 1.40,
+            children: List.generate(
+              4,
+              (_) => ShimmerBox(borderRadius: BorderRadius.circular(16.r)),
+            ),
+          ),
+          SizedBox(height: 18.h),
+          ShimmerBox(
+            width: double.infinity,
+            height: 170.h,
+            borderRadius: BorderRadius.circular(18.r),
+          ),
+        ],
       ),
     );
   }
@@ -120,12 +149,16 @@ class _DealerAnalyticsScreenState extends State<DealerAnalyticsScreen> {
             style: AppTextStyles.body13.copyWith(color: _inkSoft),
           ),
           SizedBox(height: 14.h),
-          ElevatedButton(
-            onPressed: controller.fetchDashboard,
-            style: ElevatedButton.styleFrom(backgroundColor: AppColors.primary),
-            child: Text(
-              "Retry".tr,
-              style: const TextStyle(color: Colors.white),
+          PressableScale(
+            child: ElevatedButton(
+              onPressed: controller.fetchDashboard,
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppColors.primary,
+              ),
+              child: Text(
+                "Retry".tr,
+                style: const TextStyle(color: Colors.white),
+              ),
             ),
           ),
         ],
@@ -134,20 +167,20 @@ class _DealerAnalyticsScreenState extends State<DealerAnalyticsScreen> {
   }
 
   Widget _content(DealerAnalyticsResponse data) {
-    return Column(
+    return StaggeredEntranceColumn(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         _subscriptionCard(),
-   
+
         Padding(
-          padding:  EdgeInsets.only(top: 10.h),
+          padding: EdgeInsets.only(top: 10.h),
           child: _sectionTitle("Overview".tr, "This period".tr),
         ),
         _statGrid(data.overview),
-   
+
         _sectionTitle("Performance Trend".tr, controller.granularity.tr),
         _chartCard(data.graph),
-          SizedBox(height:15.h),
+        SizedBox(height: 15.h),
         _sectionTitle("Top Listings".tr, ""),
         if (data.topListings.isEmpty)
           Padding(
@@ -160,7 +193,7 @@ class _DealerAnalyticsScreenState extends State<DealerAnalyticsScreen> {
             ),
           )
         else
-          ...data.topListings.map(_listingCard),
+          Column(children: data.topListings.map(_listingCard).toList()),
       ],
     );
   }
@@ -244,164 +277,159 @@ class _DealerAnalyticsScreenState extends State<DealerAnalyticsScreen> {
     );
   }
 
- void _showAccountSheet() {
-  final profile = StorageService.getProfile();
+  void _showAccountSheet() {
+    final profile = StorageService.getProfile();
 
-  final String name = profile?['name']?.toString().trim().isNotEmpty == true
-      ? profile!['name'].toString()
-      : "Dealer".tr;
+    final String name = profile?['name']?.toString().trim().isNotEmpty == true
+        ? profile!['name'].toString()
+        : "Dealer".tr;
 
-  final String? email = profile?['email']?.toString();
+    final String? email = profile?['email']?.toString();
 
-  showModalBottomSheet(
-    context: context,
-    backgroundColor: Colors.transparent,
-    isScrollControlled: true,
-    builder: (_) => SafeArea(
-      child: Container(
-        padding: EdgeInsets.fromLTRB(20.w, 12.h, 20.w, 16.h),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.vertical(
-            top: Radius.circular(24.r),
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      isScrollControlled: true,
+      builder: (_) => SafeArea(
+        child: Container(
+          padding: EdgeInsets.fromLTRB(20.w, 12.h, 20.w, 16.h),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.vertical(top: Radius.circular(24.r)),
           ),
-        ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            /// Drag handle
-            Container(
-              width: 36.w,
-              height: 4.h,
-              decoration: BoxDecoration(
-                color: const Color(0xFFD9D9D9),
-                borderRadius: BorderRadius.circular(10.r),
-              ),
-            ),
-
-            SizedBox(height: 20.h),
-
-            /// Profile header
-            Row(
-              children: [
-                Container(
-                  width: 46.w,
-                  height: 46.w,
-                  decoration: BoxDecoration(
-                    color: AppColors.primarySoft,
-                    shape: BoxShape.circle,
-                  ),
-                  alignment: Alignment.center,
-                  child: Icon(
-                    Icons.person_outline_rounded,
-                    color: AppColors.primary,
-                    size: 22.sp,
-                  ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              /// Drag handle
+              Container(
+                width: 36.w,
+                height: 4.h,
+                decoration: BoxDecoration(
+                  color: const Color(0xFFD9D9D9),
+                  borderRadius: BorderRadius.circular(10.r),
                 ),
+              ),
 
-                SizedBox(width: 12.w),
+              SizedBox(height: 20.h),
 
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        name,
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: AppTextStyles.title16.copyWith(
-                          fontWeight: FontWeight.w600,
-                          color: const Color(0xFF222222),
-                        ),
-                      ),
+              /// Profile header
+              Row(
+                children: [
+                  Container(
+                    width: 46.w,
+                    height: 46.w,
+                    decoration: BoxDecoration(
+                      color: AppColors.primarySoft,
+                      shape: BoxShape.circle,
+                    ),
+                    alignment: Alignment.center,
+                    child: Icon(
+                      Icons.person_outline_rounded,
+                      color: AppColors.primary,
+                      size: 22.sp,
+                    ),
+                  ),
 
-                      if (email != null && email.isNotEmpty) ...[
-                        SizedBox(height: 3.h),
+                  SizedBox(width: 12.w),
+
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
                         Text(
-                          email,
+                          name,
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
-                          style: AppTextStyles.body12.copyWith(
-                            color: const Color(0xFF8A8A8A),
+                          style: AppTextStyles.title16.copyWith(
+                            fontWeight: FontWeight.w600,
+                            color: const Color(0xFF222222),
                           ),
                         ),
+
+                        if (email != null && email.isNotEmpty) ...[
+                          SizedBox(height: 3.h),
+                          Text(
+                            email,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: AppTextStyles.body12.copyWith(
+                              color: const Color(0xFF8A8A8A),
+                            ),
+                          ),
+                        ],
                       ],
-                    ],
-                  ),
-                ),
-              ],
-            ),
-
-            SizedBox(height: 20.h),
-
-            /// Divider
-            Container(
-              height: 1,
-              color: const Color(0xFFEDEDED),
-            ),
-
-            SizedBox(height: 8.h),
-
-            /// Logout
-            InkWell(
-              borderRadius: BorderRadius.circular(12.r),
-              onTap: () async {
-                Navigator.pop(context);
-
-                await Get.find<AuthController>().logout();
-
-                Get.offAll(() => WelcomeScreen());
-              },
-              child: Padding(
-                padding: EdgeInsets.symmetric(
-                  vertical: 12.h,
-                  horizontal: 2.w,
-                ),
-                child: Row(
-                  children: [
-                    Container(
-                      width: 36.w,
-                      height: 36.w,
-                      decoration: BoxDecoration(
-                        color: const Color(0xFFFFF1F1),
-                        borderRadius: BorderRadius.circular(10.r),
-                      ),
-                      alignment: Alignment.center,
-                      child: Icon(
-                        Icons.logout_rounded,
-                        size: 18.sp,
-                        color: const Color(0xFFD64545),
-                      ),
                     ),
+                  ),
+                ],
+              ),
 
-                    SizedBox(width: 12.w),
+              SizedBox(height: 20.h),
 
-                    Expanded(
-                      child: Text(
-                        "Log out".tr,
-                        style: AppTextStyles.medium14.copyWith(
+              /// Divider
+              Container(height: 1, color: const Color(0xFFEDEDED)),
+
+              SizedBox(height: 8.h),
+
+              /// Logout
+              InkWell(
+                borderRadius: BorderRadius.circular(12.r),
+                onTap: () async {
+                  Navigator.pop(context);
+
+                  await Get.find<AuthController>().logout();
+
+                  Get.offAll(() => WelcomeScreen());
+                },
+                child: Padding(
+                  padding: EdgeInsets.symmetric(
+                    vertical: 12.h,
+                    horizontal: 2.w,
+                  ),
+                  child: Row(
+                    children: [
+                      Container(
+                        width: 36.w,
+                        height: 36.w,
+                        decoration: BoxDecoration(
+                          color: const Color(0xFFFFF1F1),
+                          borderRadius: BorderRadius.circular(10.r),
+                        ),
+                        alignment: Alignment.center,
+                        child: Icon(
+                          Icons.logout_rounded,
+                          size: 18.sp,
                           color: const Color(0xFFD64545),
                         ),
                       ),
-                    ),
 
-                    Icon(
-                      Icons.chevron_right_rounded,
-                      size: 20.sp,
-                      color: const Color(0xFFB0B0B0),
-                    ),
-                  ],
+                      SizedBox(width: 12.w),
+
+                      Expanded(
+                        child: Text(
+                          "Log out".tr,
+                          style: AppTextStyles.medium14.copyWith(
+                            color: const Color(0xFFD64545),
+                          ),
+                        ),
+                      ),
+
+                      Icon(
+                        Icons.chevron_right_rounded,
+                        size: 20.sp,
+                        color: const Color(0xFFB0B0B0),
+                      ),
+                    ],
+                  ),
                 ),
               ),
-            ),
 
-            SizedBox(height: 4.h),
-          ],
+              SizedBox(height: 4.h),
+            ],
+          ),
         ),
       ),
-    ),
-  );
-}
+    );
+  }
 
   Widget _titleBlock() {
     final profile = StorageService.getProfile();
@@ -478,18 +506,20 @@ class _DealerAnalyticsScreenState extends State<DealerAnalyticsScreen> {
           ),
         ),
         SizedBox(width: 8.w),
-        InkWell(
-          borderRadius: BorderRadius.circular(14.r),
-          onTap: () => showDealerFilterSheet(context, controller),
-          child: Container(
-            width: 40.w,
-            height: 40.w,
-            decoration: BoxDecoration(
-              color: AppColors.primary,
-              borderRadius: BorderRadius.circular(14.r),
+        PressableScale(
+          child: InkWell(
+            borderRadius: BorderRadius.circular(14.r),
+            onTap: () => showDealerFilterSheet(context, controller),
+            child: Container(
+              width: 40.w,
+              height: 40.w,
+              decoration: BoxDecoration(
+                color: AppColors.primary,
+                borderRadius: BorderRadius.circular(14.r),
+              ),
+              alignment: Alignment.center,
+              child: Icon(Icons.tune_rounded, color: Colors.white, size: 16.sp),
             ),
-            alignment: Alignment.center,
-            child: Icon(Icons.tune_rounded, color: Colors.white, size: 16.sp),
           ),
         ),
       ],
@@ -655,7 +685,7 @@ class _DealerAnalyticsScreenState extends State<DealerAnalyticsScreen> {
         icon: Icons.house_rounded,
         iconBg: AppColors.primaryLight,
         iconColor: AppColors.primary,
-        value: "${o.listings.total}",
+        value: o.listings.total,
         label: "Total Listings".tr,
         foot:
             "${o.listings.open} Open · ${o.listings.sold} Sold · ${o.listings.rejected} Rejected",
@@ -664,7 +694,7 @@ class _DealerAnalyticsScreenState extends State<DealerAnalyticsScreen> {
         icon: Icons.remove_red_eye_rounded,
         iconBg: _goldLight,
         iconColor: const Color(0xFF8A6A0B),
-        value: "${o.engagement.totalViews}",
+        value: o.engagement.totalViews,
         label: "Total Views".tr,
         foot: "${o.engagement.periodViews} ${"in this period".tr}",
         trend: viewsTrend,
@@ -673,7 +703,7 @@ class _DealerAnalyticsScreenState extends State<DealerAnalyticsScreen> {
         icon: Icons.bar_chart_rounded,
         iconBg: _blueSoft,
         iconColor: _blue,
-        value: "${o.engagement.totalImpressions}",
+        value: o.engagement.totalImpressions,
         label: "Impressions".tr,
         foot:
             "${o.engagement.totalReach} ${"reach".tr} · ${o.engagement.periodImpressions} ${"this period".tr}",
@@ -682,7 +712,7 @@ class _DealerAnalyticsScreenState extends State<DealerAnalyticsScreen> {
         icon: Icons.forum_outlined,
         iconBg: _greenSoft,
         iconColor: _green,
-        value: "${o.chats.totalConversations}",
+        value: o.chats.totalConversations,
         label: "Conversations".tr,
         foot: "${o.chats.totalUsersStartedChat} ${"unique users chatted".tr}",
       ),
@@ -690,7 +720,7 @@ class _DealerAnalyticsScreenState extends State<DealerAnalyticsScreen> {
         icon: Icons.sell_rounded,
         iconBg: const Color(0xFFE4F7EF),
         iconColor: const Color(0xFF25A85D),
-        value: "${o.sales.soldCount}",
+        value: o.sales.soldCount,
         label: "Units Sold".tr,
         foot: o.sales.soldCount == 0
             ? "No sales this period".tr
@@ -700,7 +730,7 @@ class _DealerAnalyticsScreenState extends State<DealerAnalyticsScreen> {
         icon: Icons.event_available_rounded,
         iconBg: AppColors.primaryLight,
         iconColor: AppColors.primary,
-        value: "${o.visits.total}",
+        value: o.visits.total,
         label: "Site Visits".tr,
         foot:
             "${o.visits.pending} ${"pending".tr} · ${o.visits.accepted} ${"accepted".tr}",
@@ -723,7 +753,7 @@ class _DealerAnalyticsScreenState extends State<DealerAnalyticsScreen> {
     Widget? iconWidget,
     required Color iconBg,
     Color? iconColor,
-    required String value,
+    required int value,
     required String label,
     required String foot,
     String? trend,
@@ -772,8 +802,8 @@ class _DealerAnalyticsScreenState extends State<DealerAnalyticsScreen> {
             ],
           ),
           SizedBox(height: 4.h),
-          Text(
-            value,
+          AnimatedCounter(
+            value: value,
             style: AppTextStyles.title18.copyWith(fontSize: 20.sp, color: _ink),
           ),
           Text(
@@ -794,7 +824,6 @@ class _DealerAnalyticsScreenState extends State<DealerAnalyticsScreen> {
       ),
     );
   }
-
 
   // ------------------------------------------------------------------ chart
 
@@ -1003,127 +1032,155 @@ class _DealerAnalyticsScreenState extends State<DealerAnalyticsScreen> {
       default:
         return Icons.home_work_rounded;
     }
-  } 
-
+  }
 
   Widget _listingCard(DealerTopListing l) {
-  final (statusColor, statusBg) = _statusColors(l.status);
-  final isSale = l.purpose.toUpperCase() == 'SALE';
+    final (statusColor, statusBg) = _statusColors(l.status);
+    final isSale = l.purpose.toUpperCase() == 'SALE';
 
-  return Container(
-    margin: EdgeInsets.only(bottom: 10.h),
-    decoration: BoxDecoration(
-      color: Colors.white,
-      borderRadius: BorderRadius.circular(14.r),
-      border: Border.all(
-        color: _line,
-        width: 0.8,
-      ),
-    ),
-    child: Material(
-      color: Colors.transparent,
-      borderRadius: BorderRadius.circular(14.r),
-      clipBehavior: Clip.antiAlias,
-      child: InkWell(
-        onTap: () => Get.to(
-          () => PropertyDetailsScreen(propertyId: l.id),
+    return PressableScale(
+      child: Container(
+        margin: EdgeInsets.only(bottom: 10.h),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(14.r),
+          border: Border.all(color: _line, width: 0.8),
         ),
-        child: Padding(
-          padding: EdgeInsets.symmetric(
-            horizontal: 11.w,
-            vertical: 10.h,
-          ),
-          child: Column(
-            children: [
-              // ================= TOP =================
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.center,
+        child: Material(
+          color: Colors.transparent,
+          borderRadius: BorderRadius.circular(14.r),
+          clipBehavior: Clip.antiAlias,
+          child: InkWell(
+            onTap: () => Get.to(() => PropertyDetailsScreen(propertyId: l.id)),
+            child: Padding(
+              padding: EdgeInsets.symmetric(horizontal: 11.w, vertical: 10.h),
+              child: Column(
                 children: [
-                  // Property icon
-                  Container(
-                    width: 42.w,
-                    height: 42.w,
-                    decoration: BoxDecoration(
-                      color: AppColors.primarySoft,
-                      borderRadius: BorderRadius.circular(11.r),
-                    ),
-                    child: Icon(
-                      _typeIcon(l.type?.title),
-                      color: AppColors.primary,
-                      size: 19.sp,
-                    ),
-                  ),
-
-                  SizedBox(width: 10.w),
-
-                  // Name + reference
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          l.propertyName,
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                          style: AppTextStyles.medium14.copyWith(
-                            fontSize: 13.sp,
-                            color: _ink,
-                          ),
+                  // ================= TOP =================
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      // Property icon
+                      Container(
+                        width: 42.w,
+                        height: 42.w,
+                        decoration: BoxDecoration(
+                          color: AppColors.primarySoft,
+                          borderRadius: BorderRadius.circular(11.r),
                         ),
+                        child: Icon(
+                          _typeIcon(l.type?.title),
+                          color: AppColors.primary,
+                          size: 19.sp,
+                        ),
+                      ),
 
-                        SizedBox(height: 2.h),
+                      SizedBox(width: 10.w),
 
-                        Row(
+                      // Name + reference
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Flexible(
-                              child: Text(
-                                l.referenceCode,
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
-                                style: TextStyle(
-                                  fontSize: 9.5.sp,
-                                  color: _inkSoft,
-                                ),
+                            Text(
+                              l.propertyName,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: AppTextStyles.medium14.copyWith(
+                                fontSize: 13.sp,
+                                color: _ink,
                               ),
                             ),
 
-                            if ((l.type?.title ?? '').isNotEmpty) ...[
-                              Padding(
-                                padding: EdgeInsets.symmetric(
-                                  horizontal: 5.w,
-                                ),
-                                child: Container(
-                                  width: 3.w,
-                                  height: 3.w,
-                                  decoration: BoxDecoration(
-                                    color: _inkSoft,
-                                    shape: BoxShape.circle,
+                            SizedBox(height: 2.h),
+
+                            Row(
+                              children: [
+                                Flexible(
+                                  child: Text(
+                                    l.referenceCode,
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                    style: TextStyle(
+                                      fontSize: 9.5.sp,
+                                      color: _inkSoft,
+                                    ),
                                   ),
                                 ),
-                              ),
-                              Flexible(
-                                child: Text(
-                                  l.type!.title,
-                                  maxLines: 1,
-                                  overflow: TextOverflow.ellipsis,
-                                  style: TextStyle(
-                                    fontSize: 9.5.sp,
-                                    color: _inkSoft,
+
+                                if ((l.type?.title ?? '').isNotEmpty) ...[
+                                  Padding(
+                                    padding: EdgeInsets.symmetric(
+                                      horizontal: 5.w,
+                                    ),
+                                    child: Container(
+                                      width: 3.w,
+                                      height: 3.w,
+                                      decoration: BoxDecoration(
+                                        color: _inkSoft,
+                                        shape: BoxShape.circle,
+                                      ),
+                                    ),
                                   ),
-                                ),
-                              ),
-                            ],
+                                  Flexible(
+                                    child: Text(
+                                      l.type!.title,
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                      style: TextStyle(
+                                        fontSize: 9.5.sp,
+                                        color: _inkSoft,
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ],
+                            ),
                           ],
                         ),
-                      ],
-                    ),
+                      ),
+
+                      SizedBox(width: 6.w),
+
+                      // Status + arrow
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.end,
+                        children: [
+                          Container(
+                            padding: EdgeInsets.symmetric(
+                              horizontal: 7.w,
+                              vertical: 3.h,
+                            ),
+                            decoration: BoxDecoration(
+                              color: statusBg,
+                              borderRadius: BorderRadius.circular(12.r),
+                            ),
+                            child: Text(
+                              l.status,
+                              style: TextStyle(
+                                fontSize: 8.sp,
+                                fontWeight: FontWeight.w700,
+                                color: statusColor,
+                              ),
+                            ),
+                          ),
+
+                          SizedBox(height: 3.h),
+
+                          Icon(
+                            Icons.chevron_right_rounded,
+                            size: 16.sp,
+                            color: _inkSoft,
+                          ),
+                        ],
+                      ),
+                    ],
                   ),
 
-                  SizedBox(width: 6.w),
+                  SizedBox(height: 8.h),
 
-                  // Status + arrow
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.end,
+                  // ================= PRICE + PURPOSE =================
+                  Row(
                     children: [
                       Container(
                         padding: EdgeInsets.symmetric(
@@ -1131,171 +1188,123 @@ class _DealerAnalyticsScreenState extends State<DealerAnalyticsScreen> {
                           vertical: 3.h,
                         ),
                         decoration: BoxDecoration(
-                          color: statusBg,
+                          color: isSale ? _goldLight : _blueSoft,
                           borderRadius: BorderRadius.circular(12.r),
                         ),
                         child: Text(
-                          l.status,
+                          l.purpose,
                           style: TextStyle(
-                            fontSize: 8.sp,
+                            fontSize: 8.5.sp,
                             fontWeight: FontWeight.w700,
-                            color: statusColor,
+                            color: isSale ? const Color(0xFF8A6A0B) : _blue,
                           ),
                         ),
                       ),
 
-                      SizedBox(height: 3.h),
+                      const Spacer(),
 
-                      Icon(
-                        Icons.chevron_right_rounded,
-                        size: 16.sp,
-                        color: _inkSoft,
+                      Text(
+                        "QAR ${_currency.format(l.price)}",
+                        style: AppTextStyles.title16.copyWith(
+                          fontSize: 13.sp,
+                          color: AppColors.primary,
+                          fontWeight: FontWeight.w700,
+                        ),
                       ),
                     ],
                   ),
-                ],
-              ),
 
-              SizedBox(height: 8.h),
+                  SizedBox(height: 8.h),
 
-              // ================= PRICE + PURPOSE =================
-              Row(
-                children: [
+                  // ================= STATS =================
                   Container(
-                    padding: EdgeInsets.symmetric(
-                      horizontal: 7.w,
-                      vertical: 3.h,
-                    ),
+                    padding: EdgeInsets.only(top: 7.h),
                     decoration: BoxDecoration(
-                      color: isSale ? _goldLight : _blueSoft,
-                      borderRadius: BorderRadius.circular(12.r),
+                      border: Border(top: BorderSide(color: _line, width: 0.7)),
                     ),
-                    child: Text(
-                      l.purpose,
-                      style: TextStyle(
-                        fontSize: 8.5.sp,
-                        fontWeight: FontWeight.w700,
-                        color: isSale
-                            ? const Color(0xFF8A6A0B)
-                            : _blue,
-                      ),
-                    ),
-                  ),
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: _compactStat(
+                            Icons.remove_red_eye_outlined,
+                            l.viewsCount,
+                            "Views".tr,
+                          ),
+                        ),
 
-                  const Spacer(),
+                        _statDivider(),
 
-                  Text(
-                    "QAR ${_currency.format(l.price)}",
-                    style: AppTextStyles.title16.copyWith(
-                      fontSize: 13.sp,
-                      color: AppColors.primary,
-                      fontWeight: FontWeight.w700,
+                        Expanded(
+                          child: _compactStat(
+                            Icons.group_outlined,
+                            l.reachCount,
+                            "Reach".tr,
+                          ),
+                        ),
+
+                        _statDivider(),
+
+                        Expanded(
+                          child: _compactStat(
+                            Icons.chat_bubble_outline_rounded,
+                            l.conversationsCount,
+                            "Chats".tr,
+                          ),
+                        ),
+
+                        _statDivider(),
+
+                        Expanded(
+                          child: _compactStat(
+                            Icons.event_outlined,
+                            l.visitsCount,
+                            "Visits".tr,
+                          ),
+                        ),
+                      ],
                     ),
                   ),
                 ],
               ),
-
-              SizedBox(height: 8.h),
-
-              // ================= STATS =================
-              Container(
-                padding: EdgeInsets.only(top: 7.h),
-                decoration: BoxDecoration(
-                  border: Border(
-                    top: BorderSide(
-                      color: _line,
-                      width: 0.7,
-                    ),
-                  ),
-                ),
-                child: Row(
-                  children: [
-                    Expanded(
-                      child: _compactStat(
-                        Icons.remove_red_eye_outlined,
-                        l.viewsCount,
-                        "Views".tr,
-                      ),
-                    ),
-
-                    _statDivider(),
-
-                    Expanded(
-                      child: _compactStat(
-                        Icons.group_outlined,
-                        l.reachCount,
-                        "Reach".tr,
-                      ),
-                    ),
-
-                    _statDivider(),
-
-                    Expanded(
-                      child: _compactStat(
-                        Icons.chat_bubble_outline_rounded,
-                        l.conversationsCount,
-                        "Chats".tr,
-                      ),
-                    ),
-
-                    _statDivider(),
-
-                    Expanded(
-                      child: _compactStat(
-                        Icons.event_outlined,
-                        l.visitsCount,
-                        "Visits".tr,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
+            ),
           ),
         ),
       ),
-    ),
-  );
-}
-Widget _compactStat(
-  IconData icon,
-  int value,
-  String label,
-) {
-  return Row(
-    mainAxisAlignment: MainAxisAlignment.center,
-    children: [
-      Icon(
-        icon,
-        size: 13.sp,
-        color: _inkSoft,
-      ),
-      SizedBox(width: 4.w),
-      Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            value.toString(),
-            style: TextStyle(
-              fontSize: 10.5.sp,
-              fontWeight: FontWeight.w700,
-              color: _ink,
-            ),
-          ),
-          Text(
-            label.tr,
-            style: TextStyle(
-              fontSize: 8.sp,
-              color: _inkSoft,
-            ),
-          ),
-        ],
-      ),
-    ],
-  );
-}
+    );
+  }
 
-  Widget _statChip({required IconData icon, required int value, required String label}) {
+  Widget _compactStat(IconData icon, int value, String label) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Icon(icon, size: 13.sp, color: _inkSoft),
+        SizedBox(width: 4.w),
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              value.toString(),
+              style: TextStyle(
+                fontSize: 10.5.sp,
+                fontWeight: FontWeight.w700,
+                color: _ink,
+              ),
+            ),
+            Text(
+              label.tr,
+              style: TextStyle(fontSize: 8.sp, color: _inkSoft),
+            ),
+          ],
+        ),
+      ],
+    );
+  }
+
+  Widget _statChip({
+    required IconData icon,
+    required int value,
+    required String label,
+  }) {
     return Column(
       children: [
         Icon(icon, size: 14.sp, color: AppColors.primary),
