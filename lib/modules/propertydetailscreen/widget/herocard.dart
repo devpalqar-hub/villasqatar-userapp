@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:villas_qatar/Core/utils/auth_guard.dart';
@@ -399,7 +400,7 @@ class _HeroImageCardState extends State<HeroImageCard> {
     final String? slug = widget.property.slug;
 
     if (slug == null || slug.trim().isEmpty) {
-      Get.snackbar("Unable to share".tr, "Property link is not available".tr);
+      Fluttertoast.showToast(msg: "Property link is not available".tr);
       return;
     }
 
@@ -469,10 +470,7 @@ class _HeroImageCardState extends State<HeroImageCard> {
                       mode: LaunchMode.externalApplication,
                     );
                   } catch (e) {
-                    Get.snackbar(
-                      "Unable to share".tr,
-                      "Could not open WhatsApp".tr,
-                    );
+                    Fluttertoast.showToast(msg: "Could not open WhatsApp".tr);
                   }
                 },
               ),
@@ -502,10 +500,8 @@ class _HeroImageCardState extends State<HeroImageCard> {
 
                   Get.back();
 
-                  Get.snackbar(
-                    "Link copied".tr,
-                    "Property link copied to clipboard".tr,
-                    snackPosition: SnackPosition.BOTTOM,
+                  Fluttertoast.showToast(
+                    msg: "Property link copied to clipboard".tr,
                   );
                 },
               ),

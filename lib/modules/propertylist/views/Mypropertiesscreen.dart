@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
 import 'package:get/get_core/src/get_main.dart';
 import 'package:get/get_instance/src/extension_instance.dart';
@@ -298,10 +299,8 @@ class _MyPropertiesScreenState extends State<MyPropertiesScreen> {
       );
 
       if (result.activated) {
-        Get.snackbar(
-          "Listing Activated".tr,
-          "${listing.propertyName} is now live.".tr,
-          snackPosition: SnackPosition.BOTTOM,
+        Fluttertoast.showToast(
+          msg: "${listing.propertyName} is now live.".tr,
         );
         return;
       }
@@ -312,27 +311,21 @@ class _MyPropertiesScreenState extends State<MyPropertiesScreen> {
 
       switch (outcome) {
         case StripePaymentOutcome.success:
-          Get.snackbar(
-            "Payment Successful".tr,
-            "${listing.propertyName} has been activated.".tr,
-            snackPosition: SnackPosition.BOTTOM,
+          Fluttertoast.showToast(
+            msg: "${listing.propertyName} has been activated.".tr,
           );
           await controller.fetchProperties(showLoader: false);
           break;
 
         case StripePaymentOutcome.cancelled:
-          Get.snackbar(
-            "Payment Cancelled".tr,
-            "You can try again anytime.".tr,
-            snackPosition: SnackPosition.BOTTOM,
+          Fluttertoast.showToast(
+            msg: "You can try again anytime.".tr,
           );
           break;
       }
     } catch (e) {
-      Get.snackbar(
-        "Payment Failed".tr,
-        e.toString().replaceFirst("Exception: ", ""),
-        snackPosition: SnackPosition.BOTTOM,
+      Fluttertoast.showToast(
+        msg: e.toString().replaceFirst("Exception: ", ""),
       );
     }
   }

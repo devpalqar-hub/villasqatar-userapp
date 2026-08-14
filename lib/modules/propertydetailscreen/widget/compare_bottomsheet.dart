@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
 
 import 'package:villas_qatar/Core/constants/app_colors.dart';
@@ -50,10 +51,8 @@ class _CompareBottomSheetState extends State<CompareBottomSheet> {
     }
 
     if (selectedProperties.length >= 2) {
-      Get.snackbar(
-        "Maximum Selection".tr,
-        "You can compare only two properties.".tr,
-        snackPosition: SnackPosition.BOTTOM,
+      Fluttertoast.showToast(
+        msg: "You can compare only two properties.".tr,
       );
       return;
     }

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
 
 import '../../../Core/constants/app_colors.dart';
@@ -564,10 +565,8 @@ class _MakeOfferBottomSheetState extends State<MakeOfferBottomSheet> {
     final String offer = offerController.text.trim();
 
     if (offer.isEmpty) {
-      Get.snackbar(
-        "Offer Required".tr,
-        "Please enter your offer amount.".tr,
-        snackPosition: SnackPosition.BOTTOM,
+      Fluttertoast.showToast(
+        msg: "Please enter your offer amount.".tr,
       );
 
       return;
@@ -576,10 +575,8 @@ class _MakeOfferBottomSheetState extends State<MakeOfferBottomSheet> {
     final double? amount = double.tryParse(offer);
 
     if (amount == null || amount <= 0) {
-      Get.snackbar(
-        "Invalid Offer".tr,
-        "Please enter a valid offer amount.".tr,
-        snackPosition: SnackPosition.BOTTOM,
+      Fluttertoast.showToast(
+        msg: "Please enter a valid offer amount.".tr,
       );
 
       return;

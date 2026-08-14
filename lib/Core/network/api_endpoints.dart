@@ -10,8 +10,13 @@ class ApiEndpoints {
   static const String googleAuth = "/api/auth/google";
   static const String appleAuth = "/api/auth/apple";
 
+  // Email/password login (dealer portal)
+  static const String login = "/api/auth/login";
+
   // Profile
   static const String completeProfile = "/api/auth/complete-profile";
+
+  static const String authMe = "/api/auth/me";
 
   static const String mypropertyList = "/api/listings/my";
 
@@ -87,5 +92,20 @@ class ApiEndpoints {
   static const String verifyPhoneSendOtp = "/api/listings/verify-phone/send-otp";
   static const String verifyPhoneVerifyOtp =  "/api/listings/verify-phone/verify-otp";
   static const String fcmToken = "/api/users/fcm-token";
+
+  static const String invoices = "/api/invoices";
+
+  static String invoiceDetail(String id) {
+    return "/api/invoices/$id";
+  }
+
+  static String listingWhatsappClick(String listingId) {
+    return "/api/listings/$listingId/track/whatsapp-click";
+  }
+
+  // Dealer portal
+  static const String dealerAnalyticsDashboard =
+      "/api/dealers/analytics/dashboard";
+  static const String dealerSubscriptionsMy = "/api/dealer-subscriptions/my";
 
 }

@@ -6,6 +6,8 @@ import 'package:get/get_utils/src/extensions/internacionalization.dart';
 import 'package:get/utils.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:villas_qatar/Core/constants/app_colors.dart';
+import 'package:villas_qatar/Core/network/api_endpoints.dart';
+import 'package:villas_qatar/Core/network/api_handler.dart';
 import 'package:villas_qatar/modules/dealers/view/dealer_detail_screen.dart';
 import 'package:villas_qatar/modules/propertylist/model/myproperty_model.dart';
 import 'package:villas_qatar/modules/sellerpropertyscreen/views/seller_property_screen.dart';
@@ -204,7 +206,10 @@ class AgentContactCard extends StatelessWidget {
           ),
           SizedBox(width: 10.w),
           GestureDetector(
-            onTap: () => _openWhatsApp(property.contactWhatsapp),
+            onTap: () {
+              _trackWhatsappClick(property.id);
+              _openWhatsApp(property.contactWhatsapp);
+            },
             child: _actionButton(
               color: const Color(0xff25D366),
               icon: const FaIcon(
@@ -271,4 +276,22 @@ class AgentContactCard extends StatelessWidget {
       await launchUrl(uri, mode: LaunchMode.externalApplication);
     }
   }
+
+  // ============================================================
+  // TRACK WHATSAPP CLICK
+  //
+  // FIRE-AND-FORGET ANALYTICS PING — MUST NEVER BLOCK OR BREAK
+  // THE WHATSAPP LAUNCH FLOW IF IT FAILS.
+  //
+  // POST /api/listings/:listingId/track/whatsapp-click
+  // ============================================================
+ Future<void> _trackWhatsappClick(String listingId) async {
+  final endpoint = ApiEndpoints.listingWhatsappClick(listingId);
+  try {
+    final response = await ApiHandler.post(endpoint);
+    if (response is Map<String, dynamic>) {
+    }
+  } catch (e, stackTrace) {
+  }
+}
 }

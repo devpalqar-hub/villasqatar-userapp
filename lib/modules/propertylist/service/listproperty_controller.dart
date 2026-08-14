@@ -331,10 +331,8 @@ class ListPropertyController extends GetxController {
   //--------------------------------------------------
 
   void saveDraft() {
-    Get.snackbar(
-      "Saved".tr,
-      "Draft saved successfully".tr,
-      snackPosition: SnackPosition.BOTTOM,
+    Fluttertoast.showToast(
+      msg: "Draft saved successfully".tr,
     );
   }
 

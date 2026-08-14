@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:get/get_core/src/get_main.dart';
+import 'package:villas_qatar/Core/constants/app_colors.dart';
+import 'package:villas_qatar/Core/theme/app_textstyles.dart';
 import 'package:villas_qatar/modules/settings/service/profile_controller.dart';
 
 class EditProfileBottomSheet extends StatelessWidget {
@@ -22,15 +24,12 @@ class EditProfileBottomSheet extends StatelessWidget {
           ),
           decoration: BoxDecoration(
             color: Colors.white,
-            borderRadius: BorderRadius.vertical(
-              top: Radius.circular(28.r),
-            ),
+            borderRadius: BorderRadius.vertical(top: Radius.circular(28.r)),
           ),
           child: SingleChildScrollView(
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-
                 Container(
                   width: 45.w,
                   height: 5.h,
@@ -46,7 +45,7 @@ class EditProfileBottomSheet extends StatelessWidget {
                   "Edit Profile".tr,
                   style: TextStyle(
                     fontSize: 18.sp,
-                    fontWeight: FontWeight.w700,
+                    fontWeight: FontWeight.w500,
                   ),
                 ),
 
@@ -54,10 +53,7 @@ class EditProfileBottomSheet extends StatelessWidget {
 
                 Text(
                   "Update your account information".tr,
-                  style: TextStyle(
-                    fontSize: 12.sp,
-                    color: Colors.grey,
-                  ),
+                  style: TextStyle(fontSize: 12.sp, color: Colors.grey),
                 ),
 
                 SizedBox(height: 24.h),
@@ -99,35 +95,74 @@ class EditProfileBottomSheet extends StatelessWidget {
 
                 Row(
                   children: [
-
                     Expanded(
-                      child: OutlinedButton(
-                        onPressed: Get.back,
-                        child: Text("Cancel".tr),
+                      child: SizedBox(
+                        height: 46.h,
+                        child: OutlinedButton(
+                          onPressed: Get.back,
+                          style: OutlinedButton.styleFrom(
+                            foregroundColor: const Color(0xFF444444),
+                            side: const BorderSide(color: Color(0xFFE2E2E2)),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(10.r),
+                            ),
+                            elevation: 0,
+                          ),
+                          child: Text(
+                            "Cancel".tr,
+                            style: AppTextStyles.body14.copyWith(
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ),
                       ),
                     ),
 
                     SizedBox(width: 14.w),
 
                     Expanded(
-                      child: ElevatedButton(
-                        onPressed: controller.isSaving
-                            ? null
-                            : () async {
-                                await controller.updateProfile();
-                                Get.back();
-                                controller.fetchProfile();
-                              },
-                        child: controller.isSaving
-                            ? SizedBox(
-                                height: 18,
-                                width: 18,
-                                child: CircularProgressIndicator(
-                                  strokeWidth: 2,
-                                  color: Colors.white,
+                      child: SizedBox(
+                        height: 46.h,
+                        child: ElevatedButton(
+                          onPressed: controller.isSaving
+                              ? null
+                              : () async {
+                                  final success = await controller
+                                      .updateProfile();
+
+                                  if (success) {
+                                    Get.back();
+                                    await controller.fetchProfile();
+                                  }
+                                },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: AppColors.primary,
+                            foregroundColor: Colors.white,
+                            disabledBackgroundColor: AppColors.primary
+                                .withOpacity(.6),
+                            disabledForegroundColor: Colors.white,
+                            elevation: 0,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(10.r),
+                            ),
+                          ),
+                          child: controller.isSaving
+                              ? SizedBox(
+                                  height: 18.w,
+                                  width: 18.w,
+                                  child: const CircularProgressIndicator(
+                                    strokeWidth: 2,
+                                    color: Colors.white,
+                                  ),
+                                )
+                              : Text(
+                                  "Save".tr,
+                                  style: AppTextStyles.body14.copyWith(
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.w600,
+                                  ),
                                 ),
-                              )
-                            : Text("Save".tr),
+                        ),
                       ),
                     ),
                   ],

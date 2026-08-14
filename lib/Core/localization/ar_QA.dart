@@ -916,70 +916,237 @@ const Map<String, String> arQA = {
   "All Locations": "جميع المواقع",
   "Area (SQM)": "المساحة (م²)",
   "Read less": "قراءة أقل",
-"Read more": "قراءة المزيد",
-"Property Insights": "إحصاءات العقار",
-"Track how people are discovering and engaging with your property.": "تتبع كيفية اكتشاف الأشخاص لعقارك وتفاعلهم معه.",
-"Last": "آخر",
-"days": "أيام",
-"Totals": "الإجمالي",
-"All Time": "كل الوقت",
-"This Period Summary": "ملخص هذه الفترة",
-"Views": "المشاهدات",
-"Reach": "الوصول",
-"Impressions": "مرات الظهور",
-"WhatsApp Clicks": "نقرات واتساب",
-"Messages Started": "الرسائل التي بدأت",
-"Users Engaged": "المستخدمون المتفاعلون",
-"You received ": "لقد تلقيت ",
-"more": "أكثر",
-"fewer": "أقل",
-"views": "مشاهدة",
-"than the previous period.": "مقارنة بالفترة السابقة.",
-"Views Over Time": "المشاهدات بمرور الوقت",
-"Data is updated daily. All times are in your local timezone.": "يتم تحديث البيانات يوميًا. جميع الأوقات حسب منطقتك الزمنية المحلية.",
-"Insights will start appearing here once your property gets activity.": "ستبدأ الإحصاءات بالظهور هنا بمجرد أن يبدأ عقارك في تلقي نشاط.",
-"My Featured": "مميزاتي",
-"Password": "كلمة المرور",
-// "Account": "الحساب",
-"Update your account information": "تحديث معلومات حسابك",
-"Featured Plans": "خطط التمييز",
-"Manage your active and past featured property plans": "إدارة خطط العقارات المميزة الحالية والسابقة",
-// "Unable to load featured properties": "تعذر تحميل العقارات المميزة",
-// "Try Again": "حاول مرة أخرى",
-"No matching properties found": "لم يتم العثور على عقارات مطابقة",
-"No featured properties available": "لا توجد عقارات مميزة متاحة",
-"Try searching with another property name": "حاول البحث باستخدام اسم عقار آخر",
-"Your featured properties will appear here": "ستظهر عقاراتك المميزة هنا",
-"Clear Search": "مسح البحث",
-"Villas Qatar Payment Receipt": "إيصال دفع Villas Qatar",
-"Unable to generate receipt. Please try again": "تعذر إنشاء الإيصال. يرجى المحاولة مرة أخرى",
-"Select Language": "اختر اللغة",
-"Ask AI to find your villa...": "اطلب من الذكاء الاصطناعي العثور على فيلتك...",
-// "100% secure": "آمن بنسبة 100%",
-// "AI-powered valuation": "تقييم مدعوم بالذكاء الاصطناعي",
-// "Real market insights": "رؤى حقيقية عن السوق",
-"Your offer will be sent directly to the property owner. You can continue the conversation through chat": "سيتم إرسال عرضك مباشرة إلى مالك العقار. يمكنك متابعة المحادثة عبر الدردشة",
-"Share Property": "مشاركة العقار",
-"Share on WhatsApp": "المشاركة عبر واتساب",
-"Unable to share": "تعذرت المشاركة",
-"Could not open WhatsApp": "تعذر فتح واتساب",
-"Copy Link": "نسخ الرابط",
-"Property Description": "وصف العقار",
-"Muncipality": "البلدية",
-"Review Listing": "مراجعة الإعلان",
-"Verify all details before submitting": "تحقق من جميع التفاصيل قبل الإرسال",
-"Are you sure you want to mark this property as sold?": "هل أنت متأكد من رغبتك في وضع علامة تم البيع على هذا العقار؟",
-"This property will be updated as sold and will no longer be available as an active listing": "سيتم تحديث حالة هذا العقار إلى تم البيع ولن يكون متاحًا بعد الآن كإعلان نشط",
-"No visit requests": "لا توجد طلبات زيارة",
-"Visit requests for your properties will appear here": "ستظهر طلبات زيارة عقاراتك هنا",
-"No scheduled visits": "لا توجد زيارات مجدولة",
-"Properties you schedule for a visit will appear here": "ستظهر هنا العقارات التي تقوم بجدولة زيارتها",
-"Skip": "تخطي",
-"Premium living Prime locations\nThe lifestyle you deserve":
-    "معيشة فاخرة، مواقع مميزة\nالحياة التي تستحقها",
-"or continue with": "أو تابع باستخدام",
-"By continuing, you agree to our\n":
-    "بمتابعة الاستخدام، فإنك توافق على\n",
-"Terms of Use": "شروط الاستخدام",
-"Privacy Policy": "سياسة الخصوصية",
+  "Read more": "قراءة المزيد",
+  "Property Insights": "إحصاءات العقار",
+  "Track how people are discovering and engaging with your property.":
+      "تتبع كيفية اكتشاف الأشخاص لعقارك وتفاعلهم معه.",
+  "Last": "آخر",
+  "days": "أيام",
+  "Totals": "الإجمالي",
+  "All Time": "كل الوقت",
+  "This Period Summary": "ملخص هذه الفترة",
+  "Views": "المشاهدات",
+  "Reach": "الوصول",
+  "Impressions": "مرات الظهور",
+  "WhatsApp Clicks": "نقرات واتساب",
+  "Messages Started": "الرسائل التي بدأت",
+  "Users Engaged": "المستخدمون المتفاعلون",
+  "You received ": "لقد تلقيت ",
+  "more": "أكثر",
+  "fewer": "أقل",
+  "views": "مشاهدة",
+  "than the previous period.": "مقارنة بالفترة السابقة.",
+  "Views Over Time": "المشاهدات بمرور الوقت",
+  "Data is updated daily. All times are in your local timezone.":
+      "يتم تحديث البيانات يوميًا. جميع الأوقات حسب منطقتك الزمنية المحلية.",
+  "Insights will start appearing here once your property gets activity.":
+      "ستبدأ الإحصاءات بالظهور هنا بمجرد أن يبدأ عقارك في تلقي نشاط.",
+  "My Featured": "مميزاتي",
+  "Password": "كلمة المرور",
+  // "Account": "الحساب",
+  "Update your account information": "تحديث معلومات حسابك",
+  "Featured Plans": "خطط التمييز",
+  "Manage your active and past featured property plans":
+      "إدارة خطط العقارات المميزة الحالية والسابقة",
+  // "Unable to load featured properties": "تعذر تحميل العقارات المميزة",
+  // "Try Again": "حاول مرة أخرى",
+  "No matching properties found": "لم يتم العثور على عقارات مطابقة",
+  "No featured properties available": "لا توجد عقارات مميزة متاحة",
+  "Try searching with another property name":
+      "حاول البحث باستخدام اسم عقار آخر",
+  "Your featured properties will appear here": "ستظهر عقاراتك المميزة هنا",
+  "Clear Search": "مسح البحث",
+  "Villas Qatar Payment Receipt": "إيصال دفع Villas Qatar",
+  "Unable to generate receipt. Please try again":
+      "تعذر إنشاء الإيصال. يرجى المحاولة مرة أخرى",
+  "Select Language": "اختر اللغة",
+  "Ask AI to find your villa...":
+      "اطلب من الذكاء الاصطناعي العثور على فيلتك...",
+  // "100% secure": "آمن بنسبة 100%",
+  // "AI-powered valuation": "تقييم مدعوم بالذكاء الاصطناعي",
+  // "Real market insights": "رؤى حقيقية عن السوق",
+  "Your offer will be sent directly to the property owner. You can continue the conversation through chat":
+      "سيتم إرسال عرضك مباشرة إلى مالك العقار. يمكنك متابعة المحادثة عبر الدردشة",
+  "Share Property": "مشاركة العقار",
+  "Share on WhatsApp": "المشاركة عبر واتساب",
+  "Unable to share": "تعذرت المشاركة",
+  "Could not open WhatsApp": "تعذر فتح واتساب",
+  "Copy Link": "نسخ الرابط",
+  "Property Description": "وصف العقار",
+  "Muncipality": "البلدية",
+  "Review Listing": "مراجعة الإعلان",
+  "Verify all details before submitting": "تحقق من جميع التفاصيل قبل الإرسال",
+  "Are you sure you want to mark this property as sold?":
+      "هل أنت متأكد من رغبتك في وضع علامة تم البيع على هذا العقار؟",
+  "This property will be updated as sold and will no longer be available as an active listing":
+      "سيتم تحديث حالة هذا العقار إلى تم البيع ولن يكون متاحًا بعد الآن كإعلان نشط",
+  "No visit requests": "لا توجد طلبات زيارة",
+  "Visit requests for your properties will appear here":
+      "ستظهر طلبات زيارة عقاراتك هنا",
+  "No scheduled visits": "لا توجد زيارات مجدولة",
+  "Properties you schedule for a visit will appear here":
+      "ستظهر هنا العقارات التي تقوم بجدولة زيارتها",
+  "Skip": "تخطي",
+  "Premium living Prime locations\nThe lifestyle you deserve":
+      "معيشة فاخرة، مواقع مميزة\nالحياة التي تستحقها",
+  "or continue with": "أو تابع باستخدام",
+  "By continuing, you agree to our\n": "بمتابعة الاستخدام، فإنك توافق على\n",
+  "Terms of Use": "شروط الاستخدام",
+  "Privacy Policy": "سياسة الخصوصية",
+  'No Properties Listed': 'No Properties Listed',
+  'This dealer hasn\'t added any listings yet':
+      'This dealer hasn\'t added any listings yet',
+  'Seller Properties': 'Seller Properties',
+  'No more properties': 'No more properties',
+  'This seller has no more properties to show':
+      'This seller has no more properties to show',
+  'View all': 'View all',
+  "This period": "هذه الفترة",
+  "Performance Trend": "اتجاه الأداء",
+  "Top Listings": "أفضل العقارات",
+  "No listings in this period": "لا توجد عقارات في هذه الفترة",
+
+  "Villas Qatar": "فلل قطر",
+  "DEALER PORTAL": "بوابة الوسيط العقاري",
+  "Dealer": "الوسيط العقاري",
+  "Log out": "تسجيل الخروج",
+
+  "Analytics": "التحليلات",
+  "Performance overview for": "نظرة عامة على أداء",
+  "your agency": "وكالتك العقارية",
+
+  // Subscription
+  "No active plan": "لا توجد خطة نشطة",
+  "Active subscription": "الاشتراك نشط",
+
+  "DAYS LEFT": "يوم متبقي",
+  "Max listings": "الحد الأقصى للعقارات",
+  "Featured left": "العقارات المميزة المتبقية",
+  "Ends": "ينتهي",
+
+  // Statistics
+  "Total Listings": "إجمالي العقارات",
+  "Total Views": "إجمالي المشاهدات",
+
+  "Conversations": "المحادثات",
+  "Units Sold": "الوحدات المباعة",
+  "Site Visits": "الزيارات للموقع",
+
+  "Sold": "مباع",
+
+  "in this period": "في هذه الفترة",
+  "reach": "الوصول",
+  "this period": "هذه الفترة",
+  "unique users chatted": "مستخدمون فريدون بدأوا محادثات",
+  "No sales this period": "لا توجد مبيعات في هذه الفترة",
+  "pending": "قيد الانتظار",
+  "accepted": "مقبول",
+
+  // Chart
+  "No trend data for this period": "لا توجد بيانات للاتجاه في هذه الفترة",
+
+  "Visits": "الزيارات",
+
+  // Listing card
+  "QAR": "ر.ق",
+
+  // Filters
+  "Filter Analytics": "تصفية التحليلات",
+  "Date range": "نطاق التاريخ",
+  "Granularity": "الفترة الزمنية",
+
+  "Listing": "العقار",
+  "Staff member": "عضو فريق العمل",
+  "Property type": "نوع العقار",
+  "Area name": "اسم المنطقة",
+  "e.g. Pearl": "مثال: اللؤلؤة",
+
+  "All listings": "جميع العقارات",
+  "All staff": "جميع الموظفين",
+  "All types": "جميع الأنواع",
+
+  // Granularity
+  "Daily": "يومي",
+  "Weekly": "أسبوعي",
+  "Monthly": "شهري",
+  "Yearly": "سنوي",
+
+  // Purpose
+  "SALE": "بيع",
+  "RENT": "إيجار",
+
+  "REJECTED": "مرفوض",
+  "RESUBMITTED": "تمت إعادة التقديم",
+  "SOLD": "مباع",
+  "PENDING_PAYMENT": "بانتظار الدفع",
+
+  "Penthouse": "بنتهاوس",
+
+  "Login as ": "تسجيل الدخول كـ ",
+
+  "Enter your dealer account email and\npassword to continue":
+      "أدخل البريد الإلكتروني لحساب الوسيط وكلمة المرور للمتابعة",
+  "Email or phone": "البريد الإلكتروني أو رقم الهاتف",
+
+  "Logging in...": "جارٍ تسجيل الدخول...",
+
+  "The dealer portal is for agencies managing listings, leads and analytics for their team.":
+      "بوابة الوسطاء مخصصة للوكالات لإدارة العقارات والعملاء المحتملين والتحليلات الخاصة بفريقهم.",
+
+  "Invoice Details": "تفاصيل الفاتورة",
+  "PDF is not available for this invoice":
+      "ملف PDF غير متوفر لهذه الفاتورة",
+  "Please login to download the invoice.":
+      "يرجى تسجيل الدخول لتنزيل الفاتورة.",
+  "Unable to download invoice PDF":
+      "تعذر تنزيل ملف PDF الخاص بالفاتورة",
+
+  "Invoice Number": "رقم الفاتورة",
+  "Total Amount": "المبلغ الإجمالي",
+  "Billed To": "فاتورة إلى",
+  "Payment Information": "معلومات الدفع",
+
+  "Company": "الشركة",
+  "Trade Number": "الرقم التجاري",
+  "Address": "العنوان",
+
+  "Payment Method": "طريقة الدفع",
+  "Paid At": "تاريخ الدفع",
+
+  "Emailed At": "تاريخ إرسال البريد الإلكتروني",
+
+
+  "Line Items": "بنود الفاتورة",
+
+  "Item": "البند",
+  "Unit Price": "سعر الوحدة",
+  "Qty": "الكمية",
+  "Amount": "المبلغ",
+
+  "Subtotal": "المجموع الفرعي",
+  "VAT (@rate%)": "ضريبة القيمة المضافة (@rate%)",
+
+  
+  "PDF": "ملف PDF",
+  "Created At": "تاريخ الإنشاء",
+  "Updated At": "تاريخ التحديث",
+
+  "Copied to clipboard": "تم النسخ إلى الحافظة",
+
+  "Paid": "مدفوعة",
+  "Unknown": "غير معروف",
+
+  
+
+  "My Invoices": "فواتيري",
+  "Search invoices": "البحث في الفواتير",
+
+
+  "No invoices found": "لم يتم العثور على فواتير",
+  "Your invoices will appear here once available":
+      "ستظهر فواتيرك هنا عند توفرها",
+
+  "Invoice": "فاتورة",
+  "Invoices": "فواتير"
+
 };

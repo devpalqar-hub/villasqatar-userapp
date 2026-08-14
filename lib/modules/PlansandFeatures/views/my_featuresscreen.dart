@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:share_plus/share_plus.dart';
@@ -627,12 +628,8 @@ class _FeaturedEntryCardState extends State<_FeaturedEntryCard> {
       );
     } catch (_) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(
-              'Unable to generate receipt. Please try again'.tr,
-            ),
-          ),
+        Fluttertoast.showToast(
+          msg: 'Unable to generate receipt. Please try again'.tr,
         );
       }
     } finally {

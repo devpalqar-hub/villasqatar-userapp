@@ -16,6 +16,7 @@ import 'package:villas_qatar/Core/network/api_handler.dart';
 import 'package:villas_qatar/Core/network/api_endpoints.dart';
 import 'package:villas_qatar/Core/services/push_notification_service.dart';
 import 'package:villas_qatar/Core/services/storage_service.dart';
+import 'package:villas_qatar/modules/dealer_dashboard/views/dealer_analytics_screen.dart';
 import 'package:villas_qatar/modules/mainscreen/mainscreen.dart';
 import 'package:villas_qatar/modules/onboard/views/login_screen.dart';
 import 'package:villas_qatar/modules/onboard/views/welcome_screen.dart';
@@ -25,6 +26,12 @@ class AuthController extends GetxController {
   final otpController = TextEditingController();
   final nameController = TextEditingController();
   final emailController = TextEditingController();
+
+  // Dealer portal login (email/username + password) — separate
+  // controllers from the buyer/renter [emailController] above since
+  // that one belongs to Complete Profile, not sign-in.
+  final dealerIdentifierController = TextEditingController();
+  final dealerPasswordController = TextEditingController();
 
   bool isLoading = false;
   bool isNewUser = false;
@@ -41,6 +48,8 @@ class AuthController extends GetxController {
   String? otpError;
   String? nameError;
   String? emailError;
+  String? dealerIdentifierError;
+  String? dealerPasswordError;
 
   @override
   void onInit() {
@@ -66,6 +75,8 @@ selectedCountryCode = "+974";
     otpController.clear();
     nameController.clear();
     emailController.clear();
+    dealerIdentifierController.clear();
+    dealerPasswordController.clear();
 
     isLoading = false;
     isNewUser = false;
@@ -78,18 +89,29 @@ selectedCountryCode = "+974";
     otpError = null;
     nameError = null;
     emailError = null;
+    dealerIdentifierError = null;
+    dealerPasswordError = null;
 
     update();
   }
 
   /// Splash Navigation
+  /// (Kept in sync with [SplashScreen]'s own navigation logic, which is
+  /// what actually runs on launch - this is unused internally but left
+  /// correct in case anything starts calling it.)
   Future<void> _navigateNext() async {
     await Future.delayed(const Duration(seconds: 3));
 
     final token = StorageService.getToken();
 
     if (token != null && token.isNotEmpty) {
-      Get.to(MainScreen());
+      final role = profile?['role']?.toString().toUpperCase();
+
+      if (role == "DEALER") {
+        Get.to(() => const DealerAnalyticsScreen());
+      } else {
+        Get.to(MainScreen());
+      }
     } else {
       Get.to(WelcomeScreen());
     }
@@ -172,6 +194,65 @@ selectedCountryCode = "+974";
     _setLoading(false);
   }
 }
+
+  /// ---------------- DEALER LOGIN (email/password) ----------------
+  bool _validateDealerLogin() {
+    dealerIdentifierError = null;
+    dealerPasswordError = null;
+
+    if (dealerIdentifierController.text.trim().isEmpty) {
+      dealerIdentifierError = "Please enter your email or phone".tr;
+    }
+
+    if (dealerPasswordController.text.isEmpty) {
+      dealerPasswordError = "Please enter your password".tr;
+    }
+
+    if (dealerIdentifierError != null || dealerPasswordError != null) {
+      Fluttertoast.showToast(
+        msg: dealerIdentifierError ?? dealerPasswordError!,
+      );
+      update();
+      return false;
+    }
+
+    return true;
+  }
+
+  Future<bool> dealerLogin() async {
+    if (!_validateDealerLogin()) return false;
+
+    try {
+      _setLoading(true);
+
+      final response = await ApiHandler.post(
+        ApiEndpoints.login,
+        body: {
+          "identifier": dealerIdentifierController.text.trim(),
+          "password": dealerPasswordController.text,
+        },
+      );
+
+      await _saveUserSession(response);
+
+      return true;
+    } catch (e) {
+      debugPrint("Dealer Login Error: $e");
+
+      dealerPasswordError = _extractErrorMessage(
+        e,
+        "Invalid email/phone or password.".tr,
+      );
+
+      Fluttertoast.showToast(msg: dealerPasswordError!);
+
+      update();
+
+      return false;
+    } finally {
+      _setLoading(false);
+    }
+  }
 
   /// ---------------- GOOGLE LOGIN ----------------
   /// Federated auth per

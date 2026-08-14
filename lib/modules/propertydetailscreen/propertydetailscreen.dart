@@ -353,106 +353,114 @@ class _PropertyDetailsScreenState extends State<PropertyDetailsScreen> {
 
                                 SizedBox(height: 5.h),
 
-                                Padding(
-                                  padding: EdgeInsets.fromLTRB(
-                                    0.w,
-                                    12.h,
-                                    0.w,
-                                    4.h,
-                                  ),
-                                  child: Row(
-                                    children: [
-                                      // ==================================
-                                      // INSIGHTS
-                                      // (Instagram-style secondary action
-                                      // next to Boost)
-                                      // ==================================
-                                      Expanded(
-                                        child: SizedBox(
-                                          height: 40.h,
-                                          child: OutlinedButton(
-                                            onPressed: () {
-                                              _onViewInsights(property);
-                                            },
-                                            style: OutlinedButton.styleFrom(
-                                              foregroundColor:
-                                                  AppColors.primary,
-                                              side: BorderSide(
-                                                color: AppColors.primary,
-                                              ),
-                                              shape: RoundedRectangleBorder(
-                                                borderRadius:
-                                                    BorderRadius.circular(10.r),
-                                              ),
-                                            ),
-                                            child: Row(
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment.center,
-                                              children: [
-                                                Icon(
-                                                  Icons.insights_rounded,
-                                                  size: 18.sp,
+                                if (isMyProperty)
+                                  Padding(
+                                    padding: EdgeInsets.fromLTRB(
+                                      0.w,
+                                      12.h,
+                                      0.w,
+                                      4.h,
+                                    ),
+                                    child: Row(
+                                      children: [
+                                        // ==================================
+                                        // INSIGHTS
+                                        // (Instagram-style secondary action
+                                        // next to Boost)
+                                        // ==================================
+                                        Expanded(
+                                          child: SizedBox(
+                                            height: 40.h,
+                                            child: OutlinedButton(
+                                              onPressed: () {
+                                                _onViewInsights(property);
+                                              },
+                                              style: OutlinedButton.styleFrom(
+                                                foregroundColor:
+                                                    AppColors.primary,
+                                                side: BorderSide(
+                                                  color: AppColors.primary,
                                                 ),
-                                                SizedBox(width: 6.w),
-                                                Text(
-                                                  "Insights".tr,
-                                                  style: TextStyle(
-                                                    fontSize: 13.sp,
-                                                    fontWeight: FontWeight.w600,
+                                                shape: RoundedRectangleBorder(
+                                                  borderRadius:
+                                                      BorderRadius.circular(
+                                                        10.r,
+                                                      ),
+                                                ),
+                                              ),
+                                              child: Row(
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment.center,
+                                                children: [
+                                                  Icon(
+                                                    Icons.insights_rounded,
+                                                    size: 18.sp,
                                                   ),
-                                                ),
-                                              ],
+                                                  SizedBox(width: 6.w),
+                                                  Text(
+                                                    "Insights".tr,
+                                                    style: TextStyle(
+                                                      fontSize: 13.sp,
+                                                      fontWeight:
+                                                          FontWeight.w600,
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
                                             ),
                                           ),
                                         ),
-                                      ),
 
-                                      SizedBox(width: 10.w),
+                                        SizedBox(width: 10.w),
 
-                                      // ==================================
-                                      // BOOST PROPERTY
-                                      // ==================================
-                                      Expanded(
-                                        child: SizedBox(
-                                          height: 40.h,
-                                          child: ElevatedButton(
-                                            onPressed: () {
-                                              _onBoostProperty(property);
-                                            },
-                                            style: ElevatedButton.styleFrom(
-                                              backgroundColor:
-                                                  AppColors.primary,
-                                              foregroundColor: Colors.white,
-                                              elevation: 0,
-                                              shape: RoundedRectangleBorder(
-                                                borderRadius:
-                                                    BorderRadius.circular(10.r),
+                                        // ==================================
+                                        // BOOST PROPERTY
+                                        // ==================================
+                                        Expanded(
+                                          child: SizedBox(
+                                            height: 40.h,
+                                            child: ElevatedButton(
+                                              onPressed: () {
+                                                _onBoostProperty(property);
+                                              },
+                                              style: ElevatedButton.styleFrom(
+                                                backgroundColor:
+                                                    AppColors.primary,
+                                                foregroundColor: Colors.white,
+                                                elevation: 0,
+                                                shape: RoundedRectangleBorder(
+                                                  borderRadius:
+                                                      BorderRadius.circular(
+                                                        10.r,
+                                                      ),
+                                                ),
                                               ),
-                                            ),
-                                            child: Row(
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment.center,
-                                              children: [
-                                                Icon(
-                                                  Icons.rocket_launch_outlined,
-                                                  size: 18.sp,
-                                                ),
-                                                SizedBox(width: 6.w),
-                                                Text(
-                                                  "Boost Property".tr,
-                                                  style: TextStyle(
-                                                    fontSize: 13.sp,
-                                                    fontWeight: FontWeight.w600,
+                                              child: Row(
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment.center,
+                                                children: [
+                                                  Icon(
+                                                    Icons
+                                                        .rocket_launch_outlined,
+                                                    size: 18.sp,
                                                   ),
-                                                ),
-                                              ],
+                                                  SizedBox(width: 6.w),
+                                                  Text(
+                                                    "Boost Property".tr,
+                                                    style: TextStyle(
+                                                      fontSize: 13.sp,
+                                                      fontWeight:
+                                                          FontWeight.w600,
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
                                             ),
                                           ),
                                         ),
-                                      ),
-                                    ],
+                                      ],
+                                    ),
                                   ),
-                                ),
                                 SizedBox(height: 12.h),
                                 OverviewCard(property: property),
                                 SizedBox(height: 12.h),
@@ -956,10 +964,8 @@ class _PropertyDetailsScreenState extends State<PropertyDetailsScreen> {
     final String propertyId = property.id?.toString().trim() ?? "";
 
     if (propertyId.isEmpty) {
-      Get.snackbar(
-        "Unable to Update".tr,
-        "Property ID is missing..".tr,
-        snackPosition: SnackPosition.BOTTOM,
+      Fluttertoast.showToast(
+        msg: "Property ID is missing..".tr,
       );
       return;
     }
@@ -1185,10 +1191,8 @@ class _PropertyDetailsScreenState extends State<PropertyDetailsScreen> {
   void _onBoostProperty(dynamic property) {
     final String id = property.id?.toString().trim() ?? '';
     if (id.isEmpty) {
-      Get.snackbar(
-        "Unable to Boost".tr,
-        "Property ID is missing.".tr,
-        snackPosition: SnackPosition.BOTTOM,
+      Fluttertoast.showToast(
+        msg: "Property ID is missing.".tr,
       );
       return;
     }
@@ -1255,19 +1259,15 @@ class _PropertyDetailsScreenState extends State<PropertyDetailsScreen> {
     debugPrint("REPORTED USER ID: $reportedUserId");
 
     if (listingId.isEmpty) {
-      Get.snackbar(
-        "Unable to report".tr,
-        "Property information is not available.".tr,
-        snackPosition: SnackPosition.BOTTOM,
+      Fluttertoast.showToast(
+        msg: "Property information is not available.".tr,
       );
       return;
     }
 
     if (reportedUserId.isEmpty) {
-      Get.snackbar(
-        "Unable to report".tr,
-        "Logged-in user information is not available.".tr,
-        snackPosition: SnackPosition.BOTTOM,
+      Fluttertoast.showToast(
+        msg: "Logged-in user information is not available.".tr,
       );
       return;
     }
@@ -1803,23 +1803,16 @@ class _PropertyDetailsScreenState extends State<PropertyDetailsScreen> {
     }
 
     if (reportSubmitted) {
-      Get.snackbar(
-        "Report submitted".tr,
-        "Thank you. Our support team will review this listing.".tr,
-        snackPosition: SnackPosition.BOTTOM,
+      Fluttertoast.showToast(
+        msg: "Thank you. Our support team will review this listing.".tr,
         backgroundColor: Colors.green.shade700,
-        colorText: Colors.white,
-        margin: EdgeInsets.all(12.w),
-        duration: const Duration(seconds: 3),
+        textColor: Colors.white,
       );
     } else if (submitError != null && submitError!.isNotEmpty) {
-      Get.snackbar(
-        "Unable to submit report".tr,
-        submitError!,
-        snackPosition: SnackPosition.BOTTOM,
+      Fluttertoast.showToast(
+        msg: submitError!,
         backgroundColor: Colors.red.shade700,
-        colorText: Colors.white,
-        margin: EdgeInsets.all(12.w),
+        textColor: Colors.white,
       );
     }
 

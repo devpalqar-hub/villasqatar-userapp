@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import 'package:villas_qatar/Core/constants/app_colors.dart';
 import 'package:villas_qatar/Core/services/storage_service.dart';
 import 'package:villas_qatar/Core/utils/auth_guard.dart';
+import 'package:villas_qatar/modules/invoices/views/my_invoices_screen.dart';
 import 'package:villas_qatar/modules/onboard/controller/auth_controller.dart';
 import 'package:villas_qatar/modules/onboard/views/welcome_screen.dart';
 import 'package:villas_qatar/modules/settings/service/profile_controller.dart';
@@ -126,6 +128,20 @@ class SettingsScreen extends StatelessWidget {
         Get.to(() => const MyFeaturedPropertiesScreen());
       },
     ),
+
+     SettingItem(
+      icon: Icons.favorite_outline,
+      title: "My Invoices".tr,
+      onTap: () {
+        if (!AuthGuard.requireLogin(
+          message: "Please login to continue".tr,
+        )) {
+          return;
+        }
+
+        Get.to(() => MyInvoicesScreen());
+      },
+    ),
   ];
 
   List<SettingItem> get preferenceItems => [
@@ -142,33 +158,67 @@ class SettingsScreen extends StatelessWidget {
   ];
 
   List<SettingItem> get supportItems => [
-    SettingItem(
-      icon: Icons.help_outline,
-      title: "Help Center".tr,
-      onTap: () {},
-    ),
-    SettingItem(
-      icon: Icons.headset_mic_outlined,
-      title: "Contact Us".tr,
-      onTap: () {},
-    ),
-    SettingItem(
-      icon: Icons.support_agent,
-      title: "Support".tr,
-      onTap: () {
-        if (!AuthGuard.requireLogin(
-          message: "Please login to contact support.".tr,
-        )) {
-          return;
-        }
+  SettingItem(
+    icon: Icons.headset_mic_outlined,
+    title: "Contact Us".tr,
+    onTap: () {
+      _openWebPage(
+        "https://villas.palqar.cloud/profile/about",
+      );
+    },
+  ),
 
-        Get.to(() => const SupportScreen());
-      },
-    ),
-    SettingItem(icon: Icons.info_outline, title: "About".tr, onTap: () {}),
-  ];
+  SettingItem(
+    icon: Icons.support_agent,
+    title: "Support".tr,
+    onTap: () {
+      if (!AuthGuard.requireLogin(
+        message: "Please login to contact support.".tr,
+      )) {
+        return;
+      }
+
+      Get.to(() => const SupportScreen());
+    },
+  ),
+
+  SettingItem(
+    icon: Icons.info_outline,
+    title: "About".tr,
+    onTap: () {
+      _openWebPage(
+        "https://villas.palqar.cloud/profile/about",
+      );
+    },
+  ),
+
+  SettingItem(
+    icon: Icons.privacy_tip_outlined,
+    title: "Privacy Policy".tr,
+    onTap: () {
+      _openWebPage(
+        "https://villas.palqar.cloud/privacy",
+      );
+    },
+  ),
+];
 }
+Future<void> _openWebPage(String url) async {
+  final Uri uri = Uri.parse(url);
 
+  try {
+    final bool launched = await launchUrl(
+      uri,
+      mode: LaunchMode.externalApplication,
+    );
+
+    if (!launched) {
+      debugPrint("❌ Unable to open URL: $url");
+    }
+  } catch (e) {
+    debugPrint("❌ Error opening URL: $e");
+  }
+}
 class SettingItem {
   final IconData icon;
   final String title;
@@ -399,32 +449,6 @@ class ProfileHeader extends StatelessWidget {
                       ),
                     ),
                   ],
-                ),
-              ),
-
-              InkWell(
-                borderRadius: BorderRadius.circular(10.r),
-                onTap: () async {
-                  // final updated = await Get.to(
-                  // //  () => EditProfileScreen(),
-                  // );
-
-                  // if (updated == true) {
-                  //   controller.fetchProfile();
-                  // }
-                },
-                child: Container(
-                  width: 38.w,
-                  height: 38.w,
-                  decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(.18),
-                    borderRadius: BorderRadius.circular(10.r),
-                  ),
-                  child: Icon(
-                    Icons.edit_outlined,
-                    color: Colors.white,
-                    size: 18.sp,
-                  ),
                 ),
               ),
             ],

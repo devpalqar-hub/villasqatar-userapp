@@ -53,20 +53,16 @@ class VisitController extends GetxController {
       // Refresh visitor list after booking
       await fetchVisitorVisits(showLoading: false);
 
-      Get.snackbar(
-        "Success".tr,
-        "Visit scheduled successfully".tr,
-        snackPosition: SnackPosition.BOTTOM,
+      Fluttertoast.showToast(
+        msg: "Visit scheduled successfully".tr,
       );
 
       return true;
     } catch (e) {
       debugPrint("Schedule Visit Error: $e");
 
-      Get.snackbar(
-        "Error".tr,
-        e.toString().replaceFirst("Exception: ", ""),
-        snackPosition: SnackPosition.BOTTOM,
+      Fluttertoast.showToast(
+        msg: e.toString().replaceFirst("Exception: ", ""),
       );
 
       return false;
@@ -97,10 +93,8 @@ class VisitController extends GetxController {
     } catch (e) {
       debugPrint("Accept Visit Error: $e");
 
-      Get.snackbar(
-        "Error".tr,
-        e.toString().replaceFirst("Exception: ", ""),
-        snackPosition: SnackPosition.BOTTOM,
+      Fluttertoast.showToast(
+        msg: e.toString().replaceFirst("Exception: ", ""),
       );
 
       return false;
@@ -182,13 +176,10 @@ class VisitController extends GetxController {
     if (id.isEmpty) {
       debugPrint("Reject Visit: Visit ID is empty");
 
-      Get.rawSnackbar(
-        message: "Visit ID is missing".tr,
-        snackPosition: SnackPosition.BOTTOM,
+      Fluttertoast.showToast(
+        msg: "Visit ID is missing".tr,
         backgroundColor: Colors.red,
-        margin: const EdgeInsets.all(16),
-        borderRadius: 10,
-        duration: const Duration(seconds: 2),
+        textColor: Colors.white,
       );
 
       return false;
@@ -218,14 +209,10 @@ class VisitController extends GetxController {
       await fetchOwnerVisits(showLoading: false);
       return true;
     } catch (e) {
-      Get.rawSnackbar(
-        message: e.toString().replaceFirst("Exception: ", ""),
-        snackPosition: SnackPosition.BOTTOM,
+      Fluttertoast.showToast(
+        msg: e.toString().replaceFirst("Exception: ", ""),
         backgroundColor: Colors.red.shade700,
-
-        margin: const EdgeInsets.all(16),
-        borderRadius: 10,
-        duration: const Duration(seconds: 3),
+        textColor: Colors.white,
       );
 
       return false;

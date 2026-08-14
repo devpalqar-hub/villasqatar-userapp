@@ -1010,4 +1010,150 @@ const Map<String, String> enUS = {
     "By continuing, you agree to our\n",
 "Terms of Use": "Terms of Use",
 "Privacy Policy": "Privacy Policy",
+'No Properties Listed': 'No Properties Listed',
+'This dealer hasn\'t added any listings yet': 'This dealer hasn\'t added any listings yet',
+'Seller Properties': 'Seller Properties',
+'No more properties': 'No more properties',
+'This seller has no more properties to show': 'This seller has no more properties to show',
+'View all': 'View all',
+
+  "This period": "This period",
+  "Performance Trend": "Performance Trend",
+  "Top Listings": "Top Listings",
+  "No listings in this period": "No listings in this period",
+  "Villas Qatar": "Villas Qatar",
+  "DEALER PORTAL": "DEALER PORTAL",
+  "Dealer": "Dealer",
+  "Log out": "Log out",
+  "Analytics": "Analytics",
+  "Performance overview for": "Performance overview for",
+  "your agency": "your agency",
+
+  // Subscription
+  "No active plan": "No active plan",
+  "Active subscription": "Active subscription",
+
+  "DAYS LEFT": "DAYS LEFT",
+  "Max listings": "Max listings",
+  "Featured left": "Featured left",
+  "Ends": "Ends",
+
+  // Statistics
+  "Total Listings": "Total Listings",
+  "Total Views": "Total Views",
+
+  "Conversations": "Conversations",
+  "Units Sold": "Units Sold",
+  "Site Visits": "Site Visits",
+  "Sold": "Sold",
+ 
+  "in this period": "in this period",
+  "reach": "reach",
+  "this period": "this period",
+  "unique users chatted": "unique users chatted",
+  "No sales this period": "No sales this period",
+  "pending": "pending",
+  "accepted": "accepted",
+  "Visits": "Visits",
+  "No trend data for this period": "No trend data for this period",
+
+  // Listing
+  "QAR": "QAR",
+  "total": "total",
+
+  // Filters
+  "Filter Analytics": "Filter Analytics",
+  "Date range": "Date range",
+  "Granularity": "Granularity",
+
+  "Listing": "Listing",
+  "Staff member": "Staff member",
+  "Property type": "Property type",
+  "Area name": "Area name",
+  "e.g. Pearl": "e.g. Pearl",
+  "All listings": "All listings",
+  "All staff": "All staff",
+  "All types": "All types",
+  // Granularity
+  "Daily": "Daily",
+  "Weekly": "Weekly",
+  "Monthly": "Monthly",
+  "Yearly": "Yearly",
+
+  // Purpose
+  "SALE": "SALE",
+  "RENT": "RENT",
+  "REJECTED": "REJECTED",
+  "RESUBMITTED": "RESUBMITTED",
+  "SOLD": "SOLD",
+  "PENDING_PAYMENT": "PENDING PAYMENT",
+
+
+  "Penthouse": "Penthouse",
+  
+  "Login as ": "Login as ",
+
+  "Enter your dealer account email and\npassword to continue":
+      "Enter your dealer account email and\npassword to continue",
+  "Email or phone": "Email or phone",
+
+  "Logging in...": "Logging in...",
+
+  "The dealer portal is for agencies managing listings, leads and analytics for their team.":
+      "The dealer portal is for agencies managing listings, leads and analytics for their team.",
+
+
+  "Invoice Details": "Invoice Details",
+  "PDF is not available for this invoice": "PDF is not available for this invoice",
+  "Please login to download the invoice.": "Please login to download the invoice.",
+  "Unable to download invoice PDF": "Unable to download invoice PDF",
+
+  "Invoice Number": "Invoice Number",
+  "Total Amount": "Total Amount",
+  "Billed To": "Billed To",
+  "Payment Information": "Payment Information",
+
+  "Company": "Company",
+  "Trade Number": "Trade Number",
+  "Address": "Address",
+
+  "Payment Method": "Payment Method",
+  "Paid At": "Paid At",
+  
+  "Emailed At": "Emailed At",
+
+
+  "Line Items": "Line Items",
+
+  "Item": "Item",
+  "Unit Price": "Unit Price",
+  "Qty": "Qty",
+  "Amount": "Amount",
+
+  "Subtotal": "Subtotal",
+  "VAT (@rate%)": "VAT (@rate%)",
+
+  "PDF": "PDF",
+  "Created At": "Created At",
+  "Updated At": "Updated At",
+
+  "Copied to clipboard": "Copied to clipboard",
+
+  "Paid": "Paid",
+  "Unknown": "Unknown",
+
+
+
+  "My Invoices": "My Invoices",
+  "Search invoices": "Search invoices",
+
+ 
+  "No invoices found": "No invoices found",
+  "Your invoices will appear here once available":
+      "Your invoices will appear here once available",
+
+  "Invoice": "Invoice",
+  "Invoices": "Invoices"
+
+
 };

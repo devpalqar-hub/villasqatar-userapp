@@ -3,7 +3,7 @@ description: "A new Flutter project."
 
 publish_to: 'none'
 
-version: 1.0.11+15
+version: 1.0.11+17
 
 environment:
   sdk: ^3.11.0
@@ -58,13 +58,6 @@ dev_dependencies:
 
   flutter_lints: ^6.0.0
 
-# quill_html_editor pins file_picker ^6.1.1, whose Windows implementation
-# still targets win32 ^5.x. share_plus >=13 and geolocator >=14.0.3 (via
-# package_info_plus) bump to win32 ^6, which conflicts. Pinned share_plus
-# and geolocator back to the last releases still on win32 5.x rather than
-# overriding win32/file_picker directly — those overrides desync the
-# compiled code from its actual API (FilePicker.platform, win32 structs)
-# and fail to build.
 
 flutter:
   uses-material-design: true

@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:app_links/app_links.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
 import 'package:villas_qatar/modules/propertydetailscreen/propertydetailscreen.dart';
 import 'package:villas_qatar/modules/propertydetailscreen/service/deeplink_controller.dart';
@@ -227,13 +228,10 @@ class DeepLinkService {
       if (property == null) {
         _lastHandledLink = null;
 
-        Get.snackbar(
-          "Property unavailable".tr,
-          deepLinkController.error.isNotEmpty
+        Fluttertoast.showToast(
+          msg: deepLinkController.error.isNotEmpty
               ? deepLinkController.error
               : "Unable to open this property".tr,
-          snackPosition:
-              SnackPosition.BOTTOM,
         );
 
         return;
@@ -290,11 +288,8 @@ Get.to(
         "Open App Link Property Error: $e",
       );
 
-      Get.snackbar(
-        "Error".tr,
-        "Unable to open this property".tr,
-        snackPosition:
-            SnackPosition.BOTTOM,
+      Fluttertoast.showToast(
+        msg: "Unable to open this property".tr,
       );
     }
   }

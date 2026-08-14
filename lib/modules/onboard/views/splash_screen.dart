@@ -6,6 +6,7 @@ import 'package:get/get.dart';
 import 'package:villas_qatar/Core/constants/app_colors.dart';
 import 'package:villas_qatar/Core/services/storage_service.dart';
 import 'package:villas_qatar/Core/theme/app_textstyles.dart';
+import 'package:villas_qatar/modules/dealer_dashboard/views/dealer_analytics_screen.dart';
 import 'package:villas_qatar/modules/mainscreen/mainscreen.dart';
 
 import 'welcome_screen.dart';
@@ -31,7 +32,17 @@ class _SplashScreenState extends State<SplashScreen> {
     final token = StorageService.getToken();
 
     if (token != null && token.isNotEmpty) {
-      Get.offAll(() => const MainScreen());
+      // Valid stored token - no need to log in again. But a dealer
+      // session must land back on the dealer dashboard, not the
+      // buyer/renter MainScreen, or a refreshed app silently drops
+      // dealers into the wrong home screen every time.
+      final role = StorageService.getProfile()?['role']?.toString().toUpperCase();
+
+      if (role == "DEALER") {
+        Get.offAll(() => const DealerAnalyticsScreen());
+      } else {
+        Get.offAll(() => const MainScreen());
+      }
     } else {
       Get.offAll(() => WelcomeScreen());
     }

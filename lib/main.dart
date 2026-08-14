@@ -16,6 +16,7 @@ import 'package:villas_qatar/Core/services/storage_service.dart';
 
 import 'package:villas_qatar/modules/home/service/UtilsController.dart';
 import 'package:villas_qatar/modules/home/service/loaction_controller.dart';
+import 'package:villas_qatar/modules/onboard/controller/auth_controller.dart';
 import 'package:villas_qatar/modules/onboard/views/splash_screen.dart';
 
 import 'core/localization/app_translation.dart';
@@ -71,6 +72,17 @@ Future<void> main() async {
   // ------------------------------------------------------------
   // Global GetX Controllers
   // ------------------------------------------------------------
+  // Registered permanently here (not lazily from WelcomeScreen/OtpScreen/
+  // CompleteProfileScreen like before) because Splash can route straight
+  // into MainScreen/DealerAnalyticsScreen on a valid stored token,
+  // skipping all three of those screens entirely - anything that later
+  // calls Get.find<AuthController>() (e.g. the Settings/dealer logout
+  // buttons) would otherwise crash with "AuthController not found".
+  Get.put(
+    AuthController(),
+    permanent: true,
+  );
+
   Get.put(
     Utilscontroller(),
     permanent: true,

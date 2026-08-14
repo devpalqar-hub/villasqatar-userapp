@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
@@ -353,7 +354,9 @@ class ChatController extends GetxController {
     debugPrint(data.toString());
     debugPrint("═══════════════════════════════════");
 
-    Get.snackbar("Chat".tr, data["message"] ?? "Something went wrong".tr);
+    Fluttertoast.showToast(
+      msg: data["message"] ?? "Something went wrong".tr,
+    );
   }
 
   ///---------------------------------------------------
@@ -565,7 +568,7 @@ class ChatController extends GetxController {
     } catch (e) {
       debugPrint("UPLOAD IMAGE ERROR : $e");
 
-      Get.snackbar("Upload Failed".tr, e.toString());
+      Fluttertoast.showToast(msg: e.toString());
 
       return null;
     }
@@ -626,9 +629,8 @@ class ChatController extends GetxController {
   Future<void> sendLocation() async {
     try {
       if (!isConnected) {
-        Get.snackbar(
-          "Not Connected".tr,
-          "Please wait for chat to connect.".tr,
+        Fluttertoast.showToast(
+          msg: "Please wait for chat to connect.".tr,
         );
         return;
       }
@@ -638,9 +640,8 @@ class ChatController extends GetxController {
       bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
 
       if (!serviceEnabled) {
-        Get.snackbar(
-          "Location Disabled".tr,
-          "Please enable location services.".tr,
+        Fluttertoast.showToast(
+          msg: "Please enable location services.".tr,
         );
         return;
       }
@@ -652,17 +653,15 @@ class ChatController extends GetxController {
       }
 
       if (permission == LocationPermission.denied) {
-        Get.snackbar(
-          "Permission Denied".tr,
-          "Location permission is required.".tr,
+        Fluttertoast.showToast(
+          msg: "Location permission is required.".tr,
         );
         return;
       }
 
       if (permission == LocationPermission.deniedForever) {
-        Get.snackbar(
-          "Permission Denied".tr,
-          "Enable location permission from settings.".tr,
+        Fluttertoast.showToast(
+          msg: "Enable location permission from settings.".tr,
         );
         return;
       }
@@ -682,7 +681,7 @@ class ChatController extends GetxController {
     } catch (e) {
       debugPrint("Send Location Error: $e");
 
-      Get.snackbar("Location Error".tr, e.toString());
+      Fluttertoast.showToast(msg: e.toString());
     }
   }
 

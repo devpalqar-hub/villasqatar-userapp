@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
 
 import 'package:villas_qatar/Core/utils/stripe_checkout_helper.dart';
@@ -1170,10 +1171,8 @@ class _BoostPropertyScreenState extends State<BoostPropertyScreen> {
 
   Future<void> _continueToPayment(FeaturedPlanModel plan) async {
     if (selectedProperty == null) {
-      Get.snackbar(
-        "Select Property".tr,
-        "Please select a property to boost".tr,
-        snackPosition: SnackPosition.BOTTOM,
+      Fluttertoast.showToast(
+        msg: "Please select a property to boost".tr,
       );
 
       return;
@@ -1218,10 +1217,8 @@ class _BoostPropertyScreenState extends State<BoostPropertyScreen> {
 
       switch (outcome) {
         case StripePaymentOutcome.success:
-          Get.snackbar(
-            "Payment Successful".tr,
-            "${plan.name} has been activated for your property.".tr,
-            snackPosition: SnackPosition.BOTTOM,
+          Fluttertoast.showToast(
+            msg: "${plan.name} has been activated for your property.".tr,
           );
 
           Get.back();
@@ -1229,19 +1226,15 @@ class _BoostPropertyScreenState extends State<BoostPropertyScreen> {
           break;
 
         case StripePaymentOutcome.cancelled:
-          Get.snackbar(
-            "Payment Cancelled".tr,
-            "You can try again anytime.".tr,
-            snackPosition: SnackPosition.BOTTOM,
+          Fluttertoast.showToast(
+            msg: "You can try again anytime.".tr,
           );
 
           break;
       }
     } catch (e) {
-      Get.snackbar(
-        "Checkout Failed".tr,
-        e.toString().replaceFirst("Exception: ", ""),
-        snackPosition: SnackPosition.BOTTOM,
+      Fluttertoast.showToast(
+        msg: e.toString().replaceFirst("Exception: ", ""),
       );
     }
   }

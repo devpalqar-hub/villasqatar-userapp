@@ -101,7 +101,12 @@ class _SellerPropertiesScreenState extends State<SellerPropertiesScreen> {
             elevation: 0,
             centerTitle: true,
             surfaceTintColor: Colors.white,
-            title: Text("Seller Properties".tr, style: AppTextStyles.title16),
+            title: Text("Seller Properties".tr,
+            style:TextStyle(
+            fontSize: 18.sp,
+            fontWeight: FontWeight.w500,
+            color: Colors.black87,
+          ), ),
           ),
           body: CustomScrollView(
             physics: const BouncingScrollPhysics(),
@@ -200,7 +205,7 @@ class _SectionTitle extends StatelessWidget {
                   "View all".tr,
                   style: AppTextStyles.body13.copyWith(
                     color: AppColors.primary,
-                    fontWeight: FontWeight.w600,
+                    fontWeight: FontWeight.w500,
                   ),
                 ),
                 Icon(Icons.arrow_forward, size: 16.sp, color: AppColors.primary),

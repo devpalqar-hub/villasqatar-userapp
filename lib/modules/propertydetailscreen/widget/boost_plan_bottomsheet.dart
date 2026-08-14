@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
 
 import 'package:villas_qatar/Core/utils/stripe_checkout_helper.dart';
@@ -865,10 +866,8 @@ class _BoostPlanBottomSheetState extends State<BoostPlanBottomSheet> {
     final String listingId = widget.propertyId.trim();
 
     if (listingId.isEmpty) {
-      Get.snackbar(
-        "Unable to Boost".tr,
-        "Property ID is missing.".tr,
-        snackPosition: SnackPosition.BOTTOM,
+      Fluttertoast.showToast(
+        msg: "Property ID is missing.".tr,
       );
 
       return;
@@ -909,10 +908,8 @@ class _BoostPlanBottomSheetState extends State<BoostPlanBottomSheet> {
           // the pop instead of the bottom sheet's route.
           Get.back();
 
-          Get.snackbar(
-            "Payment Successful".tr,
-            "${plan.name} has been activated for your property.".tr,
-            snackPosition: SnackPosition.BOTTOM,
+          Fluttertoast.showToast(
+            msg: "${plan.name} has been activated for your property.".tr,
           );
 
           // Refresh the controllers that show boost/featured state so
@@ -933,19 +930,15 @@ class _BoostPlanBottomSheetState extends State<BoostPlanBottomSheet> {
           break;
 
         case StripePaymentOutcome.cancelled:
-          Get.snackbar(
-            "Payment Cancelled".tr,
-            "You can try again anytime.".tr,
-            snackPosition: SnackPosition.BOTTOM,
+          Fluttertoast.showToast(
+            msg: "You can try again anytime.".tr,
           );
 
           break;
       }
     } catch (e) {
-      Get.snackbar(
-        "Checkout Failed".tr,
-        e.toString().replaceFirst("Exception: ", ""),
-        snackPosition: SnackPosition.BOTTOM,
+      Fluttertoast.showToast(
+        msg: e.toString().replaceFirst("Exception: ", ""),
       );
     } finally {
       // The sheet may already be closed/disposed by now on the

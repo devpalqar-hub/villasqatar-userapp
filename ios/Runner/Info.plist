@@ -18,8 +18,18 @@
 	<string>villas_qatar</string>
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
+	<key>NSCameraUsageDescription</key>
+    <string>Villas Qatar needs access to your camera to capture property photos and videos.</string>
+    <key>NSPhotoLibraryUsageDescription</key>
+    <string>Villas Qatar needs access to your photo library to select property photos and videos.</string>
 	<key>CFBundleShortVersionString</key>
-	<string>$(FLUTTER_BUILD_NAME)</string>
+    <string>$(FLUTTER_BUILD_NAME)</string>
+    <key>NSCameraUsageDescription</key> 
+    <string>Villas Qatar needs access to your camera to capture property photos and videos.</string>
+    <key>NSPhotoLibraryUsageDescription</key>
+    <string>Villas Qatar needs access to your photo library to select property photos and videos.</string>
+    <key>NSPhotoLibraryAddUsageDescription</key>
+    <string>Villas Qatar needs access to save property photos and videos to your photo library.</string>
 	<key>CFBundleSignature</key>
 	<string>????</string>
 	<key>CFBundleURLTypes</key>

@@ -13,7 +13,7 @@ import 'package:villas_qatar/modules/onboard/views/complete_profile_screen.dart'
 
 class OtpScreen extends StatelessWidget {
   OtpScreen({super.key});
-  final AuthController controller = Get.put(AuthController());
+  final AuthController controller = Get.find<AuthController>();
   Widget otpBox(bool active) {
     return Container(
       width: 45.w,

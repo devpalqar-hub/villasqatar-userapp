@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
 import 'package:villas_qatar/Core/network/api_endpoints.dart';
@@ -131,7 +132,7 @@ class LocationController extends GetxController {
 
       bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
       if (!serviceEnabled) {
-        Get.snackbar("Location".tr, "Please enable location services.".tr);
+        Fluttertoast.showToast(msg: "Please enable location services.".tr);
         return;
       }
 
@@ -143,7 +144,7 @@ class LocationController extends GetxController {
 
       if (permission == LocationPermission.denied ||
           permission == LocationPermission.deniedForever) {
-        Get.snackbar("Permission".tr, "Location permission denied.".tr);
+        Fluttertoast.showToast(msg: "Location permission denied.".tr);
         return;
       }
 
@@ -204,7 +205,7 @@ class LocationController extends GetxController {
       debugPrint(e.toString());
       debugPrint(stackTrace.toString());
 
-      Get.snackbar("Error".tr, "Unable to detect current location.".tr);
+      Fluttertoast.showToast(msg: "Unable to detect current location.".tr);
     } finally {
       isLoading = false;
       update();

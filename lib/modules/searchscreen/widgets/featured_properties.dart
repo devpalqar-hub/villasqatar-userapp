@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
 
 import 'package:villas_qatar/Core/constants/app_colors.dart';
@@ -373,10 +374,8 @@ void _openPropertyDetails() {
   if (id.isEmpty) {
     debugPrint("FEATURED PROPERTY ERROR: Property ID is empty");
 
-    Get.snackbar(
-      "Error".tr,
-      "Property details are not available".tr,
-      snackPosition: SnackPosition.BOTTOM,
+    Fluttertoast.showToast(
+      msg: "Property details are not available".tr,
     );
     return;
   }

@@ -2,6 +2,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
 
 import 'package:villas_qatar/Core/constants/app_colors.dart';
@@ -144,14 +145,10 @@ class PropertyCard extends StatelessWidget {
                             ? null
                             : () async {
                                 if (id.isEmpty) {
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    SnackBar(
-                                      content: Text(
-                                        "Property ID is not available".tr,
-                                      ),
-                                    ),
+                                  Fluttertoast.showToast(
+                                    msg: "Property ID is not available".tr,
                                   );
-    
+
                                   return;
                                 }
     

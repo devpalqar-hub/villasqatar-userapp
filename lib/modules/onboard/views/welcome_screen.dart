@@ -6,12 +6,13 @@ import 'package:villas_qatar/Core/services/storage_service.dart';
 import 'package:villas_qatar/Core/theme/app_textstyles.dart';
 import 'package:villas_qatar/modules/mainscreen/mainscreen.dart';
 import 'package:villas_qatar/modules/onboard/controller/auth_controller.dart';
+import 'package:villas_qatar/modules/onboard/views/dealer_login_screen.dart';
 import 'package:villas_qatar/modules/onboard/views/login_screen.dart';
 
 class WelcomeScreen extends StatelessWidget {
   WelcomeScreen({super.key});
 
-  final AuthController controller = Get.put(AuthController());
+  final AuthController controller = Get.find<AuthController>();
   @override
   Widget build(BuildContext context) {
     return GetBuilder<AuthController>(
@@ -181,7 +182,26 @@ class WelcomeScreen extends StatelessWidget {
                           textAlign: TextAlign.center,
                         ),
                       ),
-                      SizedBox(height: 30.h),
+                      SizedBox(height: 14.h),
+
+                      Center(
+                        child: TextButton.icon(
+                          onPressed: () {
+                            Get.to(() => DealerLoginScreen());
+                          },
+                          style: TextButton.styleFrom(
+                            foregroundColor: AppColors.primary,
+                          ),
+                          icon: Icon(Icons.storefront_outlined, size: 16.sp),
+                          label: Text(
+                            "Login as Dealer".tr,
+                            style: AppTextStyles.medium13.copyWith(
+                              color: AppColors.primary,
+                            ),
+                          ),
+                        ),
+                      ),
+                      SizedBox(height: 16.h),
                     ],
                   ),
                 ),

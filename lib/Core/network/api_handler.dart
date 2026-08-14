@@ -285,13 +285,20 @@ class ApiHandler {
         throw Exception(_getErrorMessage(data, "Bad Request".tr));
 
       case 401:
+        // Token expired/invalid (dealer or buyer session alike) - clear
+        // storage and drop the user back to WelcomeScreen automatically.
+        // AuthController is registered permanently in main(), so it's
+        // reset in place rather than deleted: deleting it here would
+        // leave every Get.find<AuthController>() call downstream (login
+        // screens, WelcomeScreen, Settings/dealer logout) crashing with
+        // "AuthController not found" until the app is fully restarted.
         final token = StorageService.getToken();
         if (token != null && token.isNotEmpty) {
           await StorageService.logout();
           if (Get.isRegistered<AuthController>()) {
-            Get.delete<AuthController>(force: true);
+            Get.find<AuthController>().reset();
           }
-        Get.offAll(() => WelcomeScreen());
+          Get.offAll(() => WelcomeScreen());
         }
 
         throw Exception(_getErrorMessage(data, "Unauthorized".tr));
@@ -318,9 +325,6 @@ class ApiHandler {
     }
   }
 
-  // ============================================================
-  // ERROR MESSAGE
-  // ============================================================
 
   static String _getErrorMessage(dynamic data, String fallback) {
     if (data is Map) {

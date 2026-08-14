@@ -27,12 +27,6 @@ class ProfileController extends GetxController {
   }
 
   Future<void> fetchProfile() async {
-    // Guest sessions (right after Skip on the welcome screen) have no
-    // token/userId, and SettingsScreen - hence this controller - gets
-    // constructed eagerly by MainScreen even while the user is still
-    // on the Home tab. There's no profile to fetch for a guest, so
-    // don't call the API (it would just 401) and never surface that
-    // as an error toast.
     if (!StorageService.isLoggedIn()) {
       return;
     }
@@ -40,9 +34,8 @@ class ProfileController extends GetxController {
     try {
       isLoading = true;
       update();
-      final userId = StorageService.getUserId();
 
-      final response = await ApiHandler.get(ApiEndpoints.userById(userId));
+      final response = await ApiHandler.get(ApiEndpoints.authMe);
 
       profile = ProfileModel.fromJson(response);
 
@@ -52,43 +45,46 @@ class ProfileController extends GetxController {
 
       await StorageService.saveProfile(response);
     } catch (e) {
-      debugPrint("FETCH PROFILE ERROR: $e");
+     
     } finally {
       isLoading = false;
       update();
     }
   }
+Future<bool> updateProfile() async {
+  try {
+    isSaving = true;
+    update();
 
-  Future<void> updateProfile() async {
-    try {
-      isSaving = true;
-      update();
+    final body = <String, dynamic>{
+      "name": nameController.text.trim(),
+      "email": emailController.text.trim(),
+      "phone": phoneController.text.trim(),
+    };
 
-      final body = {
-        "name": nameController.text.trim(),
-        "email": emailController.text.trim(),
-        "phone": phoneController.text.trim(),
-      };
-
-      if (passwordController.text.trim().isNotEmpty) {
-        body["password"] = passwordController.text.trim();
-      }
-
-      final response = await ApiHandler.patch(ApiEndpoints.myProfile, body: body);
-
-      profile = ProfileModel.fromJson(response);
-
-      await StorageService.saveProfile(response);
-
-      Get.snackbar("Success".tr, "Profile updated successfully".tr);
-    } catch (e) {
-      Get.snackbar("Error".tr, e.toString());
-    } finally {
-      isSaving = false;
-      update();
+    if (passwordController.text.trim().isNotEmpty) {
+      body["password"] = passwordController.text.trim();
     }
-  }
 
+    final response = await ApiHandler.patch(
+      ApiEndpoints.myProfile,
+      body: body,
+    );
+
+    profile = ProfileModel.fromJson(response);
+
+    await StorageService.saveProfile(response);
+
+    return true;
+  } catch (e) {
+    debugPrint("UPDATE PROFILE ERROR: $e");
+
+    return false;
+  } finally {
+    isSaving = false;
+    update();
+  }
+}
   @override
   void onClose() {
     nameController.dispose();
