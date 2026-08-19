@@ -50,6 +50,10 @@ class ChatStartScreen extends StatelessWidget {
             Expanded(
               child: GetBuilder<ChatController>(
                 builder: (controller) {
+                  if (controller.isLoading) {
+                    return const Center(child: CircularProgressIndicator());
+                  }
+
                   if (controller.messages.isEmpty) {
                     return const EmptyConversationWidget();
                   }
@@ -152,7 +156,8 @@ class ChatStartScreen extends StatelessWidget {
             /// Show only when conversation has NOT started yet
             GetBuilder<ChatController>(
               builder: (chatController) {
-                if (chatController.messages.isNotEmpty) {
+                if (chatController.isLoading ||
+                    chatController.messages.isNotEmpty) {
                   return const SizedBox.shrink();
                 }
 
@@ -394,25 +399,8 @@ class ChatStartScreen extends StatelessWidget {
         ],
       ),
       actions: [
-        /// CALL
-        IconButton(
-          onPressed: () async {
-            final phoneNumber = listing?.contactPhone ?? property?.contactPhone;
+      
 
-            debugPrint("DIAL NUMBER: $phoneNumber");
-
-            if (phoneNumber == null || phoneNumber.trim().isEmpty) {
-              return;
-            }
-
-            final uri = Uri(scheme: 'tel', path: phoneNumber.trim());
-
-            await launchUrl(uri, mode: LaunchMode.externalApplication);
-          },
-          icon: const Icon(Icons.call, color: AppColors.primary),
-        ),
-
-        /// MORE OPTIONS
         PopupMenuButton<String>(
           color: Colors.white,
           surfaceTintColor: Colors.white,

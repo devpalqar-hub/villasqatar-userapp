@@ -260,8 +260,7 @@ Widget build(BuildContext context) {
                     runSpacing: 7.h,
                     children: _granularities.map((g) {
                       return _chip(
-                        label: g[0].toUpperCase() +
-                            g.substring(1),
+                        label: (g[0].toUpperCase() + g.substring(1)).tr,
                         selected: _granularity == g,
                         onTap: () {
                           setState(() {
@@ -298,7 +297,7 @@ Widget build(BuildContext context) {
 
                       ..._purposes.map(
                         (p) => _chip(
-                          label: p,
+                          label: p.tr,
                           selected: _purpose == p,
                           onTap: () {
                             setState(() {
@@ -336,7 +335,7 @@ Widget build(BuildContext context) {
 
                       ..._statuses.map(
                         (s) => _chip(
-                          label: s,
+                          label: s.tr,
                           selected: _status == s,
                           onTap: () {
                             setState(() {

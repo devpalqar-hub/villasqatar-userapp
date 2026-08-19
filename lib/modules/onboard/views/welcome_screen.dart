@@ -1,6 +1,8 @@
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'package:villas_qatar/Core/constants/app_colors.dart';
 import 'package:villas_qatar/Core/services/storage_service.dart';
 import 'package:villas_qatar/Core/theme/app_textstyles.dart';
@@ -102,6 +104,7 @@ class WelcomeScreen extends StatelessWidget {
                         ],
                       ),
                       SizedBox(height: 20.h),
+
                       /// Social Buttons
                       Row(
                         children: [
@@ -168,14 +171,30 @@ class WelcomeScreen extends StatelessWidget {
                                 text: 'Terms of Use'.tr,
                                 style: AppTextStyles.medium13.copyWith(
                                   color: AppColors.primary,
+                                  decoration: TextDecoration.underline,
+                                  decorationColor: AppColors.primary,
                                 ),
+                                recognizer: TapGestureRecognizer()
+                                  ..onTap = () {
+                                    _openWebUrl(
+                                      'https://villas.palqar.cloud/terms',
+                                    );
+                                  },
                               ),
                               TextSpan(text: ' and '.tr),
                               TextSpan(
                                 text: 'Privacy Policy'.tr,
                                 style: AppTextStyles.medium13.copyWith(
                                   color: AppColors.primary,
+                                  decoration: TextDecoration.underline,
+                                  decorationColor: AppColors.primary,
                                 ),
+                                recognizer: TapGestureRecognizer()
+                                  ..onTap = () {
+                                    _openWebUrl(
+                                      'https://villas.palqar.cloud/privacy',
+                                    );
+                                  },
                               ),
                             ],
                           ),
@@ -349,5 +368,19 @@ class WelcomeScreen extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  Future<void> _openWebUrl(String url) async {
+    final uri = Uri.parse(url);
+
+    if (await canLaunchUrl(uri)) {
+      await launchUrl(uri, mode: LaunchMode.externalApplication);
+    } else {
+      Get.snackbar(
+        'Error'.tr,
+        'Unable to open the page'.tr,
+        snackPosition: SnackPosition.BOTTOM,
+      );
+    }
   }
 }

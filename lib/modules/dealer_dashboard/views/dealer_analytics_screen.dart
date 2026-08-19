@@ -433,7 +433,7 @@ class _DealerAnalyticsScreenState extends State<DealerAnalyticsScreen> {
 
   Widget _titleBlock() {
     final profile = StorageService.getProfile();
-    final name = profile?['name'.tr];
+    final name = profile?['name'];
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [

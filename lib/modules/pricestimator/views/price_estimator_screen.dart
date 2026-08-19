@@ -521,7 +521,7 @@ class _PriceEstimatorScreenState extends State<PriceEstimatorScreen> {
           children: [
             /// Background Image
             Positioned.fill(
-              child: Image.asset("assets/auth_bg 1.png", fit: BoxFit.cover),
+              child: Image.asset("assets/auth_bg1.png", fit: BoxFit.cover),
             ),
 
             /// Left Content
@@ -619,7 +619,7 @@ class _PriceEstimatorScreenState extends State<PriceEstimatorScreen> {
                                 "Select Amenities".tr,
                                 style: TextStyle(
                                   fontSize: 17.sp,
-                                  fontWeight: FontWeight.w700,
+                                  fontWeight: FontWeight.w500,
                                   color: AppColors.textPrimary,
                                 ),
                               ),
@@ -868,7 +868,7 @@ class _PriceEstimatorScreenState extends State<PriceEstimatorScreen> {
                 overflow: TextOverflow.ellipsis,
                 style: const TextStyle(
                   fontSize: 15,
-                  fontWeight: FontWeight.w700,
+                  fontWeight: FontWeight.w500,
                   color: AppColors.primary,
                 ),
               ),
@@ -1259,7 +1259,7 @@ class _PriceEstimatorScreenState extends State<PriceEstimatorScreen> {
                       overflow: TextOverflow.ellipsis,
                       style: TextStyle(
                         fontSize: 10.sp,
-                        fontWeight: FontWeight.w700,
+                        fontWeight: FontWeight.w500,
                         color: const Color(0xff1E2344),
                       ),
                     ),
@@ -1746,7 +1746,7 @@ Future<void> _showOptionSheet<T>({
                       title,
                       style: TextStyle(
                         fontSize: 17.sp,
-                        fontWeight: FontWeight.w700,
+                        fontWeight: FontWeight.w500,
                         color: AppColors.textPrimary,
                       ),
                     ),
@@ -1799,9 +1799,7 @@ Future<void> _showOptionSheet<T>({
                               labelBuilder(value),
                               style: TextStyle(
                                 fontSize: 13.sp,
-                                fontWeight: selected
-                                    ? FontWeight.w600
-                                    : FontWeight.w400,
+                                fontWeight: FontWeight.w500,
                                 color: selected
                                     ? AppColors.primary
                                     : AppColors.textPrimary,

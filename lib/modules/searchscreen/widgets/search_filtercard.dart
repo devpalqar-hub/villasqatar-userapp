@@ -1008,7 +1008,7 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
                                   return DropdownMenuItem<String>(
                                     value: item.id,
                                     child: Text(
-                                      item.title,
+                                      item.title.tr,
                                       style: TextStyle(fontSize: 13.sp),
                                     ),
                                   );
@@ -1330,7 +1330,7 @@ class CustomFilterChip extends StatelessWidget {
           ),
         ),
         child: Text(
-          title,
+          title.tr,
           style: TextStyle(
             fontSize: 13.sp,
             fontWeight: FontWeight.w500,

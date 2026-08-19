@@ -443,16 +443,7 @@ class InputBar extends StatelessWidget {
               ),
             ),
 
-            IconButton(
-              splashRadius: 22.r,
-              icon: Icon(
-                Icons.emoji_emotions_outlined,
-                color: AppColors.textSecondary,
-                size: 22.sp,
-              ),
-              onPressed: () {},
-            ),
-
+           
             AnimatedContainer(
               duration: const Duration(milliseconds: 250),
               width: 42.w,

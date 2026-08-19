@@ -432,7 +432,8 @@ class _MakeOfferBottomSheetState extends State<MakeOfferBottomSheet> {
 
           Expanded(
             child: Text(
-              "Your offer will be sent directly to the property owner. You can continue the conversation through chat".tr,
+              "Your offer will be sent directly to the property owner. You can continue the conversation through chat"
+                  .tr,
               style: TextStyle(
                 fontSize: 9.5.sp,
                 height: 1.45,
@@ -565,9 +566,7 @@ class _MakeOfferBottomSheetState extends State<MakeOfferBottomSheet> {
     final String offer = offerController.text.trim();
 
     if (offer.isEmpty) {
-      Fluttertoast.showToast(
-        msg: "Please enter your offer amount.".tr,
-      );
+      Fluttertoast.showToast(msg: "Please enter your offer amount.".tr);
 
       return;
     }
@@ -575,9 +574,7 @@ class _MakeOfferBottomSheetState extends State<MakeOfferBottomSheet> {
     final double? amount = double.tryParse(offer);
 
     if (amount == null || amount <= 0) {
-      Fluttertoast.showToast(
-        msg: "Please enter a valid offer amount.".tr,
-      );
+      Fluttertoast.showToast(msg: "Please enter a valid offer amount.".tr);
 
       return;
     }
@@ -593,8 +590,10 @@ class _MakeOfferBottomSheetState extends State<MakeOfferBottomSheet> {
     Get.to(
       () => ChatStartScreen(
         property: widget.property,
-        initialMessage:
-            "I'm ready to buy this property for $currency ${offerController.text.trim()}",
+        initialMessage: "ready_to_buy_property".trParams({
+          "currency": currency,
+          "amount": offerController.text.trim(),
+        }),
       ),
     );
   }

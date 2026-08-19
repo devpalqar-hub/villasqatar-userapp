@@ -324,7 +324,7 @@ const Map<String, String> enUS = {
 
   "Tip: Properties with photos get 10x more interest!":
       "Tip: Properties with photos get 10x more interest!",
- 
+
   "Make sure to add high quality photos and videos":
       "Make sure to add high quality photos and videos",
 
@@ -868,8 +868,8 @@ const Map<String, String> enUS = {
   "Verifying...": "Verifying...",
   "Google": "Google",
   "Apple": "Apple",
-  "Discover premium villas and properties\\nin the best locations across Qatar":
-      "Discover premium villas and properties\\nin the best locations across Qatar",
+  "Discover premium villas and properties\nin the best locations across Qatar":
+      "Discover premium villas and properties\nin the best locations across Qatar",
   "Login Required": "Login Required",
   "Please sign in to use this feature.": "Please sign in to use this feature.",
   "Not Now": "Not Now",
@@ -1171,13 +1171,159 @@ const Map<String, String> enUS = {
 
   "Invoice": "Invoice",
   "Invoices": "Invoices",
-  
+
   "Enter your email": "Enter your email",
   "Select Municipality": "Select Municipality",
   "Use GPS": "Use GPS",
-  "This image will be shown first in listings": "This image will be shown first in listings",
+  "This image will be shown first in listings":
+      "This image will be shown first in listings",
   "Submit Property": "Submit Property",
- 
-  "Download Receipt": "Download Receipt"
 
+  "Download Receipt": "Download Receipt",
+
+  // --- Auto-added: full localization sweep 2026-08-19 ---
+  " (150 Reviews)": " (150 Reviews)",
+  " and ": " and ",
+  "Accept": "Accept",
+  "Add your details to personalize\nyour experience":
+      "Add your details to personalize\nyour experience",
+  "Additional details": "Additional details",
+  "Amount Paid": "Amount Paid",
+  "Apple sign-in failed": "Apple sign-in failed",
+  "Chat with Seller": "Chat with Seller",
+  "Check": "Check",
+  "Close": "Close",
+  "Complete Payment": "Complete Payment",
+  "Currency": "Currency",
+  "Dashboard": "Dashboard",
+  "Date not available": "Date not available",
+  "Describe your property": "Describe your property",
+  "Doha": "Doha",
+  "Edit & Resubmit": "Edit & Resubmit",
+  "End Date": "End Date",
+  "Ends today": "Ends today",
+  "Enter amount": "Enter amount",
+  "Expired": "Expired",
+  "Failed": "Failed",
+  "Failed to complete profile. Please try again.":
+      "Failed to complete profile. Please try again.",
+  "Failed to update profile": "Failed to update profile",
+  "Find your dream villa": "Find your dream villa",
+  "Free Estimates Used": "Free Estimates Used",
+  "Google sign-in failed": "Google sign-in failed",
+  "ID #": "ID #",
+  "Inappropriate content": "Inappropriate content",
+  "Incorrect listing information": "Incorrect listing information",
+  "Invalid OTP. Please try again.": "Invalid OTP. Please try again.",
+  "Invalid email/phone or password.": "Invalid email/phone or password.",
+  "Invalid property response": "Invalid property response",
+  "Issue": "Issue",
+  "Let's complete\n": "Let's complete\n",
+  "your profile": "your profile",
+  "LISTED": "LISTED",
+  "Listing Rejected": "Listing Rejected",
+  "Location not available": "Location not available",
+  "Logged-in user information is not available.":
+      "Logged-in user information is not available.",
+  "Login is required to make an offer.": "Login is required to make an offer.",
+  "Login is required to save properties to your wishlist.":
+      "Login is required to save properties to your wishlist.",
+  "Message": "Message",
+  "Misleading or fake listing": "Misleading or fake listing",
+  "Offer Submitted!": "Offer Submitted!",
+  "Owner": "Owner",
+  "Pay": "Pay",
+  "Please add a cover image": "Please add a cover image",
+  "Please add at least one property photo":
+      "Please add at least one property photo",
+  "Please enter a property description": "Please enter a property description",
+  "Please enter a valid email address": "Please enter a valid email address",
+  "Please enter a valid offer amount.": "Please enter a valid offer amount.",
+  "Please enter the address": "Please enter the address",
+  "Please enter the area": "Please enter the area",
+  "Please enter the number of bathrooms":
+      "Please enter the number of bathrooms",
+  "Please enter the number of bedrooms": "Please enter the number of bedrooms",
+  "Please enter the price": "Please enter the price",
+  "Please enter the property name": "Please enter the property name",
+  "Please enter your contact number": "Please enter your contact number",
+  "Please enter your email address": "Please enter your email address",
+  "Please enter your email or phone": "Please enter your email or phone",
+  "Please enter your full name": "Please enter your full name",
+  "Please enter your offer amount.": "Please enter your offer amount.",
+  "Please enter your password": "Please enter your password",
+  "Please login to continue": "Please login to continue",
+  "Please login to report a listing.": "Please login to report a listing.",
+  "Please select Sale or Rent": "Please select Sale or Rent",
+  "Please select a municipality": "Please select a municipality",
+  "Please select a property type": "Please select a property type",
+  "Please select the property location on the map":
+      "Please select the property location on the map",
+  "Premium Living. Perfect Location": "Premium Living. Perfect Location",
+  "Property ID is missing..": "Property ID is missing..",
+  "Property is no longer available": "Property is no longer available",
+  "Property link copied to clipboard": "Property link copied to clipboard",
+  "Property link is not available": "Property link is not available",
+  "Property marked as sold successfully":
+      "Property marked as sold successfully",
+  "Property not found": "Property not found",
+  "Property owner": "Property owner",
+  "Provide additional information that may help us review this listing.":
+      "Provide additional information that may help us review this listing.",
+  "Qatar": "Qatar",
+  "Reject": "Reject",
+  "Report listing": "Report listing",
+  "Reports are reviewed by our support team.":
+      "Reports are reviewed by our support team.",
+  "Resubmitted": "Resubmitted",
+  "Scheduled": "Scheduled",
+  "Send": "Send",
+  "Something went wrong. Please try again.":
+      "Something went wrong. Please try again.",
+  "Start Date": "Start Date",
+  "Submit Offer": "Submit Offer",
+  "Suspected scam or fraud": "Suspected scam or fraud",
+  "Tell us what's wrong with this property.":
+      "Tell us what's wrong with this property.",
+  "Thank you. Our support team will review this listing.":
+      "Thank you. Our support team will review this listing.",
+  "Total Paid": "Total Paid",
+  "Unable to mark property as sold": "Unable to mark property as sold",
+  "Unable to open the page": "Unable to open the page",
+  "Unable to start checkout. Please try again.":
+      "Unable to start checkout. Please try again.",
+  "Unable to start payment. Please try again.":
+      "Unable to start payment. Please try again.",
+  "Update Property": "Update Property",
+  "Verification Required": "Verification Required",
+  "Verified Contact": "Verified Contact",
+  "Verified Seller": "Verified Seller",
+  "Verify Number": "Verify Number",
+  "Verify OTP": "Verify OTP",
+  "Visit Request": "Visit Request",
+  "Visitor": "Visitor",
+  "Why are you reporting this listing?": "Why are you reporting this listing?",
+  "Would you like to accept or reject this visit request?":
+      "Would you like to accept or reject this visit request?",
+  "You can try again anytime.": "You can try again anytime.",
+  "Your Offer Details": "Your Offer Details",
+  "Choose the reason that best describes the issue.":
+      "Choose the reason that best describes the issue.",
+  "العربية": "العربية",
+  "@count Invoice": "@count Invoice",
+  "@count Invoices": "@count Invoices",
+  // --- Auto-added: follow-up sweep 2026-08-19 ---
+  "We'll never share your information with anyone":
+      "We'll never share your information with anyone",
+  "Login is required to schedule a property visit.":
+      "Login is required to schedule a property visit.",
+  "Please login to save properties to your wishlist.":
+      "Please login to save properties to your wishlist.",
+  "Please review the issue below and update your listing before submitting it again.":
+      "Please review the issue below and update your listing before submitting it again.",
+  "Sign in to keep estimating.": "Sign in to keep estimating.",
+  "Your offer has been sent successfully.\nThe seller will review it and contact you soon.":
+      "Your offer has been sent successfully.\nThe seller will review it and contact you soon.",
+  "Payment Pending": "Payment Pending",
+  "ready_to_buy_property": "I'm ready to buy this property for @currency @amount",
 };

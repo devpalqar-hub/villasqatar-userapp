@@ -4,6 +4,8 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
 
+import 'package:villas_qatar/Core/constants/app_colors.dart';
+import 'package:villas_qatar/Core/theme/app_textstyles.dart';
 import 'package:villas_qatar/modules/propertylist/model/myproperty_model.dart';
 
 /// Property Insights panel - app-native version of the web
@@ -25,15 +27,23 @@ class PropertyInsightsBottomSheet extends StatelessWidget {
     this.insights = const PropertyInsights.empty(),
   });
 
-  static const Color primaryColor = Color(0xff8A1538);
+  static const Color primaryColor = AppColors.primary;
+
+  static const List<BoxShadow> _cardShadow = [
+    BoxShadow(
+      color: Color(0x0A1F1F1F),
+      blurRadius: 18,
+      offset: Offset(0, 6),
+    ),
+  ];
 
   @override
   Widget build(BuildContext context) {
     return Container(
       height: MediaQuery.of(context).size.height * 0.9,
       decoration: BoxDecoration(
-        color: const Color(0xffF7F7F8),
-        borderRadius: BorderRadius.vertical(top: Radius.circular(24.r)),
+        color: const Color(0xffF7F8FA),
+        borderRadius: BorderRadius.vertical(top: Radius.circular(28.r)),
       ),
       clipBehavior: Clip.antiAlias,
       child: Column(
@@ -44,10 +54,10 @@ class PropertyInsightsBottomSheet extends StatelessWidget {
           SizedBox(height: 10.h),
 
           Container(
-            width: 42.w,
+            width: 38.w,
             height: 4.h,
             decoration: BoxDecoration(
-              color: const Color(0xffD5D5D5),
+              color: const Color(0xffE1E1E6),
               borderRadius: BorderRadius.circular(20.r),
             ),
           ),
@@ -57,7 +67,7 @@ class PropertyInsightsBottomSheet extends StatelessWidget {
           // =====================================================
           Container(
             color: Colors.white,
-            padding: EdgeInsets.fromLTRB(16.w, 12.h, 10.w, 14.h),
+            padding: EdgeInsets.fromLTRB(20.w, 14.h, 12.w, 16.h),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -65,21 +75,21 @@ class PropertyInsightsBottomSheet extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Container(
-                      width: 40.w,
-                      height: 40.w,
+                      width: 38.w,
+                      height: 38.w,
                       alignment: Alignment.center,
                       decoration: BoxDecoration(
                         color: primaryColor.withOpacity(.08),
-                        borderRadius: BorderRadius.circular(11.r),
+                        borderRadius: BorderRadius.circular(12.r),
                       ),
                       child: Icon(
-                        Icons.bar_chart_rounded,
-                        size: 20.sp,
+                        Icons.insights_rounded,
+                        size: 19.sp,
                         color: primaryColor,
                       ),
                     ),
 
-                    SizedBox(width: 11.w),
+                    SizedBox(width: 12.w),
 
                     Expanded(
                       child: Column(
@@ -87,22 +97,20 @@ class PropertyInsightsBottomSheet extends StatelessWidget {
                         children: [
                           Text(
                             "Property Insights".tr,
-                            style: TextStyle(
-                              fontSize: 16.sp,
-                              fontWeight: FontWeight.w500,
-                              color: const Color(0xff1F1F1F),
+                            style: AppTextStyles.title16.copyWith(
+                              color: AppColors.textPrimary,
                             ),
                           ),
 
-                          SizedBox(height: 2.h),
+                          SizedBox(height: 3.h),
 
                           Text(
                             "Track how people are discovering and engaging with your property."
                                 .tr,
-                            style: TextStyle(
-                              fontSize: 9.5.sp,
-                              color: const Color(0xff888888),
-                              height: 1.3,
+                            style: AppTextStyles.body12.copyWith(
+                              color: AppColors.textSecondary,
+                              height: 1.35,
+                              fontSize: 10.5.sp,
                             ),
                           ),
                         ],
@@ -112,12 +120,17 @@ class PropertyInsightsBottomSheet extends StatelessWidget {
                     InkWell(
                       onTap: Get.back,
                       customBorder: const CircleBorder(),
-                      child: Padding(
-                        padding: EdgeInsets.all(4.w),
+                      child: Container(
+                        margin: EdgeInsets.only(left: 4.w),
+                        padding: EdgeInsets.all(6.w),
+                        decoration: const BoxDecoration(
+                          color: Color(0xffF3F3F5),
+                          shape: BoxShape.circle,
+                        ),
                         child: Icon(
                           Icons.close_rounded,
-                          size: 20.sp,
-                          color: const Color(0xff333333),
+                          size: 17.sp,
+                          color: const Color(0xff4B4B52),
                         ),
                       ),
                     ),
@@ -125,25 +138,24 @@ class PropertyInsightsBottomSheet extends StatelessWidget {
                 ),
 
                 if (insights.formattedTrendRange.isNotEmpty) ...[
-                  SizedBox(height: 12.h),
+                  SizedBox(height: 14.h),
 
                   Container(
                     width: double.infinity,
                     padding: EdgeInsets.symmetric(
-                      horizontal: 12.w,
-                      vertical: 9.h,
+                      horizontal: 14.w,
+                      vertical: 10.h,
                     ),
                     decoration: BoxDecoration(
-                      color: const Color(0xffF7F7F8),
-                      borderRadius: BorderRadius.circular(10.r),
-                      border: Border.all(color: const Color(0xffEBEBEF)),
+                      color: primaryColor.withOpacity(.05),
+                      borderRadius: BorderRadius.circular(14.r),
                     ),
                     child: Row(
                       children: [
                         Icon(
                           Icons.calendar_today_rounded,
-                          size: 13.sp,
-                          color: const Color(0xff555555),
+                          size: 12.5.sp,
+                          color: primaryColor,
                         ),
 
                         SizedBox(width: 8.w),
@@ -156,7 +168,7 @@ class PropertyInsightsBottomSheet extends StatelessWidget {
                             style: TextStyle(
                               fontSize: 11.5.sp,
                               fontWeight: FontWeight.w700,
-                              color: const Color(0xff222222),
+                              color: AppColors.textPrimary,
                             ),
                           ),
                         ),
@@ -166,7 +178,8 @@ class PropertyInsightsBottomSheet extends StatelessWidget {
                           '${"days".tr}',
                           style: TextStyle(
                             fontSize: 9.5.sp,
-                            color: const Color(0xff888888),
+                            fontWeight: FontWeight.w500,
+                            color: AppColors.textSecondary,
                           ),
                         ),
                       ],
@@ -182,7 +195,7 @@ class PropertyInsightsBottomSheet extends StatelessWidget {
           // =====================================================
           Expanded(
             child: SingleChildScrollView(
-              padding: EdgeInsets.fromLTRB(16.w, 16.h, 16.w, 24.h),
+              padding: EdgeInsets.fromLTRB(16.w, 18.h, 16.w, 28.h),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -254,11 +267,11 @@ class PropertyInsightsBottomSheet extends StatelessWidget {
   }) {
     return Container(
       width: double.infinity,
-      padding: EdgeInsets.all(14.w),
+      padding: EdgeInsets.all(16.w),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(14.r),
-        border: Border.all(color: const Color(0xffEAEAEA)),
+        borderRadius: BorderRadius.circular(18.r),
+        boxShadow: _cardShadow,
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -268,10 +281,8 @@ class PropertyInsightsBottomSheet extends StatelessWidget {
             children: [
               Text(
                 title,
-                style: TextStyle(
-                  fontSize: 12.5.sp,
-                  fontWeight: FontWeight.w800,
-                  color: const Color(0xff1F1F1F),
+                style: AppTextStyles.bold14.copyWith(
+                  color: AppColors.textPrimary,
                 ),
               ),
 
@@ -285,7 +296,7 @@ class PropertyInsightsBottomSheet extends StatelessWidget {
                     overflow: TextOverflow.ellipsis,
                     style: TextStyle(
                       fontSize: 9.5.sp,
-                      color: const Color(0xff999999),
+                      color: AppColors.textHint,
                     ),
                   ),
                 ),
@@ -293,7 +304,7 @@ class PropertyInsightsBottomSheet extends StatelessWidget {
             ],
           ),
 
-          SizedBox(height: 12.h),
+          SizedBox(height: 14.h),
 
           child,
         ],
@@ -336,7 +347,7 @@ class PropertyInsightsBottomSheet extends StatelessWidget {
       _metricTile(
         iconWidget: FaIcon(
           FontAwesomeIcons.whatsapp,
-          size: 14.sp,
+          size: 13.sp,
           color: const Color(0xff2FA84F),
         ),
         bgColor: const Color(0xffE1F6E4),
@@ -397,28 +408,28 @@ class PropertyInsightsBottomSheet extends StatelessWidget {
     return Container(
       padding: EdgeInsets.all(10.w),
       decoration: BoxDecoration(
-        color: highlighted ? primaryColor.withOpacity(.06) : Colors.white,
-        borderRadius: BorderRadius.circular(12.r),
-        border: Border.all(
-          color: highlighted
-              ? primaryColor.withOpacity(.25)
-              : const Color(0xffEDEDED),
-        ),
+        color: highlighted
+            ? primaryColor.withOpacity(.05)
+            : const Color(0xffFAFAFB),
+        borderRadius: BorderRadius.circular(14.r),
+        border: highlighted
+            ? Border.all(color: primaryColor.withOpacity(.18))
+            : null,
       ),
       child: Row(
         children: [
           Container(
-            width: 30.w,
-            height: 30.w,
+            width: 32.w,
+            height: 32.w,
             alignment: Alignment.center,
             decoration: BoxDecoration(
               color: bgColor,
-              shape: BoxShape.circle,
+              borderRadius: BorderRadius.circular(10.r),
             ),
             child: glyph,
           ),
 
-          SizedBox(width: 8.w),
+          SizedBox(width: 9.w),
 
           Expanded(
             child: Column(
@@ -431,16 +442,19 @@ class PropertyInsightsBottomSheet extends StatelessWidget {
                   overflow: TextOverflow.ellipsis,
                   style: TextStyle(
                     fontSize: 8.5.sp,
-                    color: const Color(0xff888888),
+                    fontWeight: FontWeight.w500,
+                    color: AppColors.textSecondary,
                   ),
                 ),
+
+                SizedBox(height: 1.h),
 
                 Text(
                   value.toString(),
                   style: TextStyle(
-                    fontSize: 14.sp,
+                    fontSize: 15.sp,
                     fontWeight: FontWeight.w800,
-                    color: const Color(0xff202020),
+                    color: AppColors.textPrimary,
                   ),
                 ),
               ],
@@ -470,20 +484,29 @@ class PropertyInsightsBottomSheet extends StatelessWidget {
       padding: EdgeInsets.all(12.w),
       decoration: BoxDecoration(
         color: changeColor.withOpacity(.06),
-        borderRadius: BorderRadius.circular(10.r),
+        borderRadius: BorderRadius.circular(14.r),
       ),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Icon(
-            isUp
-                ? Icons.trending_up_rounded
-                : Icons.trending_down_rounded,
-            size: 15.sp,
-            color: changeColor,
+          Container(
+            width: 24.w,
+            height: 24.w,
+            alignment: Alignment.center,
+            decoration: BoxDecoration(
+              color: changeColor.withOpacity(.12),
+              shape: BoxShape.circle,
+            ),
+            child: Icon(
+              isUp
+                  ? Icons.trending_up_rounded
+                  : Icons.trending_down_rounded,
+              size: 14.sp,
+              color: changeColor,
+            ),
           ),
 
-          SizedBox(width: 8.w),
+          SizedBox(width: 10.w),
 
           Expanded(
             child: RichText(
@@ -491,7 +514,7 @@ class PropertyInsightsBottomSheet extends StatelessWidget {
                 style: TextStyle(
                   fontSize: 10.5.sp,
                   color: const Color(0xff444444),
-                  height: 1.35,
+                  height: 1.4,
                 ),
                 children: [
                   TextSpan(
@@ -540,28 +563,26 @@ class PropertyInsightsBottomSheet extends StatelessWidget {
 
     return Container(
       width: double.infinity,
-      padding: EdgeInsets.fromLTRB(10.w, 14.h, 16.w, 10.h),
+      padding: EdgeInsets.fromLTRB(12.w, 16.h, 18.w, 12.h),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(14.r),
-        border: Border.all(color: const Color(0xffEAEAEA)),
+        borderRadius: BorderRadius.circular(18.r),
+        boxShadow: _cardShadow,
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Padding(
-            padding: EdgeInsets.symmetric(horizontal: 6.w),
+            padding: EdgeInsets.symmetric(horizontal: 4.w),
             child: Text(
               "Views Over Time".tr,
-              style: TextStyle(
-                fontSize: 12.5.sp,
-                fontWeight: FontWeight.w800,
-                color: const Color(0xff1F1F1F),
+              style: AppTextStyles.bold14.copyWith(
+                color: AppColors.textPrimary,
               ),
             ),
           ),
 
-          SizedBox(height: 14.h),
+          SizedBox(height: 16.h),
 
           SizedBox(
             height: 170.h,
@@ -576,7 +597,7 @@ class PropertyInsightsBottomSheet extends StatelessWidget {
                   drawVerticalLine: false,
                   horizontalInterval: (maxY / 4).clamp(1, double.infinity),
                   getDrawingHorizontalLine: (value) => FlLine(
-                    color: const Color(0xffEFEFEF),
+                    color: const Color(0xffF1F1F3),
                     strokeWidth: 1,
                   ),
                 ),
@@ -598,7 +619,7 @@ class PropertyInsightsBottomSheet extends StatelessWidget {
                           value.toInt().toString(),
                           style: TextStyle(
                             fontSize: 8.5.sp,
-                            color: const Color(0xff9A9A9A),
+                            color: AppColors.textHint,
                           ),
                         );
                       },
@@ -622,7 +643,7 @@ class PropertyInsightsBottomSheet extends StatelessWidget {
                             points[index].formattedPeriod,
                             style: TextStyle(
                               fontSize: 8.sp,
-                              color: const Color(0xff9A9A9A),
+                              color: AppColors.textHint,
                             ),
                           ),
                         );
@@ -678,8 +699,8 @@ class PropertyInsightsBottomSheet extends StatelessWidget {
                         begin: Alignment.topCenter,
                         end: Alignment.bottomCenter,
                         colors: [
-                          primaryColor.withOpacity(.22),
-                          primaryColor.withOpacity(.02),
+                          primaryColor.withOpacity(.20),
+                          primaryColor.withOpacity(.0),
                         ],
                       ),
                     ),
@@ -689,16 +710,16 @@ class PropertyInsightsBottomSheet extends StatelessWidget {
             ),
           ),
 
-          SizedBox(height: 6.h),
+          SizedBox(height: 8.h),
 
           Padding(
-            padding: EdgeInsets.symmetric(horizontal: 6.w),
+            padding: EdgeInsets.symmetric(horizontal: 4.w),
             child: Row(
               children: [
                 Icon(
                   Icons.info_outline_rounded,
                   size: 11.sp,
-                  color: const Color(0xffAAAAAA),
+                  color: AppColors.textHint,
                 ),
 
                 SizedBox(width: 5.w),
@@ -711,7 +732,7 @@ class PropertyInsightsBottomSheet extends StatelessWidget {
                     overflow: TextOverflow.ellipsis,
                     style: TextStyle(
                       fontSize: 8.5.sp,
-                      color: const Color(0xffAAAAAA),
+                      color: AppColors.textHint,
                     ),
                   ),
                 ),
@@ -730,31 +751,39 @@ class PropertyInsightsBottomSheet extends StatelessWidget {
   Widget _emptyStateBanner() {
     return Container(
       width: double.infinity,
-      padding: EdgeInsets.all(12.w),
+      padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 28.h),
       decoration: BoxDecoration(
-        color: primaryColor.withOpacity(.06),
-        borderRadius: BorderRadius.circular(12.r),
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(18.r),
+        boxShadow: _cardShadow,
       ),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
+      child: Column(
         children: [
-          Icon(
-            Icons.insights_rounded,
-            size: 16.sp,
-            color: primaryColor,
+          Container(
+            width: 44.w,
+            height: 44.w,
+            alignment: Alignment.center,
+            decoration: BoxDecoration(
+              color: primaryColor.withOpacity(.08),
+              shape: BoxShape.circle,
+            ),
+            child: Icon(
+              Icons.insights_rounded,
+              size: 21.sp,
+              color: primaryColor,
+            ),
           ),
 
-          SizedBox(width: 10.w),
+          SizedBox(height: 12.h),
 
-          Expanded(
-            child: Text(
-              "Insights will start appearing here once your property gets activity."
-                  .tr,
-              style: TextStyle(
-                fontSize: 10.sp,
-                color: const Color(0xff555555),
-                height: 1.35,
-              ),
+          Text(
+            "Insights will start appearing here once your property gets activity."
+                .tr,
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              fontSize: 11.sp,
+              color: AppColors.textSecondary,
+              height: 1.4,
             ),
           ),
         ],

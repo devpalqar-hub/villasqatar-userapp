@@ -33,8 +33,12 @@ class ProfileModel {
       authProvider: json["authProvider"] ?? "",
       isProfileComplete: json["isProfileComplete"] ?? false,
       isActive: json["isActive"] ?? false,
-      createdAt: DateTime.parse(json["createdAt"]),
-      updatedAt: DateTime.parse(json["updatedAt"]),
+      // Some responses (e.g. the "profile" object embedded in social
+      // login responses) omit createdAt/updatedAt entirely - don't let
+      // a missing/unparsable date blow up the whole profile and leave
+      // the UI stuck showing "Guest".
+      createdAt: DateTime.tryParse(json["createdAt"] ?? "") ?? DateTime.now(),
+      updatedAt: DateTime.tryParse(json["updatedAt"] ?? "") ?? DateTime.now(),
     );
   }
 

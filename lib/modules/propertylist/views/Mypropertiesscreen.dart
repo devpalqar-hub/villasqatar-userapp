@@ -227,10 +227,7 @@ class _MyPropertiesScreenState extends State<MyPropertiesScreen> {
       padding: const EdgeInsets.fromLTRB(12, 8, 16, 8),
       child: Row(
         children: [
-          IconButton(
-            icon: const Icon(Icons.arrow_back, color: AppColors.primary),
-            onPressed: () {},
-          ),
+        
           Expanded(
             child: Text(
               "My Properties".tr,

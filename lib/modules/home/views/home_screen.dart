@@ -181,11 +181,7 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
           ),
           SizedBox(width: 10.w),
-          Icon(
-            CupertinoIcons.bell_solid,
-            color: AppColors.primary.withOpacity(.9),
-          ),
-          SizedBox(width: 10.w),
+       
         ],
       ),
       body: SafeArea(
@@ -591,11 +587,6 @@ class _HomeScreenState extends State<HomeScreen> {
                       sqm: '${property.area.toStringAsFixed(0)} SQM',
                       beds: property.bedrooms.toString(),
                       verified: property.contactVerified,
-
-                      /// Every card in this carousel comes from the
-                      /// featured-properties endpoint itself, so it's
-                      /// always featured - don't rely on the listing's
-                      /// own `isFeatured` flag, which can lag/be unset.
                       isFeatured: true,
                       propertyId: property.id,
                       slug: property.slug,

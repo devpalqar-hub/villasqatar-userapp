@@ -520,6 +520,16 @@ selectedCountryCode = "+974";
       await StorageService.setLoggedIn(true);
     }
 
+    // Social logins (Google/Apple) for a brand-new user return only
+    // { isNew: true, access_token } - no "profile" - even though the
+    // backend has already pre-filled name/email from the provider.
+    // Fetch it now so the name/email show up immediately instead of
+    // staying blank ("Guest"/"No Email") until something else happens
+    // to call /auth/me later.
+    if (profile == null && accessToken != null && accessToken!.isNotEmpty) {
+      await _fetchAndCacheProfile();
+    }
+
     if (profile != null) {
       await StorageService.saveProfile(profile!);
     }
@@ -531,6 +541,23 @@ selectedCountryCode = "+974";
     unawaited(PushNotificationService.registerCurrentToken());
 
     update();
+  }
+
+  /// Fetches the authenticated user's profile from `/auth/me` and stores
+  /// it on [profile]. Used right after a social login response that
+  /// didn't include a "profile" (new-user case) so the name/email are
+  /// available immediately instead of only after some other screen
+  /// happens to call this endpoint.
+  Future<void> _fetchAndCacheProfile() async {
+    try {
+      final response = await ApiHandler.get(ApiEndpoints.authMe);
+
+      if (response is Map<String, dynamic>) {
+        profile = response;
+      }
+    } catch (e) {
+      debugPrint("Fetch Profile Error: $e");
+    }
   }
 
   Future<void> logout() async {

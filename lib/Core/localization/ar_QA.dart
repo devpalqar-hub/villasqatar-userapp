@@ -126,7 +126,7 @@ const Map<String, String> arQA = {
       "اشترِ أو استأجر واكتشف أفضل العقارات من حولك",
 
   "No Properties Found": "لم يتم العثور على عقارات",
-   "No more properties": "لا توجد عقارات أخرى",
+  "No more properties": "لا توجد عقارات أخرى",
   "Try changing your search or filters": "حاول تغيير البحث أو الفلاتر",
 
   "Filter Properties": "تصفية العقارات",
@@ -854,7 +854,7 @@ const Map<String, String> arQA = {
   "Verifying...": "جارٍ التحقق...",
   "Google": "جوجل",
   "Apple": "آبل",
-  "Discover premium villas and properties\\nin the best locations across Qatar":
+  "Discover premium villas and properties\nin the best locations across Qatar":
       "اكتشف أفضل الفلل والعقارات الفاخرة في أرقى المواقع في قطر",
   "Login Required": "تسجيل الدخول مطلوب",
   "Please sign in to use this feature.":
@@ -1002,13 +1002,14 @@ const Map<String, String> arQA = {
   "By continuing, you agree to our\n": "بمتابعة الاستخدام، فإنك توافق على\n",
   "Terms of Use": "شروط الاستخدام",
   "Privacy Policy": "سياسة الخصوصية",
-  'No Properties Listed': 'No Properties Listed',
+  'No Properties Listed': 'لا توجد عقارات مدرجة',
   'This dealer hasn\'t added any listings yet':
-      'This dealer hasn\'t added any listings yet',
+      'لم يقم هذا الوسيط بإضافة أي عقارات بعد',
   "Seller Properties": "عقارات البائع",
- 
-   "This seller has no more properties to show": "لا يملك هذا البائع المزيد من العقارات لعرضها",
-  'View all': 'View all',
+
+  "This seller has no more properties to show":
+      "لا يملك هذا البائع المزيد من العقارات لعرضها",
+  'View all': 'عرض الكل',
   "This period": "هذه الفترة",
   "Performance Trend": "اتجاه الأداء",
   "Top Listings": "أفضل العقارات",
@@ -1149,15 +1150,161 @@ const Map<String, String> arQA = {
 
   "Invoice": "فاتورة",
   "Invoices": "فواتير",
-  
+
   "Enter your email": "أدخل بريدك الإلكتروني",
   "Select Municipality": "اختر البلدية",
   "Use GPS": "استخدام نظام تحديد المواقع",
-  "This image will be shown first in listings": "ستظهر هذه الصورة أولاً في القوائم",
+  "This image will be shown first in listings":
+      "ستظهر هذه الصورة أولاً في القوائم",
   "Submit Property": "إرسال العقار",
- 
-  
-  
-  "Download Receipt": "تنزيل الإيصال"
 
+  "Download Receipt": "تنزيل الإيصال",
+
+  // --- Auto-added: full localization sweep 2026-08-19 ---
+  " (150 Reviews)": " (150 تقييم)",
+  " and ": " و ",
+  "Accept": "قبول",
+  "Add your details to personalize\nyour experience":
+      "أضف بياناتك لتخصيص\nتجربتك",
+  "Additional details": "تفاصيل إضافية",
+  "Amount Paid": "المبلغ المدفوع",
+  "Apple sign-in failed": "فشل تسجيل الدخول عبر آبل",
+  "Chat with Seller": "تواصل مع البائع",
+  "Check": "تحقق",
+  "Close": "إغلاق",
+  "Complete Payment": "إتمام الدفع",
+  "Currency": "العملة",
+  "Dashboard": "لوحة التحكم",
+  "Date not available": "التاريخ غير متوفر",
+  "Describe your property": "صف عقارك",
+  "Doha": "الدوحة",
+  "Edit & Resubmit": "تعديل وإعادة الإرسال",
+  "End Date": "تاريخ الانتهاء",
+  "Ends today": "ينتهي اليوم",
+  "Enter amount": "أدخل المبلغ",
+  "Expired": "منتهي الصلاحية",
+  "Failed": "فشل",
+  "Failed to complete profile. Please try again.":
+      "تعذر إكمال الملف الشخصي. يرجى المحاولة مرة أخرى.",
+  "Failed to update profile": "تعذر تحديث الملف الشخصي",
+  "Find your dream villa": "اعثر على فيلا أحلامك",
+  "Free Estimates Used": "التقديرات المجانية المستخدمة",
+  "Google sign-in failed": "فشل تسجيل الدخول عبر جوجل",
+  "ID #": "رقم التعريف #",
+  "Inappropriate content": "محتوى غير لائق",
+  "Incorrect listing information": "معلومات الإعلان غير صحيحة",
+  "Invalid OTP. Please try again.":
+      "رمز التحقق غير صحيح. يرجى المحاولة مرة أخرى.",
+  "Invalid email/phone or password.":
+      "البريد الإلكتروني/رقم الهاتف أو كلمة المرور غير صحيحة.",
+  "Invalid property response": "استجابة غير صالحة للعقار",
+  "Issue": "المشكلة",
+  "Let's complete\n": "لنكمل\n",
+  "your profile": "ملفك الشخصي",
+  "LISTED": "مُدرج",
+  "Listing Rejected": "تم رفض الإعلان",
+  "Location not available": "الموقع غير متوفر",
+  "Logged-in user information is not available.":
+      "معلومات المستخدم المسجل دخوله غير متوفرة.",
+  "Login is required to make an offer.": "يجب تسجيل الدخول لتقديم عرض.",
+  "Login is required to save properties to your wishlist.":
+      "يجب تسجيل الدخول لحفظ العقارات في قائمة المفضلة.",
+  "Message": "رسالة",
+  "Misleading or fake listing": "إعلان مضلل أو مزيف",
+  "No properties found": "لا توجد عقارات",
+  "Offer Submitted!": "تم إرسال العرض!",
+  "Owner": "المالك",
+  "Pay": "الدفع",
+  "Please add a cover image": "يرجى إضافة صورة غلاف",
+  "Please add at least one property photo":
+      "يرجى إضافة صورة واحدة على الأقل للعقار",
+  "Please enter a property description": "يرجى إدخال وصف للعقار",
+  "Please enter a valid email address": "يرجى إدخال بريد إلكتروني صحيح",
+  "Please enter a valid offer amount.": "يرجى إدخال قيمة عرض صحيحة.",
+  "Please enter the address": "يرجى إدخال العنوان",
+  "Please enter the area": "يرجى إدخال المساحة",
+  "Please enter the number of bathrooms": "يرجى إدخال عدد الحمامات",
+  "Please enter the number of bedrooms": "يرجى إدخال عدد غرف النوم",
+  "Please enter the price": "يرجى إدخال السعر",
+  "Please enter the property name": "يرجى إدخال اسم العقار",
+  "Please enter your contact number": "يرجى إدخال رقم التواصل الخاص بك",
+  "Please enter your email address": "يرجى إدخال بريدك الإلكتروني",
+  "Please enter your email or phone":
+      "يرجى إدخال بريدك الإلكتروني أو رقم هاتفك",
+  "Please enter your full name": "يرجى إدخال اسمك الكامل",
+  "Please enter your offer amount.": "يرجى إدخال قيمة عرضك.",
+  "Please enter your password": "يرجى إدخال كلمة المرور",
+  "Please login to continue": "يرجى تسجيل الدخول للمتابعة",
+  "Please login to report a listing.": "يرجى تسجيل الدخول للإبلاغ عن إعلان.",
+  "Please select Sale or Rent": "يرجى اختيار بيع أو إيجار",
+  "Please select a municipality": "يرجى اختيار البلدية",
+  "Please select a property type": "يرجى اختيار نوع العقار",
+  "Please select the property location on the map":
+      "يرجى تحديد موقع العقار على الخريطة",
+  "Premium Living. Perfect Location": "معيشة راقية. موقع مثالي",
+  "Property ID is missing..": "معرّف العقار غير موجود..",
+  "Property is no longer available": "العقار لم يعد متاحًا",
+  "Property link copied to clipboard": "تم نسخ رابط العقار إلى الحافظة",
+  "Property link is not available": "رابط العقار غير متوفر",
+  "Property marked as sold successfully": "تم تحديد العقار كمباع بنجاح",
+  "Property not found": "لم يتم العثور على العقار",
+  "Property owner": "مالك العقار",
+  "Provide additional information that may help us review this listing.":
+      "قدم معلومات إضافية قد تساعدنا في مراجعة هذا الإعلان.",
+  "Qatar": "قطر",
+  "Reject": "رفض",
+  "Report listing": "الإبلاغ عن الإعلان",
+  "Reports are reviewed by our support team.":
+      "تتم مراجعة البلاغات من قبل فريق الدعم لدينا.",
+  "Resubmitted": "تمت إعادة التقديم",
+  "Scheduled": "مجدولة",
+  "Send": "إرسال",
+  "Something went wrong. Please try again.":
+      "حدث خطأ ما. يرجى المحاولة مرة أخرى.",
+  "Start Date": "تاريخ البدء",
+  "Submit Offer": "إرسال العرض",
+  "Suspected scam or fraud": "اشتباه في احتيال أو نصب",
+  "Tell us what's wrong with this property.":
+      "أخبرنا بما هو خاطئ في هذا العقار.",
+  "Thank you. Our support team will review this listing.":
+      "شكرًا لك. سيقوم فريق الدعم لدينا بمراجعة هذا الإعلان.",
+  "Total Paid": "إجمالي المدفوع",
+  "Unable to mark property as sold": "تعذر تحديد العقار كمباع",
+  "Unable to open the page": "تعذر فتح الصفحة",
+  "Unable to start checkout. Please try again.":
+      "تعذر بدء عملية الدفع. يرجى المحاولة مرة أخرى.",
+  "Unable to start payment. Please try again.":
+      "تعذر بدء عملية الدفع. يرجى المحاولة مرة أخرى.",
+  "Update Property": "تحديث العقار",
+  "Verification Required": "التحقق مطلوب",
+  "Verified Contact": "بيانات تواصل موثقة",
+  "Verified Seller": "بائع موثّق",
+  "Verify Number": "تحقق من الرقم",
+  "Verify OTP": "تحقق من الرمز",
+  "Visit Request": "طلب زيارة",
+  "Visitor": "زائر",
+  "Why are you reporting this listing?": "لماذا تقوم بالإبلاغ عن هذا الإعلان؟",
+  "Would you like to accept or reject this visit request?":
+      "هل ترغب في قبول أو رفض طلب الزيارة هذا؟",
+  "You can try again anytime.": "يمكنك المحاولة مرة أخرى في أي وقت.",
+  "Your Offer Details": "تفاصيل عرضك",
+  "Choose the reason that best describes the issue.":
+      "اختر السبب الذي يصف المشكلة بشكل أفضل.",
+  "العربية": "العربية",
+  "@count Invoice": "@count فاتورة",
+  "@count Invoices": "@count فواتير",
+  // --- Auto-added: follow-up sweep 2026-08-19 ---
+  "We'll never share your information with anyone":
+      "لن نشارك معلوماتك مع أي جهة أبدًا",
+  "Login is required to schedule a property visit.":
+      "يجب تسجيل الدخول لجدولة زيارة للعقار.",
+  "Please login to save properties to your wishlist.":
+      "يرجى تسجيل الدخول لحفظ العقارات في قائمة المفضلة.",
+  "Please review the issue below and update your listing before submitting it again.":
+      "يرجى مراجعة المشكلة أدناه وتحديث إعلانك قبل إعادة تقديمه.",
+  "Sign in to keep estimating.": "سجّل الدخول لمتابعة التقدير.",
+  "Your offer has been sent successfully.\nThe seller will review it and contact you soon.":
+      "تم إرسال عرضك بنجاح.\nسيقوم البائع بمراجعته والتواصل معك قريبًا.",
+  "Payment Pending": "بانتظار الدفع",
+  "ready_to_buy_property": "أنا مستعد لشراء هذا العقار مقابل @currency @amount",
 };

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get_core/src/get_main.dart';
 import 'package:get/get_navigation/src/extension_navigation.dart';
 import 'package:get/get_state_manager/src/simple/get_controllers.dart';
@@ -19,6 +20,15 @@ class ProfileController extends GetxController {
 
   bool isLoading = false;
   bool isSaving = false;
+
+  /// Strips the `Exception: ` prefix `ApiHandler` wraps error bodies in,
+  /// so the backend's actual message (e.g. "Please provide a valid phone
+  /// number with country code") reaches the user as-is.
+  String _extractErrorMessage(Object e, String fallback) {
+    final text = e.toString();
+    if (text.isEmpty) return fallback;
+    return text.startsWith("Exception: ") ? text.substring(11) : text;
+  }
 
   @override
   void onInit() {
@@ -45,7 +55,22 @@ class ProfileController extends GetxController {
 
       await StorageService.saveProfile(response);
     } catch (e) {
-     
+      debugPrint("Fetch Profile Error: $e");
+
+      // /auth/me failed (network hiccup, expired token mid-flow, etc.) -
+      // fall back to whatever was cached from login rather than leaving
+      // the screen stuck on "Guest"/"No Email" with no explanation.
+      final cached = StorageService.getProfile();
+      if (cached != null) {
+        try {
+          profile = ProfileModel.fromJson(cached);
+          nameController.text = profile!.name;
+          emailController.text = profile!.email;
+          phoneController.text = profile!.phone;
+        } catch (e) {
+          debugPrint("Cached Profile Parse Error: $e");
+        }
+      }
     } finally {
       isLoading = false;
       update();
@@ -78,6 +103,10 @@ Future<bool> updateProfile() async {
     return true;
   } catch (e) {
     debugPrint("UPDATE PROFILE ERROR: $e");
+
+    Fluttertoast.showToast(
+      msg: _extractErrorMessage(e, "Failed to update profile".tr),
+    );
 
     return false;
   } finally {

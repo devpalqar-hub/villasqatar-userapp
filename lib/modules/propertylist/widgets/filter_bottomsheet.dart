@@ -175,7 +175,7 @@ void showFilterBottomSheet(BuildContext context) {
                                     "Unfurnished",
                                   ].map((e) {
                                     return chip(
-                                      title: e,
+                                      title: e.tr,
                                       selected: furnishing == e,
                                       onTap: () {
                                         setState(() {

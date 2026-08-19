@@ -37,10 +37,7 @@ class ChatListScreen extends StatelessWidget {
             color: Colors.black87,
           ),
         ),
-        leading: IconButton(
-          onPressed: () => Get.back(),
-          icon: const Icon(Icons.arrow_back, color: AppColors.primary),
-        ),
+       
         actions: [
           IconButton(
             tooltip: "My Visits".tr,

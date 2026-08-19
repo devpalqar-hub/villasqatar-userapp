@@ -70,10 +70,9 @@ class _DealerDetailsScreenState extends State<DealerDetailsScreen> {
                               _Identity(p, d),
                               SizedBox(height: 16.h),
                               _ContactCard(p, d),
-                              SizedBox(height: 16.h),
-                              _SubscriptionAndStats(d),
-                              SizedBox(height: 16.h),
-                              SizedBox(height: 10.h),
+                            
+                         
+                              SizedBox(height: 18.h),
                               _SectionTitle(
                                 title: "Properties".tr,
                                 onViewAll: () {
@@ -519,187 +518,6 @@ class _ContactTile extends StatelessWidget {
   }
 }
 
-// --------------------------------------------------- Subscription + Stats
-class _SubscriptionAndStats extends StatelessWidget {
-  final DealerDetailsModel d;
-
-  const _SubscriptionAndStats(this.d);
-
-  @override
-  Widget build(BuildContext context) {
-    final sub = d.activeSubscription;
-    final total = d.listings.length;
-    final active = d.listings
-        .where((e) => e.status.toLowerCase() == "active")
-        .length;
-    final sold = d.listings
-        .where((e) => e.status.toLowerCase() == "sold")
-        .length;
-    final rent = d.listings
-        .where((e) => e.purpose.toLowerCase() == "rent")
-        .length;
-
-    return Column(
-      children: [
-        if (sub != null)
-          Container(
-            width: double.infinity,
-            padding: EdgeInsets.all(16.w),
-            decoration: BoxDecoration(
-              gradient: AppColors.primaryGradient,
-              borderRadius: BorderRadius.circular(16.r),
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      "Subscription Plan".tr,
-                      style: AppTextStyles.body13.copyWith(color: Colors.white),
-                    ),
-                    const Icon(Icons.workspace_premium, color: Colors.amber),
-                  ],
-                ),
-
-                Row(
-                  children: [
-                    Text(
-                      sub.plan.name ?? "",
-                      style: AppTextStyles.title18.copyWith(
-                        color: Colors.white,
-                      ),
-                    ),
-                    SizedBox(width: 8.w),
-                    Container(
-                      padding: EdgeInsets.symmetric(
-                        horizontal: 8.w,
-                        vertical: 3.h,
-                      ),
-                      decoration: BoxDecoration(
-                        color: Colors.white.withOpacity(.2),
-                        borderRadius: BorderRadius.circular(20),
-                      ),
-                      child: Text(
-                        sub.paymentStatus ?? "",
-                        style: AppTextStyles.body12.copyWith(
-                          color: Colors.white,
-                          fontSize: 10.sp,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-                SizedBox(height: 5.h),
-                Text(
-                  "Valid Till".tr,
-                  style: AppTextStyles.body12.copyWith(color: Colors.white70),
-                ),
-                Text(
-                  _fmtDate(sub.endDate),
-                  style: AppTextStyles.bold16.copyWith(color: Colors.white),
-                ),
-                Padding(
-                  padding: EdgeInsets.symmetric(vertical: 10.h),
-                  child: Divider(color: Colors.white24, height: 1),
-                ),
-                Wrap(
-                  spacing: 14.w,
-                  runSpacing: 8.h,
-                  children: _planFeatures(sub.plan)
-                      .map(
-                        (f) => Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            const Icon(
-                              Icons.check_circle,
-                              size: 15,
-                              color: Colors.white,
-                            ),
-                            SizedBox(width: 6.w),
-                            Text(
-                              f,
-                              style: AppTextStyles.body12.copyWith(
-                                color: Colors.white,
-                              ),
-                            ),
-                          ],
-                        ),
-                      )
-                      .toList(),
-                ),
-              ],
-            ),
-          ),
-        if (sub != null) SizedBox(height: 16.h),
-        _Card(
-          title: "Statistics".tr,
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              _StatTile(
-                Icons.home_outlined,
-                "$total",
-                "Total Properties".tr,
-                AppColors.primary,
-              ),
-              _StatTile(
-                Icons.check_circle_outline,
-                "$active",
-                "Active Listings".tr,
-                AppColors.success,
-              ),
-              _StatTile(
-                Icons.sell_outlined,
-                "$sold",
-                "Sold Properties".tr,
-                Colors.orange,
-              ),
-              _StatTile(
-                Icons.key_outlined,
-                "$rent",
-                "For Rent".tr,
-                Colors.indigo,
-              ),
-            ],
-          ),
-        ),
-      ],
-    );
-  }
-
-  List<String> _planFeatures(SubscriptionPlan plan) => [
-    if (plan.maxListings != null) "${plan.maxListings} ${"Listings".tr}",
-
-    if (plan.validityDays != null)
-      "${"Valid for".tr} ${plan.validityDays} ${"Days".tr}",
-
-    if ((plan.boostDiscountPercent ?? 0) > 0)
-      "${plan.boostDiscountPercent}% ${"Boost Discount".tr}",
-
-    "Priority Support".tr,
-  ];
-
-  String _fmtDate(DateTime dt) =>
-      "${dt.day.toString().padLeft(2, '0')} ${_months[dt.month - 1]} ${dt.year}";
-
-  static const _months = [
-    "Jan",
-    "Feb",
-    "Mar",
-    "Apr",
-    "May",
-    "Jun",
-    "Jul",
-    "Aug",
-    "Sep",
-    "Oct",
-    "Nov",
-    "Dec",
-  ];
-}
 
 class _StatTile extends StatelessWidget {
   final IconData icon;
@@ -810,7 +628,7 @@ class _SectionTitle extends StatelessWidget {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Text(title, style: AppTextStyles.title18),
+        Text(title, style: AppTextStyles.title16.copyWith(fontWeight:FontWeight.w500)),
         InkWell(
           onTap: onViewAll,
           child: Row(
@@ -841,7 +659,7 @@ class _PropertiesRow extends StatelessWidget {
         padding: EdgeInsets.symmetric(horizontal: 16.w),
         child: Container(
           width: double.infinity,
-          padding: EdgeInsets.symmetric(vertical: 32.h, horizontal: 20.w),
+          padding: EdgeInsets.symmetric(vertical: 10.h, horizontal: 20.w),
           decoration: BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.circular(12.r),
@@ -887,7 +705,7 @@ class _PropertiesRow extends StatelessWidget {
       );
     }
     return SizedBox(
-      height: 260.h,
+      height: 220.h,
       child: ListView.separated(
         scrollDirection: Axis.horizontal,
         padding: EdgeInsets.symmetric(horizontal: 16.w),
@@ -909,6 +727,7 @@ class _PropertyCard extends StatelessWidget {
     final photo = listing.sortedPhotos.isNotEmpty
         ? listing.sortedPhotos.first.url
         : "";
+
     final forSale = listing.purpose.toLowerCase() != "rent";
 
     return GestureDetector(
@@ -922,10 +741,10 @@ class _PropertyCard extends StatelessWidget {
         );
       },
       child: Container(
-        width: 210.w,
+        width: 180.w,
         decoration: BoxDecoration(
           color: Colors.white,
-          borderRadius: BorderRadius.circular(16.r),
+          borderRadius: BorderRadius.circular(12.r),
           boxShadow: [
             BoxShadow(
               color: Colors.black.withOpacity(.05),
@@ -935,13 +754,14 @@ class _PropertyCard extends StatelessWidget {
           ],
         ),
         child: Column(
+          mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Stack(
               children: [
                 ClipRRect(
                   borderRadius: BorderRadius.vertical(
-                    top: Radius.circular(16.r),
+                    top: Radius.circular(12.r),
                   ),
                   child: SizedBox(
                     height: 120.h,
@@ -980,9 +800,16 @@ class _PropertyCard extends StatelessWidget {
                 ),
               ],
             ),
+
             Padding(
-              padding: EdgeInsets.all(10.w),
+              padding: EdgeInsets.fromLTRB(
+                10.w,
+                10.w,
+                10.w,
+                5.h, // reduced bottom space
+              ),
               child: Column(
+                mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
@@ -991,7 +818,9 @@ class _PropertyCard extends StatelessWidget {
                     overflow: TextOverflow.ellipsis,
                     style: AppTextStyles.bold12,
                   ),
+
                   SizedBox(height: 4.h),
+
                   Row(
                     children: [
                       Icon(
@@ -1013,9 +842,12 @@ class _PropertyCard extends StatelessWidget {
                       ),
                     ],
                   ),
+
                   SizedBox(height: 8.h),
+
                   Text(
-                    "QAR ${listing.price.toStringAsFixed(0)}${forSale ? '' : '/month'}",
+                    "QAR ${listing.price.toStringAsFixed(0)}"
+                    "${forSale ? '' : '/month'}",
                     style: AppTextStyles.bold16.copyWith(
                       color: AppColors.primary,
                       fontSize: 13.sp,
@@ -1030,7 +862,6 @@ class _PropertyCard extends StatelessWidget {
     );
   }
 }
-
 // -------------------------------------------------------------- Generic
 class _Card extends StatelessWidget {
   final String title;

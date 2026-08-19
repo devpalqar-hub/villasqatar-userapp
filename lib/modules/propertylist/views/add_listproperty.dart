@@ -1115,7 +1115,7 @@ Widget _buildWhatsAppVerifiedBanner() {
                 ],
 
                 Text(
-                  item.title,
+                  item.title.tr,
                   style: const TextStyle(
                     color: AppColors.primary,
                     fontSize: 11,
@@ -1327,7 +1327,7 @@ Widget _buildWhatsAppVerifiedBanner() {
                 ],
 
                 Text(
-                  item.title,
+                  item.title.tr,
                   style: const TextStyle(
                     color: AppColors.primary,
                     fontSize: 11,
@@ -1371,7 +1371,7 @@ Widget _buildWhatsAppVerifiedBanner() {
               border: Border.all(color: AppColors.primary.withOpacity(.25)),
             ),
             child: Text(
-              item.title,
+              item.title.tr,
               style: const TextStyle(
                 color: AppColors.primary,
                 fontWeight: FontWeight.w600,
@@ -1436,7 +1436,7 @@ Widget _buildWhatsAppVerifiedBanner() {
                           color: AppColors.primary,
                         ),
                         title: Text(
-                          item.title,
+                          item.title.tr,
                           style: const TextStyle(fontWeight: FontWeight.w500),
                         ),
                         onTap: () {
@@ -2909,7 +2909,7 @@ class _AppDropdownField extends StatelessWidget {
             color: AppColors.hintGrey,
           ),
           items: items
-              .map((e) => DropdownMenuItem(value: e, child: Text(e)))
+              .map((e) => DropdownMenuItem(value: e, child: Text(e.tr)))
               .toList(),
           onChanged: onChanged,
         ),
@@ -3140,7 +3140,7 @@ class _AmenityTile extends StatelessWidget {
             const SizedBox(height: 7),
 
             Text(
-              label,
+              label.tr,
               maxLines: 2,
               overflow: TextOverflow.ellipsis,
               textAlign: TextAlign.center,
