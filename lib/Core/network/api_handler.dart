@@ -23,6 +23,7 @@ class ApiHandler {
     );
   }
 
+
   static Future<dynamic> get(
     String endpoint, {
     Map<String, String>? headers,

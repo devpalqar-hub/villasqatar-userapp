@@ -77,3 +77,6 @@ flutter:
       fonts:
         - asset: assets/fonts/Rubik.ttf
 
+
+dependency_overrides:
+  file_picker: ^9.0.2
