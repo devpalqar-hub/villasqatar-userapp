@@ -170,9 +170,12 @@ class _MainScreenState extends State<MainScreen> {
 
     // Clear previous property-name search
     controller.filter.search = "";
+    controller.searchTextController.clear();
 
     // Set selected category/type
     controller.filter.type = type;
+
+    controller.update();
 
     // Fetch filtered properties
     controller.fetchProperties();

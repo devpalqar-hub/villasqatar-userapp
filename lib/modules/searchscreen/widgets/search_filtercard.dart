@@ -40,7 +40,6 @@ class _SearchFilterCardState extends State<SearchFilterCard> {
     "LAND".tr,
   ];
 
-
   // Canonical (untranslated) keys — used for value/business-logic comparisons.
   // Display text is derived via `.tr` at render time so it stays correct
   // when the locale changes.
@@ -54,12 +53,11 @@ class _SearchFilterCardState extends State<SearchFilterCard> {
     "Area: High to Low".tr,
   ];
 
-String selectedSort = "Sort".tr;
-  
+  String selectedSort = "Sort".tr;
 
   @override
   Widget build(BuildContext context) {
-    final int selectedTab = widget.controller.filter.purpose == "RENT".tr ? 1 : 0;
+    final int selectedTab = widget.controller.filter.purpose == "RENT" ? 1 : 0;
     return Container(
       width: double.infinity,
       padding: EdgeInsets.only(top: 5.h, left: 16.w, right: 16.w, bottom: 5.h),
@@ -86,11 +84,11 @@ String selectedSort = "Sort".tr;
                   child: InkWell(
                     borderRadius: BorderRadius.circular(8.r),
                     onTap: () {
-                      widget.controller.filter.purpose = index == 0
-                          ? "SALE".tr
-                          : "RENT".tr;
-
-                      widget.controller.update();
+                      widget.controller.applyFilters(
+                        purpose: index == 0 ? "SALE" : "RENT",
+                        type: widget.controller.filter.type,
+                        search: widget.controller.filter.search,
+                      );
                     },
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -169,8 +167,12 @@ String selectedSort = "Sort".tr;
                             color: const Color(0xff32354A),
                             fontSize: 14.sp,
                           ),
-                          onChanged: (_) {
+                          onChanged: (value) {
                             setState(() {});
+                            if (value.trim().isEmpty &&
+                                widget.controller.filter.search.isNotEmpty) {
+                              widget.controller.clearSearch();
+                            }
                           },
 
                           onSubmitted: (value) async {
@@ -238,39 +240,8 @@ String selectedSort = "Sort".tr;
                                     onPressed: () async {
                                       FocusScope.of(context).unfocus();
 
-                                      widget.controller.searchTextController
-                                          .clear();
-                                      widget.controller.filter.search = "";
-
                                       setState(() {});
-                                      await widget.controller.applyFilters(
-                                        search: "",
-                                        type: widget.controller.filter.type,
-                                        purpose:
-                                            widget.controller.filter.purpose,
-                                        furnishingId: widget
-                                            .controller
-                                            .filter
-                                            .furnishingId,
-                                        nearbyTags:
-                                            widget.controller.filter.nearbyTags,
-                                        minPrice:
-                                            widget.controller.filter.minPrice,
-                                        maxPrice:
-                                            widget.controller.filter.maxPrice,
-                                        minBedrooms: widget
-                                            .controller
-                                            .filter
-                                            .minBedrooms,
-                                        minBathrooms: widget
-                                            .controller
-                                            .filter
-                                            .minBathrooms,
-                                        minArea:
-                                            widget.controller.filter.minArea,
-                                        maxArea:
-                                            widget.controller.filter.maxArea,
-                                      );
+                                      await widget.controller.clearSearch();
 
                                       widget.controller.update();
                                     },
@@ -347,196 +318,197 @@ String selectedSort = "Sort".tr;
 
           SizedBox(height: 12.h),
 
-         Row(
-  children: [
-    /// Property Type
-    Expanded(
-      child: Container(
-        height: 42.h,
-        padding: EdgeInsets.symmetric(horizontal: 10.w),
-        decoration: BoxDecoration(
-          color: const Color(0xffF8F9FB),
-          borderRadius: BorderRadius.circular(5.r),
-          border: Border.all(color: const Color(0xffE6E9EF)),
-        ),
-        child: DropdownButtonHideUnderline(
-          child: DropdownButton<String>(
-            value: selectedPropertyType,
-            isExpanded: true,
-            underline: const SizedBox(),
-            items: propertyTypes
-                .map(
-                  (e) => DropdownMenuItem(
-                    value: e,
-                    child: Text(
-                      e == "Property Type".tr
-                          ? "Property Type".tr
-                          : e,
-                      style: TextStyle(fontSize: 10.sp),
+          Row(
+            children: [
+              /// Property Type
+              Expanded(
+                child: Container(
+                  height: 42.h,
+                  padding: EdgeInsets.symmetric(horizontal: 10.w),
+                  decoration: BoxDecoration(
+                    color: const Color(0xffF8F9FB),
+                    borderRadius: BorderRadius.circular(5.r),
+                    border: Border.all(color: const Color(0xffE6E9EF)),
+                  ),
+                  child: DropdownButtonHideUnderline(
+                    child: DropdownButton<String>(
+                      value: selectedPropertyType,
+                      isExpanded: true,
+                      underline: const SizedBox(),
+                      items: propertyTypes
+                          .map(
+                            (e) => DropdownMenuItem(
+                              value: e,
+                              child: Text(
+                                e == "Property Type".tr
+                                    ? "Property Type".tr
+                                    : e,
+                                style: TextStyle(fontSize: 10.sp),
+                              ),
+                            ),
+                          )
+                          .toList(),
+                      onChanged: (value) {
+                        if (value == null) return;
+
+                        setState(() {
+                          selectedPropertyType = value;
+                        });
+
+                        widget.controller.filter.type =
+                            value == "Property Type".tr ? "" : value;
+
+                        widget.controller.fetchProperties();
+                      },
                     ),
                   ),
-                )
-                .toList(),
-            onChanged: (value) {
-              if (value == null) return;
-
-              setState(() {
-                selectedPropertyType = value;
-              });
-
-              widget.controller.filter.type =
-                  value == "Property Type".tr? "" : value;
-
-              widget.controller.fetchProperties();
-            },
-          ),
-        ),
-      ),
-    ),
-
-    SizedBox(width: 10.w),
-
-    /// Sort
-    Expanded(
-      child: Container(
-        height: 42.h,
-        padding: EdgeInsets.symmetric(horizontal: 10.w),
-        decoration: BoxDecoration(
-          color: const Color(0xffF8F9FB),
-          borderRadius: BorderRadius.circular(5.r),
-          border: Border.all(color: const Color(0xffE6E9EF)),
-        ),
-        child: DropdownButtonHideUnderline(
-          child: DropdownButton<String>(
-            value: selectedSort,
-            isExpanded: true,
-            underline: const SizedBox(),
-            items: sortOptions.map((e) {
-              return DropdownMenuItem(
-                value: e,
-                child: Text(
-                  e.tr,
-                  style: TextStyle(fontSize: 10.sp),
                 ),
-              );
-            }).toList(),
-            onChanged: (value) {
-              if (value == null) return;
-
-              setState(() {
-                selectedSort = value;
-              });
-
-              switch (value) {
-                case "Newest":
-                  widget.controller.filter.sortBy = "createdAt".tr;
-                  widget.controller.filter.sortOrder = "desc".tr;
-                  break;
-
-                case "Oldest":
-                  widget.controller.filter.sortBy = "createdAt".tr;
-                  widget.controller.filter.sortOrder = "asc".tr;
-                  break;
-
-                case "Price: Low to High":
-                  widget.controller.filter.sortBy = "price".tr;
-                  widget.controller.filter.sortOrder = "asc".tr;
-                  break;
-
-                case "Price: High to Low":
-                  widget.controller.filter.sortBy = "price".tr;
-                  widget.controller.filter.sortOrder = "desc".tr;
-                  break;
-
-                case "Area: Low to High":
-                  widget.controller.filter.sortBy = "area".tr;
-                  widget.controller.filter.sortOrder = "asc".tr;
-                  break;
-
-                case "Area: High to Low":
-                  widget.controller.filter.sortBy = "area".tr;
-                  widget.controller.filter.sortOrder = "desc".tr;
-                  break;
-
-                default:
-                  widget.controller.filter.sortBy = "";
-                  widget.controller.filter.sortOrder = "";
-              }
-
-              widget.controller.fetchProperties();
-            },
-          ),
-        ),
-      ),
-    ),
-
-    SizedBox(width: 10.w),
-
-    /// Filters
-    Builder(
-      builder: (context) {
-        final activeCount = widget.controller.filter.activeFilterCount;
-
-        return InkWell(
-          onTap: _showFilterBottomSheet,
-          borderRadius: BorderRadius.circular(8.r),
-          child: Container(
-            height: 42.h,
-            padding: EdgeInsets.symmetric(horizontal: 12.w),
-            decoration: BoxDecoration(
-              color: const Color(0xffF8F9FB),
-              borderRadius: BorderRadius.circular(5.r),
-              border: Border.all(
-                color: activeCount > 0
-                    ? AppColors.primary
-                    : const Color(0xffE6E9EF),
               ),
-            ),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Icon(
-                  Icons.tune_rounded,
-                  color: AppColors.primary,
-                  size: 20.sp,
-                ),
-                SizedBox(width: 6.w),
-                Text(
-                  "Filters".tr,
-                  style: AppTextStyles.body13.copyWith(
-                    fontSize: 11.sp,
-                    fontWeight: FontWeight.w600,
-                    color: const Color(0xff32354A),
+
+              SizedBox(width: 10.w),
+
+              /// Sort
+              Expanded(
+                child: Container(
+                  height: 42.h,
+                  padding: EdgeInsets.symmetric(horizontal: 10.w),
+                  decoration: BoxDecoration(
+                    color: const Color(0xffF8F9FB),
+                    borderRadius: BorderRadius.circular(5.r),
+                    border: Border.all(color: const Color(0xffE6E9EF)),
+                  ),
+                  child: DropdownButtonHideUnderline(
+                    child: DropdownButton<String>(
+                      value: selectedSort,
+                      isExpanded: true,
+                      underline: const SizedBox(),
+                      items: sortOptions.map((e) {
+                        return DropdownMenuItem(
+                          value: e,
+                          child: Text(e.tr, style: TextStyle(fontSize: 10.sp)),
+                        );
+                      }).toList(),
+                      onChanged: (value) {
+                        if (value == null) return;
+
+                        setState(() {
+                          selectedSort = value;
+                        });
+
+                        switch (value) {
+                          case "Newest":
+                            widget.controller.filter.sortBy = "createdAt".tr;
+                            widget.controller.filter.sortOrder = "desc".tr;
+                            break;
+
+                          case "Oldest":
+                            widget.controller.filter.sortBy = "createdAt".tr;
+                            widget.controller.filter.sortOrder = "asc".tr;
+                            break;
+
+                          case "Price: Low to High":
+                            widget.controller.filter.sortBy = "price".tr;
+                            widget.controller.filter.sortOrder = "asc".tr;
+                            break;
+
+                          case "Price: High to Low":
+                            widget.controller.filter.sortBy = "price".tr;
+                            widget.controller.filter.sortOrder = "desc".tr;
+                            break;
+
+                          case "Area: Low to High":
+                            widget.controller.filter.sortBy = "area".tr;
+                            widget.controller.filter.sortOrder = "asc".tr;
+                            break;
+
+                          case "Area: High to Low":
+                            widget.controller.filter.sortBy = "area".tr;
+                            widget.controller.filter.sortOrder = "desc".tr;
+                            break;
+
+                          default:
+                            widget.controller.filter.sortBy = "";
+                            widget.controller.filter.sortOrder = "";
+                        }
+
+                        widget.controller.fetchProperties();
+                      },
+                    ),
                   ),
                 ),
-                if (activeCount > 0) ...[
-                  SizedBox(width: 6.w),
-                  Container(
-                    padding: EdgeInsets.symmetric(horizontal: 6.w, vertical: 1.h),
-                    constraints: BoxConstraints(minWidth: 18.w),
-                    decoration: BoxDecoration(
-                      color: AppColors.primary,
-                      borderRadius: BorderRadius.circular(20.r),
-                    ),
-                    child: Text(
-                      "$activeCount",
-                      textAlign: TextAlign.center,
-                      style: AppTextStyles.body13.copyWith(
-                        fontSize: 10.sp,
-                        fontWeight: FontWeight.w700,
-                        color: Colors.white,
+              ),
+
+              SizedBox(width: 10.w),
+
+              /// Filters
+              Builder(
+                builder: (context) {
+                  final activeCount =
+                      widget.controller.filter.activeFilterCount;
+
+                  return InkWell(
+                    onTap: _showFilterBottomSheet,
+                    borderRadius: BorderRadius.circular(8.r),
+                    child: Container(
+                      height: 42.h,
+                      padding: EdgeInsets.symmetric(horizontal: 12.w),
+                      decoration: BoxDecoration(
+                        color: const Color(0xffF8F9FB),
+                        borderRadius: BorderRadius.circular(5.r),
+                        border: Border.all(
+                          color: activeCount > 0
+                              ? AppColors.primary
+                              : const Color(0xffE6E9EF),
+                        ),
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(
+                            Icons.tune_rounded,
+                            color: AppColors.primary,
+                            size: 20.sp,
+                          ),
+                          SizedBox(width: 6.w),
+                          Text(
+                            "Filters".tr,
+                            style: AppTextStyles.body13.copyWith(
+                              fontSize: 11.sp,
+                              fontWeight: FontWeight.w600,
+                              color: const Color(0xff32354A),
+                            ),
+                          ),
+                          if (activeCount > 0) ...[
+                            SizedBox(width: 6.w),
+                            Container(
+                              padding: EdgeInsets.symmetric(
+                                horizontal: 6.w,
+                                vertical: 1.h,
+                              ),
+                              constraints: BoxConstraints(minWidth: 18.w),
+                              decoration: BoxDecoration(
+                                color: AppColors.primary,
+                                borderRadius: BorderRadius.circular(20.r),
+                              ),
+                              child: Text(
+                                "$activeCount",
+                                textAlign: TextAlign.center,
+                                style: AppTextStyles.body13.copyWith(
+                                  fontSize: 10.sp,
+                                  fontWeight: FontWeight.w700,
+                                  color: Colors.white,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ],
                       ),
                     ),
-                  ),
-                ],
-              ],
-            ),
+                  );
+                },
+              ),
+            ],
           ),
-        );
-      },
-    ),
-  ],
-),
 
           SizedBox(height: 15.h),
 
@@ -692,436 +664,82 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
         return Padding(
           padding: EdgeInsets.only(bottom: keyboardInset),
           child: SafeArea(
-          child: Container(
-            constraints: BoxConstraints(
-              maxHeight: MediaQuery.of(context).size.height * .78,
-            ),
-            decoration: BoxDecoration(
-              color: const Color(0xffF8F9FB),
-              borderRadius: BorderRadius.vertical(top: Radius.circular(24.r)),
-            ),
-            child: Column(
-              children: [
-                Padding(
-                  padding: EdgeInsets.fromLTRB(20.w, 16.h, 20.w, 12.h),
-                  child: Column(
-                    children: [
-                      Center(
-                        child: Container(
-                          width: 44.w,
-                          height: 5.h,
-                          decoration: BoxDecoration(
-                            color: Colors.grey.shade300,
-                            borderRadius: BorderRadius.circular(20),
+            child: Container(
+              constraints: BoxConstraints(
+                maxHeight: MediaQuery.of(context).size.height * .78,
+              ),
+              decoration: BoxDecoration(
+                color: const Color(0xffF8F9FB),
+                borderRadius: BorderRadius.vertical(top: Radius.circular(24.r)),
+              ),
+              child: Column(
+                children: [
+                  Padding(
+                    padding: EdgeInsets.fromLTRB(20.w, 16.h, 20.w, 12.h),
+                    child: Column(
+                      children: [
+                        Center(
+                          child: Container(
+                            width: 44.w,
+                            height: 5.h,
+                            decoration: BoxDecoration(
+                              color: Colors.grey.shade300,
+                              borderRadius: BorderRadius.circular(20),
+                            ),
                           ),
                         ),
-                      ),
-                      SizedBox(height: 18.h),
-                      Row(
-                        children: [
-                          Container(
-                            width: 46.w,
-                            height: 46.w,
-                            decoration: BoxDecoration(
-                              color: AppColors.primary.withOpacity(.08),
-                              shape: BoxShape.circle,
-                            ),
-                            child: Icon(
-                              Icons.tune_rounded,
-                              color: AppColors.primary,
-                              size: 22.sp,
-                            ),
-                          ),
-                          SizedBox(width: 14.w),
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  "Filter Properties".tr,
-                                  style: AppTextStyles.title16.copyWith(
-                                    fontWeight: FontWeight.w500,
-                                  ),
-                                ),
-
-                                SizedBox(height: 2.h),
-                                Text(
-                                  "Refine your search results".tr,
-                                  style: AppTextStyles.body13.copyWith(
-                                    color: AppColors.hintGrey,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                          InkWell(
-                            borderRadius: BorderRadius.circular(30),
-                            onTap: () => Navigator.pop(context),
-                            child: Container(
-                              width: 38.w,
-                              height: 38.w,
+                        SizedBox(height: 18.h),
+                        Row(
+                          children: [
+                            Container(
+                              width: 46.w,
+                              height: 46.w,
                               decoration: BoxDecoration(
-                                color: Colors.white,
+                                color: AppColors.primary.withOpacity(.08),
                                 shape: BoxShape.circle,
-                                border: Border.all(color: Colors.grey.shade300),
                               ),
-                              child: Icon(Icons.close_rounded, size: 20.sp),
+                              child: Icon(
+                                Icons.tune_rounded,
+                                color: AppColors.primary,
+                                size: 22.sp,
+                              ),
                             ),
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                ),
-                Divider(height: 1, color: Colors.grey.shade200),
-                Flexible(
-                  child: SingleChildScrollView(
-                    padding: EdgeInsets.symmetric(
-                      horizontal: 16.w,
-                      vertical: 10.h,
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        _sectionTitle("Location".tr),
+                            SizedBox(width: 14.w),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    "Filter Properties".tr,
+                                    style: AppTextStyles.title16.copyWith(
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                  ),
 
-                        SizedBox(height: 8),
-
-                        GetBuilder<Utilscontroller>(
-                          builder: (utils) {
-                            return SizedBox(
-                              height: 42.h,
-                              child: DropdownButtonFormField<String>(
-                                isDense: true,
-                                isExpanded: true,
-                                value: widget.controller.filter.locationId,
-                                decoration: InputDecoration(
-                                  hintText: "All Locations".tr,
-                                  filled: true,
-                                  fillColor: Colors.white,
-                                  contentPadding: EdgeInsets.symmetric(
-                                    horizontal: 14.w,
-                                    vertical: 10.h,
-                                  ),
-                                  border: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(10.r),
-                                  ),
-                                  enabledBorder: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(10.r),
-                                    borderSide: BorderSide(
-                                      color: Colors.grey.shade300,
-                                    ),
-                                  ),
-                                  focusedBorder: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(10.r),
-                                    borderSide: const BorderSide(
-                                      color: AppColors.primary,
-                                    ),
-                                  ),
-                                ),
-                                items: [
-                                  DropdownMenuItem<String>(
-                                    value: null,
-                                    child: Text(
-                                      "All Locations".tr,
-                                      style: TextStyle(fontSize: 13.sp),
-                                    ),
-                                  ),
-                                  ...utils.municipalities.map(
-                                    (m) => DropdownMenuItem<String>(
-                                      value: m.id,
-                                      child: Text(
-                                        m.name.tr,
-                                        style: TextStyle(fontSize: 13.sp),
-                                      ),
+                                  SizedBox(height: 2.h),
+                                  Text(
+                                    "Refine your search results".tr,
+                                    style: AppTextStyles.body13.copyWith(
+                                      color: AppColors.hintGrey,
                                     ),
                                   ),
                                 ],
-                                onChanged: (v) {
-                                  setState(() {
-                                    widget.controller.filter.locationId = v;
-                                  });
-                                },
                               ),
-                            );
-                          },
-                        ),
-                        SizedBox(height: 20),
-                        _sectionTitle("Price Range".tr),
-                        _FilterCard(
-                          child: Row(
-                            children: [
-                              Expanded(
-                                child: NumberSpinnerField(
-                                  hint: "Min Price".tr,
-                                  value:
-                                      widget.controller.filter.minPrice
-                                          ?.toInt() ??
-                                      0,
-                                  onChanged: (v) {
-                                    setState(() {
-                                      widget.controller.filter.minPrice = v
-                                          .toDouble();
-                                    });
-                                  },
-                                ),
-                              ),
-                              SizedBox(width: 12),
-                              const Text("-", style: TextStyle(fontSize: 22)),
-                              SizedBox(width: 12),
-                              Expanded(
-                                child: NumberSpinnerField(
-                                  hint: "Max Price".tr,
-                                  value:
-                                      widget.controller.filter.maxPrice
-                                          ?.toInt() ??
-                                      0,
-                                  onChanged: (v) {
-                                    setState(() {
-                                      widget.controller.filter.maxPrice = v
-                                          .toDouble();
-                                    });
-                                  },
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                        SizedBox(height: 12.h),
-                        _sectionTitle("Bedrooms".tr),
-                        SizedBox(height: 5.h),
-                        Wrap(
-                          spacing: 7.w,
-                          runSpacing: 12.h,
-                          children: [
-                            _NumberChip(
-                              title: "All".tr,
-                              selected:
-                                  widget.controller.filter.minBedrooms == null,
-                              onTap: () => setState(() {
-                                widget.controller.filter.minBedrooms = null;
-                              }),
                             ),
-
-                            ...List.generate(5, (i) {
-                              final value = i + 1;
-
-                              return _NumberChip(
-                                title: "$value",
-                                selected:
-                                    widget.controller.filter.minBedrooms ==
-                                    value,
-                                onTap: () => setState(() {
-                                  widget.controller.filter.minBedrooms = value;
-                                }),
-                              );
-                            }),
-                            _NumberChip(
-                              title: "6+",
-                              selected:
-                                  widget.controller.filter.minBedrooms == 6,
-                              onTap: () => setState(() {
-                                widget.controller.filter.minBedrooms = 6;
-                              }),
-                            ),
-                          ],
-                        ),
-                        SizedBox(height: 12.h),
-                        _sectionTitle("Bathrooms".tr),
-                        SizedBox(height: 5.h),
-                        Wrap(
-                          spacing: 6.w,
-                          runSpacing: 12.h,
-                          children: [
-                            _NumberChip(
-                              title: "All".tr,
-                              selected:
-                                  widget.controller.filter.minBathrooms == null,
-                              onTap: () => setState(() {
-                                widget.controller.filter.minBathrooms = null;
-                              }),
-                            ),
-                            ...List.generate(5, (i) {
-                              final value = i + 1;
-                              return _NumberChip(
-                                title: "$value",
-                                selected:
-                                    widget.controller.filter.minBathrooms ==
-                                    value,
-                                onTap: () => setState(() {
-                                  widget.controller.filter.minBathrooms = value;
-                                }),
-                              );
-                            }),
-                            _NumberChip(
-                              title: "6+",
-                              selected:
-                                  widget.controller.filter.minBathrooms == 5,
-                              onTap: () => setState(() {
-                                widget.controller.filter.minBathrooms = 5;
-                              }),
-                            ),
-                          ],
-                        ),
-                        SizedBox(height: 15.h),
-                        _sectionTitle("Furnishing".tr),
-                        GetBuilder<Utilscontroller>(
-                          builder: (utils) {
-                            return SizedBox(
-                              height: 42.h,
-                              child: DropdownButtonFormField<String>(
-                                isDense: true,
-                                value:
-                                    widget
-                                        .controller
-                                        .filter
-                                        .furnishingId
-                                        .isEmpty
-                                    ? null
-                                    : widget.controller.filter.furnishingId,
-                                decoration: InputDecoration(
-                                  hintText: "Any".tr,
-                                  filled: true,
-                                  fillColor: Colors.white,
-                                  isDense: true,
-                                  contentPadding: EdgeInsets.symmetric(
-                                    horizontal: 14.w,
-                                    vertical: 12.h,
-                                  ),
-                                  border: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(10.r),
-                                  ),
-                                  enabledBorder: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(10.r),
-                                    borderSide: BorderSide(
-                                      color: Colors.grey.shade300,
-                                    ),
-                                  ),
-                                  focusedBorder: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(10.r),
-                                    borderSide: const BorderSide(
-                                      color: AppColors.primary,
-                                    ),
+                            InkWell(
+                              borderRadius: BorderRadius.circular(30),
+                              onTap: () => Navigator.pop(context),
+                              child: Container(
+                                width: 38.w,
+                                height: 38.w,
+                                decoration: BoxDecoration(
+                                  color: Colors.white,
+                                  shape: BoxShape.circle,
+                                  border: Border.all(
+                                    color: Colors.grey.shade300,
                                   ),
                                 ),
-                                items: utils.furnishingOptions.map((item) {
-                                  return DropdownMenuItem<String>(
-                                    value: item.id,
-                                    child: Text(
-                                      item.title.tr,
-                                      style: TextStyle(fontSize: 13.sp),
-                                    ),
-                                  );
-                                }).toList(),
-                                onChanged: (v) {
-                                  setState(() {
-                                    widget.controller.filter.furnishingId =
-                                        v ?? "";
-                                  });
-                                },
-                              ),
-                            );
-                          },
-                        ),
-                        SizedBox(height: 15.h),
-                        _sectionTitle("Nearby".tr),
-                        GetBuilder<Utilscontroller>(
-                          builder: (utils) {
-                            return Wrap(
-                              spacing: 10.w,
-                              runSpacing: 10.h,
-                              children: utils.nearbyTags.map((item) {
-                                final selected = widget
-                                    .controller
-                                    .filter
-                                    .nearbyTags
-                                    .contains(item.id);
-
-                                return CustomFilterChip(
-                                  title: item.title,
-                                  selected: selected,
-                                  onTap: () {
-                                    setState(() {
-                                      if (selected) {
-                                        widget.controller.filter.nearbyTags
-                                            .remove(item.id);
-                                      } else {
-                                        widget.controller.filter.nearbyTags.add(
-                                          item.id,
-                                        );
-                                      }
-                                    });
-                                  },
-                                );
-                              }).toList(),
-                            );
-                          },
-                        ),
-                        SizedBox(height: 15.h),
-                        _sectionTitle("Amenities".tr),
-                        GetBuilder<Utilscontroller>(
-                          builder: (utils) {
-                            return Wrap(
-                              spacing: 10.w,
-                              runSpacing: 10.h,
-                              children: utils.amenities.map((item) {
-                                final selected = widget
-                                    .controller
-                                    .filter
-                                    .amenities
-                                    .contains(item.id);
-
-                                return CustomFilterChip(
-                                  title: item.title,
-                                  selected: selected,
-                                  onTap: () {
-                                    setState(() {
-                                      if (selected) {
-                                        widget.controller.filter.amenities
-                                            .remove(item.id);
-                                      } else {
-                                        widget.controller.filter.amenities.add(
-                                          item.id,
-                                        );
-                                      }
-                                    });
-                                  },
-                                );
-                              }).toList(),
-                            );
-                          },
-                        ),
-                        SizedBox(height: 15.h),
-                        _sectionTitle("Area (SQM)".tr),
-                        Row(
-                          children: [
-                            Expanded(
-                              child: NumberSpinnerField(
-                                hint: "Min Area".tr,
-                                value:
-                                    widget.controller.filter.minArea?.toInt() ??
-                                    0,
-                                onChanged: (v) {
-                                  setState(() {
-                                    widget.controller.filter.minArea = v
-                                        .toDouble();
-                                  });
-                                },
-                              ),
-                            ),
-                            SizedBox(width: 12),
-                            Expanded(
-                              child: NumberSpinnerField(
-                                hint: "Max Area".tr,
-                                value:
-                                    widget.controller.filter.maxArea?.toInt() ??
-                                    0,
-                                onChanged: (v) {
-                                  setState(() {
-                                    widget.controller.filter.maxArea = v
-                                        .toDouble();
-                                  });
-                                },
+                                child: Icon(Icons.close_rounded, size: 20.sp),
                               ),
                             ),
                           ],
@@ -1129,96 +747,462 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
                       ],
                     ),
                   ),
-                ),
-                Container(
-                  padding: EdgeInsets.fromLTRB(20.w, 16.h, 20.w, 16.h),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    border: Border(
-                      top: BorderSide(color: Colors.grey.shade200),
+                  Divider(height: 1, color: Colors.grey.shade200),
+                  Flexible(
+                    child: SingleChildScrollView(
+                      padding: EdgeInsets.symmetric(
+                        horizontal: 16.w,
+                        vertical: 10.h,
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          _sectionTitle("Location".tr),
+
+                          SizedBox(height: 8),
+
+                          GetBuilder<Utilscontroller>(
+                            builder: (utils) {
+                              return SizedBox(
+                                height: 42.h,
+                                child: DropdownButtonFormField<String>(
+                                  isDense: true,
+                                  isExpanded: true,
+                                  value: widget.controller.filter.locationId,
+                                  decoration: InputDecoration(
+                                    hintText: "All Locations".tr,
+                                    filled: true,
+                                    fillColor: Colors.white,
+                                    contentPadding: EdgeInsets.symmetric(
+                                      horizontal: 14.w,
+                                      vertical: 10.h,
+                                    ),
+                                    border: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(10.r),
+                                    ),
+                                    enabledBorder: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(10.r),
+                                      borderSide: BorderSide(
+                                        color: Colors.grey.shade300,
+                                      ),
+                                    ),
+                                    focusedBorder: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(10.r),
+                                      borderSide: const BorderSide(
+                                        color: AppColors.primary,
+                                      ),
+                                    ),
+                                  ),
+                                  items: [
+                                    DropdownMenuItem<String>(
+                                      value: null,
+                                      child: Text(
+                                        "All Locations".tr,
+                                        style: TextStyle(fontSize: 13.sp),
+                                      ),
+                                    ),
+                                    ...utils.municipalities.map(
+                                      (m) => DropdownMenuItem<String>(
+                                        value: m.id,
+                                        child: Text(
+                                          m.name.tr,
+                                          style: TextStyle(fontSize: 13.sp),
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                  onChanged: (v) {
+                                    setState(() {
+                                      widget.controller.filter.locationId = v;
+                                    });
+                                  },
+                                ),
+                              );
+                            },
+                          ),
+                          SizedBox(height: 20),
+                          _sectionTitle("Price Range".tr),
+                          _FilterCard(
+                            child: Row(
+                              children: [
+                                Expanded(
+                                  child: NumberSpinnerField(
+                                    hint: "Min Price".tr,
+                                    value:
+                                        widget.controller.filter.minPrice
+                                            ?.toInt() ??
+                                        0,
+                                    onChanged: (v) {
+                                      setState(() {
+                                        widget.controller.filter.minPrice = v
+                                            .toDouble();
+                                      });
+                                    },
+                                  ),
+                                ),
+                                SizedBox(width: 12),
+                                const Text("-", style: TextStyle(fontSize: 22)),
+                                SizedBox(width: 12),
+                                Expanded(
+                                  child: NumberSpinnerField(
+                                    hint: "Max Price".tr,
+                                    value:
+                                        widget.controller.filter.maxPrice
+                                            ?.toInt() ??
+                                        0,
+                                    onChanged: (v) {
+                                      setState(() {
+                                        widget.controller.filter.maxPrice = v
+                                            .toDouble();
+                                      });
+                                    },
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          SizedBox(height: 12.h),
+                          _sectionTitle("Bedrooms".tr),
+                          SizedBox(height: 5.h),
+                          Wrap(
+                            spacing: 7.w,
+                            runSpacing: 12.h,
+                            children: [
+                              _NumberChip(
+                                title: "All".tr,
+                                selected:
+                                    widget.controller.filter.minBedrooms ==
+                                    null,
+                                onTap: () => setState(() {
+                                  widget.controller.filter.minBedrooms = null;
+                                }),
+                              ),
+
+                              ...List.generate(5, (i) {
+                                final value = i + 1;
+
+                                return _NumberChip(
+                                  title: "$value",
+                                  selected:
+                                      widget.controller.filter.minBedrooms ==
+                                      value,
+                                  onTap: () => setState(() {
+                                    widget.controller.filter.minBedrooms =
+                                        value;
+                                  }),
+                                );
+                              }),
+                              _NumberChip(
+                                title: "6+",
+                                selected:
+                                    widget.controller.filter.minBedrooms == 6,
+                                onTap: () => setState(() {
+                                  widget.controller.filter.minBedrooms = 6;
+                                }),
+                              ),
+                            ],
+                          ),
+                          SizedBox(height: 12.h),
+                          _sectionTitle("Bathrooms".tr),
+                          SizedBox(height: 5.h),
+                          Wrap(
+                            spacing: 6.w,
+                            runSpacing: 12.h,
+                            children: [
+                              _NumberChip(
+                                title: "All".tr,
+                                selected:
+                                    widget.controller.filter.minBathrooms ==
+                                    null,
+                                onTap: () => setState(() {
+                                  widget.controller.filter.minBathrooms = null;
+                                }),
+                              ),
+                              ...List.generate(5, (i) {
+                                final value = i + 1;
+                                return _NumberChip(
+                                  title: "$value",
+                                  selected:
+                                      widget.controller.filter.minBathrooms ==
+                                      value,
+                                  onTap: () => setState(() {
+                                    widget.controller.filter.minBathrooms =
+                                        value;
+                                  }),
+                                );
+                              }),
+                              _NumberChip(
+                                title: "6+",
+                                selected:
+                                    widget.controller.filter.minBathrooms == 5,
+                                onTap: () => setState(() {
+                                  widget.controller.filter.minBathrooms = 5;
+                                }),
+                              ),
+                            ],
+                          ),
+                          SizedBox(height: 15.h),
+                          _sectionTitle("Furnishing".tr),
+                          GetBuilder<Utilscontroller>(
+                            builder: (utils) {
+                              return SizedBox(
+                                height: 42.h,
+                                child: DropdownButtonFormField<String>(
+                                  isDense: true,
+                                  value:
+                                      widget
+                                          .controller
+                                          .filter
+                                          .furnishingId
+                                          .isEmpty
+                                      ? null
+                                      : widget.controller.filter.furnishingId,
+                                  decoration: InputDecoration(
+                                    hintText: "Any".tr,
+                                    filled: true,
+                                    fillColor: Colors.white,
+                                    isDense: true,
+                                    contentPadding: EdgeInsets.symmetric(
+                                      horizontal: 14.w,
+                                      vertical: 12.h,
+                                    ),
+                                    border: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(10.r),
+                                    ),
+                                    enabledBorder: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(10.r),
+                                      borderSide: BorderSide(
+                                        color: Colors.grey.shade300,
+                                      ),
+                                    ),
+                                    focusedBorder: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(10.r),
+                                      borderSide: const BorderSide(
+                                        color: AppColors.primary,
+                                      ),
+                                    ),
+                                  ),
+                                  items: utils.furnishingOptions.map((item) {
+                                    return DropdownMenuItem<String>(
+                                      value: item.id,
+                                      child: Text(
+                                        item.title.tr,
+                                        style: TextStyle(fontSize: 13.sp),
+                                      ),
+                                    );
+                                  }).toList(),
+                                  onChanged: (v) {
+                                    setState(() {
+                                      widget.controller.filter.furnishingId =
+                                          v ?? "";
+                                    });
+                                  },
+                                ),
+                              );
+                            },
+                          ),
+                          SizedBox(height: 15.h),
+                          _sectionTitle("Nearby".tr),
+                          GetBuilder<Utilscontroller>(
+                            builder: (utils) {
+                              return Wrap(
+                                spacing: 10.w,
+                                runSpacing: 10.h,
+                                children: utils.nearbyTags.map((item) {
+                                  final selected = widget
+                                      .controller
+                                      .filter
+                                      .nearbyTags
+                                      .contains(item.id);
+
+                                  return CustomFilterChip(
+                                    title: item.title,
+                                    selected: selected,
+                                    onTap: () {
+                                      setState(() {
+                                        if (selected) {
+                                          widget.controller.filter.nearbyTags
+                                              .remove(item.id);
+                                        } else {
+                                          widget.controller.filter.nearbyTags
+                                              .add(item.id);
+                                        }
+                                      });
+                                    },
+                                  );
+                                }).toList(),
+                              );
+                            },
+                          ),
+                          SizedBox(height: 15.h),
+                          _sectionTitle("Amenities".tr),
+                          GetBuilder<Utilscontroller>(
+                            builder: (utils) {
+                              return Wrap(
+                                spacing: 10.w,
+                                runSpacing: 10.h,
+                                children: utils.amenities.map((item) {
+                                  final selected = widget
+                                      .controller
+                                      .filter
+                                      .amenities
+                                      .contains(item.id);
+
+                                  return CustomFilterChip(
+                                    title: item.title,
+                                    selected: selected,
+                                    onTap: () {
+                                      setState(() {
+                                        if (selected) {
+                                          widget.controller.filter.amenities
+                                              .remove(item.id);
+                                        } else {
+                                          widget.controller.filter.amenities
+                                              .add(item.id);
+                                        }
+                                      });
+                                    },
+                                  );
+                                }).toList(),
+                              );
+                            },
+                          ),
+                          SizedBox(height: 15.h),
+                          _sectionTitle("Area (SQM)".tr),
+                          Row(
+                            children: [
+                              Expanded(
+                                child: NumberSpinnerField(
+                                  hint: "Min Area".tr,
+                                  value:
+                                      widget.controller.filter.minArea
+                                          ?.toInt() ??
+                                      0,
+                                  onChanged: (v) {
+                                    setState(() {
+                                      widget.controller.filter.minArea = v
+                                          .toDouble();
+                                    });
+                                  },
+                                ),
+                              ),
+                              SizedBox(width: 12),
+                              Expanded(
+                                child: NumberSpinnerField(
+                                  hint: "Max Area".tr,
+                                  value:
+                                      widget.controller.filter.maxArea
+                                          ?.toInt() ??
+                                      0,
+                                  onChanged: (v) {
+                                    setState(() {
+                                      widget.controller.filter.maxArea = v
+                                          .toDouble();
+                                    });
+                                  },
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
                     ),
                   ),
-                  child: Row(
-                    children: [
-                      Expanded(
-                        child: SizedBox(
-                          height: 42.h,
-                          child: OutlinedButton(
-                            onPressed: () async {
-                              await widget.controller.clearFilters();
+                  Container(
+                    padding: EdgeInsets.fromLTRB(20.w, 16.h, 20.w, 16.h),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      border: Border(
+                        top: BorderSide(color: Colors.grey.shade200),
+                      ),
+                    ),
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: SizedBox(
+                            height: 42.h,
+                            child: OutlinedButton(
+                              onPressed: () async {
+                                await widget.controller.clearFilters();
 
-                              setState(() {
+                                setState(() {
+                                  minPriceCtrl.clear();
+                                  maxPriceCtrl.clear();
+                                  bedCtrl.clear();
+                                  bathCtrl.clear();
+                                  areaCtrl.clear();
+                                  maxAreaCtrl.clear();
+                                });
+                              },
+                              style: OutlinedButton.styleFrom(
+                                side: const BorderSide(
+                                  color: AppColors.primary,
+                                ),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(10.r),
+                                ),
+                              ),
+                              child: Text(
+                                "Reset".tr,
+                                style: AppTextStyles.body14.copyWith(
+                                  color: AppColors.primary,
+                                  fontWeight: FontWeight.w700,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+
+                        SizedBox(width: 14.w),
+
+                        Expanded(
+                          child: SizedBox(
+                            height: 42.h,
+                            child: PrimaryButton(
+                              title: "Apply Filters".tr,
+                              onTap: () {
+                                widget.controller.applyFilters(
+                                  search: widget
+                                      .controller
+                                      .searchTextController
+                                      .text,
+                                  purpose: widget.controller.filter.purpose,
+                                  type: widget.controller.filter.type,
+                                  locationId:
+                                      widget.controller.filter.locationId,
+                                  furnishingId:
+                                      widget.controller.filter.furnishingId,
+                                  amenities: widget.controller.filter.amenities,
+                                  nearbyTags:
+                                      widget.controller.filter.nearbyTags,
+                                  minPrice: widget.controller.filter.minPrice,
+                                  maxPrice: widget.controller.filter.maxPrice,
+                                  minBedrooms:
+                                      widget.controller.filter.minBedrooms,
+                                  minBathrooms:
+                                      widget.controller.filter.minBathrooms,
+                                  minArea: widget.controller.filter.minArea,
+                                  maxArea: widget.controller.filter.maxArea,
+                                );
+
                                 minPriceCtrl.clear();
                                 maxPriceCtrl.clear();
                                 bedCtrl.clear();
                                 bathCtrl.clear();
-                                areaCtrl.clear();
+                                minAreaCtrl.clear();
                                 maxAreaCtrl.clear();
-                              });
-                            },
-                            style: OutlinedButton.styleFrom(
-                              side: const BorderSide(color: AppColors.primary),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(10.r),
-                              ),
-                            ),
-                            child: Text(
-                              "Reset".tr,
-                              style: AppTextStyles.body14.copyWith(
-                                color: AppColors.primary,
-                                fontWeight: FontWeight.w700,
-                              ),
+
+                                Navigator.pop(context);
+                              },
                             ),
                           ),
                         ),
-                      ),
-
-                      SizedBox(width: 14.w),
-
-                      Expanded(
-                        child: SizedBox(
-                          height: 42.h,
-                          child: PrimaryButton(
-                            title: "Apply Filters".tr,
-                            onTap: () {
-                              widget.controller.applyFilters(
-                                search:
-                                    widget.controller.searchTextController.text,
-                                purpose: widget.controller.filter.purpose,
-                                type: widget.controller.filter.type,
-                                locationId: widget.controller.filter.locationId,
-                                furnishingId:
-                                    widget.controller.filter.furnishingId,
-                                amenities: widget.controller.filter.amenities,
-                                nearbyTags: widget.controller.filter.nearbyTags,
-                                minPrice: widget.controller.filter.minPrice,
-                                maxPrice: widget.controller.filter.maxPrice,
-                                minBedrooms:
-                                    widget.controller.filter.minBedrooms,
-                                minBathrooms:
-                                    widget.controller.filter.minBathrooms,
-                                minArea: widget.controller.filter.minArea,
-                                maxArea: widget.controller.filter.maxArea,
-                              );
-
-                              minPriceCtrl.clear();
-                              maxPriceCtrl.clear();
-                              bedCtrl.clear();
-                              bathCtrl.clear();
-                              minAreaCtrl.clear();
-                              maxAreaCtrl.clear();
-
-                              Navigator.pop(context);
-                            },
-                          ),
-                        ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
-          ),
           ),
         );
       },

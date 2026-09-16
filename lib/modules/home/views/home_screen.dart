@@ -181,7 +181,6 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
           ),
           SizedBox(width: 10.w),
-       
         ],
       ),
       body: SafeArea(
@@ -227,39 +226,43 @@ class _HomeScreenState extends State<HomeScreen> {
                           for (var data in utilscontroller.listingTypes)
                             Padding(
                               padding: EdgeInsets.only(right: 8.w),
-                              child: Container(
-                                width: 100.w,
-                                padding: EdgeInsets.all(5.w),
-                                decoration: BoxDecoration(
-                                  color: Colors.white,
-                                  borderRadius: BorderRadius.circular(10.r),
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color: Colors.black.withOpacity(.02),
-                                      spreadRadius: .1,
-                                      blurRadius: 10,
-                                    ),
-                                  ],
-                                ),
-                                child: Column(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    Image.network(
-                                      data.image ?? "",
-                                      width: 60.w,
-                                      height: 60.w,
-                                    ),
-                                    SizedBox(height: 4.h),
-                                    Text(
-                                      data.title.tr,
-                                      textAlign: TextAlign.center,
-                                      style: TextStyle(
-                                        fontFamily: "Rubik",
-                                        fontSize: 12.sp,
-                                        fontWeight: FontWeight.w400,
+                              child: InkWell(
+                                borderRadius: BorderRadius.circular(10.r),
+                                onTap: () => widget.onCategorySelected(data.id),
+                                child: Container(
+                                  width: 100.w,
+                                  padding: EdgeInsets.all(5.w),
+                                  decoration: BoxDecoration(
+                                    color: Colors.white,
+                                    borderRadius: BorderRadius.circular(10.r),
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: Colors.black.withOpacity(.02),
+                                        spreadRadius: .1,
+                                        blurRadius: 10,
                                       ),
-                                    ),
-                                  ],
+                                    ],
+                                  ),
+                                  child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Image.network(
+                                        data.image ?? "",
+                                        width: 60.w,
+                                        height: 60.w,
+                                      ),
+                                      SizedBox(height: 4.h),
+                                      Text(
+                                        data.title.tr,
+                                        textAlign: TextAlign.center,
+                                        style: TextStyle(
+                                          fontFamily: "Rubik",
+                                          fontSize: 12.sp,
+                                          fontWeight: FontWeight.w400,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
                                 ),
                               ),
                             ),
