@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get_core/src/get_main.dart';
@@ -5,8 +7,11 @@ import 'package:get/get_instance/src/extension_instance.dart';
 import 'package:get/get_state_manager/src/simple/get_state.dart';
 import 'package:get/get_utils/src/extensions/internacionalization.dart';
 import 'package:villas_qatar/Core/constants/app_colors.dart';
+import 'package:villas_qatar/Core/network/api_endpoints.dart';
+import 'package:villas_qatar/Core/network/api_handler.dart';
 import 'package:villas_qatar/Core/theme/app_textstyles.dart';
 import 'package:villas_qatar/Core/widgets/primary_button.dart';
+import 'package:villas_qatar/modules/home/model/autocomplete_result.dart';
 import 'package:villas_qatar/modules/home/service/UtilsController.dart';
 import 'package:villas_qatar/modules/home/service/loaction_controller.dart';
 import 'package:villas_qatar/modules/propertylist/service/listproperty_controller.dart';
@@ -23,6 +28,11 @@ class SearchFilterCard extends StatefulWidget {
 
 class _SearchFilterCardState extends State<SearchFilterCard> {
   final ListPropertyController controller = Get.put(ListPropertyController());
+
+  final FocusNode _searchFocusNode = FocusNode();
+  Timer? _autocompleteDebounce;
+  bool _suggestionsLoading = false;
+  List<AutocompleteResult> _suggestions = const [];
 
   final List<String> tabs = ["Buy".tr, "Rent".tr];
 
@@ -54,6 +64,115 @@ class _SearchFilterCardState extends State<SearchFilterCard> {
   ];
 
   String selectedSort = "Sort".tr;
+
+  @override
+  void initState() {
+    super.initState();
+
+    _searchFocusNode.addListener(() {
+      if (mounted) setState(() {});
+    });
+  }
+
+  @override
+  void dispose() {
+    _autocompleteDebounce?.cancel();
+    _searchFocusNode.dispose();
+    super.dispose();
+  }
+
+  /// Debounced GET /api/search/autocomplete?q=... as the user types.
+  void _onQueryChanged(String value) {
+    _autocompleteDebounce?.cancel();
+
+    final String query = value.trim();
+
+    if (query.length < 2) {
+      setState(() {
+        _suggestions = const [];
+        _suggestionsLoading = false;
+      });
+      return;
+    }
+
+    _autocompleteDebounce = Timer(
+      const Duration(milliseconds: 350),
+      () => _fetchAutocomplete(query),
+    );
+  }
+
+  Future<void> _fetchAutocomplete(String query) async {
+    if (!mounted) return;
+
+    setState(() => _suggestionsLoading = true);
+
+    try {
+      final dynamic response = await ApiHandler.get(
+        ApiEndpoints.searchAutocomplete(query),
+      );
+
+      final List<dynamic> rawResults = response is Map
+          ? (response['results'] as List<dynamic>? ?? const [])
+          : const [];
+
+      final List<AutocompleteResult> results = rawResults
+          .whereType<Map>()
+          .map(
+            (e) => AutocompleteResult.fromJson(Map<String, dynamic>.from(e)),
+          )
+          .toList();
+
+      if (!mounted) return;
+      setState(() {
+        _suggestions = results;
+        _suggestionsLoading = false;
+      });
+    } catch (_) {
+      if (!mounted) return;
+      setState(() {
+        _suggestions = const [];
+        _suggestionsLoading = false;
+      });
+    }
+  }
+
+  /// Either a place or a property just fills the field and searches — the
+  /// matching properties list below on this same screen. A place's
+  /// coordinates come along when it has any; a property matches by name.
+  Future<void> _selectSuggestion(AutocompleteResult result) async {
+    FocusScope.of(context).unfocus();
+
+    setState(() => _suggestions = const []);
+
+    widget.controller.searchTextController.value = TextEditingValue(
+      text: result.name,
+      selection: TextSelection.collapsed(offset: result.name.length),
+    );
+
+    setState(() {});
+
+    await widget.controller.applyFilters(
+      search: result.name,
+      type: widget.controller.filter.type,
+      purpose: widget.controller.filter.purpose,
+      latitude: result.latitude,
+      longitude: result.longitude,
+      furnishingId: widget.controller.filter.furnishingId,
+      nearbyTags: widget.controller.filter.nearbyTags,
+      minPrice: widget.controller.filter.minPrice,
+      maxPrice: widget.controller.filter.maxPrice,
+      minBedrooms: widget.controller.filter.minBedrooms,
+      minBathrooms: widget.controller.filter.minBathrooms,
+      minArea: widget.controller.filter.minArea,
+      maxArea: widget.controller.filter.maxArea,
+    );
+
+    widget.controller.update();
+  }
+
+  bool get _showSuggestions =>
+      _searchFocusNode.hasFocus &&
+      (_suggestionsLoading || _suggestions.isNotEmpty);
 
   @override
   Widget build(BuildContext context) {
@@ -160,6 +279,7 @@ class _SearchFilterCardState extends State<SearchFilterCard> {
                       Expanded(
                         child: TextField(
                           controller: widget.controller.searchTextController,
+                          focusNode: _searchFocusNode,
 
                           textInputAction: TextInputAction.search,
                           textAlignVertical: TextAlignVertical.center,
@@ -169,6 +289,7 @@ class _SearchFilterCardState extends State<SearchFilterCard> {
                           ),
                           onChanged: (value) {
                             setState(() {});
+                            _onQueryChanged(value);
                             if (value.trim().isEmpty &&
                                 widget.controller.filter.search.isNotEmpty) {
                               widget.controller.clearSearch();
@@ -240,7 +361,7 @@ class _SearchFilterCardState extends State<SearchFilterCard> {
                                     onPressed: () async {
                                       FocusScope.of(context).unfocus();
 
-                                      setState(() {});
+                                      setState(() => _suggestions = const []);
                                       await widget.controller.clearSearch();
 
                                       widget.controller.update();
@@ -315,6 +436,15 @@ class _SearchFilterCardState extends State<SearchFilterCard> {
               ),
             ],
           ),
+
+          if (_showSuggestions) ...[
+            SizedBox(height: 8.h),
+            _SuggestionsList(
+              loading: _suggestionsLoading,
+              suggestions: _suggestions,
+              onSelected: _selectSuggestion,
+            ),
+          ],
 
           SizedBox(height: 12.h),
 
@@ -1542,5 +1672,101 @@ class _NumberSpinnerFieldState extends State<NumberSpinnerField> {
   void dispose() {
     controller.dispose();
     super.dispose();
+  }
+}
+
+/// Autocomplete dropdown — places (with coordinates) and existing
+/// properties (opened directly by slug), rendered under the search field.
+class _SuggestionsList extends StatelessWidget {
+  final bool loading;
+  final List<AutocompleteResult> suggestions;
+  final ValueChanged<AutocompleteResult> onSelected;
+
+  const _SuggestionsList({
+    required this.loading,
+    required this.suggestions,
+    required this.onSelected,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      constraints: BoxConstraints(maxHeight: 240.h),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(8.r),
+        border: Border.all(color: const Color(0xffE6E9EF)),
+      ),
+      child: loading
+          ? Padding(
+              padding: EdgeInsets.symmetric(vertical: 18.h),
+              child: Center(
+                child: SizedBox(
+                  width: 18.w,
+                  height: 18.w,
+                  child: const CircularProgressIndicator(
+                    strokeWidth: 2,
+                    color: AppColors.primary,
+                  ),
+                ),
+              ),
+            )
+          : ListView.separated(
+              shrinkWrap: true,
+              padding: EdgeInsets.symmetric(vertical: 6.h),
+              physics: const ClampingScrollPhysics(),
+              itemCount: suggestions.length,
+              separatorBuilder: (_, __) =>
+                  Divider(height: 1, color: const Color(0xffE6E9EF)),
+              itemBuilder: (context, index) {
+                final AutocompleteResult result = suggestions[index];
+                final bool isPlace =
+                    result.type == AutocompleteResultType.place;
+
+                return InkWell(
+                  onTap: () => onSelected(result),
+                  child: Padding(
+                    padding: EdgeInsets.symmetric(
+                      horizontal: 12.w,
+                      vertical: 10.h,
+                    ),
+                    child: Row(
+                      children: [
+                        Icon(
+                          isPlace
+                              ? Icons.place_outlined
+                              : Icons.villa_outlined,
+                          size: 17.sp,
+                          color: AppColors.primary,
+                        ),
+                        SizedBox(width: 10.w),
+                        Expanded(
+                          child: Text(
+                            result.name,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: AppTextStyles.body14.copyWith(
+                              fontSize: 12.5.sp,
+                              fontWeight: FontWeight.w500,
+                              color: const Color(0xff32354A),
+                            ),
+                          ),
+                        ),
+                        SizedBox(width: 8.w),
+                        Text(
+                          isPlace ? "Place".tr : "Property".tr,
+                          style: TextStyle(
+                            fontSize: 9.5.sp,
+                            fontWeight: FontWeight.w600,
+                            color: const Color(0xffA5ADBA),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                );
+              },
+            ),
+    );
   }
 }

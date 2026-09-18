@@ -122,7 +122,7 @@ class SettingsScreen extends StatelessWidget {
           return;
         }
 
-        //   Get.to(() => const MyFeaturedPropertiesScreen());
+         Get.to(() => const MyFeaturedPropertiesScreen());
       },
     ),
 

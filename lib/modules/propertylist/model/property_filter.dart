@@ -6,6 +6,11 @@ class PropertyFilter {
 
   String? locationId;
 
+  /// Coordinates of a place picked from the search autocomplete — used
+  /// instead of [locationId] when the match wasn't a listed municipality.
+  double? latitude;
+  double? longitude;
+
   String furnishingId = '';
 
   // Single nearby tag (for API if needed)
@@ -34,6 +39,9 @@ class PropertyFilter {
     purpose = '';
 
     locationId = null;
+
+    latitude = null;
+    longitude = null;
 
     furnishingId = '';
 
@@ -79,6 +87,8 @@ class PropertyFilter {
       ..type = type
       ..purpose = purpose
       ..locationId = locationId
+      ..latitude = latitude
+      ..longitude = longitude
       ..furnishingId = furnishingId
       ..nearbyTagId = nearbyTagId
       ..amenities = List<String>.from(amenities)

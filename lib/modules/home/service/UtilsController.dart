@@ -18,12 +18,6 @@ class Utilscontroller extends GetxController {
   List<OptionItem> listingTypes = [];
   List<Municipality> municipalities = [];
 
-  @override
-  void onInit() {
-    super.onInit();
-    fetchPropertyType();
-  }
-
   Future<void> fetchPropertyType() async {
     isLoading = true;
     errorMessage = null;

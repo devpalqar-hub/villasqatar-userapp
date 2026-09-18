@@ -197,7 +197,12 @@ class _MainScreenState extends State<MainScreen> {
     });
   }
 
-  void _handleHomeSearch(String propertyName, String purpose) {
+  void _handleHomeSearch(
+    String propertyName,
+    String purpose, {
+    double? latitude,
+    double? longitude,
+  }) {
     debugPrint("MAIN RECEIVED SEARCH: $propertyName ($purpose)");
 
     final controller = Get.isRegistered<PropertySearchController>()
@@ -208,8 +213,14 @@ class _MainScreenState extends State<MainScreen> {
 
     // Apply the query and the Rent/Sale toggle together in one fetch,
     // so the Search screen (and its filter chips) opens already matching
-    // what was picked on the home banner.
-    controller.applyFilters(search: propertyName, purpose: purpose);
+    // what was picked on the home banner. Coordinates carry over when the
+    // query came from picking a place out of the search autocomplete.
+    controller.applyFilters(
+      search: propertyName,
+      purpose: purpose,
+      latitude: latitude,
+      longitude: longitude,
+    );
 
     // Switch the EXISTING MainScreen to the Search tab — bottomNavigationBar
     // stays put since it's outside the AnimatedSwitcher that swaps pages.

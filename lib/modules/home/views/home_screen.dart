@@ -37,7 +37,13 @@ import 'package:villas_qatar/modules/pricestimator/views/price_estimator_screen.
 class HomeScreen extends StatefulWidget {
   /// Fired when the AI search bar's arrow is tapped — carries the typed
   /// query plus which Rent/Sale toggle was active ("RENT" / "SALE").
-  final void Function(String propertyName, String purpose) onSearch;
+  final void Function(
+    String propertyName,
+    String purpose, {
+    double? latitude,
+    double? longitude,
+  })
+  onSearch;
   final void Function(String type) onCategorySelected;
   final void Function(String purpose) onPurposeSelected;
 
@@ -74,10 +80,6 @@ class _HomeScreenState extends State<HomeScreen> {
     dealerController = Get.isRegistered<DealerController>()
         ? Get.find<DealerController>()
         : Get.put(DealerController());
-
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      dealerController.fetchDealers();
-    });
   }
 
   @override
@@ -98,74 +100,20 @@ class _HomeScreenState extends State<HomeScreen> {
         surfaceTintColor: Colors.white,
         elevation: 0,
         scrolledUnderElevation: 0,
-        leading: Container(),
-        leadingWidth: 10.w,
+
+        centerTitle: false,
+        titleSpacing: 15.w,
+
         title: Image.asset(
           'assets/Logo/logo.png',
           width: 140.w,
           fit: BoxFit.contain,
         ),
+
         bottom: PreferredSize(
           preferredSize: Size.fromHeight(1.h),
           child: Container(height: 1.h, color: AppColors.warmBorder),
         ),
-        actions: [
-          InkWell(
-            borderRadius: BorderRadius.circular(999.r),
-            onTap: () {
-              showLocationBottomSheet(context);
-            },
-            child: Container(
-              height: 32.h,
-              padding: EdgeInsets.symmetric(horizontal: 10.w),
-              decoration: BoxDecoration(
-                color: AppColors.cream,
-                borderRadius: BorderRadius.circular(999.r),
-                border: Border.all(color: AppColors.warmBorder),
-              ),
-              child: GetBuilder<LocationController>(
-                builder: (_) {
-                  return Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Icon(
-                        Icons.location_on_outlined,
-                        color: AppColors.primary,
-                        size: 14.sp,
-                      ),
-
-                      SizedBox(width: 6.w),
-
-                      Flexible(
-                        child: Text(
-                          AppLocation.areaName.isEmpty
-                              ? "Doha".tr
-                              : AppLocation.areaName,
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                          style: AppTextStyles.body13.copyWith(
-                            fontSize: 11.5.sp,
-                            fontWeight: FontWeight.w500,
-                            color: AppColors.ink,
-                          ),
-                        ),
-                      ),
-
-                      SizedBox(width: 2.w),
-
-                      Icon(
-                        Icons.keyboard_arrow_down,
-                        size: 16.sp,
-                        color: AppColors.ink,
-                      ),
-                    ],
-                  );
-                },
-              ),
-            ),
-          ),
-          SizedBox(width: 10.w),
-        ],
       ),
       body: GetBuilder<Homecontroller>(
         builder: (___) {
@@ -176,10 +124,12 @@ class _HomeScreenState extends State<HomeScreen> {
               children: [
                 /// ─── HERO ────────────────────────────────────────────────────
                 HomeBanner(
-                  onSearch: (propertyName, type) {
+                  onSearch: (propertyName, type, {latitude, longitude}) {
                     widget.onSearch(
                       propertyName,
                       type == PropertySearchType.rent ? "RENT" : "SALE",
+                      latitude: latitude,
+                      longitude: longitude,
                     );
                   },
                 ),
@@ -207,7 +157,8 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
 
                 /// ─── FEATURED PROPERTIES ────────────────────────────────────
-               SizedBox(height: 12.h),
+                SizedBox(height: 12.h),
+
                 /// ─── AI PRICE ESTIMATOR ─────────────────────────────────────
                 _spaced(
                   Padding(
@@ -279,18 +230,57 @@ class _HomeScreenState extends State<HomeScreen> {
     child: child,
   );
 
-
   static const double _headerGap = 14;
 
   /// ═══════════════════════════════════════════════════════════════════════
   /// SEARCH BY PROPERTY TYPE
   /// ═══════════════════════════════════════════════════════════════════════
 
-Widget _buildCategoriesSection() {
-  return GetBuilder<Utilscontroller>(
-    builder: (controller) {
-      if (controller.isLoading &&
-          controller.listingTypes.isEmpty) {
+  Widget _buildCategoriesSection() {
+    return GetBuilder<Utilscontroller>(
+      builder: (controller) {
+        if (controller.isLoading && controller.listingTypes.isEmpty) {
+          return _spaced(
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Padding(
+                  padding: _gutter,
+                  child: SectionHeader(
+                    title: "Search by Property Type".tr,
+                    subtitle: "Find the right property type for your search".tr,
+                    showSeeAll: false,
+                  ),
+                ),
+
+                SizedBox(height: 8.h),
+
+                SizedBox(
+                  height: 110.h,
+                  child: AppShimmer(
+                    child: ListView.separated(
+                      scrollDirection: Axis.horizontal,
+                      physics: const NeverScrollableScrollPhysics(),
+                      padding: EdgeInsets.symmetric(horizontal: 20.w),
+                      itemCount: 3,
+                      separatorBuilder: (_, __) => SizedBox(width: 10.w),
+                      itemBuilder: (_, __) => ShimmerBox(
+                        width: 110.w,
+                        height: 110.h,
+                        borderRadius: BorderRadius.circular(14.r),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          );
+        }
+
+        if (controller.listingTypes.isEmpty) {
+          return const SizedBox.shrink();
+        }
+
         return _spaced(
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -299,94 +289,48 @@ Widget _buildCategoriesSection() {
                 padding: _gutter,
                 child: SectionHeader(
                   title: "Search by Property Type".tr,
-                  subtitle:
-                      "Find the right property type for your search".tr,
-                  showSeeAll: false,
+                  subtitle: "Find the right property type for your search".tr,
+                  onSeeAllTap: () {
+                    Get.offAll(
+                      () => const MainScreen(initialIndex: 1),
+                      transition: AppTransitions.forward,
+                    );
+                  },
                 ),
               ),
 
               SizedBox(height: 8.h),
 
               SizedBox(
-                height: 110.h,
-                child: AppShimmer(
-                  child: ListView.separated(
-                    scrollDirection: Axis.horizontal,
-                    physics:
-                        const NeverScrollableScrollPhysics(),
-                    padding: EdgeInsets.symmetric(horizontal: 20.w),
-                    itemCount: 3,
-                    separatorBuilder: (_, __) =>
-                        SizedBox(width: 10.w),
-                    itemBuilder: (_, __) => ShimmerBox(
+                height: 120.h,
+                child: ListView.separated(
+                  scrollDirection: Axis.horizontal,
+                  physics: const BouncingScrollPhysics(),
+                  padding: EdgeInsets.symmetric(horizontal: 20.w),
+                  itemCount: controller.listingTypes.length,
+                  separatorBuilder: (_, __) => SizedBox(width: 10.w),
+                  itemBuilder: (_, index) {
+                    final type = controller.listingTypes[index];
+
+                    return SizedBox(
                       width: 110.w,
-                      height: 110.h,
-                      borderRadius: BorderRadius.circular(14.r),
-                    ),
-                  ),
+                      child: CategoryCard(
+                        title: type.title.tr,
+                        imageUrl: type.image,
+                        listingCount: type.listingCount,
+                        onTap: () => widget.onCategorySelected(type.id),
+                      ),
+                    );
+                  },
                 ),
               ),
             ],
           ),
         );
-      }
+      },
+    );
+  }
 
-      if (controller.listingTypes.isEmpty) {
-        return const SizedBox.shrink();
-      }
-
-      return _spaced(
-        Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Padding(
-              padding: _gutter,
-              child: SectionHeader(
-                title: "Search by Property Type".tr,
-                subtitle:
-                    "Find the right property type for your search".tr,
-                onSeeAllTap: () {
-                  Get.offAll(
-                    () => const MainScreen(initialIndex: 1),
-                    transition: AppTransitions.forward,
-                  );
-                },
-              ),
-            ),
-
-            SizedBox(height: 8.h),
-
-            SizedBox(
-              height: 120.h,
-              child: ListView.separated(
-                scrollDirection: Axis.horizontal,
-                physics: const BouncingScrollPhysics(),
-                padding: EdgeInsets.symmetric(horizontal: 20.w),
-                itemCount: controller.listingTypes.length,
-                separatorBuilder: (_, __) =>
-                    SizedBox(width: 10.w),
-                itemBuilder: (_, index) {
-                  final type = controller.listingTypes[index];
-
-                  return SizedBox(
-                    width: 110.w,
-                    child: CategoryCard(
-                      title: type.title.tr,
-                      imageUrl: type.image,
-                      listingCount: type.listingCount,
-                      onTap: () =>
-                          widget.onCategorySelected(type.id),
-                    ),
-                  );
-                },
-              ),
-            ),
-          ],
-        ),
-      );
-    },
-  );
-}
   /// ═══════════════════════════════════════════════════════════════════════
   /// NEAR YOU
   /// ═══════════════════════════════════════════════════════════════════════
@@ -734,19 +678,6 @@ Future<void> _handleBannerTap(String linkUrl) async {
   } catch (e) {
     debugPrint("Banner URL error: $e");
   }
-}
-
-void showLocationBottomSheet(BuildContext context) {
-  final controller = Get.find<LocationController>();
-
-  Get.bottomSheet(
-    LocationBottomSheet(controller: controller),
-    isScrollControlled: true,
-    backgroundColor: Colors.white,
-    shape: const RoundedRectangleBorder(
-      borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
-    ),
-  );
 }
 
 class LocationBottomSheet extends StatelessWidget {

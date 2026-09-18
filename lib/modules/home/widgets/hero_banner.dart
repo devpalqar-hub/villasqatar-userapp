@@ -1,10 +1,17 @@
+import 'dart:async';
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
 import 'package:villas_qatar/Core/constants/app_colors.dart';
+import 'package:villas_qatar/Core/network/api_endpoints.dart';
+import 'package:villas_qatar/Core/network/api_handler.dart';
 import 'package:villas_qatar/Core/theme/app_fonts.dart';
+import 'package:villas_qatar/Core/utils/app_transitions.dart';
+import 'package:villas_qatar/modules/home/model/autocomplete_result.dart';
+import 'package:villas_qatar/modules/propertydetailscreen/propertydetailscreen.dart';
+import 'package:villas_qatar/modules/propertydetailscreen/service/deeplink_controller.dart';
 
 /// Search intent selected alongside the query.
 enum PropertySearchType { rent, sale }
@@ -48,8 +55,15 @@ class HeroBannerModel {
 /// fetched directly from GET /api/hero-banners inside this widget — no
 /// separate controller/service.
 class HomeBanner extends StatefulWidget {
-  /// Passes back both the query text and which mode (rent/sale) was active.
-  final void Function(String propertyName, PropertySearchType type) onSearch;
+  /// Passes back the query text, which mode (rent/sale) was active, and — if
+  /// the query came from picking a place suggestion — its coordinates.
+  final void Function(
+    String propertyName,
+    PropertySearchType type, {
+    double? latitude,
+    double? longitude,
+  })
+  onSearch;
 
   /// "Explore Properties" button on the photo. Passes back the active
   /// banner's `actionUrl` (may be null).
@@ -84,6 +98,10 @@ class _HomeBannerState extends State<HomeBanner> {
   bool _loading = true;
   List<HeroBannerModel> _slides = const [];
 
+  Timer? _autocompleteDebounce;
+  bool _suggestionsLoading = false;
+  List<AutocompleteResult> _suggestions = const [];
+
   @override
   void initState() {
     super.initState();
@@ -91,6 +109,104 @@ class _HomeBannerState extends State<HomeBanner> {
       setState(() => _isFocused = _focusNode.hasFocus);
     });
     _loadHeroBanners();
+  }
+
+  /// Debounced GET /api/search/autocomplete?q=... as the user types.
+  void _onQueryChanged(String value) {
+    _autocompleteDebounce?.cancel();
+
+    final String query = value.trim();
+
+    if (query.length < 2) {
+      setState(() {
+        _suggestions = const [];
+        _suggestionsLoading = false;
+      });
+      return;
+    }
+
+    _autocompleteDebounce = Timer(
+      const Duration(milliseconds: 350),
+      () => _fetchAutocomplete(query),
+    );
+  }
+
+  Future<void> _fetchAutocomplete(String query) async {
+    if (!mounted) return;
+
+    setState(() => _suggestionsLoading = true);
+
+    try {
+      final dynamic response = await ApiHandler.get(
+        ApiEndpoints.searchAutocomplete(query),
+      );
+
+      final List<dynamic> rawResults = response is Map
+          ? (response['results'] as List<dynamic>? ?? const [])
+          : const [];
+
+      final List<AutocompleteResult> results = rawResults
+          .whereType<Map>()
+          .map(
+            (e) => AutocompleteResult.fromJson(Map<String, dynamic>.from(e)),
+          )
+          .toList();
+
+      if (!mounted) return;
+      setState(() {
+        _suggestions = results;
+        _suggestionsLoading = false;
+      });
+    } catch (_) {
+      if (!mounted) return;
+      setState(() {
+        _suggestions = const [];
+        _suggestionsLoading = false;
+      });
+    }
+  }
+
+  /// A place fills the field with its name and immediately searches with
+  /// its coordinates attached; a property opens straight to its details.
+  void _selectSuggestion(AutocompleteResult result) {
+    FocusScope.of(context).unfocus();
+
+    setState(() => _suggestions = const []);
+
+    if (result.type == AutocompleteResultType.property) {
+      searchController.clear();
+      _openPropertyBySlug(result.slug);
+      return;
+    }
+
+    widget.onSearch(
+      result.name,
+      _selectedType,
+      latitude: result.latitude,
+      longitude: result.longitude,
+    );
+
+    searchController.clear();
+  }
+
+  Future<void> _openPropertyBySlug(String? slug) async {
+    if (slug == null || slug.trim().isEmpty) return;
+
+    final DeepLinkController deepLinkController =
+        Get.isRegistered<DeepLinkController>()
+        ? Get.find<DeepLinkController>()
+        : Get.put(DeepLinkController(), permanent: true);
+
+    final property = await deepLinkController.fetchPropertyBySlug(
+      slug: slug,
+    );
+
+    if (property == null || !mounted) return;
+
+    Get.to(
+      () => PropertyDetailsScreen(propertyId: property.id),
+      transition: AppTransitions.forward,
+    );
   }
 
   /// Direct API call — no controller/service in between.
@@ -140,6 +256,7 @@ class _HomeBannerState extends State<HomeBanner> {
 
   @override
   void dispose() {
+    _autocompleteDebounce?.cancel();
     searchController.dispose();
     _focusNode.dispose();
     _pageController.dispose();
@@ -271,6 +388,10 @@ class _HomeBannerState extends State<HomeBanner> {
                 isFocused: _isFocused,
                 onSubmit: _searchProperty,
                 onAdvancedFilters: widget.onAdvancedFilters,
+                onQueryChanged: _onQueryChanged,
+                suggestions: _suggestions,
+                suggestionsLoading: _suggestionsLoading,
+                onSuggestionSelected: _selectSuggestion,
               ),
             ),
           ],
@@ -482,6 +603,10 @@ class _SearchCard extends StatelessWidget {
   final bool isFocused;
   final VoidCallback onSubmit;
   final VoidCallback? onAdvancedFilters;
+  final ValueChanged<String> onQueryChanged;
+  final List<AutocompleteResult> suggestions;
+  final bool suggestionsLoading;
+  final ValueChanged<AutocompleteResult> onSuggestionSelected;
 
   const _SearchCard({
     required this.selectedType,
@@ -491,7 +616,14 @@ class _SearchCard extends StatelessWidget {
     required this.isFocused,
     required this.onSubmit,
     this.onAdvancedFilters,
+    required this.onQueryChanged,
+    required this.suggestions,
+    required this.suggestionsLoading,
+    required this.onSuggestionSelected,
   });
+
+  bool get _showSuggestions =>
+      isFocused && (suggestionsLoading || suggestions.isNotEmpty);
 
   @override
   Widget build(BuildContext context) {
@@ -527,7 +659,17 @@ class _SearchCard extends StatelessWidget {
             focusNode: focusNode,
             isFocused: isFocused,
             onSubmit: onSubmit,
+            onChanged: onQueryChanged,
           ),
+
+          if (_showSuggestions) ...[
+            SizedBox(height: 8.h),
+            _SuggestionsList(
+              loading: suggestionsLoading,
+              suggestions: suggestions,
+              onSelected: onSuggestionSelected,
+            ),
+          ],
         ],
       ),
     );
@@ -599,12 +741,14 @@ class _SearchField extends StatelessWidget {
   final FocusNode focusNode;
   final bool isFocused;
   final VoidCallback onSubmit;
+  final ValueChanged<String> onChanged;
 
   const _SearchField({
     required this.controller,
     required this.focusNode,
     required this.isFocused,
     required this.onSubmit,
+    required this.onChanged,
   });
 
   @override
@@ -631,7 +775,9 @@ class _SearchField extends StatelessWidget {
           Expanded(
             child: TextField(
               controller: controller,
+              focusNode: focusNode,
               textInputAction: TextInputAction.search,
+              onChanged: onChanged,
               onSubmitted: (_) => onSubmit(),
               style: TextStyle(
                 fontFamily: AppFonts.currentFont,
@@ -673,6 +819,104 @@ class _SearchField extends StatelessWidget {
           ),
         ],
       ),
+    );
+  }
+}
+
+/// Autocomplete dropdown — places (with coordinates) and existing
+/// properties (opened directly by slug), rendered under the search field.
+class _SuggestionsList extends StatelessWidget {
+  final bool loading;
+  final List<AutocompleteResult> suggestions;
+  final ValueChanged<AutocompleteResult> onSelected;
+
+  const _SuggestionsList({
+    required this.loading,
+    required this.suggestions,
+    required this.onSelected,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      constraints: BoxConstraints(maxHeight: 240.h),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(14.r),
+        border: Border.all(color: AppColors.warmBorder),
+      ),
+      child: loading
+          ? Padding(
+              padding: EdgeInsets.symmetric(vertical: 18.h),
+              child: Center(
+                child: SizedBox(
+                  width: 18.w,
+                  height: 18.w,
+                  child: const CircularProgressIndicator(
+                    strokeWidth: 2,
+                    color: AppColors.primary,
+                  ),
+                ),
+              ),
+            )
+          : ListView.separated(
+              shrinkWrap: true,
+              padding: EdgeInsets.symmetric(vertical: 6.h),
+              physics: const ClampingScrollPhysics(),
+              itemCount: suggestions.length,
+              separatorBuilder: (_, __) =>
+                  Divider(height: 1, color: AppColors.warmBorder),
+              itemBuilder: (context, index) {
+                final AutocompleteResult result = suggestions[index];
+                final bool isPlace =
+                    result.type == AutocompleteResultType.place;
+
+                return InkWell(
+                  onTap: () => onSelected(result),
+                  child: Padding(
+                    padding: EdgeInsets.symmetric(
+                      horizontal: 12.w,
+                      vertical: 10.h,
+                    ),
+                    child: Row(
+                      children: [
+                        Icon(
+                          isPlace
+                              ? Icons.place_outlined
+                              : Icons.villa_outlined,
+                          size: 17.sp,
+                          color: AppColors.primary,
+                        ),
+                        SizedBox(width: 10.w),
+                        Expanded(
+                          child: Text(
+                            result.name,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: TextStyle(
+                              fontFamily: AppFonts.currentFont,
+                              fontSize: 12.sp,
+                              fontWeight: FontWeight.w500,
+                              color: AppColors.ink,
+                            ),
+                          ),
+                        ),
+                        SizedBox(width: 8.w),
+                        Text(
+                          isPlace ? "Place".tr : "Property".tr,
+                          style: TextStyle(
+                            fontFamily: AppFonts.currentFont,
+                            fontSize: 9.5.sp,
+                            fontWeight: FontWeight.w600,
+                            color: AppColors.inkFaint,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                );
+              },
+            ),
     );
   }
 }

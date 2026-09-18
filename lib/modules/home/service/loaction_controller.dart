@@ -43,10 +43,6 @@ class LocationController extends GetxController {
     /// Restore the last saved location (if any) so it survives
     /// app restarts instead of falling back to the Doha default.
     AppLocation.restore();
-
-    if (AppLocation.hasLocation) {
-      fetchNearbyProperties(refresh: true);
-    }
   }
 
   Future<bool> searchLocation(String keyword) async {

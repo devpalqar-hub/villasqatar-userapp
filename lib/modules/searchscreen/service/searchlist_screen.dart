@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:villas_qatar/Core/network/api_endpoints.dart';
 import 'package:villas_qatar/Core/network/api_handler.dart';
-import 'package:villas_qatar/Core/utils/app_location.dart';
 import 'package:villas_qatar/modules/propertylist/model/myproperty_model.dart';
 import 'package:villas_qatar/modules/propertylist/model/property_filter.dart';
 
@@ -81,14 +80,14 @@ class PropertySearchController extends GetxController {
         query["sortOrder"] = filter.sortOrder;
       }
 
-      // // User Current Location
-      // if (AppLocation.latitude != null) {
-      //   query['latitude'] = AppLocation.latitude!.toString();
-      // }
+      // Coordinates of a place picked from the search autocomplete
+      if (filter.latitude != null) {
+        query['latitude'] = filter.latitude!.toString();
+      }
 
-      // if (AppLocation.longitude != null) {
-      //   query['longitude'] = AppLocation.longitude!.toString();
-      // }
+      if (filter.longitude != null) {
+        query['longitude'] = filter.longitude!.toString();
+      }
       if (filter.furnishingId.isNotEmpty) {
         query['furnishingId'] = filter.furnishingId;
       }
@@ -223,6 +222,8 @@ class PropertySearchController extends GetxController {
     String? type,
     String? purpose,
     String? locationId,
+    double? latitude,
+    double? longitude,
     String? furnishingId,
     List<String>? amenities,
     List<String>? nearbyTags,
@@ -251,6 +252,9 @@ class PropertySearchController extends GetxController {
     if (locationId != null) {
       filter.locationId = locationId;
     }
+
+    filter.latitude = latitude;
+    filter.longitude = longitude;
 
     if (furnishingId != null) {
       filter.furnishingId = furnishingId;

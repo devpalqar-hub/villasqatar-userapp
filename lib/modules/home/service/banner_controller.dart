@@ -11,13 +11,6 @@ class BannerController extends GetxController {
   bool isLoading = false;
   String errorMessage = '';
 
-  @override
-  void onInit() {
-    super.onInit();
-
-    fetchFeaturedBanners();
-  }
-
   Future<void> fetchFeaturedBanners() async {
     if (isLoading) return;
 

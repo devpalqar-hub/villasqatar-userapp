@@ -81,6 +81,10 @@ class ApiEndpoints {
 
   static const String geocode = "/api/listings/geocode";
   static const String reverseGeocode = "/api/listings/reverse-geocode";
+
+  static String searchAutocomplete(String query) {
+    return "/api/search/autocomplete?q=${Uri.encodeComponent(query)}";
+  }
   static String myProfile = "/api/users/profile/me";
   static String userById(String id) => "/api/users/$id";
   static const String dealers = "/api/dealers";
