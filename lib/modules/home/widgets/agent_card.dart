@@ -4,9 +4,10 @@ import 'package:villas_qatar/Core/constants/app_colors.dart';
 import 'package:villas_qatar/Core/theme/app_textstyles.dart';
 import 'package:villas_qatar/Core/widgets/motion/pressable_scale.dart';
 
-/// Featured-dealer card in the website's card style: white tile, neutral
-/// hairline border, 16px corners, with the dealer's avatar ringed in the brand
-/// tint and the tagline in muted ink.
+/// Featured-dealer tile in the website's partner-logo style: a flat white
+/// card with soft shadow (no border) showing the dealer's logo with their
+/// name centered underneath — falls back to a generic icon placeholder
+/// tile when there's no logo.
 class AgentCards extends StatelessWidget {
   final String image;
   final String name;
@@ -29,40 +30,35 @@ class AgentCards extends StatelessWidget {
       child: Material(
         color: Colors.transparent,
         child: InkWell(
-          borderRadius: BorderRadius.circular(16.r),
+          borderRadius: BorderRadius.circular(8.r),
           onTap: onTap,
           child: Container(
-            width: 145.w,
-            padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 16.h),
+            width: 120.w,
+            height:80.h,
+            padding: EdgeInsets.fromLTRB(10.w, 10.h, 10.w, 10.h),
             decoration: BoxDecoration(
               color: AppColors.white,
-              borderRadius: BorderRadius.circular(16.r),
-              border: Border.all(color: AppColors.coolBorder),
+              borderRadius: BorderRadius.circular(8.r),
+              border: Border.all(color: Colors.grey.withOpacity(0.2)),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(.06),
+                  blurRadius: 12,
+                  offset: const Offset(0, 4),
+                ),
+              ],
             ),
             child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                /// Avatar with a soft gold ring, echoing the site's dealer
-                /// cards, which frame the logo in a warm border.
-                Container(
-                  padding: EdgeInsets.all(2.5.r),
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    border: Border.all(color: AppColors.goldBorder),
-                  ),
-                  child: Hero(
-                    tag: phone,
-                    child: CircleAvatar(
-                      radius: 32.r,
-                      backgroundColor: AppColors.sand,
-                      backgroundImage: image.startsWith("http")
-                          ? NetworkImage(image)
-                          : AssetImage(image) as ImageProvider,
-                    ),
-                  ),
+                SizedBox(
+                  height: 32.h,
+                  width: double.infinity,
+                  child: _buildLogo(),
                 ),
 
-                SizedBox(height: 12.h),
+                SizedBox(height: 6.h),
 
                 Text(
                   name,
@@ -70,24 +66,10 @@ class AgentCards extends StatelessWidget {
                   overflow: TextOverflow.ellipsis,
                   textAlign: TextAlign.center,
                   style: AppTextStyles.bold14.copyWith(
-                    fontSize: 12.5.sp,
+                    fontSize: 11.sp,
                     fontWeight: FontWeight.w700,
                     color: AppColors.ink,
                     letterSpacing: -0.1,
-                  ),
-                ),
-
-                SizedBox(height: 5.h),
-
-                Text(
-                  designation,
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
-                  textAlign: TextAlign.center,
-                  style: AppTextStyles.body13.copyWith(
-                    fontSize: 10.sp,
-                    color: AppColors.inkMuted,
-                    height: 1.4,
                   ),
                 ),
               ],
@@ -95,6 +77,35 @@ class AgentCards extends StatelessWidget {
           ),
         ),
       ),
+    );
+  }
+
+  Widget _buildLogo() {
+    if (image.trim().isEmpty) {
+      return _placeholder();
+    }
+
+    return image.startsWith("http")
+        ? Image.network(
+            image,
+            fit: BoxFit.contain,
+            errorBuilder: (_, __, ___) => _placeholder(),
+          )
+        : Image.asset(
+            image,
+            fit: BoxFit.contain,
+            errorBuilder: (_, __, ___) => _placeholder(),
+          );
+  }
+
+  Widget _placeholder() {
+    return Container(
+      decoration: BoxDecoration(
+        color: AppColors.sand,
+        borderRadius: BorderRadius.circular(8.r),
+      ),
+      alignment: Alignment.center,
+      child: Icon(Icons.business_rounded, size: 18.sp, color: AppColors.gold),
     );
   }
 }

@@ -53,12 +53,11 @@ class PropertyCard extends StatelessWidget {
 
     return Container(
       width: width ?? 180.w,
-      height: 200.h,
+      height: 220.h,
       margin: margin ?? EdgeInsets.only(right: 5.w),
       decoration: BoxDecoration(
         color: Colors.white,
-        // 18px corners over a gold-tinted hairline — the same card treatment
-        // the website uses for its property listings.
+      
         borderRadius: BorderRadius.circular(8.r),
         border: Border.all(color: AppColors.goldBorder, width: 1),
         boxShadow: [
@@ -82,9 +81,7 @@ class PropertyCard extends StatelessWidget {
               if (listing.photos != null)
                 Image.network(listing.photos!.first.url!),
 
-              /// =================================================
-              /// PURPOSE / FEATURED TAG
-              /// =================================================
+              
               if (_purposeLabel() != null)
                 Positioned(
                   top: 8.h,

@@ -33,8 +33,8 @@ class SectionHeader extends StatelessWidget {
             children: [
               Text(
                 title,
-                style: AppTextStyles.title18.copyWith(
-                  fontSize: 19.sp,
+                style: AppTextStyles.title16.copyWith(
+                  fontSize: 17.sp,
                   fontWeight: FontWeight.w600,
                   color: AppColors.ink,
                   letterSpacing: -0.2,
@@ -46,11 +46,9 @@ class SectionHeader extends StatelessWidget {
                 SizedBox(height: 3.h),
                 Text(
                   subtitle!,
-                  style: AppTextStyles.body13.copyWith(
-                    fontSize: 12.sp,
-                    color: AppColors.inkMuted,
-                    height: 1.45,
-                  ),
+                  style: Theme.of(context).textTheme.bodySmall
+                                ?.copyWith(fontSize: 11.sp, color: Colors.grey,fontWeight: FontWeight.w600,),
+                          
                 ),
               ],
             ],

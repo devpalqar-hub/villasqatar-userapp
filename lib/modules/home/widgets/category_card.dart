@@ -70,29 +70,29 @@ class CategoryCard extends StatelessWidget {
                       child: _buildIcon(),
                     ),
 
-                    SizedBox(height: 12.h),
+                    SizedBox(height: 8.h),
 
                     Text(
                       title,
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                       style: AppTextStyles.bold14.copyWith(
-                        fontSize: 13.sp,
+                        fontSize: 12.sp,
                         fontWeight: FontWeight.w700,
                         color: AppColors.ink,
                         letterSpacing: -0.1,
                       ),
                     ),
 
-                    SizedBox(height: 3.h),
+                    SizedBox(height: 2.h),
 
                     Text(
                       "$listingCount+ ${"Properties".tr}",
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                       style: AppTextStyles.bold12.copyWith(
-                        fontSize: 10.sp,
-                        fontWeight: FontWeight.w600,
+                        fontSize: 8.sp,
+                        fontWeight: FontWeight.w800,
                         color: AppColors.primary,
                       ),
                     ),
