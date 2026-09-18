@@ -21,6 +21,10 @@ class MainScreen extends StatefulWidget {
   final String? initialPurpose;
   final String? initialCategory;
 
+  /// Municipality to pre-filter the search tab by — used when a popular place
+  /// is tapped on Home. Maps to the API's `municipalityId` query parameter.
+  final String? initialLocationId;
+
   const MainScreen({
     super.key,
     this.initialIndex = 0,
@@ -28,6 +32,7 @@ class MainScreen extends StatefulWidget {
     this.initialType,
     this.initialPurpose,
     this.initialCategory,
+    this.initialLocationId,
   });
 
   @override
@@ -81,6 +86,12 @@ class _MainScreenState extends State<MainScreen> {
     if (widget.initialCategory != null &&
         widget.initialCategory!.trim().isNotEmpty) {
       controller.filter.type = widget.initialCategory!.trim();
+    }
+
+    /// Apply initial MUNICIPALITY if provided
+    if (widget.initialLocationId != null &&
+        widget.initialLocationId!.trim().isNotEmpty) {
+      controller.filter.locationId = widget.initialLocationId!.trim();
     }
 
     /// If MainScreen was opened directly on Search,

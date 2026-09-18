@@ -23,7 +23,6 @@ class ApiHandler {
     );
   }
 
-
   static Future<dynamic> get(
     String endpoint, {
     Map<String, String>? headers,
@@ -33,34 +32,11 @@ class ApiHandler {
 
       final requestHeaders = _headers(headers);
 
-      debugPrint("========== GET REQUEST ==========");
-      debugPrint("URL: $url");
-
-      debugPrint("HEADERS:");
-      requestHeaders.forEach((key, value) {
-        debugPrint("$key : $value");
-      });
-
-      debugPrint("================================");
+      requestHeaders.forEach((key, value) {});
 
       final response = await http
           .get(Uri.parse(url), headers: requestHeaders)
           .timeout(_timeoutDuration, onTimeout: _onTimeout);
-
-      debugPrint("========== GET RESPONSE ==========");
-      debugPrint("URL: $url");
-      debugPrint("STATUS CODE: ${response.statusCode}");
-
-      try {
-        final json = jsonDecode(response.body);
-        debugPrint("BODY:");
-        debugPrint(const JsonEncoder.withIndent("  ").convert(json));
-      } catch (_) {
-        debugPrint("BODY:");
-        debugPrint(response.body);
-      }
-
-      debugPrint("=================================");
 
       return await _handleResponse(response);
     } on SocketException {
@@ -325,7 +301,6 @@ class ApiHandler {
         throw Exception(_getErrorMessage(data, "Error ${response.statusCode}"));
     }
   }
-
 
   static String _getErrorMessage(dynamic data, String fallback) {
     if (data is Map) {

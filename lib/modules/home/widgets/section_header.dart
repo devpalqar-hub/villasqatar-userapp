@@ -5,14 +5,19 @@ import 'package:villas_qatar/Core/theme/app_textstyles.dart';
 
 import '../../../Core/constants/app_colors.dart';
 
+/// Section heading in the website's house style: an ink-coloured title with an
+/// optional muted subtitle stacked underneath, and a maroon "View all" link
+/// pushed to the far edge.
 class SectionHeader extends StatelessWidget {
   final String title;
+  final String? subtitle;
   final bool showSeeAll;
   final VoidCallback? onSeeAllTap;
 
   const SectionHeader({
     super.key,
     required this.title,
+    this.subtitle,
     this.showSeeAll = true,
     this.onSeeAllTap,
   });
@@ -20,39 +25,67 @@ class SectionHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          title,
-          style: AppTextStyles.bold14.copyWith(
-            color: AppColors.textPrimary,
-            fontWeight: FontWeight.w400,
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                title,
+                style: AppTextStyles.title18.copyWith(
+                  fontSize: 19.sp,
+                  fontWeight: FontWeight.w600,
+                  color: AppColors.ink,
+                  letterSpacing: -0.2,
+                  height: 1.2,
+                ),
+              ),
+
+              if (subtitle != null && subtitle!.isNotEmpty) ...[
+                SizedBox(height: 3.h),
+                Text(
+                  subtitle!,
+                  style: AppTextStyles.body13.copyWith(
+                    fontSize: 12.sp,
+                    color: AppColors.inkMuted,
+                    height: 1.45,
+                  ),
+                ),
+              ],
+            ],
           ),
         ),
 
-        const Spacer(),
-
-        if (showSeeAll)
+        if (showSeeAll) ...[
+          SizedBox(width: 12.w),
           InkWell(
+            borderRadius: BorderRadius.circular(6.r),
             onTap: onSeeAllTap,
-            child: Row(
-              children: [
-                Text(
-                  'See all'.tr,
-                  style: AppTextStyles.medium13.copyWith(
-                    color: AppColors.primary,
-                    fontSize: 10.sp,
-                    fontWeight: FontWeight.w400,
+            child: Padding(
+              padding: EdgeInsets.symmetric(vertical: 4.h),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    'View all'.tr,
+                    style: AppTextStyles.medium13.copyWith(
+                      color: AppColors.primary,
+                      fontSize: 12.sp,
+                      fontWeight: FontWeight.w600,
+                    ),
                   ),
-                ),
-                SizedBox(width: 4.w),
-                Icon(
-                  Icons.arrow_forward,
-                  color: AppColors.primary,
-                  size: 16.sp,
-                ),
-              ],
+                  SizedBox(width: 5.w),
+                  Icon(
+                    Icons.arrow_forward,
+                    color: AppColors.primary,
+                    size: 15.sp,
+                  ),
+                ],
+              ),
             ),
           ),
+        ],
       ],
     );
   }

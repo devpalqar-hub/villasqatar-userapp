@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
+import 'package:villas_qatar/Core/constants/app_colors.dart';
 import 'package:villas_qatar/Core/theme/app_textstyles.dart';
 import 'package:villas_qatar/Core/utils/app_transitions.dart';
 import 'package:villas_qatar/modules/home/model/nearBypropertyResponse.dart';
@@ -28,7 +29,7 @@ class LocationCard extends StatelessWidget {
         height: 120.h,
         margin: EdgeInsets.only(right: 2.w),
         decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(10.r),
+          borderRadius: BorderRadius.circular(16.r),
           image: DecorationImage(
             image: image.isNotEmpty
                 ? NetworkImage(image)
@@ -39,7 +40,7 @@ class LocationCard extends StatelessWidget {
         ),
         child: Container(
           decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(10.r),
+            borderRadius: BorderRadius.circular(16.r),
             gradient: LinearGradient(
               begin: Alignment.topCenter,
               end: Alignment.bottomCenter,
@@ -63,8 +64,8 @@ class LocationCard extends StatelessWidget {
                       vertical: 2.h,
                     ),
                     decoration: BoxDecoration(
-                      color: const Color(0xff8C1437),
-                      borderRadius: BorderRadius.circular(5.r),
+                      color: AppColors.primary,
+                      borderRadius: BorderRadius.circular(999.r),
                     ),
                     child: Row(
                       mainAxisSize: MainAxisSize.min,

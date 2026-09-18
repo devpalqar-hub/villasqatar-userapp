@@ -1,4 +1,3 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:fluttertoast/fluttertoast.dart';
@@ -8,46 +7,41 @@ import 'package:villas_qatar/Core/constants/app_colors.dart';
 import 'package:villas_qatar/Core/theme/app_motion.dart';
 import 'package:villas_qatar/Core/theme/app_textstyles.dart';
 import 'package:villas_qatar/Core/widgets/motion/pressable_scale.dart';
-import 'package:villas_qatar/modules/propertydetailscreen/propertydetailscreen.dart';
+import 'package:villas_qatar/modules/home/model/PropertyModel.dart';
 import 'package:villas_qatar/modules/wishlist/service/wishlist_controller.dart';
 
+import '../../PlansandFeatures/model/myfeatured_property.dart';
+
+// Adjust this import to wherever FeaturedListing actually lives in your
+// project (the model you shared — id, slug, propertyName, purpose,
+// bedrooms, bathrooms, area, price, photos, etc.).
+
+/// Property card — "For Rent" / "For Sale" pill, wishlist heart, photo,
+/// title, location, beds/baths/area stats and price — built entirely from
+/// a [FeaturedListing], the same shape returned by the listings API.
 class PropertyCard extends StatelessWidget {
-  final String image;
-  final String title;
-  final String location;
+  /// The listing this card renders. Replaces the old individual
+  /// image/title/location/price/... parameters.
+  final PropertyModel listing;
+
+  /// Optional straight-line distance label shown next to the location
+  /// (e.g. "1.2 km") — not part of [FeaturedListing], so it's still passed
+  /// in separately when the caller has it.
   final String distance;
-  final String price;
-  final String sqm;
-  final String beds;
 
-  final bool verified;
-  final bool isFeatured;
+  /// Overrides the card's intrinsic width — pass [double.infinity] to fill
+  /// a grid cell instead of the fixed width used in horizontal rails.
+  final double? width;
 
-  final String? propertyId;
-  final String? slug;
-
-  final int bathrooms;
-  final double area;
-
-  /// Optional suffix shown after the price, e.g. "/mo" for rentals.
-  final String? priceSuffix;
+  /// Overrides the trailing margin used between cards in a horizontal rail.
+  final EdgeInsetsGeometry? margin;
 
   const PropertyCard({
     super.key,
-    required this.image,
-    required this.title,
-    required this.location,
-    required this.distance,
-    required this.price,
-    required this.sqm,
-    required this.beds,
-    this.isFeatured = false,
-    this.verified = true,
-    this.propertyId,
-    this.slug,
-    this.bathrooms = 0,
-    this.area = 0,
-    this.priceSuffix,
+    required this.listing,
+    this.distance = '',
+    this.width,
+    this.margin,
   });
 
   @override
@@ -56,21 +50,22 @@ class PropertyCard extends StatelessWidget {
         Get.isRegistered<WishlistController>()
         ? Get.find<WishlistController>()
         : Get.put(WishlistController());
-    // ? Get.find<WishlistController>()
-    // : Get.put(WishlistController());
 
     return Container(
-      width: 168.w,
-      margin: EdgeInsets.only(right: 5.w),
+      width: width ?? 180.w,
+      height: 200.h,
+      margin: margin ?? EdgeInsets.only(right: 5.w),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(10.r),
-        border: Border.all(color: Colors.grey.shade200, width: 1),
+        // 18px corners over a gold-tinted hairline — the same card treatment
+        // the website uses for its property listings.
+        borderRadius: BorderRadius.circular(8.r),
+        border: Border.all(color: AppColors.goldBorder, width: 1),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(.06),
-            blurRadius: 12,
-            offset: const Offset(0, 4),
+            color: Colors.black.withOpacity(.05),
+            blurRadius: 18,
+            offset: const Offset(0, 6),
           ),
         ],
       ),
@@ -84,12 +79,43 @@ class PropertyCard extends StatelessWidget {
           /// ===================================================
           Stack(
             children: [
-              _buildImage(),
+              if (listing.photos != null)
+                Image.network(listing.photos!.first.url!),
 
               /// =================================================
-              /// FEATURED TAG
+              /// PURPOSE / FEATURED TAG
               /// =================================================
-              if (isFeatured)
+              if (_purposeLabel() != null)
+                Positioned(
+                  top: 8.h,
+                  left: 8.w,
+                  child: Container(
+                    padding: EdgeInsets.symmetric(
+                      horizontal: 8.w,
+                      vertical: 4.h,
+                    ),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(6.r),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(.08),
+                          blurRadius: 6,
+                          offset: const Offset(0, 2),
+                        ),
+                      ],
+                    ),
+                    child: Text(
+                      _purposeLabel()!,
+                      style: AppTextStyles.medium13.copyWith(
+                        color: AppColors.ink,
+                        fontSize: 9.sp,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                  ),
+                )
+              else if (listing.isFeatured ?? false)
                 Positioned(
                   top: 8.h,
                   left: 8.w,
@@ -124,7 +150,7 @@ class PropertyCard extends StatelessWidget {
                 child: GetBuilder<WishlistController>(
                   init: wishlistController,
                   builder: (controller) {
-                    final String id = propertyId?.trim() ?? '';
+                    final String id = listing.id ?? "";
 
                     final bool wishlisted =
                         id.isNotEmpty && controller.isWishlisted(id);
@@ -215,10 +241,6 @@ class PropertyCard extends StatelessWidget {
                   },
                 ),
               ),
-
-              /// =================================================
-              /// IMAGE BOTTOM INFO
-              /// =================================================
             ],
           ),
 
@@ -232,12 +254,14 @@ class PropertyCard extends StatelessWidget {
               children: [
                 /// TITLE
                 Text(
-                  title,
+                  listing.propertyName ?? "No Name",
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
                   style: AppTextStyles.title16.copyWith(
-                    fontSize: 12.sp,
-                    color: AppColors.textPrimary,
+                    fontSize: 12.5.sp,
+                    fontWeight: FontWeight.w700,
+                    color: AppColors.ink,
+                    height: 1.35,
                   ),
                 ),
 
@@ -249,19 +273,20 @@ class PropertyCard extends StatelessWidget {
                     Icon(
                       Icons.location_on_outlined,
                       size: 12.sp,
-                      color: Colors.grey,
+                      color: AppColors.primary,
                     ),
 
                     SizedBox(width: 4.w),
 
                     Expanded(
                       child: Text(
-                        location,
+                        listing.addressLine1 ?? "",
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                         style: AppTextStyles.body13.copyWith(
-                          fontSize: 8.sp,
-                          color: Colors.grey,
+                          fontSize: 9.5.sp,
+                          fontWeight: FontWeight.w500,
+                          color: AppColors.inkFaint,
                         ),
                       ),
                     ),
@@ -279,15 +304,11 @@ class PropertyCard extends StatelessWidget {
 
                 SizedBox(height: 5.h),
 
-                /// PRICE
-                Text(
-                  price,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: AppTextStyles.bold14.copyWith(
-                    fontSize: 10.sp,
-                    color: AppColors.textPrimary,
-                  ),
+                /// PRICE — bold maroon amount, lighter "/ month" suffix
+                /// for rentals, matching the site's listing badges.
+                _PriceLine(
+                  amountText: _formattedPrice(),
+                  suffix: _priceSuffix(),
                 ),
 
                 SizedBox(height: 5.h),
@@ -297,42 +318,17 @@ class PropertyCard extends StatelessWidget {
                 /// =================================================
                 Row(
                   children: [
-                    Flexible(
-                      child: Text(
-                        "$beds Beds",
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: TextStyle(color: Colors.grey, fontSize: 10.sp),
-                      ),
+                    _statChip(
+                      Icons.bed_outlined,
+                      "${listing.bedrooms} Beds".tr,
                     ),
-
-                    SizedBox(width: 6.w),
-
-                    // _buildDot(),
-                    SizedBox(width: 6.w),
-
-                    Flexible(
-                      child: Text(
-                        "$bathrooms Baths",
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: TextStyle(color: Colors.grey, fontSize: 10.sp),
-                      ),
+                    SizedBox(width: 8.w),
+                    _statChip(
+                      Icons.bathtub_outlined,
+                      "${listing.bathrooms} Baths".tr,
                     ),
-
-                    SizedBox(width: 6.w),
-
-                    // _buildDot(),
-                    SizedBox(width: 6.w),
-
-                    Flexible(
-                      child: Text(
-                        _areaText(),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: TextStyle(color: Colors.grey, fontSize: 10.sp),
-                      ),
-                    ),
+                    SizedBox(width: 8.w),
+                    _statChip(Icons.square_foot_rounded, _areaText()),
                   ],
                 ),
               ],
@@ -344,21 +340,87 @@ class PropertyCard extends StatelessWidget {
   }
 
   // =============================================================
+  // PURPOSE LABEL ("For Rent" / "For Sale")
+  // =============================================================
+
+  String? _purposeLabel() {
+    switch (listing.purpose) {
+      case 'RENT':
+        return "For Rent".tr;
+      case 'SALE':
+        return "For Sale".tr;
+      default:
+        return null;
+    }
+  }
+
+  // =============================================================
+  // PRICE
+  // =============================================================
+
+  /// "QAR 28,000" — thousands-separated, no decimals when the price is a
+  /// whole number.
+  String _formattedPrice() {
+    final double price = listing.price ?? 0;
+    final bool isWhole = price == price.roundToDouble();
+    final String raw = isWhole
+        ? price.toInt().toString()
+        : price.toStringAsFixed(2);
+
+    final parts = raw.split('.');
+    final String intPart = parts[0];
+    final buffer = StringBuffer();
+
+    for (int i = 0; i < intPart.length; i++) {
+      final int posFromEnd = intPart.length - i;
+      buffer.write(intPart[i]);
+      if (posFromEnd > 1 && posFromEnd % 3 == 1) {
+        buffer.write(',');
+      }
+    }
+
+    final String formattedInt = buffer.toString();
+    return 'QAR $formattedInt${parts.length > 1 ? '.${parts[1]}' : ''}';
+  }
+
+  /// "/ month" for rentals, nothing for sale listings.
+  String? _priceSuffix() {
+    return listing.purpose == 'RENT' ? '/ month' : null;
+  }
+
+  // =============================================================
   // AREA TEXT
   // =============================================================
 
   String _areaText() {
-    /// Prefer area if it has a valid value.
-    if (area > 0) {
-      return "${area.toStringAsFixed(0)} sqm";
+    if (listing.area != null && listing.area! > 0) {
+      return "${listing.area!.toStringAsFixed(0)} m²";
     }
+    return "0 m²";
+  }
 
-    /// Otherwise use the sqm string passed from parent.
-    if (sqm.trim().isNotEmpty) {
-      return "${sqm.trim()} sqm";
-    }
+  // =============================================================
+  // STAT CHIP (icon + value, e.g. bed / bath / area)
+  // =============================================================
 
-    return "0 sqm";
+  Widget _statChip(IconData icon, String value) {
+    return Flexible(
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(icon, size: 12.sp, color: AppColors.inkFaint),
+          SizedBox(width: 3.w),
+          Flexible(
+            child: Text(
+              value,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(color: AppColors.inkMuted, fontSize: 10.sp),
+            ),
+          ),
+        ],
+      ),
+    );
   }
 
   // =============================================================
@@ -366,7 +428,7 @@ class PropertyCard extends StatelessWidget {
   // =============================================================
 
   Widget _buildImage() {
-    final String cleanImage = image.trim();
+    final String cleanImage = listing.photos!.first.url!;
 
     final bool validNetworkImage =
         cleanImage.startsWith('https://') || cleanImage.startsWith('http://');
@@ -438,6 +500,42 @@ class PropertyCard extends StatelessWidget {
               size: 28.sp,
               color: Colors.grey.shade400,
             ),
+    );
+  }
+}
+
+/// "QAR 28,000 / month" — bold maroon amount, lighter gray suffix, laid
+/// out on one line matching the card design.
+class _PriceLine extends StatelessWidget {
+  final String amountText;
+  final String? suffix;
+
+  const _PriceLine({required this.amountText, this.suffix});
+
+  @override
+  Widget build(BuildContext context) {
+    return RichText(
+      maxLines: 1,
+      overflow: TextOverflow.ellipsis,
+      text: TextSpan(
+        style: AppTextStyles.bold14.copyWith(
+          fontSize: 13.sp,
+          fontWeight: FontWeight.w800,
+          color: AppColors.primary,
+        ),
+        children: [
+          TextSpan(text: amountText),
+          if (suffix != null && suffix!.trim().isNotEmpty)
+            TextSpan(
+              text: ' ${suffix!.trim()}',
+              style: TextStyle(
+                fontSize: 10.sp,
+                fontWeight: FontWeight.w500,
+                color: AppColors.inkFaint,
+              ),
+            ),
+        ],
+      ),
     );
   }
 }

@@ -1,27 +1,88 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
-import 'package:villas_qatar/core/constants/app_colors.dart';
-import 'package:villas_qatar/modules/searchscreen/view/search_screen.dart';
+import 'package:http/http.dart' as http;
+import 'package:villas_qatar/Core/constants/app_colors.dart';
+import 'package:villas_qatar/Core/theme/app_fonts.dart';
 
 /// Search intent selected alongside the query.
 enum PropertySearchType { rent, sale }
 
+/// Single entry from GET /api/hero-banners.
+class HeroBannerModel {
+  final String id;
+  final String mobileImageUrl;
+  final String webImageUrl;
+  final String title;
+  final String subtitle;
+  final String? actionUrl;
+  final String? actionButtonName;
+
+  const HeroBannerModel({
+    required this.id,
+    required this.mobileImageUrl,
+    required this.webImageUrl,
+    required this.title,
+    required this.subtitle,
+    this.actionUrl,
+    this.actionButtonName,
+  });
+
+  factory HeroBannerModel.fromJson(Map<String, dynamic> json) {
+    return HeroBannerModel(
+      id: json['id'] as String? ?? '',
+      mobileImageUrl: json['mobileImageUrl'] as String? ?? '',
+      webImageUrl: json['webImageUrl'] as String? ?? '',
+      title: json['title'] as String? ?? '',
+      subtitle: json['subtitle'] as String? ?? '',
+      actionUrl: json['actionUrl'] as String?,
+      actionButtonName: json['actionButtonName'] as String?,
+    );
+  }
+}
+
+/// Home hero: a full-bleed property photograph with a headline and an
+/// "Explore Properties" CTA, topped by a Rent/Buy search card that overlaps
+/// the bottom edge of the photo. The banner (image + title + subtitle) is
+/// fetched directly from GET /api/hero-banners inside this widget — no
+/// separate controller/service.
 class HomeBanner extends StatefulWidget {
-  /// Now passes back both the query text and which mode (rent/sale) was active.
+  /// Passes back both the query text and which mode (rent/sale) was active.
   final void Function(String propertyName, PropertySearchType type) onSearch;
-  const HomeBanner({super.key, required this.onSearch});
+
+  /// "Explore Properties" button on the photo. Passes back the active
+  /// banner's `actionUrl` (may be null).
+  final void Function(String? actionUrl)? onExploreProperties;
+
+  /// "Advanced Filters" link on the search card.
+  final VoidCallback? onAdvancedFilters;
+
+  const HomeBanner({
+    super.key,
+    required this.onSearch,
+    this.onExploreProperties,
+    this.onAdvancedFilters,
+  });
 
   @override
   State<HomeBanner> createState() => _HomeBannerState();
 }
 
 class _HomeBannerState extends State<HomeBanner> {
+  static const String _heroBannersEndpoint =
+      'https://apivillas.palqar.cloud/api/hero-banners';
+
   final TextEditingController searchController = TextEditingController();
   final FocusNode _focusNode = FocusNode();
+  final PageController _pageController = PageController();
 
   PropertySearchType _selectedType = PropertySearchType.rent;
   bool _isFocused = false;
+  int _activeIndex = 0;
+
+  bool _loading = true;
+  List<HeroBannerModel> _slides = const [];
 
   @override
   void initState() {
@@ -29,6 +90,38 @@ class _HomeBannerState extends State<HomeBanner> {
     _focusNode.addListener(() {
       setState(() => _isFocused = _focusNode.hasFocus);
     });
+    _loadHeroBanners();
+  }
+
+  /// Direct API call — no controller/service in between.
+  Future<void> _loadHeroBanners() async {
+    try {
+      final response = await http
+          .get(Uri.parse(_heroBannersEndpoint), headers: {'accept': '*/*'})
+          .timeout(const Duration(seconds: 12));
+
+      List<HeroBannerModel> parsed = [];
+      if (response.statusCode == 200) {
+        final decoded = jsonDecode(response.body);
+        if (decoded is List) {
+          parsed = decoded
+              .map((e) => HeroBannerModel.fromJson(e as Map<String, dynamic>))
+              .toList();
+        }
+      }
+
+      if (!mounted) return;
+      setState(() {
+        _slides = parsed;
+        _loading = false;
+      });
+    } catch (_) {
+      if (!mounted) return;
+      setState(() {
+        _slides = const [];
+        _loading = false;
+      });
+    }
   }
 
   void _searchProperty() {
@@ -49,101 +142,298 @@ class _HomeBannerState extends State<HomeBanner> {
   void dispose() {
     searchController.dispose();
     _focusNode.dispose();
+    _pageController.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      height: 240.h,
+    // Fallback content if the API returns nothing / fails.
+    final HeroBannerModel fallback = const HeroBannerModel(
+      id: 'fallback',
+      mobileImageUrl: '',
+      webImageUrl: '',
+      title: 'A Better Way to Live in Qatar',
+      subtitle:
+          'Discover exceptional homes in Qatar — buy, rent or invest with confidence.',
+    );
 
-      child: ClipRRect(
-        borderRadius: BorderRadiusGeometry.only(
-          bottomLeft: Radius.circular(40),
-          bottomRight: Radius.circular(40),
-        ),
-        child: Stack(
+    final List<HeroBannerModel> slides = _slides.isNotEmpty
+        ? _slides
+        : [fallback];
+    final int activeIndex = _activeIndex.clamp(0, slides.length - 1);
+
+    return Column(
+      children: [
+        Stack(
+          clipBehavior: Clip.none,
           children: [
-            /// Background Image
-            Positioned.fill(
-              child: Opacity(
-                opacity: .3,
-                child: ClipRRect(
-                  borderRadius: BorderRadiusGeometry.only(
-                    bottomLeft: Radius.circular(40),
-                    bottomRight: Radius.circular(40),
-                  ),
-                  child: Image.asset("assets/auth_bg1.png", fit: BoxFit.cover),
-                ),
-              ),
-            ),
-
-            /// Content
-            Padding(
-              padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 15.h),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+            SizedBox(
+              height: 250.h,
+              width: double.infinity,
+              child: Stack(
+                fit: StackFit.expand,
                 children: [
-                  Row(
-                    children: [
-                      Text(
-                        "Find your".tr + "dream villas".tr,
-                        style: TextStyle(
-                          fontFamily: "Rubik",
-                          fontSize: 20.sp,
-                          fontWeight: FontWeight.w400,
-                          color: Colors.black,
+                  /// Background photograph(s) — swipeable if the API
+                  /// returns more than one banner.
+                  PageView.builder(
+                    controller: _pageController,
+                    itemCount: slides.length,
+                    onPageChanged: (i) => setState(() => _activeIndex = i),
+                    itemBuilder: (context, index) {
+                      return _BannerImage(
+                        loading: _loading,
+                        imageUrl: slides[index].mobileImageUrl,
+                      );
+                    },
+                  ),
+
+                  /// Horizontal scrim — dark on the text side, clearing to
+                  /// the right.
+                  const IgnorePointer(
+                    child: DecoratedBox(
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          begin: Alignment.centerLeft,
+                          end: Alignment.centerRight,
+                          colors: [
+                            Color(0xE60B1019),
+                            Color(0x8C0B1019),
+                            Color(0x1F0B1019),
+                          ],
+                          stops: [0.0, 0.5, 1.0],
                         ),
                       ),
-                    ],
-                  ),
-
-                  Text(
-                    "in Qatar".tr,
-                    style: TextStyle(
-                      fontSize: 25.sp,
-                      fontWeight: FontWeight.w500,
-                      color: AppColors.primary,
                     ),
                   ),
 
-                  //  SizedBox(height: 6.h),
-                  SizedBox(
-                    width: 240.w,
-                    child: Text(
-                      "Discover premium villas and properties in the best locations across Qatar"
-                          .tr,
-                      style: TextStyle(
-                        fontSize: 11.sp,
-                        color: Colors.black.withOpacity(.9),
+                  /// Bottom scrim so the caption + dots read on the photo.
+                  const IgnorePointer(
+                    child: DecoratedBox(
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          begin: Alignment.bottomCenter,
+                          end: Alignment.topCenter,
+                          colors: [Color(0x990B1019), Color(0x000B1019)],
+                          stops: [0.0, 0.5],
+                        ),
                       ),
                     ),
                   ),
-                  const Spacer(),
 
-                  /// ---- Rent / Sale toggle ----
+                  /// Content
                   Padding(
-                    padding: EdgeInsets.only(right: 14.w, bottom: 10.h),
-                    child: _SearchTypeToggle(
-                      selected: _selectedType,
-                      onChanged: (type) {
-                        setState(() => _selectedType = type);
-                      },
-                    ),
-                  ),
+                    padding: EdgeInsets.fromLTRB(12.w, 22.h, 12.w, 0.h),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const _HeroEyebrow(),
 
-                  /// ---- AI-style search bar ----
-                  Padding(
-                    padding: EdgeInsets.only(right: 14.w),
-                    child: _AiSearchField(
-                      controller: searchController,
-                      focusNode: _focusNode,
-                      isFocused: _isFocused,
-                      onSubmit: _searchProperty,
+                        SizedBox(height: 14.h),
+
+                        /// Headline from the API's `title`, last word
+                        /// picked out in gold.
+                        _HeroTitle(title: slides[activeIndex].title),
+
+                        SizedBox(height: 10.h),
+
+                        SizedBox(
+                          width: 250.w,
+                          child: Text(
+                            slides[activeIndex].subtitle,
+                            style: TextStyle(
+                              fontFamily: AppFonts.currentFont,
+                              fontSize: 11.5.sp,
+                              height: 1.5,
+                              color: Colors.white.withOpacity(.88),
+                            ),
+                          ),
+                        ),
+
+                        SizedBox(height: 18.h),
+                      ],
                     ),
                   ),
                 ],
               ),
+            ),
+
+            /// ---- Search card — overlaps the photo's bottom edge ----
+            Positioned(
+              left: 0.w,
+              right: 0.w,
+              bottom: -35.h,
+              child: _SearchCard(
+                selectedType: _selectedType,
+                onTypeChanged: (type) => setState(() => _selectedType = type),
+                controller: searchController,
+                focusNode: _focusNode,
+                isFocused: _isFocused,
+                onSubmit: _searchProperty,
+                onAdvancedFilters: widget.onAdvancedFilters,
+              ),
+            ),
+          ],
+        ),
+
+        /// Reserve room for the overlapping search card.
+        SizedBox(height: 30.h),
+      ],
+    );
+  }
+}
+
+/// Renders the banner photo from the network, with a placeholder while
+/// loading and a graceful fallback to the bundled asset if the URL is
+/// empty or fails to load.
+class _BannerImage extends StatelessWidget {
+  final bool loading;
+  final String imageUrl;
+
+  const _BannerImage({required this.loading, required this.imageUrl});
+
+  @override
+  Widget build(BuildContext context) {
+    if (loading) {
+      return Container(color: AppColors.maroonDeep.withOpacity(.85));
+    }
+
+    if (imageUrl.isEmpty) {
+      return Image.asset(
+        "assets/hero-bg.jpg",
+        fit: BoxFit.cover,
+        alignment: Alignment.centerRight,
+        errorBuilder: (_, __, ___) => Container(color: AppColors.maroonDeep),
+      );
+    }
+
+    return Image.network(
+      imageUrl,
+      fit: BoxFit.cover,
+      alignment: Alignment.centerRight,
+      loadingBuilder: (context, child, progress) {
+        if (progress == null) return child;
+        return Container(color: AppColors.maroonDeep.withOpacity(.85));
+      },
+      errorBuilder: (_, __, ___) => Image.asset(
+        "assets/hero-bg.jpg",
+        fit: BoxFit.cover,
+        alignment: Alignment.centerRight,
+        errorBuilder: (_, __, ___) => Container(color: AppColors.maroonDeep),
+      ),
+    );
+  }
+}
+
+/// "A Better Way to Live in Qatar" style headline, built dynamically from
+/// the API's `title` string — every word white except the last, which is
+/// picked out in gold.
+class _HeroTitle extends StatelessWidget {
+  final String title;
+
+  const _HeroTitle({required this.title});
+
+  @override
+  Widget build(BuildContext context) {
+    final words = title.trim().split(RegExp(r'\s+'));
+    final String lastWord = words.isNotEmpty ? words.removeLast() : '';
+    final String leadingText = words.isEmpty ? '' : '${words.join(' ')} ';
+
+    return RichText(
+      text: TextSpan(
+        style: TextStyle(
+          fontFamily: AppFonts.currentFont,
+          fontSize: 26.sp,
+          fontWeight: FontWeight.w700,
+          height: 1.18,
+          letterSpacing: -0.3,
+          color: Colors.white,
+        ),
+        children: [
+          if (leadingText.isNotEmpty) TextSpan(text: leadingText),
+          TextSpan(
+            text: lastWord,
+            style: const TextStyle(color: AppColors.gold),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// Uppercase eyebrow label over the hero photo.
+class _HeroEyebrow extends StatelessWidget {
+  const _HeroEyebrow();
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Text(
+          "PREMIUM PROPERTIES".tr,
+          style: TextStyle(
+            fontFamily: AppFonts.currentFont,
+            fontSize: 9.sp,
+            fontWeight: FontWeight.w600,
+            letterSpacing: 1.4,
+            color: AppColors.goldPale,
+          ),
+        ),
+        SizedBox(width: 8.w),
+        Icon(Icons.circle, size: 4.sp, color: AppColors.goldPale),
+      ],
+    );
+  }
+}
+
+/// White "Explore Properties" pill button. Uses the banner's own
+/// `actionButtonName` when the API provides one, otherwise falls back to
+/// the default label.
+class _ExploreButton extends StatelessWidget {
+  final String? label;
+  final VoidCallback? onTap;
+
+  const _ExploreButton({this.label, this.onTap});
+
+  @override
+  Widget build(BuildContext context) {
+    final String text = (label != null && label!.trim().isNotEmpty)
+        ? label!
+        : "Explore Properties".tr;
+
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 12.h),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(999.r),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(.18),
+              blurRadius: 14,
+              offset: const Offset(0, 6),
+            ),
+          ],
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              text,
+              style: TextStyle(
+                fontFamily: AppFonts.currentFont,
+                fontSize: 12.5.sp,
+                fontWeight: FontWeight.w700,
+                color: AppColors.ink,
+              ),
+            ),
+            SizedBox(width: 8.w),
+            Icon(
+              Icons.arrow_forward_rounded,
+              size: 15.sp,
+              color: AppColors.ink,
             ),
           ],
         ),
@@ -152,7 +442,99 @@ class _HomeBannerState extends State<HomeBanner> {
   }
 }
 
-/// Pill-shaped Rent / Sale segmented toggle.
+/// Carousel dots — one per banner returned by the API.
+class _HeroDots extends StatelessWidget {
+  final int activeIndex;
+  final int count;
+
+  const _HeroDots({required this.activeIndex, required this.count});
+
+  @override
+  Widget build(BuildContext context) {
+    if (count <= 1) return const SizedBox.shrink();
+
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: List.generate(count, (index) {
+        final bool active = index == activeIndex;
+
+        return Container(
+          margin: EdgeInsets.only(right: 5.w),
+          width: active ? 14.w : 5.w,
+          height: 5.w,
+          decoration: BoxDecoration(
+            color: active ? Colors.white : Colors.white.withOpacity(.45),
+            borderRadius: BorderRadius.circular(999.r),
+          ),
+        );
+      }),
+    );
+  }
+}
+
+/// White search card: Rent/Buy toggle + Advanced Filters, then the search
+/// field — floated over the hero photo's bottom edge.
+class _SearchCard extends StatelessWidget {
+  final PropertySearchType selectedType;
+  final ValueChanged<PropertySearchType> onTypeChanged;
+  final TextEditingController controller;
+  final FocusNode focusNode;
+  final bool isFocused;
+  final VoidCallback onSubmit;
+  final VoidCallback? onAdvancedFilters;
+
+  const _SearchCard({
+    required this.selectedType,
+    required this.onTypeChanged,
+    required this.controller,
+    required this.focusNode,
+    required this.isFocused,
+    required this.onSubmit,
+    this.onAdvancedFilters,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: EdgeInsets.all(14.w),
+      decoration: BoxDecoration(
+        // color: Colors.white,
+        borderRadius: BorderRadius.circular(20.r),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(.12),
+            blurRadius: 24,
+            offset: const Offset(0, 10),
+          ),
+        ],
+      ),
+      child: Column(
+        children: [
+          Row(
+            children: [
+              _SearchTypeToggle(
+                selected: selectedType,
+                onChanged: onTypeChanged,
+              ),
+              const Spacer(),
+            ],
+          ),
+
+          SizedBox(height: 10.h),
+
+          _SearchField(
+            controller: controller,
+            focusNode: focusNode,
+            isFocused: isFocused,
+            onSubmit: onSubmit,
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// Pill-shaped Rent / Buy segmented toggle.
 class _SearchTypeToggle extends StatelessWidget {
   final PropertySearchType selected;
   final ValueChanged<PropertySearchType> onChanged;
@@ -165,17 +547,15 @@ class _SearchTypeToggle extends StatelessWidget {
       height: 34.h,
       padding: EdgeInsets.all(3.r),
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(.85),
-        borderRadius: BorderRadius.circular(20.r),
-        boxShadow: const [
-          BoxShadow(color: Colors.black12, blurRadius: 8, offset: Offset(0, 2)),
-        ],
+        color: AppColors.cream,
+        borderRadius: BorderRadius.circular(8.r),
+        border: Border.all(color: AppColors.warmBorder),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
           _buildOption(context, "Rent".tr, PropertySearchType.rent),
-          _buildOption(context, "Sale".tr, PropertySearchType.sale),
+          _buildOption(context, "Buy".tr, PropertySearchType.sale),
         ],
       ),
     );
@@ -193,21 +573,18 @@ class _SearchTypeToggle extends StatelessWidget {
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 200),
         curve: Curves.easeOut,
-        padding: EdgeInsets.symmetric(horizontal: 18.w, vertical: 6.h),
+        padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 6.h),
         decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(18.r),
-          gradient: isActive
-              ? const LinearGradient(
-                  colors: [Color(0xffA61E3D), Color(0xff7A1630)],
-                )
-              : null,
+          borderRadius: BorderRadius.circular(8.r),
+          gradient: isActive ? AppColors.ctaGradient : null,
         ),
         child: Text(
           label,
           style: TextStyle(
+            fontFamily: AppFonts.currentFont,
             fontSize: 11.sp,
             fontWeight: FontWeight.w600,
-            color: isActive ? Colors.white : Colors.black54,
+            color: isActive ? Colors.white : AppColors.inkMuted,
           ),
         ),
       ),
@@ -215,16 +592,15 @@ class _SearchTypeToggle extends StatelessWidget {
   }
 }
 
-/// A search field styled like a modern AI-assistant search box:
-/// gradient border that lights up on focus, a sparkle/AI icon, and
-/// a rounded send button.
-class _AiSearchField extends StatelessWidget {
+/// Location search field with a plain magnifier prefix and a filled circular
+/// search button, matching the site's search bar.
+class _SearchField extends StatelessWidget {
   final TextEditingController controller;
   final FocusNode focusNode;
   final bool isFocused;
   final VoidCallback onSubmit;
 
-  const _AiSearchField({
+  const _SearchField({
     required this.controller,
     required this.focusNode,
     required this.isFocused,
@@ -234,91 +610,68 @@ class _AiSearchField extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return AnimatedContainer(
-      duration: const Duration(milliseconds: 250),
-      curve: Curves.easeOut,
-      padding: EdgeInsets.all(isFocused ? 1.6 : 0),
+      duration: const Duration(milliseconds: 200),
+      height: 48.h,
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(16.r),
-        gradient: isFocused
-            ? const LinearGradient(
-                colors: [
-                  Color(0xffA61E3D),
-                  Color(0xffFFB199),
-                  Color(0xffA61E3D),
-                ],
-              )
-            : null,
-        boxShadow: [
-          BoxShadow(
-            color: isFocused
-                ? const Color(0xffA61E3D).withOpacity(.25)
-                : Colors.black12,
-            blurRadius: isFocused ? 20 : 15,
-            offset: const Offset(0, 4),
+        color: AppColors.cream,
+        borderRadius: BorderRadius.circular(14.r),
+        border: Border.all(
+          color: isFocused ? AppColors.primary : AppColors.warmBorder,
+          width: isFocused ? 1.4 : 1,
+        ),
+      ),
+      child: Row(
+        children: [
+          SizedBox(width: 14.w),
+
+          Icon(Icons.search_rounded, color: AppColors.inkFaint, size: 19.sp),
+
+          SizedBox(width: 8.w),
+
+          Expanded(
+            child: TextField(
+              controller: controller,
+              textInputAction: TextInputAction.search,
+              onSubmitted: (_) => onSubmit(),
+              style: TextStyle(
+                fontFamily: AppFonts.currentFont,
+                fontSize: 12.sp,
+                color: AppColors.ink,
+              ),
+              decoration: InputDecoration(
+                border: InputBorder.none,
+                hintText: "Search by location, area or landmark".tr,
+                isDense: true,
+                isCollapsed: true,
+                hintStyle: TextStyle(
+                  fontFamily: AppFonts.currentFont,
+                  fontSize: 11.sp,
+                  color: AppColors.inkFaint,
+                ),
+              ),
+            ),
+          ),
+
+          Padding(
+            padding: EdgeInsets.all(6.w),
+            child: GestureDetector(
+              onTap: onSubmit,
+              child: Container(
+                width: 36.w,
+                height: 36.h,
+                decoration: BoxDecoration(
+                  gradient: AppColors.ctaGradient,
+                  borderRadius: BorderRadius.circular(11.r),
+                ),
+                child: Icon(
+                  Icons.search_rounded,
+                  color: Colors.white,
+                  size: 18.sp,
+                ),
+              ),
+            ),
           ),
         ],
-      ),
-      child: Container(
-        height: 48.h,
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(15.r),
-        ),
-        child: Row(
-          children: [
-            SizedBox(width: 14.w),
-
-            /// AI sparkle icon instead of plain magnifier
-            ShaderMask(
-              shaderCallback: (bounds) => const LinearGradient(
-                colors: [Color(0xffA61E3D), Color(0xffFF8A65)],
-              ).createShader(bounds),
-              child: Icon(Icons.auto_awesome, color: Colors.white, size: 18.sp),
-            ),
-
-            SizedBox(width: 10.w),
-
-            Expanded(
-              child: TextField(
-                controller: controller,
-                focusNode: focusNode,
-                textInputAction: TextInputAction.search,
-                onSubmitted: (_) => onSubmit(),
-                style: TextStyle(fontSize: 12.sp, color: Colors.black87),
-                decoration: InputDecoration(
-                  border: InputBorder.none,
-                  hintText: "Ask AI to find your villa...".tr,
-                  isDense: true,
-                  isCollapsed: true,
-                  hintStyle: TextStyle(fontSize: 11.sp, color: Colors.grey),
-                ),
-              ),
-            ),
-
-            /// Send / Arrow button
-            Padding(
-              padding: EdgeInsets.only(right: 6.w),
-              child: GestureDetector(
-                onTap: onSubmit,
-                child: Container(
-                  width: 36.w,
-                  height: 32.h,
-                  decoration: BoxDecoration(
-                    gradient: const LinearGradient(
-                      colors: [Color(0xffA61E3D), Color(0xff7A1630)],
-                    ),
-                    borderRadius: BorderRadius.circular(30.r),
-                  ),
-                  child: Icon(
-                    Icons.arrow_forward_rounded,
-                    color: Colors.white,
-                    size: 16.sp,
-                  ),
-                ),
-              ),
-            ),
-          ],
-        ),
       ),
     );
   }

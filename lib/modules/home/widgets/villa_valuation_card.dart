@@ -2,322 +2,221 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get_utils/src/extensions/internacionalization.dart';
 import 'package:villas_qatar/Core/constants/app_colors.dart';
-import 'package:villas_qatar/Core/utils/auth_guard.dart';
-import 'package:villas_qatar/Core/utils/guest_limter.dart';
-import 'package:villas_qatar/modules/pricestimator/views/price_estimator_screen.dart';
+import 'package:villas_qatar/Core/theme/app_textstyles.dart';
+import 'package:villas_qatar/Core/widgets/motion/pressable_scale.dart';
 
-/// A hero valuation card for Villas Qatar: image banner, headline, stats,
-/// and a call-to-action to start an AI estimate.
+/// Compact "AI Price Estimator" promo banner: eyebrow + headline + CTA on
+/// the left, a photo thumbnail with a floating estimate badge on the right.
 class VillaValuationCard extends StatelessWidget {
-  VillaValuationCard({
-    super.key,
-    required this.onGetEstimate,
-    this.imageUrl =
-        'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80',
-    this.brandLabel = 'VILLAS QATAR',
-    String? titleLine1,
-    String? titleLine2,
-    String? subtitle,
-    String? ctaLabel,
-  }) : titleLine1 = titleLine1 ?? "What's your".tr,
-       titleLine2 = titleLine2 ?? 'villa worth?'.tr,
-       subtitle =
-           subtitle ??
-           'Find out in 30 seconds with our AI-powered valuation.'.tr,
-       ctaLabel = ctaLabel ?? 'Get my free estimate'.tr;
+  const VillaValuationCard({super.key, required this.onGetEstimate});
 
-  final VoidCallback onGetEstimate;
-  final String imageUrl;
-  final String brandLabel;
-  final String titleLine1;
-  final String titleLine2;
-  final String subtitle;
-  final String ctaLabel;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: 390.w,
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(18.r),
-        border: Border.all(color: const Color(0xFFF2E8EA)),
-      ),
-      clipBehavior: Clip.antiAlias,
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Padding(
-            padding: const EdgeInsets.fromLTRB(20, 20, 20, 20),
-            child: _Headline(line1: titleLine1, line2: titleLine2),
-          ),
-          Padding(
-            padding: const EdgeInsets.fromLTRB(20, 0, 20, 20),
-            child: _Subtitle(text: subtitle),
-          ),
-          Padding(
-            padding: const EdgeInsets.fromLTRB(16, 0, 16, 20),
-            child: _ValuationPanel(
-              ctaLabel: ctaLabel,
-              onGetEstimate: onGetEstimate,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class ValuationStat {
-  const ValuationStat({
-    required this.icon,
-    required this.value,
-    required this.label,
-  });
-  final IconData icon;
-  final String value;
-  final String label;
-}
-
-class _HeroImage extends StatelessWidget {
-  const _HeroImage({required this.imageUrl});
-  final String imageUrl;
-
-  @override
-  Widget build(BuildContext context) {
-    return Image.network(
-      imageUrl,
-      fit: BoxFit.cover,
-      loadingBuilder: (context, child, progress) => progress == null
-          ? child
-          : Container(
-              color: AppColors.divider,
-              alignment: Alignment.center,
-              child: const CircularProgressIndicator(strokeWidth: 2),
-            ),
-      errorBuilder: (context, error, stackTrace) => Container(
-        color: AppColors.divider,
-        alignment: Alignment.center,
-        child: const Icon(
-          Icons.image_not_supported_outlined,
-          color: AppColors.textHint,
-        ),
-      ),
-    );
-  }
-}
-
-class _Headline extends StatelessWidget {
-  const _Headline({required this.line1, required this.line2});
-  final String line1;
-  final String line2;
-
-  @override
-  Widget build(BuildContext context) {
-    return RichText(
-      text: TextSpan(
-        style: const TextStyle(
-          fontFamily: 'Rubik',
-          fontSize: 32,
-          fontWeight: FontWeight.w700,
-          height: 1.1,
-          color: AppColors.textPrimary,
-        ),
-        children: [
-          TextSpan(text: '$line1\n'),
-          TextSpan(
-            text: line2,
-            style: const TextStyle(color: AppColors.secondary),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _Subtitle extends StatelessWidget {
-  const _Subtitle({required this.text});
-  final String text;
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Container(width: 3, height: 39, color: AppColors.secondary),
-        const SizedBox(width: 16),
-        Expanded(
-          child: Text(
-            text,
-            style: const TextStyle(
-              fontFamily: 'Rubik',
-              fontSize: 15,
-              height: 1.5,
-              color: AppColors.textSecondary,
-            ),
-          ),
-        ),
-      ],
-    );
-  }
-}
-
-class _ValuationPanel extends StatelessWidget {
-  const _ValuationPanel({required this.ctaLabel, required this.onGetEstimate});
-
-  final String ctaLabel;
   final VoidCallback onGetEstimate;
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: AppColors.white,
-        borderRadius: BorderRadius.circular(24),
-        boxShadow: [
-          BoxShadow(
-            color: AppColors.shadow.withOpacity(0.08),
-            blurRadius: 30,
-            offset: const Offset(0, 15),
-          ),
-        ],
-      ),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          _GradientCta(label: ctaLabel, onPressed: onGetEstimate),
-          const SizedBox(height: 16),
-          const _TrustBadgeRow(),
-        ],
-      ),
-    );
-  }
-}
-
-class _StatColumn extends StatelessWidget {
-  const _StatColumn({required this.stat});
-  final ValuationStat stat;
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      children: [
-        Container(
-          padding: const EdgeInsets.all(12),
-          decoration: const BoxDecoration(
-            color: AppColors.featured,
-            shape: BoxShape.circle,
-          ),
-          child: Icon(stat.icon, color: AppColors.secondary, size: 20),
-        ),
-        const SizedBox(height: 10),
-        Text(
-          stat.value,
-          style: const TextStyle(
-            fontFamily: 'Rubik',
-            fontSize: 18,
-            fontWeight: FontWeight.w700,
-            color: AppColors.textPrimary,
-          ),
-        ),
-        const SizedBox(height: 4),
-        Text(
-          stat.label,
-          style: const TextStyle(
-            fontFamily: 'Rubik',
-            fontSize: 11,
-            color: AppColors.textSecondary,
-          ),
-        ),
-      ],
-    );
-  }
-}
-
-class _GradientCta extends StatelessWidget {
-  const _GradientCta({required this.label, required this.onPressed});
-  final String label;
-  final VoidCallback onPressed;
-
-  @override
-  Widget build(BuildContext context) {
-    return SizedBox(
       width: double.infinity,
-      height: 50,
-      child: DecoratedBox(
-        decoration: BoxDecoration(borderRadius: BorderRadius.circular(12)),
-        child: Material(
-          color: AppColors.secondary,
-          borderRadius: BorderRadius.circular(12),
-          child: InkWell(
-            borderRadius: BorderRadius.circular(12),
-            onTap: onPressed,
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
+      padding: EdgeInsets.fromLTRB(16.w, 16.h, 12.w, 16.h),
+      decoration: BoxDecoration(
+        color: AppColors.cream,
+        borderRadius: BorderRadius.circular(20.r),
+        border: Border.all(color: AppColors.warmBorder),
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Icon(Icons.auto_awesome, color: Colors.amber, size: 20),
-                const SizedBox(width: 12),
-                Flexible(
-                  child: Text(
-                    label,
-                    style: const TextStyle(
-                      fontFamily: 'Rubik',
-                      color: Colors.black,
-                      fontSize: 15,
-                      fontWeight: FontWeight.w500,
+                Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(Icons.auto_awesome, size: 12.sp, color: AppColors.gold),
+                    SizedBox(width: 6.w),
+                    Text(
+                      "AI PRICE ESTIMATOR".tr,
+                      style: AppTextStyles.bold12.copyWith(
+                        fontSize: 9.5.sp,
+                        fontWeight: FontWeight.w700,
+                        letterSpacing: 0.6,
+                        color: AppColors.gold,
+                      ),
                     ),
-                    overflow: TextOverflow.ellipsis,
+                  ],
+                ),
+
+                SizedBox(height: 10.h),
+
+                Text(
+                  "Know Your Property's True Value".tr,
+                  style: AppTextStyles.title18.copyWith(
+                    fontSize: 16.5.sp,
+                    fontWeight: FontWeight.w700,
+                    color: AppColors.ink,
+                    height: 1.25,
+                    letterSpacing: -0.2,
                   ),
                 ),
-                const SizedBox(width: 12),
-                const Icon(
-                  Icons.arrow_forward,
-                  color: AppColors.white,
-                  size: 20,
+
+                SizedBox(height: 6.h),
+
+                Text(
+                  "Get AI-powered accurate price estimates in seconds.".tr,
+                  style: AppTextStyles.body13.copyWith(
+                    fontSize: 11.sp,
+                    color: AppColors.inkMuted,
+                    height: 1.45,
+                  ),
+                ),
+
+                SizedBox(height: 14.h),
+
+                _EstimateCta(onPressed: onGetEstimate),
+              ],
+            ),
+          ),
+
+          SizedBox(width: 14.w),
+
+          _ThumbnailWithBadge(),
+        ],
+      ),
+    );
+  }
+}
+
+/// Rounded property photo with a floating "AI Estimate" value chip.
+class _ThumbnailWithBadge extends StatelessWidget {
+  const _ThumbnailWithBadge();
+
+  @override
+  Widget build(BuildContext context) {
+    return Stack(
+      clipBehavior: Clip.none,
+      children: [
+        ClipRRect(
+          borderRadius: BorderRadius.circular(16.r),
+          child: Image.asset(
+            "assets/hero-bg.jpg",
+            width: 96.w,
+            height: 110.h,
+            fit: BoxFit.cover,
+            errorBuilder: (_, __, ___) => Container(
+              width: 96.w,
+              height: 110.h,
+              color: AppColors.sand,
+              child: Icon(
+                Icons.villa_outlined,
+                color: AppColors.gold,
+                size: 28.sp,
+              ),
+            ),
+          ),
+        ),
+
+        Positioned(
+          top: -14.h,
+          right: -6.w,
+          child: Container(
+            padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 6.h),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(10.r),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(.12),
+                  blurRadius: 10,
+                  offset: const Offset(0, 4),
+                ),
+              ],
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  "AI Estimate".tr,
+                  style: AppTextStyles.body13.copyWith(
+                    fontSize: 7.5.sp,
+                    fontWeight: FontWeight.w600,
+                    color: AppColors.inkFaint,
+                  ),
+                ),
+                SizedBox(height: 2.h),
+                Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      "QAR 2.4M",
+                      style: AppTextStyles.bold12.copyWith(
+                        fontSize: 10.5.sp,
+                        fontWeight: FontWeight.w700,
+                        color: AppColors.trendText,
+                      ),
+                    ),
+                    SizedBox(width: 2.w),
+                    Icon(
+                      Icons.trending_up_rounded,
+                      size: 11.sp,
+                      color: AppColors.trendText,
+                    ),
+                  ],
                 ),
               ],
             ),
           ),
         ),
-      ),
+      ],
     );
   }
 }
 
-class _TrustBadgeRow extends StatelessWidget {
-  const _TrustBadgeRow();
+/// Maroon gradient "Estimate Now" button.
+class _EstimateCta extends StatelessWidget {
+  const _EstimateCta({required this.onPressed});
 
-  static final _badges = [
-    (icon: Icons.verified_user_outlined, label: '100% secure'.tr),
-    (icon: Icons.check_circle, label: 'AI-powered valuation'.tr),
-    (icon: Icons.bar_chart, label: 'Real market insights'.tr),
-  ];
+  final VoidCallback onPressed;
 
   @override
   Widget build(BuildContext context) {
-    return Wrap(
-      alignment: WrapAlignment.center,
-      spacing: 12,
-      runSpacing: 8,
-      children: [
-        for (final badge in _badges)
-          Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Icon(badge.icon, size: 16, color: AppColors.secondary),
-              const SizedBox(width: 8),
-              Text(
-                badge.label,
-                style: const TextStyle(
-                  fontFamily: 'Rubik',
-                  fontSize: 11,
-                  color: AppColors.textSecondary,
-                ),
+    return PressableScale(
+      child: InkWell(
+        borderRadius: BorderRadius.circular(999.r),
+        onTap: onPressed,
+        child: Container(
+          padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 10.h),
+          decoration: BoxDecoration(
+            gradient: AppColors.ctaGradient,
+            borderRadius: BorderRadius.circular(999.r),
+            boxShadow: [
+              BoxShadow(
+                color: AppColors.primary.withOpacity(.22),
+                blurRadius: 14,
+                offset: const Offset(0, 6),
               ),
             ],
           ),
-      ],
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                "Estimate Now".tr,
+                style: AppTextStyles.bold14.copyWith(
+                  fontSize: 12.sp,
+                  fontWeight: FontWeight.w600,
+                  color: AppColors.white,
+                ),
+              ),
+              SizedBox(width: 8.w),
+              Icon(
+                Icons.arrow_forward_rounded,
+                size: 14.sp,
+                color: AppColors.white,
+              ),
+            ],
+          ),
+        ),
+      ),
     );
   }
 }

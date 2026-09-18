@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 class AppColors {
   // Brand Colors
-  static const Color primary =  Color(0xFF8A1538);
+  static const Color primary = Color(0xFF8A1538);
   static const Color primaryDark = Color(0xFF6E102D);
   static const Color primaryLight = Color(0xFFF8E9EE);
 
@@ -78,16 +78,98 @@ class AppColors {
   static const cardBg = Color(0xFFFFFFFF);
 
   static const Color primarySoft = Color(0xFFF3E3E9);
-   static const Color surface = Color(0xFFFFFFFF);
-    static const LinearGradient heroGradient = LinearGradient(
+  static const Color surface = Color(0xFFFFFFFF);
+  static const LinearGradient heroGradient = LinearGradient(
     begin: Alignment.topLeft,
     end: Alignment.bottomRight,
     colors: [Color(0xFF7B1F3D), Color(0xFFA13A5C)],
   );
 
-   static const LinearGradient buttonGradient = LinearGradient(
+  static const LinearGradient buttonGradient = LinearGradient(
     begin: Alignment.centerLeft,
     end: Alignment.centerRight,
     colors: [Color(0xFF7B1F3D), Color(0xFF9A3054)],
+  );
+
+  // ─── Web-aligned design tokens ─────────────────────────────────────────────
+  // Mirrors the palette used by user-site so the app and the website read as
+  // one product: deep maroon brand, gold accent, warm cream surfaces.
+
+  /// Gold accent — the site's `#d39d55` (hero eyebrow, headline accent, CTAs).
+  static const Color gold = Color(0xFFD39D55);
+
+  /// Softer gold used for hovered/active borders on the site.
+  static const Color goldSoft = Color(0xFFE6CFA1);
+
+  /// Pale gold used for uppercase eyebrow text over dark imagery.
+  static const Color goldPale = Color(0xFFD6CFB3);
+
+  /// Warm panel background — the site's `#fdfaf6` AI-estimator panel.
+  static const Color cream = Color(0xFFFDFAF6);
+
+  /// Card background top-stop for the category gradient (`#fffdf8`).
+  static const Color creamCard = Color(0xFFFFFDF8);
+
+  /// Sand chip/circle background (`#f5f1e6`).
+  static const Color sand = Color(0xFFF5F1E6);
+
+  /// Warm hairline border around cream cards (`#ebe6d8`).
+  static const Color warmBorder = Color(0xFFEBE6D8);
+
+  /// Neutral hairline border used on the site's place/dealer cards.
+  static const Color coolBorder = Color(0xFFE8E9EB);
+
+  /// Gold-tinted border used on the site's property cards (`#d39d557e`).
+  static const Color goldBorder = Color(0x7ED39D55);
+
+  /// Heading ink (`#16181d`).
+  static const Color ink = Color(0xFF16181D);
+
+  /// Body/subtitle ink (`#6b6d72`).
+  static const Color inkMuted = Color(0xFF6B6D72);
+
+  /// Label/caption ink (`#8b8d92`).
+  static const Color inkFaint = Color(0xFF8B8D92);
+
+  /// Deepest maroon — the site's app-promo panel (`#640d22`).
+  static const Color maroonDeep = Color(0xFF640D22);
+
+  /// Tint behind maroon feature icons on the dealer CTA (`#fdf2f4`).
+  static const Color maroonTint = Color(0xFFFDF2F4);
+
+  /// Positive trend chip (site `#dcfce7` / `#15803d`).
+  static const Color trendBg = Color(0xFFDCFCE7);
+  static const Color trendText = Color(0xFF15803D);
+
+  /// Warm badge chip behind "Smart & Fast" (site `#fef3c7`).
+  static const Color goldChipBg = Color(0xFFFEF3C7);
+
+  /// Maroon → gold hairline that tops the site's category cards.
+  static const LinearGradient accentLine = LinearGradient(
+    begin: Alignment.centerLeft,
+    end: Alignment.centerRight,
+    colors: [primary, gold],
+  );
+
+  /// Blush → gold wash behind category icons (site `#fbe1e6` → `#f6ebd6`).
+  static const LinearGradient categoryIconGradient = LinearGradient(
+    begin: Alignment.topLeft,
+    end: Alignment.bottomRight,
+    colors: [Color(0xFFFBE1E6), Color(0xFFF6EBD6)],
+  );
+
+  /// Cream card wash (site `linear-gradient(165deg, #fffdf8, #ffffff 55%)`).
+  static const LinearGradient creamCardGradient = LinearGradient(
+    begin: Alignment.topLeft,
+    end: Alignment.bottomRight,
+    colors: [creamCard, white],
+    stops: [0.0, 0.55],
+  );
+
+  /// Maroon CTA gradient (site `linear-gradient(135deg, #a51b44, #8A1538)`).
+  static const LinearGradient ctaGradient = LinearGradient(
+    begin: Alignment.topLeft,
+    end: Alignment.bottomRight,
+    colors: [Color(0xFFA51B44), primary],
   );
 }

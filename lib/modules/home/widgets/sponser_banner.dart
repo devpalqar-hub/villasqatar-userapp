@@ -8,11 +8,7 @@ class InvestmentBanner extends StatelessWidget {
   final BannerModel banner;
   final VoidCallback? onTap;
 
-  const InvestmentBanner({
-    super.key,
-    required this.banner,
-    this.onTap,
-  });
+  const InvestmentBanner({super.key, required this.banner, this.onTap});
 
   @override
   Widget build(BuildContext context) {
@@ -24,13 +20,11 @@ class InvestmentBanner extends StatelessWidget {
     /// Check banner validity using startDate and endDate.
     final DateTime now = DateTime.now();
 
-    if (banner.startDate != null &&
-        now.isBefore(banner.startDate!)) {
+    if (banner.startDate != null && now.isBefore(banner.startDate!)) {
       return const SizedBox.shrink();
     }
 
-    if (banner.endDate != null &&
-        now.isAfter(banner.endDate!)) {
+    if (banner.endDate != null && now.isAfter(banner.endDate!)) {
       return const SizedBox.shrink();
     }
 
@@ -40,7 +34,7 @@ class InvestmentBanner extends StatelessWidget {
         width: double.infinity,
         height: 150.h,
         decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(10.r),
+          borderRadius: BorderRadius.circular(18.r),
           boxShadow: [
             BoxShadow(
               color: Colors.black.withOpacity(.08),
@@ -50,7 +44,7 @@ class InvestmentBanner extends StatelessWidget {
           ],
         ),
         child: ClipRRect(
-          borderRadius: BorderRadius.circular(10.r),
+          borderRadius: BorderRadius.circular(18.r),
           child: Stack(
             fit: StackFit.expand,
             children: [
@@ -58,35 +52,25 @@ class InvestmentBanner extends StatelessWidget {
               /// BANNER IMAGE
               /// imageUrl from BannerModel
               /// ==========================================
-
               _buildBannerImage(),
 
               /// ==========================================
               /// OVERLAY
               /// Makes text readable over bright images.
               /// ==========================================
-
               Container(
                 decoration: BoxDecoration(
                   gradient: LinearGradient(
                     begin: Alignment.centerLeft,
                     end: Alignment.centerRight,
                     colors: [
-                      const Color(
-                        0xff5E0D27,
-                      ).withOpacity(.88),
+                      const Color(0xff5E0D27).withOpacity(.88),
 
-                      const Color(
-                        0xff8C1437,
-                      ).withOpacity(.45),
+                      const Color(0xff8C1437).withOpacity(.45),
 
                       Colors.black.withOpacity(.05),
                     ],
-                    stops: const [
-                      0.0,
-                      0.55,
-                      1.0,
-                    ],
+                    stops: const [0.0, 0.55, 1.0],
                   ),
                 ),
               ),
@@ -95,7 +79,6 @@ class InvestmentBanner extends StatelessWidget {
               /// FEATURED BADGE
               /// Uses isFeatured from model
               /// ==========================================
-
               if (banner.isFeatured)
                 Positioned(
                   top: 12.h,
@@ -107,8 +90,7 @@ class InvestmentBanner extends StatelessWidget {
                     ),
                     decoration: BoxDecoration(
                       color: Colors.white.withOpacity(.92),
-                      borderRadius:
-                          BorderRadius.circular(20.r),
+                      borderRadius: BorderRadius.circular(20.r),
                     ),
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
@@ -116,9 +98,7 @@ class InvestmentBanner extends StatelessWidget {
                         Icon(
                           Icons.star_rounded,
                           size: 12.sp,
-                          color: const Color(
-                            0xff8C1437,
-                          ),
+                          color: const Color(0xff8C1437),
                         ),
 
                         SizedBox(width: 3.w),
@@ -126,9 +106,7 @@ class InvestmentBanner extends StatelessWidget {
                         Text(
                           "Featured".tr,
                           style: TextStyle(
-                            color: const Color(
-                              0xff8C1437,
-                            ),
+                            color: const Color(0xff8C1437),
                             fontSize: 9.sp,
                             fontWeight: FontWeight.w700,
                           ),
@@ -141,20 +119,13 @@ class InvestmentBanner extends StatelessWidget {
               /// ==========================================
               /// CONTENT
               /// ==========================================
-
               Padding(
-                padding: EdgeInsets.symmetric(
-                  horizontal: 20.w,
-                  vertical: 18.h,
-                ),
+                padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 18.h),
                 child: Column(
-                  crossAxisAlignment:
-                      CrossAxisAlignment.start,
-                  mainAxisAlignment:
-                      MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     /// TITLE FROM API
-
                     SizedBox(
                       width: 210.w,
                       child: Text(
@@ -191,47 +162,33 @@ class InvestmentBanner extends StatelessWidget {
                     //     ),
                     //   ),
                     // ),
-
                     SizedBox(height: 12.h),
 
                     /// LINK URL ACTION
-
                     if (banner.linkUrl.isNotEmpty)
                       SizedBox(
                         height: 30.h,
                         child: OutlinedButton(
                           onPressed: onTap,
-                          style:
-                              OutlinedButton.styleFrom(
-                            padding:
-                                EdgeInsets.symmetric(
-                              horizontal: 16.w,
-                            ),
+                          style: OutlinedButton.styleFrom(
+                            padding: EdgeInsets.symmetric(horizontal: 16.w),
                             side: BorderSide(
-                              color: Colors.white
-                                  .withOpacity(.45),
+                              color: Colors.white.withOpacity(.45),
                             ),
-                            backgroundColor: Colors.white
-                                .withOpacity(.10),
-                            shape:
-                                RoundedRectangleBorder(
-                              borderRadius:
-                                  BorderRadius.circular(
-                                20.r,
-                              ),
+                            backgroundColor: Colors.white.withOpacity(.10),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(20.r),
                             ),
                           ),
                           child: Row(
-                            mainAxisSize:
-                                MainAxisSize.min,
+                            mainAxisSize: MainAxisSize.min,
                             children: [
                               Text(
                                 "Explore Now".tr,
                                 style: TextStyle(
                                   color: Colors.white,
                                   fontSize: 11.sp,
-                                  fontWeight:
-                                      FontWeight.w600,
+                                  fontWeight: FontWeight.w600,
                                 ),
                               ),
 
@@ -271,11 +228,7 @@ class InvestmentBanner extends StatelessWidget {
       height: double.infinity,
       fit: BoxFit.cover,
 
-      loadingBuilder: (
-        context,
-        child,
-        loadingProgress,
-      ) {
+      loadingBuilder: (context, child, loadingProgress) {
         if (loadingProgress == null) {
           return child;
         }
@@ -294,11 +247,7 @@ class InvestmentBanner extends StatelessWidget {
         );
       },
 
-      errorBuilder: (
-        context,
-        error,
-        stackTrace,
-      ) {
+      errorBuilder: (context, error, stackTrace) {
         return _fallbackImage();
       },
     );

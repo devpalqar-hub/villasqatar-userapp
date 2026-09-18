@@ -30,7 +30,7 @@ class SettingsScreen extends StatelessWidget {
         elevation: 0,
         surfaceTintColor: Colors.transparent,
         centerTitle: true,
-     
+
         title: Text(
           "Settings".tr,
           style: TextStyle(
@@ -122,17 +122,15 @@ class SettingsScreen extends StatelessWidget {
           return;
         }
 
-        Get.to(() => const MyFeaturedPropertiesScreen());
+        //   Get.to(() => const MyFeaturedPropertiesScreen());
       },
     ),
 
-     SettingItem(
+    SettingItem(
       icon: Icons.favorite_outline,
       title: "My Invoices".tr,
       onTap: () {
-        if (!AuthGuard.requireLogin(
-          message: "Please login to continue".tr,
-        )) {
+        if (!AuthGuard.requireLogin(message: "Please login to continue".tr)) {
           return;
         }
 
@@ -155,51 +153,46 @@ class SettingsScreen extends StatelessWidget {
   ];
 
   List<SettingItem> get supportItems => [
-  SettingItem(
-    icon: Icons.headset_mic_outlined,
-    title: "Contact Us".tr,
-    onTap: () {
-      _openWebPage(
-        "https://villas.palqar.cloud/profile/about",
-      );
-    },
-  ),
+    SettingItem(
+      icon: Icons.headset_mic_outlined,
+      title: "Contact Us".tr,
+      onTap: () {
+        _openWebPage("https://villas.palqar.cloud/profile/about");
+      },
+    ),
 
-  SettingItem(
-    icon: Icons.support_agent,
-    title: "Support".tr,
-    onTap: () {
-      if (!AuthGuard.requireLogin(
-        message: "Please login to contact support.".tr,
-      )) {
-        return;
-      }
+    SettingItem(
+      icon: Icons.support_agent,
+      title: "Support".tr,
+      onTap: () {
+        if (!AuthGuard.requireLogin(
+          message: "Please login to contact support.".tr,
+        )) {
+          return;
+        }
 
-      Get.to(() => const SupportScreen());
-    },
-  ),
+        Get.to(() => const SupportScreen());
+      },
+    ),
 
-  SettingItem(
-    icon: Icons.info_outline,
-    title: "About".tr,
-    onTap: () {
-      _openWebPage(
-        "https://villas.palqar.cloud/profile/about",
-      );
-    },
-  ),
+    SettingItem(
+      icon: Icons.info_outline,
+      title: "About".tr,
+      onTap: () {
+        _openWebPage("https://villas.palqar.cloud/profile/about");
+      },
+    ),
 
-  SettingItem(
-    icon: Icons.privacy_tip_outlined,
-    title: "Privacy Policy".tr,
-    onTap: () {
-      _openWebPage(
-        "https://villas.palqar.cloud/privacy",
-      );
-    },
-  ),
-];
+    SettingItem(
+      icon: Icons.privacy_tip_outlined,
+      title: "Privacy Policy".tr,
+      onTap: () {
+        _openWebPage("https://villas.palqar.cloud/privacy");
+      },
+    ),
+  ];
 }
+
 Future<void> _openWebPage(String url) async {
   final Uri uri = Uri.parse(url);
 
@@ -216,6 +209,7 @@ Future<void> _openWebPage(String url) async {
     debugPrint("❌ Error opening URL: $e");
   }
 }
+
 class SettingItem {
   final IconData icon;
   final String title;

@@ -8,7 +8,7 @@ import 'package:villas_qatar/Core/services/storage_service.dart';
 import 'package:villas_qatar/Core/theme/app_textstyles.dart';
 
 import 'package:villas_qatar/modules/PlansandFeatures/model/featured_property_model.dart';
-import 'package:villas_qatar/modules/PlansandFeatures/services/featured_properties_controller.dart';
+import 'package:villas_qatar/modules/PlansandFeatures/services/FeaturedPropertiesController.dart';
 import 'package:villas_qatar/modules/home/widgets/property_card.dart';
 import 'package:villas_qatar/modules/propertydetailscreen/widget/agent_conatct_card.dart';
 import 'package:villas_qatar/modules/propertydetailscreen/widget/boost_plan_bottomsheet.dart';
@@ -59,8 +59,6 @@ class _PropertyDetailsScreenState extends State<PropertyDetailsScreen> {
     debugPrint("DETAIL SCREEN PROPERTY ID: $propertyId");
     debugPrint("DETAIL SCREEN PROPERTY ID: $propertyId");
 
-    featuredScrollController.addListener(_onFeaturedScroll);
-
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final String? id = propertyId?.trim();
 
@@ -70,17 +68,15 @@ class _PropertyDetailsScreenState extends State<PropertyDetailsScreen> {
         controller.fetchPropertyDetails(id);
       }
 
-      featuredController.fetchFeaturedProperties(
-        location: FeaturedLocation.propertyDetailPage,
-        limit: 5,
-      );
+      // featuredController.fetchFeaturedProperties(
+      //   location: FeaturedLocation.propertyDetailPage,
+      //   limit: 5,
+      // );
     });
   }
 
   @override
   void dispose() {
-    featuredScrollController.removeListener(_onFeaturedScroll);
-
     featuredScrollController.dispose();
 
     super.dispose();
@@ -649,221 +645,6 @@ class _PropertyDetailsScreenState extends State<PropertyDetailsScreen> {
                                 SizedBox(height: 12.h),
                                 AgentContactCard(property: property),
                                 SizedBox(height: 12.h),
-                                GetBuilder<FeaturedPropertiesController>(
-                                  builder: (featuredController) {
-                                    final List<FeaturedProperty>
-                                    featuredProperties = featuredController
-                                        .getProperties(
-                                          FeaturedLocation.propertyDetailPage,
-                                        );
-
-                                    final bool isLoading = featuredController
-                                        .isLoading(
-                                          FeaturedLocation.propertyDetailPage,
-                                        );
-
-                                    final bool isLoadingMore =
-                                        featuredController.isLoadingMore(
-                                          FeaturedLocation.propertyDetailPage,
-                                        );
-
-                                    final bool hasMore = featuredController
-                                        .hasMore(
-                                          FeaturedLocation.propertyDetailPage,
-                                        );
-
-                                    final String error = featuredController
-                                        .getError(
-                                          FeaturedLocation.propertyDetailPage,
-                                        );
-
-                                    if (isLoading &&
-                                        featuredProperties.isEmpty) {
-                                      return SizedBox(
-                                        height: 250.h,
-
-                                        child: const Center(
-                                          child: CircularProgressIndicator(),
-                                        ),
-                                      );
-                                    }
-                                    if (error.isNotEmpty &&
-                                        featuredProperties.isEmpty) {
-                                      return SizedBox(
-                                        height: 150.h,
-
-                                        child: Center(
-                                          child: Column(
-                                            mainAxisSize: MainAxisSize.min,
-
-                                            children: [
-                                              Text(
-                                                "Unable to load featured properties"
-                                                    .tr,
-                                                textAlign: TextAlign.center,
-                                                style: TextStyle(
-                                                  fontSize: 12.sp,
-                                                  color: Colors.grey,
-                                                ),
-                                              ),
-
-                                              SizedBox(height: 8.h),
-
-                                              TextButton(
-                                                onPressed: () {
-                                                  featuredController
-                                                      .refreshFeatured(
-                                                        location: FeaturedLocation
-                                                            .propertyDetailPage,
-
-                                                        limit: 5,
-                                                      );
-                                                },
-
-                                                child: Text("Retry".tr),
-                                              ),
-                                            ],
-                                          ),
-                                        ),
-                                      );
-                                    }
-                                    if (featuredProperties.isEmpty) {
-                                      return const SizedBox.shrink();
-                                    }
-                                    final String currentPropertyId =
-                                        propertyId?.trim() ?? '';
-
-                                    final List<FeaturedProperty>
-                                    displayProperties = featuredProperties
-                                        .where((featured) {
-                                          return featured.listing.id !=
-                                              currentPropertyId;
-                                        })
-                                        .toList();
-
-                                    if (displayProperties.isEmpty &&
-                                        !isLoadingMore) {
-                                      return const SizedBox.shrink();
-                                    }
-
-                                    return Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-
-                                      children: [
-                                        Text(
-                                          "Featured Properties".tr,
-
-                                          style: TextStyle(
-                                            fontSize: 18.sp,
-
-                                            fontWeight: FontWeight.w600,
-
-                                            color: Colors.black,
-                                          ),
-                                        ),
-
-                                        SizedBox(height: 12.h),
-
-                                        SizedBox(
-                                          height: 250.h,
-
-                                          child: ListView.separated(
-                                            controller:
-                                                featuredScrollController,
-
-                                            scrollDirection: Axis.horizontal,
-
-                                            physics:
-                                                const BouncingScrollPhysics(),
-                                            itemCount:
-                                                displayProperties.length +
-                                                (hasMore ? 1 : 0),
-
-                                            separatorBuilder: (context, index) {
-                                              return SizedBox(width: 8.w);
-                                            },
-
-                                            itemBuilder: (context, index) {
-                                              if (index ==
-                                                  displayProperties.length) {
-                                                return SizedBox(
-                                                  width: 55.w,
-                                                  child: Center(
-                                                    child: isLoadingMore
-                                                        ? SizedBox(
-                                                            width: 22.w,
-                                                            height: 22.w,
-                                                            child:
-                                                                const CircularProgressIndicator(
-                                                                  strokeWidth:
-                                                                      2,
-                                                                  color: Color(
-                                                                    0xFF8E123E,
-                                                                  ),
-                                                                ),
-                                                          )
-                                                        : const SizedBox.shrink(),
-                                                  ),
-                                                );
-                                              }
-
-                                              final FeaturedProperty featured =
-                                                  displayProperties[index];
-
-                                              final FeaturedListing listing =
-                                                  featured.listing;
-
-                                              // ====================
-                                              // PROPERTY CARD
-                                              // ====================
-                                              return GestureDetector(
-                                                onTap: () async {
-                                                  await controller
-                                                      .fetchPropertyDetails(
-                                                        listing.id,
-                                                      );
-
-                                                  propertyId = listing.id;
-
-                                                  selectedImageIndex = 0;
-
-                                                  featuredController
-                                                      .refreshFeatured(
-                                                        location: FeaturedLocation
-                                                            .propertyDetailPage,
-                                                        limit: 5,
-                                                      );
-
-                                                  setState(() {});
-                                                },
-                                                child: PropertyCard(
-                                                  propertyId: listing.id,
-                                                  slug: listing.slug,
-                                                  image: listing.imageUrl,
-                                                  title: listing.propertyName,
-                                                  location:
-                                                      listing.formattedLocation,
-                                                  distance: '',
-                                                  price: listing.formattedPrice,
-                                                  sqm: listing.area.toString(),
-                                                  area: listing.area,
-                                                  beds: listing.bedrooms
-                                                      .toString(),
-                                                  bathrooms: listing.bathrooms,
-                                                  verified:
-                                                      listing.priceNegotiable,
-                                                  isFeatured:
-                                                      listing.isFeatured,
-                                                ),
-                                              );
-                                            },
-                                          ),
-                                        ),
-                                      ],
-                                    );
-                                  },
-                                ),
 
                                 SizedBox(height: 20.h),
                               ],
@@ -964,9 +745,7 @@ class _PropertyDetailsScreenState extends State<PropertyDetailsScreen> {
     final String propertyId = property.id?.toString().trim() ?? "";
 
     if (propertyId.isEmpty) {
-      Fluttertoast.showToast(
-        msg: "Property ID is missing..".tr,
-      );
+      Fluttertoast.showToast(msg: "Property ID is missing..".tr);
       return;
     }
 
@@ -1191,9 +970,7 @@ class _PropertyDetailsScreenState extends State<PropertyDetailsScreen> {
   void _onBoostProperty(dynamic property) {
     final String id = property.id?.toString().trim() ?? '';
     if (id.isEmpty) {
-      Fluttertoast.showToast(
-        msg: "Property ID is missing.".tr,
-      );
+      Fluttertoast.showToast(msg: "Property ID is missing.".tr);
       return;
     }
 
@@ -1220,34 +997,6 @@ class _PropertyDetailsScreenState extends State<PropertyDetailsScreen> {
     );
   }
 
-  void _onFeaturedScroll() {
-    if (!featuredScrollController.hasClients) {
-      return;
-    }
-
-    final ScrollPosition position = featuredScrollController.position;
-
-    if (position.pixels >= position.maxScrollExtent - 200) {
-      final bool hasMore = featuredController.hasMore(
-        FeaturedLocation.propertyDetailPage,
-      );
-
-      final bool loadingMore = featuredController.isLoadingMore(
-        FeaturedLocation.propertyDetailPage,
-      );
-
-      if (hasMore && !loadingMore) {
-        debugPrint("LOAD MORE PROPERTY_DETAIL_PAGE FEATURED");
-
-        featuredController.loadMore(
-          location: FeaturedLocation.propertyDetailPage,
-
-          limit: 5,
-        );
-      }
-    }
-  }
-
   Future<void> _showReportListingSheet(Property property) async {
     final String listingId = property.id?.toString().trim() ?? '';
 
@@ -1259,9 +1008,7 @@ class _PropertyDetailsScreenState extends State<PropertyDetailsScreen> {
     debugPrint("REPORTED USER ID: $reportedUserId");
 
     if (listingId.isEmpty) {
-      Fluttertoast.showToast(
-        msg: "Property information is not available.".tr,
-      );
+      Fluttertoast.showToast(msg: "Property information is not available.".tr);
       return;
     }
 

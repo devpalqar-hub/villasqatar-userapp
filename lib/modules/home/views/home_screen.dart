@@ -10,27 +10,28 @@ import 'package:villas_qatar/Core/utils/app_transitions.dart';
 import 'package:villas_qatar/Core/widgets/motion/app_shimmer.dart';
 import 'package:villas_qatar/Core/widgets/motion/staggered_entrance_column.dart';
 import 'package:villas_qatar/modules/PlansandFeatures/model/featured_property_model.dart';
-import 'package:villas_qatar/modules/PlansandFeatures/services/featured_properties_controller.dart';
+import 'package:villas_qatar/modules/PlansandFeatures/services/FeaturedPropertiesController.dart';
 import 'package:villas_qatar/modules/dealers/service/dealer_controller.dart';
 import 'package:villas_qatar/modules/dealers/view/dealer_detail_screen.dart';
 import 'package:villas_qatar/modules/dealers/view/detail_list_screen.dart';
+import 'package:villas_qatar/modules/home/service/HomeController.dart';
 import 'package:villas_qatar/modules/home/service/UtilsController.dart';
 import 'package:villas_qatar/modules/home/service/banner_controller.dart';
 import 'package:villas_qatar/modules/home/service/loaction_controller.dart';
 import 'package:villas_qatar/modules/home/widgets/agent_card.dart';
 import 'package:villas_qatar/modules/home/widgets/category_card.dart';
+import 'package:villas_qatar/modules/home/widgets/dealer_cta_card.dart';
+import 'package:villas_qatar/modules/home/widgets/popular_place_card.dart';
+import 'package:villas_qatar/modules/home/widgets/property_card.dart';
 import 'package:villas_qatar/modules/home/widgets/villa_valuation_card.dart';
 import 'package:villas_qatar/modules/home/widgets/hero_banner.dart';
 import 'package:villas_qatar/modules/home/widgets/location_card.dart';
-import 'package:villas_qatar/modules/home/widgets/property_card.dart';
 import 'package:villas_qatar/modules/home/widgets/section_header.dart';
 import 'package:villas_qatar/modules/home/widgets/sponser_banner.dart';
 import 'package:villas_qatar/modules/home/widgets/why_choose_card.dart';
-import 'package:villas_qatar/modules/mainscreen/home_bottom_nav.dart';
 import 'package:villas_qatar/modules/mainscreen/mainscreen.dart';
+import 'package:villas_qatar/modules/onboard/views/dealer_login_screen.dart';
 import 'package:villas_qatar/modules/pricestimator/views/price_estimator_screen.dart';
-import 'package:villas_qatar/modules/propertydetailscreen/propertydetailscreen.dart';
-import 'package:villas_qatar/modules/searchscreen/view/search_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   /// Fired when the AI search bar's arrow is tapped — carries the typed
@@ -69,12 +70,6 @@ class _HomeScreenState extends State<HomeScreen> {
         ? Get.find<BannerController>()
         : Get.put(BannerController(), permanent: true);
 
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      featuredController.fetchFeaturedProperties(
-        location: FeaturedLocation.homePage,
-        limit: 5,
-      );
-    });
     dealerController = Get.isRegistered<DealerController>()
         ? Get.find<DealerController>()
         : Get.put(DealerController());
@@ -82,37 +77,26 @@ class _HomeScreenState extends State<HomeScreen> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       dealerController.fetchDealers();
     });
-    featuredScrollController.addListener(_onFeaturedScroll);
-  }
-
-  void _onFeaturedScroll() {
-    if (!featuredScrollController.hasClients) {
-      return;
-    }
-
-    final position = featuredScrollController.position;
-    if (position.pixels >= position.maxScrollExtent - 150) {
-      featuredController.loadMore(
-        location: FeaturedLocation.homePage,
-        limit: 5,
-      );
-    }
   }
 
   @override
   void dispose() {
-    featuredScrollController.removeListener(_onFeaturedScroll);
-
     featuredScrollController.dispose();
 
     super.dispose();
   }
 
+  Homecontroller hctrl = Get.put(Homecontroller());
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: AppColors.background,
       appBar: AppBar(
         backgroundColor: Colors.white,
+        surfaceTintColor: Colors.white,
+        elevation: 0,
+        scrolledUnderElevation: 0,
         leading: Container(),
         leadingWidth: 10.w,
         title: Image.asset(
@@ -120,26 +104,23 @@ class _HomeScreenState extends State<HomeScreen> {
           width: 140.w,
           fit: BoxFit.contain,
         ),
+        bottom: PreferredSize(
+          preferredSize: Size.fromHeight(1.h),
+          child: Container(height: 1.h, color: AppColors.warmBorder),
+        ),
         actions: [
           InkWell(
-            borderRadius: BorderRadius.circular(20.r),
+            borderRadius: BorderRadius.circular(999.r),
             onTap: () {
               showLocationBottomSheet(context);
             },
             child: Container(
-              height: 30.h,
-              padding: EdgeInsets.symmetric(horizontal: 8.w),
+              height: 32.h,
+              padding: EdgeInsets.symmetric(horizontal: 10.w),
               decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(20.r),
-                border: Border.all(color: Colors.grey.shade300),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.09),
-                    blurRadius: 10,
-                    offset: const Offset(0, 3),
-                  ),
-                ],
+                color: AppColors.cream,
+                borderRadius: BorderRadius.circular(999.r),
+                border: Border.all(color: AppColors.warmBorder),
               ),
               child: GetBuilder<LocationController>(
                 builder: (_) {
@@ -162,7 +143,9 @@ class _HomeScreenState extends State<HomeScreen> {
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                           style: AppTextStyles.body13.copyWith(
-                            color: AppColors.textPrimary,
+                            fontSize: 11.5.sp,
+                            fontWeight: FontWeight.w500,
+                            color: AppColors.ink,
                           ),
                         ),
                       ),
@@ -172,7 +155,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       Icon(
                         Icons.keyboard_arrow_down,
                         size: 16.sp,
-                        color: AppColors.textPrimary,
+                        color: AppColors.ink,
                       ),
                     ],
                   );
@@ -183,28 +166,169 @@ class _HomeScreenState extends State<HomeScreen> {
           SizedBox(width: 10.w),
         ],
       ),
-      body: SafeArea(
-        child: SingleChildScrollView(
-          //  padding: EdgeInsets.symmetric(horizontal: 24.w),
-          child: StaggeredEntranceColumn(
-            spacing: 12.h,
-            children: [
-              //SizedBox(height: 20),
-              // HomeHeader(),
-              HomeBanner(
-                onSearch: (propertyName, type) {
-                  widget.onSearch(
-                    propertyName,
-                    type == PropertySearchType.rent ? "RENT" : "SALE",
-                  );
-                },
-              ),
+      body: GetBuilder<Homecontroller>(
+        builder: (___) {
+          return SingleChildScrollView(
+            physics: const BouncingScrollPhysics(),
+            child: StaggeredEntranceColumn(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                /// ─── HERO ────────────────────────────────────────────────────
+                _spaced(
+                  HomeBanner(
+                    onSearch: (propertyName, type) {
+                      widget.onSearch(
+                        propertyName,
+                        type == PropertySearchType.rent ? "RENT" : "SALE",
+                      );
+                    },
+                  ),
+                ),
 
-              // QuickActionsCard(onPurposeSelected: widget.onPurposeSelected),
+                SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  child: Row(
+                    children: [
+                      SizedBox(width: 20.w),
+                      for (var property in hctrl.featuredProperties)
+                        PropertyCard(listing: property),
+                    ],
+                  ),
+                ),
+
+                /// ─── FEATURED PROPERTIES ────────────────────────────────────
+
+                /// ─── SEARCH BY PROPERTY TYPE ────────────────────────────────
+                _buildCategoriesSection(),
+
+                /// ─── NEAR YOU ───────────────────────────────────────────────
+                _buildNearYouSection(),
+
+                /// ─── SPONSORED BANNERS ──────────────────────────────────────
+                _buildBannersSection(),
+
+                /// ─── AI PRICE ESTIMATOR ─────────────────────────────────────
+                _spaced(
+                  Padding(
+                    padding: _gutter,
+                    child: VillaValuationCard(
+                      onGetEstimate: () {
+                        Get.to(
+                          () => const PriceEstimatorScreen(),
+                          transition: AppTransitions.forward,
+                        );
+                      },
+                    ),
+                  ),
+                ),
+
+                /// ─── FEATURED DEALERS ───────────────────────────────────────
+                _buildDealersSection(),
+
+                /// ─── POPULAR PLACES ─────────────────────────────────────────
+                _buildPopularPlacesSection(),
+
+                /// ─── DEALER CTA ─────────────────────────────────────────────
+                _spaced(
+                  Padding(
+                    padding: _gutter,
+                    child: DealerCtaCard(
+                      onBecomeDealer: () {
+                        Get.to(
+                          () => DealerLoginScreen(),
+                          transition: AppTransitions.forward,
+                        );
+                      },
+                    ),
+                  ),
+                ),
+
+                /// ─── TRUST STRIP ────────────────────────────────────────────
+                Padding(padding: _gutter, child: const WhyChooseCard()),
+
+                SizedBox(height: 24.h),
+              ],
+            ),
+          );
+        },
+      ),
+    );
+  }
+
+  /// Horizontal page gutter — the 16px side margin the website uses on mobile.
+  EdgeInsets get _gutter => EdgeInsets.symmetric(horizontal: 16.w);
+
+  /// Vertical rhythm between home sections.
+  static const double _sectionGap = 26;
+
+  /// Adds the trailing section gap to [child].
+  ///
+  /// The gap lives inside each section rather than on the parent Column, so a
+  /// section that has nothing to show can collapse to zero height without
+  /// leaving a hole in the page.
+  Widget _spaced(Widget child) => Padding(
+    padding: EdgeInsets.only(bottom: _sectionGap.h),
+    child: child,
+  );
+
+  /// Gap between a section's heading and the content beneath it.
+  static const double _headerGap = 14;
+
+  /// ═══════════════════════════════════════════════════════════════════════
+  /// SEARCH BY PROPERTY TYPE
+  /// ═══════════════════════════════════════════════════════════════════════
+  Widget _buildCategoriesSection() {
+    return GetBuilder<Utilscontroller>(
+      builder: (controller) {
+        if (controller.isLoading && controller.listingTypes.isEmpty) {
+          return _spaced(
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Padding(
+                  padding: _gutter,
+                  child: SectionHeader(
+                    title: "Search by Property Type".tr,
+                    subtitle: "Find the right property type for your search".tr,
+                    showSeeAll: false,
+                  ),
+                ),
+                SizedBox(height: _headerGap.h),
+                SizedBox(
+                  height: 150.h,
+                  child: AppShimmer(
+                    child: ListView.separated(
+                      scrollDirection: Axis.horizontal,
+                      physics: const NeverScrollableScrollPhysics(),
+                      padding: _gutter,
+                      itemCount: 3,
+                      separatorBuilder: (_, __) => SizedBox(width: 12.w),
+                      itemBuilder: (_, __) => ShimmerBox(
+                        width: 138.w,
+                        height: 150.h,
+                        borderRadius: BorderRadius.circular(18.r),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          );
+        }
+
+        if (controller.listingTypes.isEmpty) {
+          return const SizedBox.shrink();
+        }
+
+        return _spaced(
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
               Padding(
-                padding: EdgeInsets.symmetric(horizontal: 16.w),
+                padding: _gutter,
                 child: SectionHeader(
-                  title: "Browse by Category".tr,
+                  title: "Search by Property Type".tr,
+                  subtitle: "Find the right property type for your search".tr,
                   onSeeAllTap: () {
                     Get.offAll(
                       () => const MainScreen(initialIndex: 1),
@@ -213,394 +337,243 @@ class _HomeScreenState extends State<HomeScreen> {
                   },
                 ),
               ),
-              GetBuilder<Utilscontroller>(
-                builder: (__) {
-                  return SizedBox(
-                    height: 110.h,
-                    child: SingleChildScrollView(
-                      scrollDirection: Axis.horizontal,
-                      physics: const BouncingScrollPhysics(),
-                      padding: EdgeInsets.symmetric(horizontal: 16.w),
-                      child: Row(
-                        children: [
-                          for (var data in utilscontroller.listingTypes)
-                            Padding(
-                              padding: EdgeInsets.only(right: 8.w),
-                              child: InkWell(
-                                borderRadius: BorderRadius.circular(10.r),
-                                onTap: () => widget.onCategorySelected(data.id),
-                                child: Container(
-                                  width: 100.w,
-                                  padding: EdgeInsets.all(5.w),
-                                  decoration: BoxDecoration(
-                                    color: Colors.white,
-                                    borderRadius: BorderRadius.circular(10.r),
-                                    boxShadow: [
-                                      BoxShadow(
-                                        color: Colors.black.withOpacity(.02),
-                                        spreadRadius: .1,
-                                        blurRadius: 10,
-                                      ),
-                                    ],
-                                  ),
-                                  child: Column(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      Image.network(
-                                        data.image ?? "",
-                                        width: 60.w,
-                                        height: 60.w,
-                                      ),
-                                      SizedBox(height: 4.h),
-                                      Text(
-                                        data.title.tr,
-                                        textAlign: TextAlign.center,
-                                        style: TextStyle(
-                                          fontFamily: "Rubik",
-                                          fontSize: 12.sp,
-                                          fontWeight: FontWeight.w400,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ),
-                            ),
-                        ],
-                      ),
-                    ),
-                  );
-                },
+
+              SizedBox(height: _headerGap.h),
+
+              SizedBox(
+                height: 150.h,
+                child: ListView.separated(
+                  scrollDirection: Axis.horizontal,
+                  physics: const BouncingScrollPhysics(),
+                  padding: _gutter,
+                  itemCount: controller.listingTypes.length,
+                  separatorBuilder: (_, __) => SizedBox(width: 12.w),
+                  itemBuilder: (_, index) {
+                    final type = controller.listingTypes[index];
+
+                    return CategoryCard(
+                      title: type.title.tr,
+                      imageUrl: type.image,
+                      listingCount: type.listingCount,
+                      onTap: () => widget.onCategorySelected(type.id),
+                    );
+                  },
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  /// ═══════════════════════════════════════════════════════════════════════
+  /// NEAR YOU
+  /// ═══════════════════════════════════════════════════════════════════════
+  Widget _buildNearYouSection() {
+    return GetBuilder<LocationController>(
+      builder: (controller) {
+        // Nothing nearby (and not still loading) — drop the whole
+        // "Near You" section instead of showing an empty header
+        // over a "No nearby properties" placeholder.
+        if (!controller.isNearbyLoading &&
+            controller.nearbyProperties.isEmpty) {
+          return const SizedBox.shrink();
+        }
+
+        return _spaced(
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Padding(
+                padding: _gutter,
+                child: SectionHeader(
+                  title: "Near You".tr,
+                  subtitle: "Listings closest to where you are right now".tr,
+                  showSeeAll: false,
+                ),
               ),
 
-              GetBuilder<LocationController>(
-                builder: (controller) {
-                  // Nothing nearby (and not still loading) — drop the whole
-                  // "Near You" section instead of showing an empty header
-                  // over a "No nearby properties" placeholder.
-                  if (!controller.isNearbyLoading &&
-                      controller.nearbyProperties.isEmpty) {
-                    return const SizedBox.shrink();
-                  }
+              SizedBox(height: _headerGap.h),
 
-                  return Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Padding(
-                        padding: EdgeInsets.symmetric(horizontal: 16.w),
-                        child: SectionHeader(title: "Near You".tr),
-                      ),
-
-                      Container(
-                        padding: EdgeInsets.symmetric(horizontal: 16.w),
-                        height: 100.h,
-                        child: controller.isNearbyLoading
-                            ? AppShimmer(
-                                child: ListView.separated(
-                                  scrollDirection: Axis.horizontal,
-                                  physics: const NeverScrollableScrollPhysics(),
-                                  itemCount: 3,
-                                  separatorBuilder: (_, __) =>
-                                      SizedBox(width: 10.w),
-                                  itemBuilder: (_, __) => ShimmerBox(
-                                    width: 130.w,
-                                    height: 100.h,
-                                    borderRadius: BorderRadius.circular(10.r),
-                                  ),
-                                ),
-                              )
-                            : ListView.separated(
-                                scrollDirection: Axis.horizontal,
-                                itemCount: controller.nearbyProperties.length,
-                                separatorBuilder: (_, __) =>
-                                    SizedBox(width: 10.w),
-                                itemBuilder: (context, index) {
-                                  final property =
-                                      controller.nearbyProperties[index];
-
-                                  return LocationCard(property: property);
-                                },
-                              ),
-                      ),
-                    ],
-                  );
-                },
-              ),
-              VillaValuationCard(
-                onGetEstimate: () {
-                  Get.to(
-                    () => const PriceEstimatorScreen(),
-                    transition: AppTransitions.forward,
-                  );
-                },
-              ),
-
-              _buildFeaturedPropertiesSection(),
-
-              _buildBannersSection(),
-              SectionHeader(
-                title: "Featured Dealers".tr,
-                showSeeAll: true,
-                onSeeAllTap: () {
-                  Get.to(() => const DealerListScreen());
-                },
-              ),
-
-              GetBuilder<DealerController>(
-                builder: (controller) {
-                  if (controller.isLoading && controller.dealers.isEmpty) {
-                    return SizedBox(
-                      height: 165.h,
-                      child: AppShimmer(
+              SizedBox(
+                height: 120.h,
+                child: controller.isNearbyLoading
+                    ? AppShimmer(
                         child: ListView.separated(
-                          padding: EdgeInsets.symmetric(horizontal: 16.w),
+                          scrollDirection: Axis.horizontal,
+                          physics: const NeverScrollableScrollPhysics(),
+                          padding: _gutter,
+                          itemCount: 3,
+                          separatorBuilder: (_, __) => SizedBox(width: 12.w),
+                          itemBuilder: (_, __) => ShimmerBox(
+                            width: 180.w,
+                            height: 120.h,
+                            borderRadius: BorderRadius.circular(16.r),
+                          ),
+                        ),
+                      )
+                    : ListView.separated(
+                        scrollDirection: Axis.horizontal,
+                        physics: const BouncingScrollPhysics(),
+                        padding: _gutter,
+                        itemCount: controller.nearbyProperties.length,
+                        separatorBuilder: (_, __) => SizedBox(width: 12.w),
+                        itemBuilder: (context, index) {
+                          return LocationCard(
+                            property: controller.nearbyProperties[index],
+                          );
+                        },
+                      ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  /// ═══════════════════════════════════════════════════════════════════════
+  /// FEATURED DEALERS
+  /// ═══════════════════════════════════════════════════════════════════════
+  Widget _buildDealersSection() {
+    return GetBuilder<DealerController>(
+      builder: (controller) {
+        if (!controller.isLoading && controller.dealers.isEmpty) {
+          return const SizedBox.shrink();
+        }
+
+        return _spaced(
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Padding(
+                padding: _gutter,
+                child: SectionHeader(
+                  title: "Featured Dealers".tr,
+                  subtitle: "Trusted agencies listing across Qatar".tr,
+                  onSeeAllTap: () {
+                    Get.to(() => const DealerListScreen());
+                  },
+                ),
+              ),
+
+              SizedBox(height: _headerGap.h),
+
+              SizedBox(
+                height: 180.h,
+                child: controller.isLoading && controller.dealers.isEmpty
+                    ? AppShimmer(
+                        child: ListView.separated(
+                          padding: _gutter,
                           scrollDirection: Axis.horizontal,
                           physics: const NeverScrollableScrollPhysics(),
                           itemCount: 3,
                           separatorBuilder: (_, __) => SizedBox(width: 12.w),
                           itemBuilder: (_, __) => ShimmerBox(
-                            width: 140.w,
-                            height: 165.h,
-                            borderRadius: BorderRadius.circular(12.r),
+                            width: 145.w,
+                            height: 180.h,
+                            borderRadius: BorderRadius.circular(16.r),
                           ),
                         ),
+                      )
+                    : ListView.separated(
+                        padding: _gutter,
+                        scrollDirection: Axis.horizontal,
+                        physics: const BouncingScrollPhysics(),
+                        itemCount: controller.dealers.length,
+                        separatorBuilder: (_, __) => SizedBox(width: 12.w),
+                        itemBuilder: (_, index) {
+                          final dealer = controller.dealers[index];
+
+                          return AgentCards(
+                            image: dealer.dealerProfile.coverImage,
+                            name: dealer.dealerProfile.dealerName.isNotEmpty
+                                ? dealer.dealerProfile.dealerName
+                                : dealer.name,
+                            designation:
+                                dealer.dealerProfile.tagline ??
+                                "Property Consultant".tr,
+                            phone: dealer.dealerProfile.contactPhone,
+                            onTap: () {
+                              Get.to(
+                                () => const DealerDetailsScreen(),
+                                arguments: dealer.id,
+                              );
+                            },
+                          );
+                        },
                       ),
-                    );
-                  }
-
-                  if (controller.dealers.isEmpty) {
-                    return SizedBox(
-                      height: 165.h,
-                      child: Center(
-                        child: Text(
-                          "No dealers found".tr,
-                          style: AppTextStyles.body14,
-                        ),
-                      ),
-                    );
-                  }
-
-                  return SizedBox(
-                    height: 165.h,
-                    child: ListView.separated(
-                      padding: EdgeInsets.symmetric(horizontal: 16.w),
-                      scrollDirection: Axis.horizontal,
-                      physics: const BouncingScrollPhysics(),
-                      itemCount: controller.dealers.length,
-                      separatorBuilder: (_, __) => SizedBox(width: 12.w),
-                      itemBuilder: (_, index) {
-                        final dealer = controller.dealers[index];
-
-                        return AgentCards(
-                          image: dealer.dealerProfile.coverImage,
-                          name: dealer.dealerProfile.dealerName.isNotEmpty
-                              ? dealer.dealerProfile.dealerName
-                              : dealer.name,
-                          designation:
-                              dealer.dealerProfile.tagline ??
-                              "Property Consultant".tr,
-                          phone: dealer.dealerProfile.contactPhone,
-                          onTap: () {
-                            Get.to(
-                              () => const DealerDetailsScreen(),
-                              arguments: dealer.id,
-                            );
-                          },
-                        );
-                      },
-                    ),
-                  );
-                },
               ),
-              const WhyChooseCard(),
             ],
           ),
-        ),
-      ),
+        );
+      },
     );
   }
 
-  Widget _buildFeaturedPropertiesSection() {
-    return GetBuilder<FeaturedPropertiesController>(
+  /// ═══════════════════════════════════════════════════════════════════════
+  /// POPULAR PLACES
+  /// ═══════════════════════════════════════════════════════════════════════
+  Widget _buildPopularPlacesSection() {
+    return GetBuilder<Utilscontroller>(
       builder: (controller) {
-        final List<FeaturedProperty> properties = controller.homeProperties;
+        final places = controller.popularMunicipalities;
 
-        final bool loading = controller.isLoading(FeaturedLocation.homePage);
-
-        final bool loadingMore = controller.isLoadingMore(
-          FeaturedLocation.homePage,
-        );
-
-        final String error = controller.getError(FeaturedLocation.homePage);
-
-        final bool canLoadMore = controller.hasMore(FeaturedLocation.homePage);
-
-        /// --------------------------------------------
-        /// INITIAL LOADING
-        /// --------------------------------------------
-
-        if (loading && properties.isEmpty) {
-          return Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              SectionHeader(title: "Featured Properties".tr),
-
-              SizedBox(
-                height: 225.h,
-                child: AppShimmer(
-                  child: ListView.separated(
-                    padding: EdgeInsets.symmetric(horizontal: 16.w),
-                    scrollDirection: Axis.horizontal,
-                    physics: const NeverScrollableScrollPhysics(),
-                    itemCount: 3,
-                    separatorBuilder: (_, __) => SizedBox(width: 10.w),
-                    itemBuilder: (_, __) =>
-                        const ShimmerListingCard(width: 168),
-                  ),
-                ),
-              ),
-            ],
-          );
-        }
-
-        if (error.isNotEmpty && properties.isEmpty) {
-          return Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              SectionHeader(title: "Featured Properties".tr),
-
-              Container(
-                width: double.infinity,
-                height: 130.h,
-
-                alignment: Alignment.center,
-
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Icon(
-                      Icons.error_outline_rounded,
-                      color: Colors.grey,
-                      size: 25.sp,
-                    ),
-
-                    SizedBox(height: 6.h),
-
-                    Text(
-                      "Unable to load featured properties".tr,
-                      style: TextStyle(fontSize: 10.sp, color: Colors.grey),
-                    ),
-
-                    SizedBox(height: 3.h),
-
-                    TextButton(
-                      onPressed: () {
-                        controller.refreshFeatured(
-                          location: FeaturedLocation.homePage,
-                          limit: 10,
-                        );
-                      },
-                      child: Text("Try Again".tr),
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          );
-        }
-
-        if (properties.isEmpty) {
+        if (places.isEmpty) {
           return const SizedBox.shrink();
         }
 
-        return Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            SectionHeader(
-              title: "Featured Properties".tr,
-              onSeeAllTap: () {
-                Get.offAll(
-                  () => const MainScreen(initialIndex: 1),
-                  transition: AppTransitions.forward,
-                );
-              },
-            ),
-            SizedBox(height: 10.h),
-            SizedBox(
-              height: 250.h,
-
-              child: ListView.separated(
-                controller: featuredScrollController,
-
-                scrollDirection: Axis.horizontal,
-
-                physics: const BouncingScrollPhysics(),
-
-                padding: EdgeInsets.zero,
-
-                itemCount: properties.length + (canLoadMore ? 1 : 0),
-
-                separatorBuilder: (context, index) {
-                  return SizedBox(width: 10.w);
-                },
-
-                itemBuilder: (context, index) {
-                  /// PAGINATION LOADER AT END
-                  if (index == properties.length) {
-                    return SizedBox(
-                      width: 55.w,
-
-                      child: Center(
-                        child: loadingMore
-                            ? SizedBox(
-                                width: 22.w,
-                                height: 22.w,
-
-                                child: const CircularProgressIndicator(
-                                  strokeWidth: 2,
-                                  color: Color(0xFF8E123E),
-                                ),
-                              )
-                            : const SizedBox.shrink(),
-                      ),
+        return _spaced(
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Padding(
+                padding: _gutter,
+                child: SectionHeader(
+                  title: "Popular Places in Qatar".tr,
+                  subtitle:
+                      "Discover properties in the most sought-after locations"
+                          .tr,
+                  onSeeAllTap: () {
+                    Get.offAll(
+                      () => const MainScreen(initialIndex: 1),
+                      transition: AppTransitions.forward,
                     );
-                  }
-
-                  final FeaturedProperty featured = properties[index];
-
-                  final property = featured.listing;
-
-                  return GestureDetector(
-                    onTap: () {
-                      debugPrint("Sending propertyId = ${property.id}");
-
-                      Get.to(
-                        () => PropertyDetailsScreen(
-                          propertyId: property.id.toString(),
-                        ),
-                        transition: AppTransitions.forward,
-                      );
-                    },
-                    child: PropertyCard(
-                      image: property.imageUrl,
-                      title: property.propertyName,
-                      location: property.formattedLocation,
-                      distance: '',
-                      price: property.price.toString(),
-                      sqm: '${property.area.toStringAsFixed(0)} SQM',
-                      beds: property.bedrooms.toString(),
-                      verified: property.contactVerified,
-                      isFeatured: true,
-                      propertyId: property.id,
-                      slug: property.slug,
-                      bathrooms: property.bathrooms,
-                      area: property.area,
-                    ),
-                  );
-                },
+                  },
+                ),
               ),
-            ),
-          ],
+
+              SizedBox(height: _headerGap.h),
+
+              SizedBox(
+                height: 100.h,
+                child: ListView.separated(
+                  scrollDirection: Axis.horizontal,
+                  physics: const BouncingScrollPhysics(),
+                  padding: _gutter,
+                  itemCount: places.length,
+                  separatorBuilder: (_, __) => SizedBox(width: 12.w),
+                  itemBuilder: (_, index) {
+                    final place = places[index];
+
+                    return PopularPlaceCard(
+                      place: place,
+                      onTap: () {
+                        Get.offAll(
+                          () => MainScreen(
+                            initialIndex: 1,
+                            initialLocationId: place.id,
+                          ),
+                          transition: AppTransitions.forward,
+                        );
+                      },
+                    );
+                  },
+                ),
+              ),
+            ],
+          ),
         );
       },
     );
@@ -612,20 +585,24 @@ Widget _buildBannersSection() {
     builder: (controller) {
       /// INITIAL LOADING
       if (controller.isLoading && controller.banners.isEmpty) {
-        return Container(
-          width: double.infinity,
-          height: 250.h,
-          decoration: BoxDecoration(
-            color: Colors.grey.shade100,
-            borderRadius: BorderRadius.circular(10.r),
-          ),
-          alignment: Alignment.center,
-          child: SizedBox(
-            width: 22.w,
-            height: 22.w,
-            child: const CircularProgressIndicator(
-              strokeWidth: 2,
-              color: Color(0xff8C1437),
+        return Padding(
+          padding: _bannerInsets,
+          child: Container(
+            width: double.infinity,
+            height: 150.h,
+            decoration: BoxDecoration(
+              color: AppColors.cream,
+              borderRadius: BorderRadius.circular(18.r),
+              border: Border.all(color: AppColors.warmBorder),
+            ),
+            alignment: Alignment.center,
+            child: SizedBox(
+              width: 22.w,
+              height: 22.w,
+              child: const CircularProgressIndicator(
+                strokeWidth: 2,
+                color: AppColors.primary,
+              ),
             ),
           ),
         );
@@ -669,39 +646,49 @@ Widget _buildBannersSection() {
       if (banners.length == 1) {
         final banner = banners.first;
 
-        return InvestmentBanner(
-          banner: banner,
-          onTap: () {
-            _handleBannerTap(banner.linkUrl);
-          },
+        return Padding(
+          padding: _bannerInsets,
+          child: InvestmentBanner(
+            banner: banner,
+            onTap: () {
+              _handleBannerTap(banner.linkUrl);
+            },
+          ),
         );
       }
 
       /// MULTIPLE BANNERS
-      return SizedBox(
-        height: 150.h,
-        child: PageView.builder(
-          itemCount: banners.length,
-          itemBuilder: (context, index) {
-            final banner = banners[index];
+      return Padding(
+        padding: _bannerInsets,
+        child: SizedBox(
+          height: 150.h,
+          child: PageView.builder(
+            itemCount: banners.length,
+            itemBuilder: (context, index) {
+              final banner = banners[index];
 
-            return Padding(
-              padding: EdgeInsets.only(
-                right: index == banners.length - 1 ? 0 : 8.w,
-              ),
-              child: InvestmentBanner(
-                banner: banner,
-                onTap: () {
-                  _handleBannerTap(banner.linkUrl);
-                },
-              ),
-            );
-          },
+              return Padding(
+                padding: EdgeInsets.only(
+                  right: index == banners.length - 1 ? 0 : 8.w,
+                ),
+                child: InvestmentBanner(
+                  banner: banner,
+                  onTap: () {
+                    _handleBannerTap(banner.linkUrl);
+                  },
+                ),
+              );
+            },
+          ),
         ),
       );
     },
   );
 }
+
+/// Gutter + trailing section gap for the banner strip, matching the rhythm the
+/// other home sections use.
+EdgeInsets get _bannerInsets => EdgeInsets.fromLTRB(16.w, 0, 16.w, 26.h);
 
 Future<void> _handleBannerTap(String linkUrl) async {
   if (linkUrl.trim().isEmpty) {

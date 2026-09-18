@@ -60,11 +60,17 @@ class OptionItem {
   final String? image;
   final String? propertyCount;
 
+  /// Live count of ACTIVE listings in this category, as returned by
+  /// `GET /api/listings/options` — the website renders it as "N+ Properties"
+  /// under each category card.
+  final int listingCount;
+
   OptionItem({
     required this.id,
     required this.title,
     this.image,
     this.propertyCount,
+    this.listingCount = 0,
   });
 
   factory OptionItem.fromJson(Map<String, dynamic> json) {
@@ -73,6 +79,7 @@ class OptionItem {
       title: json['title']?.toString() ?? '',
       image: json['image']?.toString(),
       propertyCount: json["propertyCount"] ?? "1",
+      listingCount: (json['listingCount'] as num?)?.toInt() ?? 0,
     );
   }
 }
@@ -85,6 +92,13 @@ class Municipality {
   final double? longitude;
   final bool isPopular;
 
+  /// Number of ACTIVE listings in this municipality.
+  final int listingCount;
+
+  /// Lowest ACTIVE listing price here — drives the "From QAR x" line on the
+  /// website's Popular Places cards.
+  final double? cheapestListingPrice;
+
   Municipality({
     required this.id,
     required this.name,
@@ -92,6 +106,8 @@ class Municipality {
     this.latitude,
     this.longitude,
     this.isPopular = false,
+    this.listingCount = 0,
+    this.cheapestListingPrice,
   });
 
   factory Municipality.fromJson(Map<String, dynamic> json) {
@@ -102,6 +118,8 @@ class Municipality {
       latitude: (json['latitude'] as num?)?.toDouble(),
       longitude: (json['longitude'] as num?)?.toDouble(),
       isPopular: json['isPopular'] == true,
+      listingCount: (json['listingCount'] as num?)?.toInt() ?? 0,
+      cheapestListingPrice: (json['cheapestListingPrice'] as num?)?.toDouble(),
     );
   }
 }

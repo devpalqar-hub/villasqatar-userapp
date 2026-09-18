@@ -5,7 +5,7 @@ import 'package:get/get.dart';
 
 import 'package:villas_qatar/Core/utils/stripe_checkout_helper.dart';
 import 'package:villas_qatar/modules/PlansandFeatures/model/featured_palnmodel.dart';
-import 'package:villas_qatar/modules/PlansandFeatures/services/featured_properties_controller.dart';
+import 'package:villas_qatar/modules/PlansandFeatures/services/FeaturedPropertiesController.dart';
 import 'package:villas_qatar/modules/PlansandFeatures/services/plan_controller.dart';
 import 'package:villas_qatar/modules/propertylist/service/myproperties_listcontroller.dart';
 
@@ -806,7 +806,7 @@ class _BoostPlanBottomSheetState extends State<BoostPlanBottomSheet> {
             onPressed: () {
               controller.retry();
             },
-            child:  Text("Try Again".tr),
+            child: Text("Try Again".tr),
           ),
         ],
       ),
@@ -866,9 +866,7 @@ class _BoostPlanBottomSheetState extends State<BoostPlanBottomSheet> {
     final String listingId = widget.propertyId.trim();
 
     if (listingId.isEmpty) {
-      Fluttertoast.showToast(
-        msg: "Property ID is missing.".tr,
-      );
+      Fluttertoast.showToast(msg: "Property ID is missing.".tr);
 
       return;
     }
@@ -915,31 +913,20 @@ class _BoostPlanBottomSheetState extends State<BoostPlanBottomSheet> {
           // Refresh the controllers that show boost/featured state so
           // the "My Features" list and this property's card reflect
           // the purchase immediately instead of on next app open.
-          if (Get.isRegistered<FeaturedPropertiesController>()) {
-            Get.find<FeaturedPropertiesController>().getMyFeaturedProperties(
-              forceRefresh: true,
-            );
-          }
 
           if (Get.isRegistered<MyPropertyController>()) {
-            Get.find<MyPropertyController>().fetchProperties(
-              showLoader: false,
-            );
+            Get.find<MyPropertyController>().fetchProperties(showLoader: false);
           }
 
           break;
 
         case StripePaymentOutcome.cancelled:
-          Fluttertoast.showToast(
-            msg: "You can try again anytime.".tr,
-          );
+          Fluttertoast.showToast(msg: "You can try again anytime.".tr);
 
           break;
       }
     } catch (e) {
-      Fluttertoast.showToast(
-        msg: e.toString().replaceFirst("Exception: ", ""),
-      );
+      Fluttertoast.showToast(msg: e.toString().replaceFirst("Exception: ", ""));
     } finally {
       // The sheet may already be closed/disposed by now on the
       // success path (Get.back() above) - only touch state if it's

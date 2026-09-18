@@ -77,6 +77,16 @@ flutter:
       fonts:
         - asset: assets/fonts/Rubik.ttf
 
+    - family: Manrope
+      fonts:
+        - asset: assets/fonts/Manrope.ttf
+
+    - family: Tajawal
+      fonts:
+        - asset: assets/fonts/Tajawal-Regular.ttf
+        - asset: assets/fonts/Tajawal-Bold.ttf
+          weight: 700
+
 
 dependency_overrides:
   file_picker: ^9.0.2

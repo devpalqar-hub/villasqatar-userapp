@@ -187,7 +187,7 @@ class SearchScreen extends StatelessWidget {
                       PropertyCategorySection(controller: controller),
                       SizedBox(height: 18.h),
 
-                      FeaturedProperties(),
+                     // FeaturedProperties(),
                       SizedBox(height: 18.h),
 
                       PropertiesSection(controller: controller),

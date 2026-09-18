@@ -2,148 +2,115 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:villas_qatar/Core/constants/app_colors.dart';
-import 'package:villas_qatar/Core/utils/app_transitions.dart';
-import 'package:villas_qatar/modules/wishlist/view/whishlist_screen.dart';
 
+/// Home quick-action row: four icon shortcuts (Map Search, Near Me, Price
+/// Estimator, Saved) sitting directly on the page, matching the site's
+/// home hero quick links.
 class QuickActionsCard extends StatelessWidget {
-  final void Function(String purpose) onPurposeSelected;
+  final VoidCallback onMapSearch;
+  final VoidCallback onNearMe;
+  final VoidCallback onPriceEstimator;
+  final VoidCallback onSaved;
 
   const QuickActionsCard({
     super.key,
-    required this.onPurposeSelected,
+    required this.onMapSearch,
+    required this.onNearMe,
+    required this.onPriceEstimator,
+    required this.onSaved,
   });
 
   @override
   Widget build(BuildContext context) {
     final items = [
-      {
-        "icon": Icons.home_work_outlined,
-        "title": "Buy".tr,
-        "subtitle": "Properties".tr,
-        "onTap": () {
-          onPurposeSelected("SALE");
-        },
-      },
-      {
-        "icon": Icons.apartment_outlined,
-        "title": "Rent".tr,
-        "subtitle": "Properties".tr,
-        "onTap": () {
-          onPurposeSelected("RENT");
-        },
-      },
-      {
-        "icon": Icons.favorite_border,
-        "title": "Wishlist".tr,
-        "subtitle": "Saved".tr,
-        "onTap": () {
-          Get.to(
-            () => WishlistScreen(),
-            transition: AppTransitions.forward,
-            duration: const Duration(
-              milliseconds: 250,
-            ),
-          );
-        },
-      },
+      _QuickAction(
+        icon: Icons.map_outlined,
+        label: "Map Search".tr,
+        background: AppColors.pinkBg,
+        iconColor: AppColors.primary,
+        onTap: onMapSearch,
+      ),
+      _QuickAction(
+        icon: Icons.near_me_outlined,
+        label: "Near Me".tr,
+        background: const Color(0xFFE3EEFF),
+        iconColor: const Color(0xFF2563EB),
+        onTap: onNearMe,
+      ),
+      _QuickAction(
+        icon: Icons.calculate_outlined,
+        label: "Price Estimator".tr,
+        background: AppColors.greenBg,
+        iconColor: AppColors.greenText,
+        onTap: onPriceEstimator,
+      ),
+      _QuickAction(
+        icon: Icons.favorite_border_rounded,
+        label: "Saved".tr,
+        background: AppColors.goldChipBg,
+        iconColor: AppColors.gold,
+        onTap: onSaved,
+      ),
     ];
 
-    return Container(
-      width: double.infinity,
-      padding: EdgeInsets.symmetric(
-        vertical: 5.h,
-      ),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(8.r),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(.05),
-            blurRadius: 22,
-            offset: const Offset(0, 6),
-          ),
-        ],
-      ),
-      child: Row(
-        children: List.generate(
-          items.length,
-          (index) {
-            final item = items[index];
+    return Row(
+      children: items
+          .map((item) => Expanded(child: item))
+          .toList(growable: false),
+    );
+  }
+}
 
-            return Expanded(
-              child: Row(
-                children: [
-                  Expanded(
-                    child: InkWell(
-                      borderRadius:
-                          BorderRadius.circular(8.r),
-                      onTap:
-                          item["onTap"] as VoidCallback,
-                      child: Padding(
-                        padding: EdgeInsets.symmetric(
-                          vertical: 5.h,
-                        ),
-                        child: Column(
-                          mainAxisSize:
-                              MainAxisSize.min,
-                          children: [
-                            Icon(
-                              item["icon"] as IconData,
-                              color: AppColors.primary,
-                              size: 24.sp,
-                            ),
+class _QuickAction extends StatelessWidget {
+  final IconData icon;
+  final String label;
+  final Color background;
+  final Color iconColor;
+  final VoidCallback onTap;
 
-                            SizedBox(height: 6.h),
+  const _QuickAction({
+    required this.icon,
+    required this.label,
+    required this.background,
+    required this.iconColor,
+    required this.onTap,
+  });
 
-                            Text(
-                              item["title"].toString(),
-                              textAlign:
-                                  TextAlign.center,
-                              style: TextStyle(
-                                fontSize: 12.sp,
-                                fontWeight:
-                                    FontWeight.w600,
-                                color: const Color(
-                                  0xff202124,
-                                ),
-                                height: 1,
-                              ),
-                            ),
-
-                            SizedBox(height: 8.h),
-
-                            Text(
-                              item["subtitle"]
-                                  .toString(),
-                              textAlign:
-                                  TextAlign.center,
-                              style: TextStyle(
-                                fontSize: 10.sp,
-                                fontWeight:
-                                    FontWeight.w400,
-                                color: const Color(
-                                  0xff707070,
-                                ),
-                                height: 1,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ),
-
-                  if (index != items.length - 1)
-                    Container(
-                      width: 1,
-                      height: 50.h,
-                      color:
-                          const Color(0xffECECEC),
-                    ),
-                ],
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      borderRadius: BorderRadius.circular(16.r),
+      onTap: onTap,
+      child: Padding(
+        padding: EdgeInsets.symmetric(vertical: 6.h),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              width: 52.w,
+              height: 52.w,
+              decoration: BoxDecoration(
+                color: background,
+                borderRadius: BorderRadius.circular(16.r),
               ),
-            );
-          },
+              child: Icon(icon, color: iconColor, size: 22.sp),
+            ),
+
+            SizedBox(height: 8.h),
+
+            Text(
+              label,
+              textAlign: TextAlign.center,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(
+                fontSize: 10.5.sp,
+                fontWeight: FontWeight.w600,
+                color: AppColors.ink,
+                height: 1,
+              ),
+            ),
+          ],
         ),
       ),
     );

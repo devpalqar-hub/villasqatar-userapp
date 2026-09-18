@@ -38,24 +38,18 @@ Future<void> main() async {
   // ------------------------------------------------------------
   // Firebase
   // ------------------------------------------------------------
-  await Firebase.initializeApp(
-    options: DefaultFirebaseOptions.currentPlatform,
-  );
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
 
   // ------------------------------------------------------------
   // Firebase Cloud Messaging
   // ------------------------------------------------------------
-  FirebaseMessaging.onBackgroundMessage(
-    firebaseMessagingBackgroundHandler,
-  );
+  FirebaseMessaging.onBackgroundMessage(firebaseMessagingBackgroundHandler);
 
   await PushNotificationService.initialize();
 
   // Register current FCM token.
   // unawaited prevents delaying app startup.
-  unawaited(
-    PushNotificationService.registerCurrentToken(),
-  );
+  unawaited(PushNotificationService.registerCurrentToken());
 
   // ------------------------------------------------------------
   // Stripe
@@ -63,11 +57,10 @@ Future<void> main() async {
   Stripe.publishableKey = StripeConfig.publishableKey;
 
   if (StripeConfig.merchantIdentifier.isNotEmpty) {
-    Stripe.merchantIdentifier =
-        StripeConfig.merchantIdentifier;
+    Stripe.merchantIdentifier = StripeConfig.merchantIdentifier;
   }
 
-  await Stripe.instance.applySettings();
+  //await Stripe.instance.applySettings();
 
   // ------------------------------------------------------------
   // Global GetX Controllers
@@ -78,29 +71,17 @@ Future<void> main() async {
   // skipping all three of those screens entirely - anything that later
   // calls Get.find<AuthController>() (e.g. the Settings/dealer logout
   // buttons) would otherwise crash with "AuthController not found".
-  Get.put(
-    AuthController(),
-    permanent: true,
-  );
+  Get.put(AuthController(), permanent: true);
 
-  Get.put(
-    Utilscontroller(),
-    permanent: true,
-  );
+  Get.put(Utilscontroller(), permanent: true);
 
-  Get.put(
-    LocationController(),
-    permanent: true,
-  );
+  Get.put(LocationController(), permanent: true);
 
   // ------------------------------------------------------------
   // Start App
   // ------------------------------------------------------------
   runApp(
-    DevicePreview(
-      enabled: false,
-      builder: (context) => const VillasQatarApp(),
-    ),
+    DevicePreview(enabled: false, builder: (context) => const VillasQatarApp()),
   );
 }
 
@@ -145,8 +126,7 @@ class _VillasQatarAppState extends State<VillasQatarApp> {
   // --------------------------------------------------------------------------
 
   Locale? _savedLocale() {
-    final String? saved =
-        StorageService.getSavedLanguageOrNull();
+    final String? saved = StorageService.getSavedLanguageOrNull();
 
     if (saved == 'ar') {
       return const Locale('ar', 'QA');
@@ -194,7 +174,6 @@ class _VillasQatarAppState extends State<VillasQatarApp> {
               // ----------------------------------------------------
               // Basic Configuration
               // ----------------------------------------------------
-
               debugShowCheckedModeBanner: false,
 
               title: 'Villas Qatar',
@@ -204,25 +183,17 @@ class _VillasQatarAppState extends State<VillasQatarApp> {
               // ----------------------------------------------------
               // Localization
               // ----------------------------------------------------
-
-              locale:
-                  DevicePreview.locale(context) ??
-                  _savedLocale(),
+              locale: DevicePreview.locale(context) ?? _savedLocale(),
 
               translations: AppTranslations(),
 
-              fallbackLocale:
-                  const Locale('en', 'US'),
+              fallbackLocale: const Locale('en', 'US'),
 
               // Direction-aware default transition: flips automatically
               // between LTR/RTL as the app locale changes.
-              defaultTransition:
-                  AppTransitions.forward,
+              defaultTransition: AppTransitions.forward,
 
-              supportedLocales: const [
-                Locale('en', 'US'),
-                Locale('ar', 'QA'),
-              ],
+              supportedLocales: const [Locale('en', 'US'), Locale('ar', 'QA')],
 
               localizationsDelegates: const [
                 GlobalMaterialLocalizations.delegate,
@@ -233,12 +204,8 @@ class _VillasQatarAppState extends State<VillasQatarApp> {
               // ----------------------------------------------------
               // App Builder
               // ----------------------------------------------------
-
               builder: (context, child) {
-                child = DevicePreview.appBuilder(
-                  context,
-                  child,
-                );
+                child = DevicePreview.appBuilder(context, child);
 
                 final Locale locale =
                     Get.locale ??
@@ -246,26 +213,21 @@ class _VillasQatarAppState extends State<VillasQatarApp> {
                     const Locale('en', 'US');
 
                 return Directionality(
-                  textDirection:
-                      locale.languageCode == 'ar'
-                          ? TextDirection.rtl
-                          : TextDirection.ltr,
-                  child:
-                      child ??
-                      const SizedBox.shrink(),
+                  textDirection: locale.languageCode == 'ar'
+                      ? TextDirection.rtl
+                      : TextDirection.ltr,
+                  child: child ?? const SizedBox.shrink(),
                 );
               },
 
               // ----------------------------------------------------
               // Theme
               // ----------------------------------------------------
-
               theme: AppTheme.lightTheme,
 
               // ----------------------------------------------------
               // Initial Screen
               // ----------------------------------------------------
-
               home: const SplashScreen(),
             );
           },
