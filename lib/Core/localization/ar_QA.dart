@@ -1406,4 +1406,14 @@ const Map<String, String> arQA = {
   "Use your current position or search for the place to fill in the address automatically.": "استخدم موقعك الحالي أو ابحث عن المكان لتعبئة العنوان تلقائياً.",
   "You can add up to 20 photos": "يمكنك إضافة حتى 20 صورة",
   "Your progress will be lost.": "سيتم فقدان ما أدخلته.",
+
+  // ================= HOME: PRICE ESTIMATOR CARD =================
+  "AI PRICE ESTIMATOR": "مُقدِّر الأسعار بالذكاء الاصطناعي",
+  "Know Your Property's True Value": "اعرف القيمة الحقيقية لعقارك",
+  "Get AI-powered accurate price estimates in seconds.":
+      "احصل على تقديرات دقيقة للأسعار بالذكاء الاصطناعي في ثوانٍ.",
+  "AI Estimate": "تقدير الذكاء الاصطناعي",
+
+  // ================= WELCOME / LOGIN =================
+  "Find your dream villa in ": "اعثر على فيلا أحلامك في ",
 };

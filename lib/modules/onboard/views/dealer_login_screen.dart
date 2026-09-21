@@ -10,7 +10,7 @@ import 'package:villas_qatar/modules/onboard/controller/auth_controller.dart';
 
 /// Email/phone + password sign-in for dealer accounts — reached from
 /// "Login as Dealer" on [WelcomeScreen]. Same visual language as
-/// [LoginScreen] (the WhatsApp-OTP flow) so the two entry points read as
+/// [WelcomeScreen] (the WhatsApp-OTP flow) so the two entry points read as
 /// one app, just swapping the phone/OTP fields for identifier/password.
 class DealerLoginScreen extends StatefulWidget {
   DealerLoginScreen({super.key});

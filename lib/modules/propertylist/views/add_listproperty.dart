@@ -491,7 +491,7 @@ class _ListYourPropertyScreenState extends State<ListYourPropertyScreen> {
             SizedBox(
               width: 96,
               child: LpOutlineButton(
-                label: 'Check'.tr,
+                label: 'Verify'.tr,
                 loading: controller.isLoading,
                 onTap: _checkPhone,
               ),

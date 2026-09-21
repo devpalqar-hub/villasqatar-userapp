@@ -52,8 +52,8 @@ class InvestmentBanner extends StatelessWidget {
               Container(
                 decoration: BoxDecoration(
                   gradient: LinearGradient(
-                    begin: Alignment.centerLeft,
-                    end: Alignment.centerRight,
+                    begin: AlignmentDirectional.centerStart,
+                    end: AlignmentDirectional.centerEnd,
                     colors: [
                       const Color(0xff5E0D27).withOpacity(.88),
 
@@ -71,9 +71,9 @@ class InvestmentBanner extends StatelessWidget {
               /// Uses isFeatured from model
               /// ==========================================
               if (banner.isFeatured)
-                Positioned(
+                PositionedDirectional(
                   top: 12.h,
-                  right: 12.w,
+                  end: 12.w,
                   child: Container(
                     padding: EdgeInsets.symmetric(
                       horizontal: 9.w,
@@ -111,7 +111,12 @@ class InvestmentBanner extends StatelessWidget {
               /// CONTENT
               /// ==========================================
               Padding(
-                padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 18.h),
+                padding: EdgeInsetsDirectional.only(
+                  start: 16.w,
+                  top: 70.h,
+                  bottom: 2.h,
+                  end: 16.w,
+                ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -120,7 +125,7 @@ class InvestmentBanner extends StatelessWidget {
                     SizedBox(
                       width: 210.w,
                       child: Text(
-                        banner.title,
+                        banner.title.tr,
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,
                         style: TextStyle(
@@ -131,8 +136,6 @@ class InvestmentBanner extends StatelessWidget {
                         ),
                       ),
                     ),
-
-                    SizedBox(height: 7.h),
 
                     // /// We cannot make a subtitle dynamic
                     // /// because BannerModel/API currently
@@ -153,7 +156,6 @@ class InvestmentBanner extends StatelessWidget {
                     //     ),
                     //   ),
                     // ),
-                    SizedBox(height: 12.h),
 
                     /// LINK URL ACTION
                     if (banner.linkUrl.isNotEmpty)
@@ -218,6 +220,9 @@ class InvestmentBanner extends StatelessWidget {
       width: double.infinity,
       height: double.infinity,
       fit: BoxFit.cover,
+      // Mirrors the picture in RTL so it flips along with the text and the
+      // gradient.
+      matchTextDirection: true,
 
       loadingBuilder: (context, child, loadingProgress) {
         if (loadingProgress == null) {
@@ -254,6 +259,9 @@ class InvestmentBanner extends StatelessWidget {
       width: double.infinity,
       height: double.infinity,
       fit: BoxFit.cover,
+      // Mirrors the picture in RTL so it flips along with the text and the
+      // gradient.
+      matchTextDirection: true,
     );
   }
 }

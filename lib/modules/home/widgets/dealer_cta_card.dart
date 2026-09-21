@@ -52,8 +52,8 @@ class DealerCtaCard extends StatelessWidget {
       child: Stack(
         children: [
           /// Faded skyline, as on the website's dealer CTA.
-          Positioned(
-            right: 0,
+          PositionedDirectional(
+            end: 0,
             top: 0,
             bottom: 0,
             child: Opacity(
@@ -61,7 +61,8 @@ class DealerCtaCard extends StatelessWidget {
               child: Image.asset(
                 "assets/dealer-cta-bg.png",
                 fit: BoxFit.fitHeight,
-                alignment: Alignment.centerRight,
+                alignment: AlignmentDirectional.centerEnd,
+                matchTextDirection: true,
                 errorBuilder: (_, __, ___) => const SizedBox.shrink(),
               ),
             ),

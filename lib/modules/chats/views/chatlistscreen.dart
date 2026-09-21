@@ -45,7 +45,7 @@ class ChatListScreen extends StatelessWidget {
               Get.to(() => const VisitListScreen());
             },
             icon: const Icon(
-              Icons.calendar_month_outlined,
+              Icons.location_city_outlined,
               color: AppColors.primary,
             ),
           ),

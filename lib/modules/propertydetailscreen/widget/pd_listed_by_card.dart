@@ -57,62 +57,79 @@ class PdListedByCard extends StatelessWidget {
         !isMyProperty && (phone.isNotEmpty || whatsapp.isNotEmpty);
 
     return PdCard(
+      padding: EdgeInsets.all(14.w),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          PdSectionHeader(title: 'Listed By'.tr),
-          SizedBox(height: 14.h),
-
-          // Who listed it.
-          Row(
+          // Badges are pinned to the card's top corner (right in LTR, left
+          // in RTL) so they never fight the name for room.
+          Stack(
             children: [
-              _avatar(),
-              SizedBox(width: 14.w),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      name,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: TextStyle(
-                        fontSize: 14.sp,
-                        fontWeight: FontWeight.w700,
-                        color: AppColors.ink,
-                      ),
-                    ),
-                    SizedBox(height: 6.h),
-                    Wrap(
-                      spacing: 6.w,
-                      runSpacing: 6.h,
-                      children: [
-                        _Badge(
-                          icon: _isDealer
-                              ? Icons.business_rounded
-                              : Icons.person_rounded,
-                          label: _isDealer ? 'Dealer'.tr : 'Property Owner'.tr,
-                          foreground: AppColors.primary,
-                          background: AppColors.maroonTint,
-                        ),
-                        if (property.contactVerified)
-                          _Badge(
-                            icon: Icons.verified_rounded,
-                            label: 'Verified Contact'.tr,
-                            foreground: AppColors.trendText,
-                            background: AppColors.trendBg,
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  PdSectionHeader(title: 'Listed By'.tr),
+                  SizedBox(height: 10.h),
+
+                  // Who listed it.
+                  Row(
+                    children: [
+                      _avatar(),
+                      SizedBox(width: 12.w),
+                      Expanded(
+                        child: Padding(
+                          // Keeps a long name clear of the badges pinned above
+                          // it (the stacked badges reach into this row).
+                          padding: EdgeInsetsDirectional.only(end: 100.w),
+                          child: Text(
+                            name,
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
+                            style: TextStyle(
+                              fontSize: 14.sp,
+                              fontWeight: FontWeight.w700,
+                              color: AppColors.ink,
+                            ),
                           ),
-                      ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+
+              PositionedDirectional(
+                top: 0,
+                end: 0,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    _Badge(
+                      icon: _isDealer
+                          ? Icons.business_rounded
+                          : Icons.person_rounded,
+                      label: _isDealer ? 'Dealer'.tr : 'Property Owner'.tr,
+                      foreground: AppColors.primary,
+                      background: AppColors.maroonTint,
                     ),
+                    if (property.contactVerified) ...[
+                      SizedBox(height: 4.h),
+                      _Badge(
+                        icon: Icons.verified_rounded,
+                        label: 'Verified Contact'.tr,
+                        foreground: AppColors.trendText,
+                        background: AppColors.trendBg,
+                      ),
+                    ],
                   ],
                 ),
               ),
             ],
           ),
 
-          SizedBox(height: 14.h),
-          Container(height: 1, color: PD.line),
           SizedBox(height: 10.h),
+          Container(height: 1, color: PD.line),
+          SizedBox(height: 4.h),
 
           // One tidy footer row: link on the start, compact actions at the end.
           Row(
@@ -122,7 +139,7 @@ class PdListedByCard extends StatelessWidget {
                   onTap: _openLister,
                   borderRadius: BorderRadius.circular(10.r),
                   child: Padding(
-                    padding: EdgeInsets.symmetric(vertical: 8.h),
+                    padding: EdgeInsets.symmetric(vertical: 6.h),
                     child: Row(
                       children: [
                         Flexible(
@@ -155,7 +172,7 @@ class PdListedByCard extends StatelessWidget {
                     tooltip: 'Call'.tr,
                     icon: Icon(
                       Icons.call_rounded,
-                      size: 19.sp,
+                      size: 17.sp,
                       color: AppColors.primary,
                     ),
                     background: AppColors.maroonTint,
@@ -169,7 +186,7 @@ class PdListedByCard extends StatelessWidget {
                     tooltip: 'WhatsApp'.tr,
                     icon: FaIcon(
                       FontAwesomeIcons.whatsapp,
-                      size: 19.sp,
+                      size: 17.sp,
                       color: const Color(0xFF1FA855),
                     ),
                     background: const Color(0xFFEAF8F0),
@@ -191,26 +208,26 @@ class PdListedByCard extends StatelessWidget {
     final String cover = property.createdBy.dealerProfile?.coverImage ?? '';
 
     return Container(
-      padding: const EdgeInsets.all(2.5),
+      padding: const EdgeInsets.all(2),
       decoration: const BoxDecoration(
         shape: BoxShape.circle,
         gradient: AppColors.accentLine,
       ),
       child: Container(
-        padding: const EdgeInsets.all(2),
+        padding: const EdgeInsets.all(1.5),
         decoration: const BoxDecoration(
           shape: BoxShape.circle,
           color: Colors.white,
         ),
         child: CircleAvatar(
-          radius: 27.r,
+          radius: 21.r,
           backgroundColor: const Color(0xFFF3F4F6),
           foregroundImage: cover.isEmpty ? null : NetworkImage(cover),
           // If the network image fails the icon underneath stays visible.
           onForegroundImageError: cover.isEmpty ? null : (_, _) {},
           child: Icon(
             Icons.person_rounded,
-            size: 28.sp,
+            size: 22.sp,
             color: AppColors.inkFaint,
           ),
         ),
@@ -261,7 +278,7 @@ class _Badge extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: EdgeInsets.symmetric(horizontal: 9.w, vertical: 4.h),
+      padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 3.h),
       decoration: BoxDecoration(
         color: background,
         borderRadius: BorderRadius.circular(20.r),
@@ -311,16 +328,16 @@ class _IconAction extends StatelessWidget {
       message: tooltip,
       child: Material(
         color: background,
-        borderRadius: BorderRadius.circular(14.r),
+        borderRadius: BorderRadius.circular(12.r),
         child: InkWell(
           onTap: onTap,
-          borderRadius: BorderRadius.circular(14.r),
+          borderRadius: BorderRadius.circular(12.r),
           child: Container(
-            width: 42.w,
-            height: 42.w,
+            width: 36.w,
+            height: 36.w,
             alignment: Alignment.center,
             decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(14.r),
+              borderRadius: BorderRadius.circular(12.r),
               border: Border.all(color: border),
             ),
             child: icon,

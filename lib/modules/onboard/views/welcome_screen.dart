@@ -1,15 +1,18 @@
+import 'package:country_pickers/utils/utils.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:villas_qatar/Core/constants/app_colors.dart';
 import 'package:villas_qatar/Core/services/storage_service.dart';
 import 'package:villas_qatar/Core/theme/app_textstyles.dart';
+import 'package:villas_qatar/Core/widgets/primary_button.dart';
 import 'package:villas_qatar/modules/mainscreen/mainscreen.dart';
 import 'package:villas_qatar/modules/onboard/controller/auth_controller.dart';
 import 'package:villas_qatar/modules/onboard/views/dealer_login_screen.dart';
-import 'package:villas_qatar/modules/onboard/views/login_screen.dart';
+import 'package:villas_qatar/modules/onboard/views/otp_screen.dart';
 
 class WelcomeScreen extends StatelessWidget {
   WelcomeScreen({super.key});
@@ -27,8 +30,11 @@ class WelcomeScreen extends StatelessWidget {
               ),
 
               SafeArea(
-                child: Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 30.w),
+                child: SingleChildScrollView(
+                  physics: const BouncingScrollPhysics(),
+                  keyboardDismissBehavior:
+                      ScrollViewKeyboardDismissBehavior.onDrag,
+                  padding: EdgeInsets.symmetric(horizontal: 24.w),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -61,11 +67,37 @@ class WelcomeScreen extends StatelessWidget {
                           ),
                         ],
                       ),
-                      SizedBox(height: 40.h),
+
+                      SizedBox(height: 18.h),
 
                       /// Logo
-                      Image.asset('assets/Logo/homeLogo.png', width: 180.w),
-                      SizedBox(height: 10.h),
+                      Image.asset('assets/Logo/homeLogo.png', width: 150.w),
+
+                      SizedBox(height: 15.h),
+
+                      /// Headline
+                      RichText(
+                        text: TextSpan(
+                          children: [
+                            TextSpan(
+                              text: 'Find your dream villa in '.tr,
+                              style: AppTextStyles.bold16.copyWith(
+                                fontSize: 21.sp,
+                                color: AppColors.textPrimary,
+                              ),
+                            ),
+                            TextSpan(
+                              text: 'Qatar'.tr,
+                              style: AppTextStyles.bold16.copyWith(
+                                fontSize: 21.sp,
+                                color: AppColors.primary,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+
+                      SizedBox(height: 8.h),
 
                       Container(
                         width: 55.w,
@@ -73,21 +105,85 @@ class WelcomeScreen extends StatelessWidget {
                         color: AppColors.primary,
                       ),
 
-                      SizedBox(height: 20.h),
+                      SizedBox(height: 10.h),
 
                       /// Description
                       Text(
                         'Premium living Prime locations\nThe lifestyle you deserve'
                             .tr,
-                        style: AppTextStyles.body14.copyWith(
-                          color: Colors.grey.shade700,
+                        style: AppTextStyles.body13.copyWith(
+                          color: AppColors.textSecondary,
                           height: 1.5,
                         ),
                       ),
 
-                      SizedBox(height: 20.h),
-                      _buildWhatsAppButton(),
-                      SizedBox(height: 20.h),
+                      SizedBox(height: 18.h),
+
+                      /// WhatsApp number + Send OTP (one step, no second
+                      /// login screen)
+                      Row(
+                        children: [
+                          FaIcon(
+                            FontAwesomeIcons.whatsapp,
+                            size: 15.sp,
+                            color: const Color(0xFF1FA855),
+                          ),
+                          SizedBox(width: 6.w),
+                          Text(
+                            "WhatsApp Number".tr,
+                            style: AppTextStyles.medium13.copyWith(
+                              color: AppColors.textPrimary,
+                            ),
+                          ),
+                        ],
+                      ),
+
+                      SizedBox(height: 8.h),
+
+                      _buildPhoneField(controller),
+
+                      SizedBox(height: 16.h),
+
+                      PrimaryButton(
+                        title: controller.isLoading
+                            ? "Sending...".tr
+                            : "Send OTP".tr,
+                        prefix: FaIcon(
+                          FontAwesomeIcons.whatsapp,
+                          color: Colors.white,
+                          size: 18.sp,
+                        ),
+                        suffix: controller.isLoading
+                            ? SizedBox(
+                                width: 18.w,
+                                height: 18.w,
+                                child: const CircularProgressIndicator(
+                                  strokeWidth: 2,
+                                  color: Colors.white,
+                                ),
+                              )
+                            : Icon(
+                                Icons.arrow_forward,
+                                color: Colors.white,
+                                size: 18.sp,
+                              ),
+                        onTap: controller.isLoading
+                            ? null
+                            : () async {
+                                final success = await controller.sendOtp();
+
+                                if (success) {
+                                  Get.to(() => OtpScreen());
+                                }
+                              },
+                      ),
+
+                      SizedBox(height: 15.h),
+
+                      _buildInfoCard(),
+
+                      SizedBox(height: 15.h),
+
                       Row(
                         children: [
                           const Expanded(child: Divider()),
@@ -103,7 +199,8 @@ class WelcomeScreen extends StatelessWidget {
                           const Expanded(child: Divider()),
                         ],
                       ),
-                      SizedBox(height: 20.h),
+
+                      SizedBox(height: 10.h),
 
                       /// Social Buttons
                       Row(
@@ -157,7 +254,7 @@ class WelcomeScreen extends StatelessWidget {
                         ],
                       ),
 
-                      SizedBox(height: 25.h),
+                      SizedBox(height: 2.h),
 
                       Center(
                         child: Text.rich(
@@ -303,32 +400,124 @@ class WelcomeScreen extends StatelessWidget {
     StorageService.saveLanguage(code);
   }
 
-  Widget _buildWhatsAppButton() {
-    return InkWell(
-      onTap: () {
-        Get.to(() => LoginScreen());
-      },
-      borderRadius: BorderRadius.circular(8.r),
-      child: Container(
-        padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 18.h),
-        decoration: BoxDecoration(
-          color: const Color(0xFF8A1538),
-          borderRadius: BorderRadius.circular(8.r),
-        ),
-        child: Row(
-          children: [
-            Icon(Icons.chat, color: Colors.white, size: 16.sp),
+  /// Country-code dropdown + number field, as one bordered box.
+  Widget _buildPhoneField(AuthController controller) {
+    return Container(
+      height: 52.h,
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(8.r),
+        border: Border.all(color: AppColors.border),
+      ),
+      child: Row(
+        children: [
+          SizedBox(
+            width: 110.w,
+            child: DropdownButtonHideUnderline(
+              child: DropdownButton<String>(
+                value: controller.selectedCountry,
+                isExpanded: true,
+                icon: Icon(
+                  Icons.keyboard_arrow_down,
+                  color: AppColors.textSecondary,
+                  size: 20.sp,
+                ),
+                items: ["QA", "IN", "AE", "US"].map((code) {
+                  final country = CountryPickerUtils.getCountryByIsoCode(code);
 
-            SizedBox(width: 15.w),
+                  return DropdownMenuItem<String>(
+                    value: code,
+                    child: Padding(
+                      padding: EdgeInsetsDirectional.only(start: 8.w),
+                      child: Row(
+                        children: [
+                          SizedBox(
+                            width: 22.w,
+                            height: 16.h,
+                            child: CountryPickerUtils.getDefaultFlagImage(
+                              country,
+                            ),
+                          ),
+                          SizedBox(width: 8.w),
+                          Text(
+                            "+${country.phoneCode}",
+                            style: AppTextStyles.body13,
+                          ),
+                        ],
+                      ),
+                    ),
+                  );
+                }).toList(),
+                onChanged: (value) {
+                  if (value == null) return;
 
-            Text(
-              'Continue with WhatsApp'.tr,
-              style: AppTextStyles.body14.copyWith(color: Colors.white),
+                  // Also refreshes selectedCountryCode / phoneNumber.
+                  controller.changeCountry(value);
+                },
+              ),
             ),
+          ),
 
-            Icon(Icons.arrow_forward_ios, color: Colors.white, size: 16.sp),
-          ],
-        ),
+          Container(width: 1, height: 28.h, color: AppColors.border),
+
+          Expanded(
+            child: TextField(
+              controller: controller.phoneController,
+              keyboardType: TextInputType.phone,
+              style: AppTextStyles.body14,
+              onChanged: (value) {
+                controller.phoneNumber =
+                    "${controller.selectedCountryCode}${value.trim()}";
+              },
+              decoration: InputDecoration(
+                border: InputBorder.none,
+                contentPadding: EdgeInsets.symmetric(horizontal: 14.w),
+                hintText: "WhatsApp Number".tr,
+                hintStyle: AppTextStyles.body14.copyWith(
+                  color: AppColors.textHint,
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildInfoCard() {
+    return Container(
+      padding: EdgeInsets.all(12.w),
+      decoration: BoxDecoration(
+        color: AppColors.authInfoBackground,
+        borderRadius: BorderRadius.circular(8.r),
+      ),
+      child: Row(
+        children: [
+          Container(
+            height: 34.w,
+            width: 34.w,
+            decoration: const BoxDecoration(
+              shape: BoxShape.circle,
+              color: AppColors.authIconBackground,
+            ),
+            child: Icon(
+              Icons.shield_outlined,
+              color: AppColors.primary,
+              size: 18.sp,
+            ),
+          ),
+
+          SizedBox(width: 12.w),
+
+          Expanded(
+            child: Text(
+              "We will send an OTP to your WhatsApp to verify your account".tr,
+              style: AppTextStyles.body13.copyWith(
+                color: AppColors.textSecondary,
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }

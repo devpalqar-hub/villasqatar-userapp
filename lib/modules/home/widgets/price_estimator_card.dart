@@ -18,7 +18,7 @@ class PriceEstimatorCard extends StatelessWidget {
 
     return Container(
       width: double.infinity,
-      height: 120.h,
+      height: 125.h,
       clipBehavior: Clip.antiAlias,
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(cardRadius),
@@ -26,16 +26,18 @@ class PriceEstimatorCard extends StatelessWidget {
         image: const DecorationImage(
           image: AssetImage("assets/estimator_card.png"),
           fit: BoxFit.cover,
+          // Mirrors the artwork in RTL so the photo stays opposite the text.
+          matchTextDirection: true,
         ),
       ),
       child: Stack(
         clipBehavior: Clip.none,
         children: [
           Padding(
-            padding: EdgeInsets.fromLTRB(16.w, 10.h, 10.w, 10.h),
+            padding: EdgeInsetsDirectional.fromSTEB(16.w, 10.h, 10.w, 10.h),
             child: FractionallySizedBox(
               widthFactor: 0.82,
-              alignment: Alignment.centerLeft,
+              alignment: AlignmentDirectional.centerStart,
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -103,7 +105,11 @@ class PriceEstimatorCard extends StatelessWidget {
             ),
           ),
 
-          Positioned(top: 16.h, right: 14.w, child: const _EstimateBadge()),
+          PositionedDirectional(
+            top: 16.h,
+            end: 14.w,
+            child: const _EstimateBadge(),
+          ),
         ],
       ),
     );

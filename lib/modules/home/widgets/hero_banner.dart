@@ -91,7 +91,7 @@ class _HomeBannerState extends State<HomeBanner> {
   final FocusNode _focusNode = FocusNode();
   final PageController _pageController = PageController();
 
-  PropertySearchType _selectedType = PropertySearchType.rent;
+  PropertySearchType _selectedType = PropertySearchType.sale;
   bool _isFocused = false;
   int _activeIndex = 0;
 
@@ -147,9 +147,7 @@ class _HomeBannerState extends State<HomeBanner> {
 
       final List<AutocompleteResult> results = rawResults
           .whereType<Map>()
-          .map(
-            (e) => AutocompleteResult.fromJson(Map<String, dynamic>.from(e)),
-          )
+          .map((e) => AutocompleteResult.fromJson(Map<String, dynamic>.from(e)))
           .toList();
 
       if (!mounted) return;
@@ -197,9 +195,7 @@ class _HomeBannerState extends State<HomeBanner> {
         ? Get.find<DeepLinkController>()
         : Get.put(DeepLinkController(), permanent: true);
 
-    final property = await deepLinkController.fetchPropertyBySlug(
-      slug: slug,
-    );
+    final property = await deepLinkController.fetchPropertyBySlug(slug: slug);
 
     if (property == null || !mounted) return;
 
@@ -281,13 +277,16 @@ class _HomeBannerState extends State<HomeBanner> {
     final int activeIndex = _activeIndex.clamp(0, slides.length - 1);
 
     return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         Stack(
-          clipBehavior: Clip.none,
+          fit: StackFit.passthrough,
           children: [
-            SizedBox(
-              height: 250.h,
-              width: double.infinity,
+            Positioned(
+              top: 0,
+              left: 0,
+              right: 0,
+              height: _photoHeight.h,
               child: Stack(
                 fit: StackFit.expand,
                 children: [
@@ -311,8 +310,9 @@ class _HomeBannerState extends State<HomeBanner> {
                     child: DecoratedBox(
                       decoration: BoxDecoration(
                         gradient: LinearGradient(
-                          begin: Alignment.centerLeft,
-                          end: Alignment.centerRight,
+                          // Dark on the text side: left in LTR, right in RTL.
+                          begin: AlignmentDirectional.centerStart,
+                          end: AlignmentDirectional.centerEnd,
                           colors: [
                             Color(0xE60B1019),
                             Color(0x8C0B1019),
@@ -376,10 +376,13 @@ class _HomeBannerState extends State<HomeBanner> {
             ),
 
             /// ---- Search card — overlaps the photo's bottom edge ----
-            Positioned(
-              left: 0.w,
-              right: 0.w,
-              bottom: -35.h,
+            ///
+            /// The card is the Stack's in-flow child, pinned by a fixed top
+            /// offset. When the autocomplete list opens it grows downward and
+            /// pushes the content below it, instead of the card being
+            /// bottom-anchored and climbing up over the photo.
+            Padding(
+              padding: EdgeInsets.only(top: _searchCardTop),
               child: _SearchCard(
                 selectedType: _selectedType,
                 onTypeChanged: (type) => setState(() => _selectedType = type),
@@ -397,11 +400,19 @@ class _HomeBannerState extends State<HomeBanner> {
           ],
         ),
 
-        /// Reserve room for the overlapping search card.
-        SizedBox(height: 30.h),
+        SizedBox(height: 4.h),
       ],
     );
   }
+
+  static const double _photoHeight = 250;
+
+  /// How far the search card hangs below the photo's bottom edge.
+  static const double _cardOverhang = 35;
+
+  /// Top offset that lands the collapsed card (14.w padding, 34.h toggle,
+  /// 10.h gap, 48.h field, 14.w padding) [_cardOverhang] below the photo.
+  double get _searchCardTop => _photoHeight.h + _cardOverhang.h - (92.h + 28.w);
 }
 
 /// Renders the banner photo from the network, with a placeholder while
@@ -423,7 +434,7 @@ class _BannerImage extends StatelessWidget {
       return Image.asset(
         "assets/hero-bg.jpg",
         fit: BoxFit.cover,
-        alignment: Alignment.centerRight,
+        alignment: AlignmentDirectional.centerEnd,
         errorBuilder: (_, __, ___) => Container(color: AppColors.maroonDeep),
       );
     }
@@ -431,7 +442,7 @@ class _BannerImage extends StatelessWidget {
     return Image.network(
       imageUrl,
       fit: BoxFit.cover,
-      alignment: Alignment.centerRight,
+      alignment: AlignmentDirectional.centerEnd,
       loadingBuilder: (context, child, progress) {
         if (progress == null) return child;
         return Container(color: AppColors.maroonDeep.withOpacity(.85));
@@ -439,7 +450,7 @@ class _BannerImage extends StatelessWidget {
       errorBuilder: (_, __, ___) => Image.asset(
         "assets/hero-bg.jpg",
         fit: BoxFit.cover,
-        alignment: Alignment.centerRight,
+        alignment: AlignmentDirectional.centerEnd,
         errorBuilder: (_, __, ___) => Container(color: AppColors.maroonDeep),
       ),
     );
@@ -580,7 +591,7 @@ class _HeroDots extends StatelessWidget {
         final bool active = index == activeIndex;
 
         return Container(
-          margin: EdgeInsets.only(right: 5.w),
+          margin: EdgeInsetsDirectional.only(end: 5.w),
           width: active ? 14.w : 5.w,
           height: 5.w,
           decoration: BoxDecoration(
@@ -696,8 +707,9 @@ class _SearchTypeToggle extends StatelessWidget {
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          _buildOption(context, "Rent".tr, PropertySearchType.rent),
+          
           _buildOption(context, "Buy".tr, PropertySearchType.sale),
+          _buildOption(context, "Rent".tr, PropertySearchType.rent),
         ],
       ),
     );
@@ -881,9 +893,7 @@ class _SuggestionsList extends StatelessWidget {
                     child: Row(
                       children: [
                         Icon(
-                          isPlace
-                              ? Icons.place_outlined
-                              : Icons.villa_outlined,
+                          isPlace ? Icons.place_outlined : Icons.villa_outlined,
                           size: 17.sp,
                           color: AppColors.primary,
                         ),

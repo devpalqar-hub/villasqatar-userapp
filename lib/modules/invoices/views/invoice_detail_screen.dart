@@ -36,7 +36,7 @@ class InvoiceDetailScreen extends StatefulWidget {
 class _InvoiceDetailScreenState extends State<InvoiceDetailScreen> {
   late final InvoiceDetailController controller;
 
-  bool _isDownloadingPdf = false;
+  // bool _isDownloadingPdf = false;
 
   @override
   void initState() {
@@ -62,98 +62,98 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailScreen> {
   // THE SHARE SHEET SO THE USER CAN VIEW / SAVE / SEND IT.
   // ============================================================
 
-  Future<void> _downloadPdf() async {
-    if (_isDownloadingPdf) return;
+  // Future<void> _downloadPdf() async {
+  //   if (_isDownloadingPdf) return;
 
-    final invoice = controller.invoice;
+  //   final invoice = controller.invoice;
 
-    if (invoice == null) {
-      debugPrint("❌ Invoice is null");
-      return;
-    }
+  //   if (invoice == null) {
+  //     debugPrint("❌ Invoice is null");
+  //     return;
+  //   }
 
-    if ((invoice.pdfObjectKey ?? "").isEmpty) {
-      _showSnack("PDF is not available for this invoice".tr);
-      return;
-    }
+  //   if ((invoice.pdfObjectKey ?? "").isEmpty) {
+  //     _showSnack("PDF is not available for this invoice".tr);
+  //     return;
+  //   }
 
-    final String url =
-        "${ApiHandler.baseUrl}/api/invoices/${invoice.id}/download";
+  //   final String url =
+  //       "${ApiHandler.baseUrl}/api/invoices/${invoice.id}/download";
 
-    final String? token = StorageService.getToken();
+  //   final String? token = StorageService.getToken();
 
-    if (token == null || token.isEmpty) {
-      _showSnack("Please login to download the invoice.".tr);
-      return;
-    }
+  //   if (token == null || token.isEmpty) {
+  //     _showSnack("Please login to download the invoice.".tr);
+  //     return;
+  //   }
 
-    setState(() => _isDownloadingPdf = true);
+  //   setState(() => _isDownloadingPdf = true);
 
-    try {
-      debugPrint("════════════════════════════════════");
-      debugPrint("📄 INVOICE PDF DOWNLOAD");
-      debugPrint("Invoice ID: ${invoice.id}");
-      debugPrint("Invoice Number: ${invoice.invoiceNumber}");
-      debugPrint("Request URL: $url");
-      debugPrint("════════════════════════════════════");
+  //   try {
+  //     debugPrint("════════════════════════════════════");
+  //     debugPrint("📄 INVOICE PDF DOWNLOAD");
+  //     debugPrint("Invoice ID: ${invoice.id}");
+  //     debugPrint("Invoice Number: ${invoice.invoiceNumber}");
+  //     debugPrint("Request URL: $url");
+  //     debugPrint("════════════════════════════════════");
 
-      final response = await http.get(
-        Uri.parse(url),
-        headers: {
-          "Authorization": "Bearer $token",
-          "Accept": "application/pdf",
-        },
-      );
+  //     final response = await http.get(
+  //       Uri.parse(url),
+  //       headers: {
+  //         "Authorization": "Bearer $token",
+  //         "Accept": "application/pdf",
+  //       },
+  //     );
 
-      debugPrint("📥 INVOICE PDF RESPONSE");
-      debugPrint("Status Code: ${response.statusCode}");
-      debugPrint("Content-Type: ${response.headers['content-type']}");
-      debugPrint("Content-Length: ${response.headers['content-length']}");
+  //     debugPrint("📥 INVOICE PDF RESPONSE");
+  //     debugPrint("Status Code: ${response.statusCode}");
+  //     debugPrint("Content-Type: ${response.headers['content-type']}");
+  //     debugPrint("Content-Length: ${response.headers['content-length']}");
 
-      if (response.statusCode < 200 || response.statusCode >= 300) {
-        debugPrint("❌ Invoice PDF request failed");
-        debugPrint("Response: ${response.body}");
-        _showSnack("Unable to download invoice PDF".tr);
-        return;
-      }
+  //     if (response.statusCode < 200 || response.statusCode >= 300) {
+  //       debugPrint("❌ Invoice PDF request failed");
+  //       debugPrint("Response: ${response.body}");
+  //       _showSnack("Unable to download invoice PDF".tr);
+  //       return;
+  //     }
 
-      final String contentType = response.headers['content-type'] ?? '';
+  //     final String contentType = response.headers['content-type'] ?? '';
 
-      if (!contentType.contains('application/pdf')) {
-        debugPrint("⚠️ Server returned non-PDF response");
-        debugPrint(response.body);
-        _showSnack("Unable to download invoice PDF".tr);
-        return;
-      }
+  //     if (!contentType.contains('application/pdf')) {
+  //       debugPrint("⚠️ Server returned non-PDF response");
+  //       debugPrint(response.body);
+  //       _showSnack("Unable to download invoice PDF".tr);
+  //       return;
+  //     }
 
-      debugPrint("✅ Server returned PDF (${response.bodyBytes.length} bytes)");
+  //     debugPrint("✅ Server returned PDF (${response.bodyBytes.length} bytes)");
 
-      final Directory dir = await getTemporaryDirectory();
+  //     final Directory dir = await getTemporaryDirectory();
 
-      final String fileName =
-          "Invoice_${invoice.invoiceNumber.replaceAll(RegExp(r'[^A-Za-z0-9_-]'), '_')}.pdf";
+  //     final String fileName =
+  //         "Invoice_${invoice.invoiceNumber.replaceAll(RegExp(r'[^A-Za-z0-9_-]'), '_')}.pdf";
 
-      final File file = File('${dir.path}/$fileName');
-      await file.writeAsBytes(response.bodyBytes, flush: true);
+  //     final File file = File('${dir.path}/$fileName');
+  //     await file.writeAsBytes(response.bodyBytes, flush: true);
 
-      if (!mounted) return;
+  //     if (!mounted) return;
 
-      await SharePlus.instance.share(
-        ShareParams(
-          files: [XFile(file.path, mimeType: 'application/pdf')],
-          subject: 'Invoice ${invoice.invoiceNumber}',
-        ),
-      );
-    } catch (e, stackTrace) {
-      debugPrint("❌ Invoice PDF exception: $e");
-      debugPrint(stackTrace.toString());
-      _showSnack("Unable to download invoice PDF".tr);
-    } finally {
-      if (mounted) {
-        setState(() => _isDownloadingPdf = false);
-      }
-    }
-  }
+  //     await SharePlus.instance.share(
+  //       ShareParams(
+  //         files: [XFile(file.path, mimeType: 'application/pdf')],
+  //         subject: 'Invoice ${invoice.invoiceNumber}',
+  //       ),
+  //     );
+  //   } catch (e, stackTrace) {
+  //     debugPrint("❌ Invoice PDF exception: $e");
+  //     debugPrint(stackTrace.toString());
+  //     _showSnack("Unable to download invoice PDF".tr);
+  //   } finally {
+  //     if (mounted) {
+  //       setState(() => _isDownloadingPdf = false);
+  //     }
+  //   }
+  // }
 
   void _showSnack(String message) {
     if (!mounted) return;
@@ -181,24 +181,24 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailScreen> {
             color: Colors.black87,
           ),
         ),
-        actions: [
-          IconButton(
-            icon: _isDownloadingPdf
-                ? SizedBox(
-                    width: 20.sp,
-                    height: 20.sp,
-                    child: const CircularProgressIndicator(
-                      strokeWidth: 2,
-                      color: AppColors.primary,
-                    ),
-                  )
-                : const Icon(
-                    Icons.file_download_outlined,
-                    color: AppColors.primary,
-                  ),
-            onPressed: _isDownloadingPdf ? null : _downloadPdf,
-          ),
-        ],
+        // actions: [
+        //   IconButton(
+        //     icon: _isDownloadingPdf
+        //         ? SizedBox(
+        //             width: 20.sp,
+        //             height: 20.sp,
+        //             child: const CircularProgressIndicator(
+        //               strokeWidth: 2,
+        //               color: AppColors.primary,
+        //             ),
+        //           )
+        //         : const Icon(
+        //             Icons.file_download_outlined,
+        //             color: AppColors.primary,
+        //           ),
+        //     onPressed: _isDownloadingPdf ? null : _downloadPdf,
+        //   ),
+        // ],
       ),
       body: GetBuilder<InvoiceDetailController>(
         tag: widget.invoiceId,

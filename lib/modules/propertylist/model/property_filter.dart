@@ -1,8 +1,11 @@
 class PropertyFilter {
+  /// The Search screen opens on Buy; tapping the active tab clears it.
+  static const String defaultPurpose = 'SALE';
+
   String search = '';
 
   String type = '';
-  String purpose = '';
+  String purpose = defaultPurpose;
 
   String? locationId;
 
@@ -36,7 +39,7 @@ class PropertyFilter {
     search = '';
 
     type = '';
-    purpose = '';
+    purpose = defaultPurpose;
 
     locationId = null;
 
@@ -90,7 +93,8 @@ class PropertyFilter {
   bool get hasCriteria =>
       search.isNotEmpty ||
       type.isNotEmpty ||
-      purpose.isNotEmpty ||
+      // Buy is the untouched default, so only a change counts as criteria.
+      purpose != defaultPurpose ||
       sortBy.isNotEmpty ||
       activeFilterCount > 0;
 

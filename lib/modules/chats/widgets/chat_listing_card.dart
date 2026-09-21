@@ -162,41 +162,6 @@ class ChatListingCard extends StatelessWidget {
                               ],
                             ),
                           ],
-                          SizedBox(height: 4.h),
-                          FittedBox(
-                            fit: BoxFit.scaleDown,
-                            alignment: AlignmentDirectional.centerStart,
-                            child: Text.rich(
-                              TextSpan(
-                                children: [
-                                  TextSpan(
-                                    text: 'QAR ',
-                                    style: TextStyle(
-                                      fontSize: 10.sp,
-                                      fontWeight: FontWeight.w700,
-                                      color: AppColors.gold,
-                                    ),
-                                  ),
-                                  TextSpan(
-                                    text: PD.number(summary.price),
-                                    style: TextStyle(
-                                      fontSize: 14.sp,
-                                      fontWeight: FontWeight.w700,
-                                      color: AppColors.primary,
-                                    ),
-                                  ),
-                                  if (summary.isRent)
-                                    TextSpan(
-                                      text: ' / ${'per year'.tr}',
-                                      style: TextStyle(
-                                        fontSize: 10.sp,
-                                        color: AppColors.inkMuted,
-                                      ),
-                                    ),
-                                ],
-                              ),
-                            ),
-                          ),
                         ],
                       ),
                     ),

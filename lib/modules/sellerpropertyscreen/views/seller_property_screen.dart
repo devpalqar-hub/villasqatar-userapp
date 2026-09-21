@@ -25,23 +25,41 @@ class SellerPropertiesScreen extends StatefulWidget {
 class _SellerPropertiesScreenState extends State<SellerPropertiesScreen> {
   late final PropertySearchController controller;
 
-  // Preview mode shows only the first 2 properties (matches the seller
-  // summary design); "View all" expands the grid to show every listing.
-  static const int _previewCount = 2;
-
-  bool _showAll = false;
+  final ScrollController _scrollController = ScrollController();
 
   @override
   void initState() {
     super.initState();
+
+    _scrollController.addListener(_onScroll);
 
     controller = Get.isRegistered<PropertySearchController>()
         ? Get.find<PropertySearchController>()
         : Get.put(PropertySearchController(), permanent: true);
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      controller.applyFilters(createdById: widget.sellerId);
+      // A seller's page lists every listing, so drop any Buy/Rent choice
+      // left over from the Search screen.
+      controller.applyFilters(createdById: widget.sellerId, purpose: '');
     });
+  }
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
+  }
+
+  /// The seller's listings arrive a page at a time; fetch the next page as
+  /// the user nears the end so every property ends up in the list.
+  void _onScroll() {
+    if (!_scrollController.hasClients) return;
+
+    final position = _scrollController.position;
+
+    if (position.pixels >= position.maxScrollExtent - 300) {
+      controller.fetchProperties(loadMore: true);
+    }
   }
 
   // --------------------------------------------------------------------
@@ -82,12 +100,6 @@ class _SellerPropertiesScreenState extends State<SellerPropertiesScreen> {
 
         final rentCount = properties.where((e) => e.purpose == "RENT").length;
 
-        final visibleProperties = _showAll
-            ? properties
-            : properties.take(_previewCount).toList();
-
-        final hasMore = properties.length > visibleProperties.length;
-
         if (controller.isLoading) {
           return const Scaffold(
             body: Center(child: CircularProgressIndicator()),
@@ -101,14 +113,17 @@ class _SellerPropertiesScreenState extends State<SellerPropertiesScreen> {
             elevation: 0,
             centerTitle: true,
             surfaceTintColor: Colors.white,
-            title: Text("Seller Properties".tr,
-            style:TextStyle(
-            fontSize: 18.sp,
-            fontWeight: FontWeight.w500,
-            color: Colors.black87,
-          ), ),
+            title: Text(
+              "Seller Properties".tr,
+              style: TextStyle(
+                fontSize: 18.sp,
+                fontWeight: FontWeight.w500,
+                color: Colors.black87,
+              ),
+            ),
           ),
           body: CustomScrollView(
+            controller: _scrollController,
             physics: const BouncingScrollPhysics(),
             slivers: [
               SliverToBoxAdapter(
@@ -116,7 +131,8 @@ class _SellerPropertiesScreenState extends State<SellerPropertiesScreen> {
                   sellerName: widget.sellerName,
                   location: _sellerLocation(properties),
                   verified: _sellerVerified(properties),
-                  propertyCount: properties.length,
+                  // Total across every page, not just the ones loaded so far.
+                  propertyCount: controller.meta?.total ?? properties.length,
                   saleCount: saleCount,
                   rentCount: rentCount,
                 ),
@@ -131,12 +147,7 @@ class _SellerPropertiesScreenState extends State<SellerPropertiesScreen> {
                 SliverPadding(
                   padding: EdgeInsets.fromLTRB(16.w, 0, 16.w, 12.h),
                   sliver: SliverToBoxAdapter(
-                    child: _SectionTitle(
-                      title: "Properties".tr,
-                      onViewAll: hasMore
-                          ? () => setState(() => _showAll = true)
-                          : null,
-                    ),
+                    child: Text("Properties".tr, style: AppTextStyles.title16),
                   ),
                 ),
 
@@ -144,21 +155,20 @@ class _SellerPropertiesScreenState extends State<SellerPropertiesScreen> {
                   padding: EdgeInsets.symmetric(horizontal: 16.w),
                   sliver: SliverGrid(
                     delegate: SliverChildBuilderDelegate((context, index) {
-                      final property = visibleProperties[index];
+                      final property = properties[index];
 
                       return SellerPropertyCard(
                         property: property,
                         onTap: () {
                           Get.to(
-                            () => PropertyDetailsScreen(
-                              propertyId: property.id,
-                            ),
+                            () =>
+                                PropertyDetailsScreen(propertyId: property.id),
                             transition: Transition.rightToLeft,
                             duration: const Duration(milliseconds: 500),
                           );
                         },
                       );
-                    }, childCount: visibleProperties.length),
+                    }, childCount: properties.length),
                     gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                       crossAxisCount: 2,
                       mainAxisSpacing: 13.h,
@@ -168,10 +178,21 @@ class _SellerPropertiesScreenState extends State<SellerPropertiesScreen> {
                   ),
                 ),
 
-                if (!hasMore)
+                if (controller.isLoadingMore)
+                  SliverToBoxAdapter(
+                    child: Padding(
+                      padding: EdgeInsets.only(top: 16.h),
+                      child: const Center(
+                        child: CircularProgressIndicator(strokeWidth: 2),
+                      ),
+                    ),
+                  )
+                else if (!controller.hasMore)
                   SliverPadding(
                     padding: EdgeInsets.fromLTRB(16.w, 16.h, 16.w, 0),
-                    sliver: const SliverToBoxAdapter(child: _NoMoreProperties()),
+                    sliver: const SliverToBoxAdapter(
+                      child: _NoMoreProperties(),
+                    ),
                   ),
               ],
 
@@ -180,39 +201,6 @@ class _SellerPropertiesScreenState extends State<SellerPropertiesScreen> {
           ),
         );
       },
-    );
-  }
-}
-
-class _SectionTitle extends StatelessWidget {
-  const _SectionTitle({required this.title, required this.onViewAll});
-
-  final String title;
-  final VoidCallback? onViewAll;
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        Text(title, style: AppTextStyles.title16),
-        if (onViewAll != null)
-          InkWell(
-            onTap: onViewAll,
-            child: Row(
-              children: [
-                Text(
-                  "View all".tr,
-                  style: AppTextStyles.body13.copyWith(
-                    color: AppColors.primary,
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-                Icon(Icons.arrow_forward, size: 16.sp, color: AppColors.primary),
-              ],
-            ),
-          ),
-      ],
     );
   }
 }

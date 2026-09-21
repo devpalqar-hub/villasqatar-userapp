@@ -22,9 +22,9 @@ import 'package:villas_qatar/modules/home/service/loaction_controller.dart';
 import 'package:villas_qatar/modules/home/widgets/agent_card.dart';
 import 'package:villas_qatar/modules/home/widgets/category_card.dart';
 import 'package:villas_qatar/modules/home/widgets/dealer_cta_card.dart';
+import 'package:villas_qatar/modules/home/widgets/featured_properties_carousel.dart';
 import 'package:villas_qatar/modules/home/widgets/home_app_bar.dart';
 import 'package:villas_qatar/modules/home/widgets/popular_place_card.dart';
-import 'package:villas_qatar/modules/home/widgets/property_card.dart';
 import 'package:villas_qatar/modules/home/widgets/price_estimator_card.dart';
 import 'package:villas_qatar/modules/home/widgets/hero_banner.dart';
 import 'package:villas_qatar/modules/home/widgets/location_card.dart';
@@ -32,7 +32,6 @@ import 'package:villas_qatar/modules/home/widgets/section_header.dart';
 import 'package:villas_qatar/modules/home/widgets/social_media_card.dart';
 import 'package:villas_qatar/modules/home/widgets/sponser_banner.dart';
 import 'package:villas_qatar/modules/home/widgets/why_choose_card.dart';
-import 'package:villas_qatar/modules/onboard/views/dealer_login_screen.dart';
 import 'package:villas_qatar/modules/pricestimator/views/price_estimator_screen.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -104,101 +103,98 @@ class _HomeScreenState extends State<HomeScreen> {
       appBar: const HomeAppBar(),
       body: GetBuilder<Homecontroller>(
         builder: (___) {
-          return SingleChildScrollView(
-            physics: const BouncingScrollPhysics(),
-            child: StaggeredEntranceColumn(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                /// ─── HERO ────────────────────────────────────────────────────
-                HomeBanner(
-                  onSearch: (propertyName, type, {latitude, longitude}) {
-                    widget.onSearch(
-                      propertyName,
-                      type == PropertySearchType.rent ? "RENT" : "SALE",
-                      latitude: latitude,
-                      longitude: longitude,
-                    );
-                  },
-                ),
-
-                Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 20.w),
-                  child: SectionHeader(
-                    title: 'Featured Properties'.tr,
-                    subtitle: 'Handpicked homes in the best locations'.tr,
-                    onSeeAllTap: () {
-                      // Navigate to all featured properties
+          return RefreshIndicator(
+            color: AppColors.primary,
+            onRefresh: hctrl.refreshHomeScreenData,
+            child: SingleChildScrollView(
+              // Always scrollable so the pull still triggers a refresh when the
+              // content is shorter than the screen.
+              physics: const AlwaysScrollableScrollPhysics(
+                parent: BouncingScrollPhysics(),
+              ),
+              child: StaggeredEntranceColumn(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  /// ─── HERO ────────────────────────────────────────────────────
+                  HomeBanner(
+                    onSearch: (propertyName, type, {latitude, longitude}) {
+                      widget.onSearch(
+                        propertyName,
+                        type == PropertySearchType.rent ? "RENT" : "SALE",
+                        latitude: latitude,
+                        longitude: longitude,
+                      );
                     },
                   ),
-                ),
-                SizedBox(height: 12.h),
-                SingleChildScrollView(
-                  scrollDirection: Axis.horizontal,
-                  child: Row(
-                    children: [
-                      SizedBox(width: 20.w),
-                      for (var property in hctrl.featuredProperties)
-                        PropertyCard(listing: property),
-                    ],
-                  ),
-                ),
 
-                /// ─── FEATURED PROPERTIES ────────────────────────────────────
-                SizedBox(height: 12.h),
-
-                /// ─── AI PRICE ESTIMATOR ─────────────────────────────────────
-                _spaced(
                   Padding(
-                    padding: _gutter,
-                    child: PriceEstimatorCard(
-                      onGetEstimate: () {
-                        Get.to(
-                          () => const PriceEstimatorScreen(),
-                          transition: AppTransitions.forward,
-                        );
-                      },
+                    padding: EdgeInsets.symmetric(horizontal: 20.w),
+                    child: SectionHeader(
+                      title: 'Featured Properties'.tr,
+                      subtitle: 'Handpicked homes in the best locations'.tr,
+                      onSeeAllTap: () => widget.onOpenSearch(),
                     ),
                   ),
-                ),
+                  SizedBox(height: 12.h),
+                  FeaturedPropertiesCarousel(
+                    properties: hctrl.featuredProperties,
+                  ),
 
-                /// ─── SEARCH BY PROPERTY TYPE ────────────────────────────────
-                _buildCategoriesSection(),
+                  /// ─── FEATURED PROPERTIES ────────────────────────────────────
+                  SizedBox(height: 12.h),
 
-                /// ─── NEAR YOU ───────────────────────────────────────────────
-                _buildNearYouSection(),
-
-                /// ─── SPONSORED BANNERS ──────────────────────────────────────
-                _buildBannersSection(),
-
-                /// ─── FEATURED DEALERS ───────────────────────────────────────
-                _buildDealersSection(),
-
-                /// ─── POPULAR PLACES ─────────────────────────────────────────
-                _buildPopularPlacesSection(),
-                _spaced(
-                  Padding(
-                    padding: _gutter,
-                    child: DealerCtaCard(
-                      onBecomeDealer: () {
-                        Get.to(
-                          () => DealerLoginScreen(),
-                          transition: AppTransitions.forward,
-                        );
-                      },
+                  /// ─── AI PRICE ESTIMATOR ─────────────────────────────────────
+                  _spaced(
+                    Padding(
+                      padding: _gutter,
+                      child: PriceEstimatorCard(
+                        onGetEstimate: () {
+                          Get.to(
+                            () => const PriceEstimatorScreen(),
+                            transition: AppTransitions.forward,
+                          );
+                        },
+                      ),
                     ),
                   ),
-                ),
 
-                /// ─── TRUST STRIP ────────────────────────────────────────────
-                Padding(padding: _gutter, child: const WhyChooseCard()),
+                  /// ─── SEARCH BY PROPERTY TYPE ────────────────────────────────
+                  _buildCategoriesSection(),
 
-                /// ─── JOIN US ON SOCIAL MEDIA ────────────────────────────────
-                SizedBox(height: _sectionGap.h),
-                Padding(padding: _gutter, child: const SocialMediaCard()),
+                  /// ─── NEAR YOU ───────────────────────────────────────────────
+                  _buildNearYouSection(),
 
-                // No bottom bar any more, so clear the system gesture area.
-                SizedBox(height: 24.h + MediaQuery.paddingOf(context).bottom),
-              ],
+                  /// ─── SPONSORED BANNERS ──────────────────────────────────────
+                  _buildBannersSection(),
+
+                  /// ─── FEATURED DEALERS ───────────────────────────────────────
+                  _buildDealersSection(),
+
+                  /// ─── POPULAR PLACES ─────────────────────────────────────────
+                  _buildPopularPlacesSection(),
+                  _spaced(
+                    Padding(
+                      padding: _gutter,
+                      child: DealerCtaCard(
+                        onBecomeDealer: _openDealerOnboarding,
+                      ),
+                    ),
+                  ),
+
+                  /// ─── TRUST STRIP ────────────────────────────────────────────
+                  Padding(
+                    padding: _gutter,
+                    child: WhyChooseCard(onTap: _openWebsite),
+                  ),
+
+                  /// ─── JOIN US ON SOCIAL MEDIA ────────────────────────────────
+                  SizedBox(height: _sectionGap.h),
+                  Padding(padding: _gutter, child: const SocialMediaCard()),
+
+                  // No bottom bar any more, so clear the system gesture area.
+                  SizedBox(height: 24.h + MediaQuery.paddingOf(context).bottom),
+                ],
+              ),
             ),
           );
         },
@@ -603,8 +599,8 @@ Widget _buildBannersSection() {
               final banner = banners[index];
 
               return Padding(
-                padding: EdgeInsets.only(
-                  right: index == banners.length - 1 ? 0 : 8.w,
+                padding: EdgeInsetsDirectional.only(
+                  end: index == banners.length - 1 ? 0 : 8.w,
                 ),
                 child: InvestmentBanner(
                   banner: banner,
@@ -624,6 +620,32 @@ Widget _buildBannersSection() {
 /// Gutter + trailing section gap for the banner strip, matching the rhythm the
 /// other home sections use.
 EdgeInsets get _bannerInsets => EdgeInsets.fromLTRB(16.w, 0, 16.w, 12.h);
+
+/// Dealer sign-up happens on the website, not in the app.
+const String _dealerOnboardingUrl =
+    'https://dealer.villasqatar.qa/dealer-onboarding';
+
+const String _websiteUrl = 'https://villasqatar.qa/';
+
+Future<void> _openDealerOnboarding() => _openExternalUrl(_dealerOnboardingUrl);
+
+Future<void> _openWebsite() => _openExternalUrl(_websiteUrl);
+
+/// Opens [url] in the phone's browser.
+Future<void> _openExternalUrl(String url) async {
+  try {
+    final bool launched = await launchUrl(
+      Uri.parse(url),
+      mode: LaunchMode.externalApplication,
+    );
+
+    if (!launched) {
+      debugPrint("Unable to open URL: $url");
+    }
+  } catch (e) {
+    debugPrint("URL launch error ($url): $e");
+  }
+}
 
 Future<void> _handleBannerTap(String linkUrl) async {
   if (linkUrl.trim().isEmpty) {

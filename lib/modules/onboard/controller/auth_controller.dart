@@ -18,7 +18,6 @@ import 'package:villas_qatar/Core/services/push_notification_service.dart';
 import 'package:villas_qatar/Core/services/storage_service.dart';
 import 'package:villas_qatar/modules/dealer_dashboard/views/dealer_analytics_screen.dart';
 import 'package:villas_qatar/modules/mainscreen/mainscreen.dart';
-import 'package:villas_qatar/modules/onboard/views/login_screen.dart';
 import 'package:villas_qatar/modules/onboard/views/welcome_screen.dart';
 
 class AuthController extends GetxController {

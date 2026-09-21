@@ -31,8 +31,8 @@ class HomeHeader extends StatelessWidget {
             children: [
               Icon(Icons.notifications_none, size: 24.sp),
 
-              Positioned(
-                right: -2.w,
+              PositionedDirectional(
+                end: -2.w,
                 top: -2.h,
                 child: CircleAvatar(
                   radius: 8.r,

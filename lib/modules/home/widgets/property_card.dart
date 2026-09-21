@@ -57,10 +57,14 @@ class _PropertyCardState extends State<PropertyCard> {
   static const Duration _slideInterval = Duration(seconds: 4);
   static const Duration _slideDuration = Duration(milliseconds: 450);
 
-  final PageController _pageController = PageController();
+  /// Starting page of the looping carousel — a large multiple of the photo
+  /// count, so the user can swipe backwards from the first photo as well.
+  static const int _loopBase = 1000;
+
+  late final PageController _pageController;
   Timer? _autoSlideTimer;
 
-  /// Raw page index of the endless carousel; use `% count` for the photo.
+  /// Raw page index of the looping carousel; use `% count` for the photo.
   int _page = 0;
 
   late List<String> _photoUrls;
@@ -74,8 +78,12 @@ class _PropertyCardState extends State<PropertyCard> {
   void initState() {
     super.initState();
     _photoUrls = _collectPhotoUrls();
+    _page = _startPage();
+    _pageController = PageController(initialPage: _page);
     _scheduleNextSlide();
   }
+
+  int _startPage() => _photoUrls.length < 2 ? 0 : _loopBase * _photoUrls.length;
 
   @override
   void didUpdateWidget(covariant PropertyCard oldWidget) {
@@ -85,10 +93,10 @@ class _PropertyCardState extends State<PropertyCard> {
 
     if (!listEquals(urls, _photoUrls)) {
       _photoUrls = urls;
-      _page = 0;
+      _page = _startPage();
 
       if (_pageController.hasClients) {
-        _pageController.jumpToPage(0);
+        _pageController.jumpToPage(_page);
       }
 
       _scheduleNextSlide();
@@ -170,9 +178,10 @@ class _PropertyCardState extends State<PropertyCard> {
           Positioned.fill(
             child: PageView.builder(
               controller: _pageController,
-              // Photos advance on their own, so the rail this card sits in
-              // keeps the horizontal drag.
-              physics: const NeverScrollableScrollPhysics(),
+              // Photos advance on their own and can also be swiped by hand;
+              // a drag on the photo moves the photos, a drag on the card body
+              // moves the rail this card sits in.
+              physics: const PageScrollPhysics(),
               onPageChanged: (index) {
                 setState(() => _page = index);
                 _scheduleNextSlide();
@@ -261,7 +270,7 @@ class _PropertyCardState extends State<PropertyCard> {
       child: Container(
         width: width ?? 180.w,
         height: 220.h,
-        margin: margin ?? EdgeInsets.only(right: 5.w),
+        margin: margin ?? EdgeInsetsDirectional.only(end: 5.w),
         decoration: BoxDecoration(
           color: Colors.white,
 
@@ -292,9 +301,9 @@ class _PropertyCardState extends State<PropertyCard> {
                     _buildPhotoCarousel(),
 
                     if (_purposeLabel() != null)
-                      Positioned(
+                      PositionedDirectional(
                         top: 8.h,
-                        left: 8.w,
+                        start: 8.w,
                         child: Container(
                           padding: EdgeInsets.symmetric(
                             horizontal: 8.w,
@@ -322,9 +331,9 @@ class _PropertyCardState extends State<PropertyCard> {
                         ),
                       )
                     else if (listing.isFeatured ?? false)
-                      Positioned(
+                      PositionedDirectional(
                         top: 8.h,
-                        left: 8.w,
+                        start: 8.w,
                         child: Container(
                           padding: EdgeInsets.symmetric(
                             horizontal: 6.w,
@@ -347,9 +356,9 @@ class _PropertyCardState extends State<PropertyCard> {
                     /// =================================================
                     /// WISHLIST BUTTON
                     /// =================================================
-                    Positioned(
+                    PositionedDirectional(
                       top: 10.h,
-                      right: 10.w,
+                      end: 10.w,
 
                       /// GetBuilder rebuilds the heart whenever
                       /// WishlistController calls update().

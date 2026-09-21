@@ -27,7 +27,7 @@ class LocationCard extends StatelessWidget {
       child: Container(
         width: 180.w,
         height: 120.h,
-        margin: EdgeInsets.only(right: 2.w),
+        margin: EdgeInsetsDirectional.only(end: 2.w),
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(16.r),
           image: DecorationImage(
@@ -57,7 +57,7 @@ class LocationCard extends StatelessWidget {
               children: [
                 /// Distance Badge
                 Align(
-                  alignment: Alignment.topRight,
+                  alignment: AlignmentDirectional.topEnd,
                   child: Container(
                     padding: EdgeInsets.symmetric(
                       horizontal: 10.w,

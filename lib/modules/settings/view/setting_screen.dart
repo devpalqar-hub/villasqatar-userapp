@@ -171,7 +171,7 @@ class SettingsScreen extends StatelessWidget {
       icon: Icons.headset_mic_outlined,
       title: "Contact Us".tr,
       onTap: () {
-        _openWebPage("https://villas.palqar.cloud/profile/about");
+        _openWebPage("https://villasqatar.qa/contact");
       },
     ),
 
@@ -193,7 +193,7 @@ class SettingsScreen extends StatelessWidget {
       icon: Icons.info_outline,
       title: "About".tr,
       onTap: () {
-        _openWebPage("https://villas.palqar.cloud/profile/about");
+        _openWebPage("https://villasqatar.qa/terms");
       },
     ),
 
@@ -201,7 +201,7 @@ class SettingsScreen extends StatelessWidget {
       icon: Icons.privacy_tip_outlined,
       title: "Privacy Policy".tr,
       onTap: () {
-        _openWebPage("https://villas.palqar.cloud/privacy");
+        _openWebPage("https://villasqatar.qa/privacy");
       },
     ),
   ];

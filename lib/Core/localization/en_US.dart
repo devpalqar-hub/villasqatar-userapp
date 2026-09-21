@@ -1425,4 +1425,14 @@ const Map<String, String> enUS = {
   "Use your current position or search for the place to fill in the address automatically.": "Use your current position or search for the place to fill in the address automatically.",
   "You can add up to 20 photos": "You can add up to 20 photos",
   "Your progress will be lost.": "Your progress will be lost.",
+
+  // ================= HOME: PRICE ESTIMATOR CARD =================
+  "AI PRICE ESTIMATOR": "AI PRICE ESTIMATOR",
+  "Know Your Property's True Value": "Know Your Property's True Value",
+  "Get AI-powered accurate price estimates in seconds.":
+      "Get AI-powered accurate price estimates in seconds.",
+  "AI Estimate": "AI Estimate",
+
+  // ================= WELCOME / LOGIN =================
+  "Find your dream villa in ": "Find your dream villa in ",
 };
