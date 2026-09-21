@@ -1,3 +1,6 @@
+import 'dart:async';
+
+import 'package:flutter/foundation.dart' show listEquals;
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:fluttertoast/fluttertoast.dart';
@@ -8,6 +11,7 @@ import 'package:villas_qatar/Core/theme/app_motion.dart';
 import 'package:villas_qatar/Core/theme/app_textstyles.dart';
 import 'package:villas_qatar/Core/widgets/motion/pressable_scale.dart';
 import 'package:villas_qatar/modules/home/model/PropertyModel.dart';
+import 'package:villas_qatar/modules/propertydetailscreen/propertydetailscreen.dart';
 import 'package:villas_qatar/modules/wishlist/service/wishlist_controller.dart';
 
 import '../../PlansandFeatures/model/myfeatured_property.dart';
@@ -19,7 +23,7 @@ import '../../PlansandFeatures/model/myfeatured_property.dart';
 /// Property card — "For Rent" / "For Sale" pill, wishlist heart, photo,
 /// title, location, beds/baths/area stats and price — built entirely from
 /// a [FeaturedListing], the same shape returned by the listings API.
-class PropertyCard extends StatelessWidget {
+class PropertyCard extends StatefulWidget {
   /// The listing this card renders. Replaces the old individual
   /// image/title/location/price/... parameters.
   final PropertyModel listing;
@@ -45,293 +49,503 @@ class PropertyCard extends StatelessWidget {
   });
 
   @override
+  State<PropertyCard> createState() => _PropertyCardState();
+}
+
+class _PropertyCardState extends State<PropertyCard> {
+  /// Time each photo stays on screen before the card slides to the next one.
+  static const Duration _slideInterval = Duration(seconds: 4);
+  static const Duration _slideDuration = Duration(milliseconds: 450);
+
+  final PageController _pageController = PageController();
+  Timer? _autoSlideTimer;
+
+  /// Raw page index of the endless carousel; use `% count` for the photo.
+  int _page = 0;
+
+  late List<String> _photoUrls;
+
+  PropertyModel get listing => widget.listing;
+  String get distance => widget.distance;
+  double? get width => widget.width;
+  EdgeInsetsGeometry? get margin => widget.margin;
+
+  @override
+  void initState() {
+    super.initState();
+    _photoUrls = _collectPhotoUrls();
+    _scheduleNextSlide();
+  }
+
+  @override
+  void didUpdateWidget(covariant PropertyCard oldWidget) {
+    super.didUpdateWidget(oldWidget);
+
+    final List<String> urls = _collectPhotoUrls();
+
+    if (!listEquals(urls, _photoUrls)) {
+      _photoUrls = urls;
+      _page = 0;
+
+      if (_pageController.hasClients) {
+        _pageController.jumpToPage(0);
+      }
+
+      _scheduleNextSlide();
+    }
+  }
+
+  @override
+  void dispose() {
+    _autoSlideTimer?.cancel();
+    _pageController.dispose();
+    super.dispose();
+  }
+
+  // =============================================================
+  // PHOTO CAROUSEL
+  // =============================================================
+
+  /// Photo URLs in the listing's own order, skipping empty entries.
+  List<String> _collectPhotoUrls() {
+    final List<PropertyPhoto> photos = [...?listing.photos]
+      ..sort((a, b) => (a.sortOrder ?? 0).compareTo(b.sortOrder ?? 0));
+
+    return photos
+        .map((photo) => photo.url?.trim() ?? '')
+        .where((url) => url.isNotEmpty)
+        .toList();
+  }
+
+  void _scheduleNextSlide() {
+    _autoSlideTimer?.cancel();
+
+    if (_photoUrls.length < 2) {
+      return;
+    }
+
+    // Small per-card offset so the cards in a rail don't all flip in step.
+    final int offsetMs = (listing.id?.hashCode ?? 0).abs() % 1200;
+
+    _autoSlideTimer = Timer(
+      _slideInterval + Duration(milliseconds: offsetMs),
+      _slideToNext,
+    );
+  }
+
+  void _slideToNext() {
+    if (!mounted) {
+      return;
+    }
+
+    // TickerMode is off while another route covers this one, so the card
+    // doesn't keep animating behind the property details screen.
+    if (TickerMode.valuesOf(context).enabled && _pageController.hasClients) {
+      // onPageChanged schedules the following slide.
+      _pageController.nextPage(
+        duration: _slideDuration,
+        curve: AppMotion.curve,
+      );
+    } else {
+      _scheduleNextSlide();
+    }
+  }
+
+  Widget _buildPhotoCarousel() {
+    final int count = _photoUrls.length;
+
+    if (count == 0) {
+      return _imagePlaceholder();
+    }
+
+    if (count == 1) {
+      return _buildImage(_photoUrls.first);
+    }
+
+    return SizedBox(
+      height: 120.h,
+      width: double.infinity,
+      child: Stack(
+        children: [
+          Positioned.fill(
+            child: PageView.builder(
+              controller: _pageController,
+              // Photos advance on their own, so the rail this card sits in
+              // keeps the horizontal drag.
+              physics: const NeverScrollableScrollPhysics(),
+              onPageChanged: (index) {
+                setState(() => _page = index);
+                _scheduleNextSlide();
+              },
+              itemBuilder: (context, index) =>
+                  _buildImage(_photoUrls[index % count]),
+            ),
+          ),
+
+          Positioned(
+            left: 0,
+            right: 0,
+            bottom: 6.h,
+            child: _buildPageIndicator(count),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildPageIndicator(int count) {
+    final int active = _page % count;
+
+    if (count > 5) {
+      return Center(
+        child: Container(
+          padding: EdgeInsets.symmetric(horizontal: 7.w, vertical: 2.h),
+          decoration: BoxDecoration(
+            color: Colors.black.withOpacity(.55),
+            borderRadius: BorderRadius.circular(10.r),
+          ),
+          child: Text(
+            '${active + 1}/$count',
+            style: TextStyle(
+              color: Colors.white,
+              fontSize: 9.sp,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+        ),
+      );
+    }
+
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: List.generate(count, (i) {
+        final bool isActive = i == active;
+
+        return AnimatedContainer(
+          duration: AppMotion.fast,
+          margin: EdgeInsets.symmetric(horizontal: 2.w),
+          width: isActive ? 14.w : 5.w,
+          height: 5.w,
+          decoration: BoxDecoration(
+            color: isActive ? Colors.white : Colors.white.withOpacity(.55),
+            borderRadius: BorderRadius.circular(3.r),
+          ),
+        );
+      }),
+    );
+  }
+
+  // =============================================================
+  // NAVIGATION
+  // =============================================================
+
+  void _openDetails() {
+    final String id = listing.id ?? '';
+
+    if (id.isEmpty) {
+      Fluttertoast.showToast(msg: "Property ID is not available".tr);
+      return;
+    }
+
+    Get.to(() => PropertyDetailsScreen(propertyId: id));
+  }
+
+  @override
   Widget build(BuildContext context) {
     final WishlistController wishlistController =
         Get.isRegistered<WishlistController>()
         ? Get.find<WishlistController>()
         : Get.put(WishlistController());
 
-    return Container(
-      width: width ?? 180.w,
-      height: 220.h,
-      margin: margin ?? EdgeInsets.only(right: 5.w),
-      decoration: BoxDecoration(
-        color: Colors.white,
-      
-        borderRadius: BorderRadius.circular(8.r),
-        border: Border.all(color: AppColors.goldBorder, width: 1),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(.05),
-            blurRadius: 18,
-            offset: const Offset(0, 6),
-          ),
-        ],
-      ),
-      clipBehavior: Clip.antiAlias,
+    return PressableScale(
+      child: Container(
+        width: width ?? 180.w,
+        height: 220.h,
+        margin: margin ?? EdgeInsets.only(right: 5.w),
+        decoration: BoxDecoration(
+          color: Colors.white,
 
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          /// ===================================================
-          /// IMAGE SECTION
-          /// ===================================================
-          Stack(
-            children: [
-              if (listing.photos != null)
-                Image.network(listing.photos!.first.url!),
+          borderRadius: BorderRadius.circular(8.r),
+          border: Border.all(color: AppColors.goldBorder, width: 1),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(.05),
+              blurRadius: 18,
+              offset: const Offset(0, 6),
+            ),
+          ],
+        ),
+        clipBehavior: Clip.antiAlias,
 
-              
-              if (_purposeLabel() != null)
-                Positioned(
-                  top: 8.h,
-                  left: 8.w,
-                  child: Container(
-                    padding: EdgeInsets.symmetric(
-                      horizontal: 8.w,
-                      vertical: 4.h,
-                    ),
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(6.r),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withOpacity(.08),
-                          blurRadius: 6,
-                          offset: const Offset(0, 2),
-                        ),
-                      ],
-                    ),
-                    child: Text(
-                      _purposeLabel()!,
-                      style: AppTextStyles.medium13.copyWith(
-                        color: AppColors.ink,
-                        fontSize: 9.sp,
-                        fontWeight: FontWeight.w700,
-                      ),
-                    ),
-                  ),
-                )
-              else if (listing.isFeatured ?? false)
-                Positioned(
-                  top: 8.h,
-                  left: 8.w,
-                  child: Container(
-                    padding: EdgeInsets.symmetric(
-                      horizontal: 6.w,
-                      vertical: 2.h,
-                    ),
-                    decoration: BoxDecoration(
-                      color: AppColors.primary,
-                      borderRadius: BorderRadius.circular(5.r),
-                    ),
-                    child: Text(
-                      "Featured".tr,
-                      style: AppTextStyles.medium13.copyWith(
-                        color: Colors.white,
-                        fontSize: 8.sp,
-                      ),
-                    ),
-                  ),
-                ),
+        child: Material(
+          type: MaterialType.transparency,
+          child: InkWell(
+            onTap: _openDetails,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                /// ===================================================
+                /// IMAGE SECTION
+                /// ===================================================
+                Stack(
+                  children: [
+                    _buildPhotoCarousel(),
 
-              /// =================================================
-              /// WISHLIST BUTTON
-              /// =================================================
-              Positioned(
-                top: 10.h,
-                right: 10.w,
-
-                /// GetBuilder rebuilds the heart whenever
-                /// WishlistController calls update().
-                child: GetBuilder<WishlistController>(
-                  init: wishlistController,
-                  builder: (controller) {
-                    final String id = listing.id ?? "";
-
-                    final bool wishlisted =
-                        id.isNotEmpty && controller.isWishlisted(id);
-
-                    final bool wishlistLoading =
-                        id.isNotEmpty && controller.isPropertyLoading(id);
-
-                    /// Material + InkWell gives this button
-                    /// its own tap target.
-                    ///
-                    /// Tapping here calls wishlist API.
-                    /// Tapping rest of card opens details.
-                    return PressableScale(
-                      child: Material(
-                        color: Colors.transparent,
-                        child: InkWell(
-                          customBorder: const CircleBorder(),
-
-                          onTap: wishlistLoading
-                              ? null
-                              : () async {
-                                  if (id.isEmpty) {
-                                    Fluttertoast.showToast(
-                                      msg: "Property ID is not available".tr,
-                                    );
-
-                                    return;
-                                  }
-
-                                  /// Calls:
-                                  /// WishlistController
-                                  ///     .toggleWishlist(id)
-                                  ///
-                                  /// which internally calls:
-                                  ///
-                                  /// POST wishlistByProperty(id)
-                                  await controller.toggleWishlist(id);
-                                },
-
-                          child: Container(
-                            width: 32.w,
-                            height: 32.w,
-                            alignment: Alignment.center,
-                            decoration: const BoxDecoration(
-                              color: Colors.white,
-                              shape: BoxShape.circle,
+                    if (_purposeLabel() != null)
+                      Positioned(
+                        top: 8.h,
+                        left: 8.w,
+                        child: Container(
+                          padding: EdgeInsets.symmetric(
+                            horizontal: 8.w,
+                            vertical: 4.h,
+                          ),
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(6.r),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black.withOpacity(.08),
+                                blurRadius: 6,
+                                offset: const Offset(0, 2),
+                              ),
+                            ],
+                          ),
+                          child: Text(
+                            _purposeLabel()!,
+                            style: AppTextStyles.medium13.copyWith(
+                              color: AppColors.ink,
+                              fontSize: 9.sp,
+                              fontWeight: FontWeight.w700,
                             ),
-
-                            /// Show loader only for the
-                            /// property currently being toggled.
-                            child: AnimatedSwitcher(
-                              duration: AppMotion.fast,
-                              switchInCurve: AppMotion.curve,
-                              switchOutCurve: AppMotion.curve,
-                              transitionBuilder: (child, animation) =>
-                                  ScaleTransition(
-                                    scale: animation,
-                                    child: FadeTransition(
-                                      opacity: animation,
-                                      child: child,
-                                    ),
-                                  ),
-                              child: wishlistLoading
-                                  ? SizedBox(
-                                      key: const ValueKey('loading'),
-                                      width: 15.w,
-                                      height: 15.w,
-                                      child: const CircularProgressIndicator(
-                                        strokeWidth: 2,
-                                        color: AppColors.primary,
-                                      ),
-                                    )
-                                  : Icon(
-                                      wishlisted
-                                          ? Icons.favorite
-                                          : Icons.favorite_border,
-                                      key: ValueKey(wishlisted),
-                                      size: 18.sp,
-                                      color: wishlisted
-                                          ? AppColors.primary
-                                          : Colors.black87,
-                                    ),
+                          ),
+                        ),
+                      )
+                    else if (listing.isFeatured ?? false)
+                      Positioned(
+                        top: 8.h,
+                        left: 8.w,
+                        child: Container(
+                          padding: EdgeInsets.symmetric(
+                            horizontal: 6.w,
+                            vertical: 2.h,
+                          ),
+                          decoration: BoxDecoration(
+                            color: AppColors.primary,
+                            borderRadius: BorderRadius.circular(5.r),
+                          ),
+                          child: Text(
+                            "Featured".tr,
+                            style: AppTextStyles.medium13.copyWith(
+                              color: Colors.white,
+                              fontSize: 8.sp,
                             ),
                           ),
                         ),
                       ),
-                    );
-                  },
-                ),
-              ),
-            ],
-          ),
 
-          /// ===================================================
-          /// PROPERTY INFORMATION
-          /// ===================================================
-          Padding(
-            padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 8.h),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                /// TITLE
-                Text(
-                  listing.propertyName ?? "No Name",
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
-                  style: AppTextStyles.title16.copyWith(
-                    fontSize: 12.5.sp,
-                    fontWeight: FontWeight.w700,
-                    color: AppColors.ink,
-                    height: 1.35,
-                  ),
-                ),
+                    /// =================================================
+                    /// WISHLIST BUTTON
+                    /// =================================================
+                    Positioned(
+                      top: 10.h,
+                      right: 10.w,
 
-                SizedBox(height: 6.h),
+                      /// GetBuilder rebuilds the heart whenever
+                      /// WishlistController calls update().
+                      child: GetBuilder<WishlistController>(
+                        init: wishlistController,
+                        builder: (controller) {
+                          final String id = listing.id ?? "";
 
-                /// LOCATION
-                Row(
-                  children: [
-                    Icon(
-                      Icons.location_on_outlined,
-                      size: 12.sp,
-                      color: AppColors.primary,
-                    ),
+                          final bool wishlisted =
+                              id.isNotEmpty && controller.isWishlisted(id);
 
-                    SizedBox(width: 4.w),
+                          final bool wishlistLoading =
+                              id.isNotEmpty && controller.isPropertyLoading(id);
 
-                    Expanded(
-                      child: Text(
-                        listing.addressLine1 ?? "",
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: AppTextStyles.body13.copyWith(
-                          fontSize: 9.5.sp,
-                          fontWeight: FontWeight.w500,
-                          color: AppColors.inkFaint,
-                        ),
+                          /// Material + InkWell gives this button
+                          /// its own tap target.
+                          ///
+                          /// Tapping here calls wishlist API.
+                          /// Tapping rest of card opens details.
+                          return PressableScale(
+                            child: Material(
+                              color: Colors.transparent,
+                              child: InkWell(
+                                customBorder: const CircleBorder(),
+
+                                onTap: wishlistLoading
+                                    ? null
+                                    : () async {
+                                        if (id.isEmpty) {
+                                          Fluttertoast.showToast(
+                                            msg: "Property ID is not available"
+                                                .tr,
+                                          );
+
+                                          return;
+                                        }
+
+                                        /// Calls:
+                                        /// WishlistController
+                                        ///     .toggleWishlist(id)
+                                        ///
+                                        /// which internally calls:
+                                        ///
+                                        /// POST wishlistByProperty(id)
+                                        await controller.toggleWishlist(id);
+                                      },
+
+                                child: Container(
+                                  width: 32.w,
+                                  height: 32.w,
+                                  alignment: Alignment.center,
+                                  decoration: const BoxDecoration(
+                                    color: Colors.white,
+                                    shape: BoxShape.circle,
+                                  ),
+
+                                  /// Show loader only for the
+                                  /// property currently being toggled.
+                                  child: AnimatedSwitcher(
+                                    duration: AppMotion.fast,
+                                    switchInCurve: AppMotion.curve,
+                                    switchOutCurve: AppMotion.curve,
+                                    transitionBuilder: (child, animation) =>
+                                        ScaleTransition(
+                                          scale: animation,
+                                          child: FadeTransition(
+                                            opacity: animation,
+                                            child: child,
+                                          ),
+                                        ),
+                                    child: wishlistLoading
+                                        ? SizedBox(
+                                            key: const ValueKey('loading'),
+                                            width: 15.w,
+                                            height: 15.w,
+                                            child:
+                                                const CircularProgressIndicator(
+                                                  strokeWidth: 2,
+                                                  color: AppColors.primary,
+                                                ),
+                                          )
+                                        : Icon(
+                                            wishlisted
+                                                ? Icons.favorite
+                                                : Icons.favorite_border,
+                                            key: ValueKey(wishlisted),
+                                            size: 18.sp,
+                                            color: wishlisted
+                                                ? AppColors.primary
+                                                : Colors.black87,
+                                          ),
+                                  ),
+                                ),
+                              ),
+                            ),
+                          );
+                        },
                       ),
                     ),
+                  ],
+                ),
 
-                    if (distance.isNotEmpty)
+                /// ===================================================
+                /// PROPERTY INFORMATION
+                /// ===================================================
+                Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 8.h),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      /// TITLE
                       Text(
-                        distance,
-                        style: AppTextStyles.medium13.copyWith(
-                          fontSize: 8.sp,
-                          color: AppColors.primary,
+                        listing.propertyName ?? "No Name",
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                        style: AppTextStyles.title16.copyWith(
+                          fontSize: 12.5.sp,
+                          fontWeight: FontWeight.w700,
+                          color: AppColors.ink,
+                          height: 1.35,
                         ),
                       ),
-                  ],
-                ),
 
-                SizedBox(height: 5.h),
+                      SizedBox(height: 6.h),
 
-                /// PRICE — bold maroon amount, lighter "/ month" suffix
-                /// for rentals, matching the site's listing badges.
-                _PriceLine(
-                  amountText: _formattedPrice(),
-                  suffix: _priceSuffix(),
-                ),
+                      /// LOCATION
+                      Row(
+                        children: [
+                          Icon(
+                            Icons.location_on_outlined,
+                            size: 12.sp,
+                            color: AppColors.primary,
+                          ),
 
-                SizedBox(height: 5.h),
+                          SizedBox(width: 4.w),
 
-                /// =================================================
-                /// BEDS / BATHS / AREA
-                /// =================================================
-                Row(
-                  children: [
-                    _statChip(
-                      Icons.bed_outlined,
-                      "${listing.bedrooms} Beds".tr,
-                    ),
-                    SizedBox(width: 8.w),
-                    _statChip(
-                      Icons.bathtub_outlined,
-                      "${listing.bathrooms} Baths".tr,
-                    ),
-                    SizedBox(width: 8.w),
-                    _statChip(Icons.square_foot_rounded, _areaText()),
-                  ],
+                          Expanded(
+                            child: Text(
+                              listing.addressLine1 ?? "",
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: AppTextStyles.body13.copyWith(
+                                fontSize: 9.5.sp,
+                                fontWeight: FontWeight.w500,
+                                color: AppColors.inkFaint,
+                              ),
+                            ),
+                          ),
+
+                          if (distance.isNotEmpty)
+                            Text(
+                              distance,
+                              style: AppTextStyles.medium13.copyWith(
+                                fontSize: 8.sp,
+                                color: AppColors.primary,
+                              ),
+                            ),
+                        ],
+                      ),
+
+                      SizedBox(height: 5.h),
+
+                      /// PRICE — bold maroon amount, lighter "/ month" suffix
+                      /// for rentals, matching the site's listing badges.
+                      _PriceLine(
+                        amountText: _formattedPrice(),
+                        suffix: _priceSuffix(),
+                      ),
+
+                      SizedBox(height: 5.h),
+
+                      /// =================================================
+                      /// BEDS / BATHS / AREA
+                      /// =================================================
+                      Row(
+                        children: [
+                          _statChip(
+                            Icons.bed_outlined,
+                            "${listing.bedrooms ?? 0} Beds".tr,
+                          ),
+                          SizedBox(width: 8.w),
+                          _statChip(
+                            Icons.bathtub_outlined,
+                            "${listing.bathrooms ?? 0} Baths".tr,
+                          ),
+                          SizedBox(width: 8.w),
+                          _statChip(Icons.square_foot_rounded, _areaText()),
+                        ],
+                      ),
+                    ],
+                  ),
                 ),
               ],
             ),
           ),
-        ],
+        ),
       ),
     );
   }
@@ -424,9 +638,7 @@ class PropertyCard extends StatelessWidget {
   // PROPERTY IMAGE
   // =============================================================
 
-  Widget _buildImage() {
-    final String cleanImage = listing.photos!.first.url!;
-
+  Widget _buildImage(String cleanImage) {
     final bool validNetworkImage =
         cleanImage.startsWith('https://') || cleanImage.startsWith('http://');
 

@@ -260,7 +260,6 @@ class _MakeOfferScreenState extends State<MakeOfferScreen> {
                               Get.to(
                                 () => ChatStartScreen(
                                   property: widget.property,
-                                  showPropertyCard: false,
                                 ),
                               );
                             },

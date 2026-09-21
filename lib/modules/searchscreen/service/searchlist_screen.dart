@@ -32,22 +32,29 @@ class PropertySearchController extends GetxController {
   // FETCH PROPERTIES
   // ============================================================
 
+  /// Incremented by every fresh (non load-more) fetch. A response only
+  /// applies if it still belongs to the latest fetch, so changing a filter
+  /// while a request is in flight shows the newest results instead of being
+  /// ignored or overwritten by a slower, older response.
+  int _requestId = 0;
+
   Future<void> fetchProperties({bool loadMore = false}) async {
     if (loadMore) {
-      if (isLoadingMore || !hasMore) {
+      if (isLoading || isLoadingMore || !hasMore) {
         return;
       }
       isLoadingMore = true;
     } else {
-      if (isLoading) {
-        return;
-      }
       isLoading = true;
+      isLoadingMore = false;
       page = 1;
       hasMore = true;
       error = '';
-      properties.clear();
+      properties = [];
+      _requestId++;
     }
+
+    final int requestId = _requestId;
 
     update();
 
@@ -92,18 +99,17 @@ class PropertySearchController extends GetxController {
         query['furnishingId'] = filter.furnishingId;
       }
 
-      // // Amenities
-      // if (selectedAmenities.isNotEmpty) {
-      //   query['amenityIds'] = selectedAmenities.join(',');
-      // }
+      // Amenities / nearby tags — the API takes comma-separated IDs.
+      if (filter.amenities.isNotEmpty) {
+        query['amenityId'] = filter.amenities.join(',');
+      }
 
-      // // Nearby Tags
-      // if (selectedNearbyTags.isNotEmpty) {
-      //   query['nearbyTagIds'] = selectedNearbyTags.join(',');
-      // }
-
-      if (filter.nearbyTagId.isNotEmpty) {
-        query['nearbyTagId'] = filter.nearbyTagId;
+      final Set<String> nearbyTagIds = {
+        ...filter.nearbyTags,
+        if (filter.nearbyTagId.isNotEmpty) filter.nearbyTagId,
+      };
+      if (nearbyTagIds.isNotEmpty) {
+        query['nearbyTagId'] = nearbyTagIds.join(',');
       }
       // Price
       if (filter.minPrice != null) {
@@ -143,6 +149,8 @@ class PropertySearchController extends GetxController {
 
       final MyPropertyModel model = MyPropertyModel.fromJson(response);
 
+      if (requestId != _requestId) return;
+
       if (loadMore) {
         properties.addAll(model.data);
       } else {
@@ -157,12 +165,21 @@ class PropertySearchController extends GetxController {
         page++;
       }
     } catch (e) {
-      error = e.toString().replaceFirst('Exception: ', '');
-      debugPrint('PROPERTY SEARCH ERROR: $error');
+      if (requestId != _requestId) return;
+
+      debugPrint('PROPERTY SEARCH ERROR: $e');
+
+      // A failed "load more" keeps the results already on screen — only a
+      // failed fresh search shows the error state.
+      if (!loadMore) {
+        error = e.toString().replaceFirst('Exception: ', '');
+      }
     } finally {
-      isLoading = false;
-      isLoadingMore = false;
-      update();
+      if (requestId == _requestId) {
+        isLoading = false;
+        isLoadingMore = false;
+        update();
+      }
     }
   }
   //======================================================
@@ -239,6 +256,10 @@ class PropertySearchController extends GetxController {
       filter.search = search.trim();
 
       _setSearchText(filter.search);
+
+      // Coordinates belong to the place picked for this search text.
+      filter.latitude = latitude;
+      filter.longitude = longitude;
     }
 
     if (type != null) {
@@ -252,9 +273,6 @@ class PropertySearchController extends GetxController {
     if (locationId != null) {
       filter.locationId = locationId;
     }
-
-    filter.latitude = latitude;
-    filter.longitude = longitude;
 
     if (furnishingId != null) {
       filter.furnishingId = furnishingId;
@@ -272,17 +290,50 @@ class PropertySearchController extends GetxController {
       filter.createdById = createdById;
     }
 
-    filter.minPrice = minPrice;
-    filter.maxPrice = maxPrice;
+    if (minPrice != null) filter.minPrice = minPrice;
+    if (maxPrice != null) filter.maxPrice = maxPrice;
 
-    filter.minBedrooms = minBedrooms;
-    filter.minBathrooms = minBathrooms;
+    if (minBedrooms != null) filter.minBedrooms = minBedrooms;
+    if (minBathrooms != null) filter.minBathrooms = minBathrooms;
 
-    filter.minArea = minArea;
-    filter.maxArea = maxArea;
+    if (minArea != null) filter.minArea = minArea;
+    if (maxArea != null) filter.maxArea = maxArea;
 
     page = 1;
     hasMore = true;
+
+    await fetchProperties();
+  }
+
+  //======================================================
+  // APPLY FILTER SHEET
+  //======================================================
+
+  /// Commits the advanced filters edited in the Filters sheet in one fetch.
+  /// Search text, buy/rent, property type and sorting are left untouched.
+  Future<void> applyDraft(PropertyFilter draft) async {
+    filter
+      ..locationId = draft.locationId
+      ..furnishingId = draft.furnishingId
+      ..amenities = List.from(draft.amenities)
+      ..nearbyTags = List.from(draft.nearbyTags)
+      ..minPrice = draft.minPrice
+      ..maxPrice = draft.maxPrice
+      ..minBedrooms = draft.minBedrooms
+      ..minBathrooms = draft.minBathrooms
+      ..minArea = draft.minArea
+      ..maxArea = draft.maxArea;
+
+    await fetchProperties();
+  }
+
+  //======================================================
+  // SORT
+  //======================================================
+
+  Future<void> setSort(String sortBy, String sortOrder) async {
+    filter.sortBy = sortBy;
+    filter.sortOrder = sortOrder;
 
     await fetchProperties();
   }
@@ -353,7 +404,6 @@ class PropertySearchController extends GetxController {
   }
 
   Future<void> fetchPropertyDetails(String propertyId) async {
-    print("fetchPropertyDetails called");
     if (propertyId.trim().isEmpty) return;
 
     if (isDetailsLoading) return;
@@ -372,12 +422,6 @@ class PropertySearchController extends GetxController {
       );
 
       selectedProperty = Property.fromJson(response);
-       print("Property.fromJson called");
-      print("==================================");
-print(selectedProperty!.latestReview?.message);
-print(selectedProperty!.rejectionReason);
-print(selectedProperty!.reviews.length);
-print("==================================");
     } catch (e) {
       detailsError = e.toString().replaceFirst('Exception: ', '');
 
@@ -392,6 +436,8 @@ print("==================================");
   // ============================================================
   Future<void> clearSearch() async {
     filter.search = '';
+    filter.latitude = null;
+    filter.longitude = null;
 
     searchTextController.clear();
 

@@ -1,203 +1,147 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
-import 'package:villas_qatar/Core/utils/app_location.dart';
-import 'package:villas_qatar/modules/home/service/loaction_controller.dart';
+import 'package:villas_qatar/Core/constants/app_colors.dart';
+import 'package:villas_qatar/Core/theme/app_textstyles.dart';
 import 'package:villas_qatar/modules/searchscreen/service/searchlist_screen.dart';
-import 'package:villas_qatar/modules/searchscreen/widgets/category_section.dart';
-
-import 'package:villas_qatar/modules/searchscreen/widgets/properties_section..dart';
-import 'package:villas_qatar/modules/searchscreen/widgets/featured_properties.dart';
+import 'package:villas_qatar/modules/searchscreen/widgets/properties_section.dart';
 import 'package:villas_qatar/modules/searchscreen/widgets/search_filtercard.dart';
-
-import '../../../core/constants/app_colors.dart';
-import '../../../core/theme/app_textstyles.dart';
 
 class SearchScreen extends StatelessWidget {
   SearchScreen({super.key});
 
-  final PropertySearchController controller = Get.isRegistered<PropertySearchController>()
+  final PropertySearchController controller =
+      Get.isRegistered<PropertySearchController>()
       ? Get.find<PropertySearchController>()
       : Get.put(PropertySearchController(), permanent: true);
+
+  /// Start fetching the next page once this close to the end of the list.
+  static const double _loadMoreThreshold = 300;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xffFCFCFC),
-      body: GetBuilder<PropertySearchController>(
-        builder: (controller) {
-          return SafeArea(
-            child: RefreshIndicator(
+      backgroundColor: Colors.white,
+      appBar: AppBar(
+        backgroundColor: Colors.white,
+        surfaceTintColor: Colors.white,
+        elevation: 0,
+        scrolledUnderElevation: 0,
+        centerTitle: false,
+        titleSpacing: 15.w,
+        title: Image.asset(
+          'assets/Logo/logo.png',
+          width: 140.w,
+          fit: BoxFit.contain,
+        ),
+        bottom: PreferredSize(
+          preferredSize: Size.fromHeight(1.h),
+          child: Container(height: 1.h, color: AppColors.warmBorder),
+        ),
+      ),
+      body: SafeArea(
+        child: GetBuilder<PropertySearchController>(
+          builder: (controller) {
+            return RefreshIndicator(
+              color: AppColors.primary,
               onRefresh: controller.refreshProperties,
-              child: SingleChildScrollView(
-                physics: const AlwaysScrollableScrollPhysics(),
-                child: Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 20.w),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      SizedBox(height: 12.h),
-                      Row(
-                        children: [
-                          Icon(
-                            Icons.location_on_outlined,
-                            color: AppColors.primary,
-                            size: 20.sp,
-                          ),
-                          SizedBox(width: 4.w),
-                          GetBuilder<LocationController>(
-                            builder: (_) {
-                              return Text(
-                                AppLocation.areaName.isNotEmpty
-                                    ? AppLocation.areaName
-                                    : "Doha, Qatar".tr,
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
-                                style: AppTextStyles.medium13.copyWith(
-                                  color: const Color(0xff3D3D3D),
-                                  fontWeight: FontWeight.w600,
-                                ),
-                              );
-                            },
-                          ),
-                          SizedBox(width: 2.w),
-                          Icon(
-                            Icons.keyboard_arrow_down,
-                            size: 18.sp,
-                            color: AppColors.primary,
-                          ),
+              child: NotificationListener<ScrollNotification>(
+                onNotification: (notification) {
+                  final bool isMainList =
+                      notification.depth == 0 &&
+                      notification.metrics.axis == Axis.vertical;
 
-                          const Spacer(),
+                  if (isMainList &&
+                      (notification is ScrollUpdateNotification ||
+                          notification is ScrollEndNotification) &&
+                      notification.metrics.extentAfter < _loadMoreThreshold) {
+                    controller.fetchProperties(loadMore: true);
+                  }
 
-                          // Stack(
-                          //   clipBehavior: Clip.none,
-                          //   children: [
-                          //     Container(
-                          //       width: 42.w,
-                          //       height: 42.w,
-                          //       decoration: const BoxDecoration(
-                          //         color: Colors.white,
-                          //         shape: BoxShape.circle,
-                          //       ),
-                          //       child: Icon(
-                          //         Icons.notifications_none_outlined,
-                          //         color: AppColors.primary,
-                          //         size: 23.sp,
-                          //       ),
-                          //     ),
-
-                          //     Positioned(
-                          //       right: 4,
-                          //       top: 5,
-                          //       child: Container(
-                          //         width: 16.w,
-                          //         height: 16.w,
-                          //         decoration: const BoxDecoration(
-                          //           color: Colors.red,
-                          //           shape: BoxShape.circle,
-                          //         ),
-                          //         alignment: Alignment.center,
-                          //         child: Text(
-                          //           "2",
-                          //           style: TextStyle(
-                          //             color: Colors.white,
-                          //             fontSize: 8.sp,
-                          //             fontWeight: FontWeight.w700,
-                          //           ),
-                          //         ),
-                          //       ),
-                          //     ),
-                          //   ],
-                          // ),
-                        ],
-                      ),
-
-                      /// HERO SECTION
-                      Padding(
-                        padding: EdgeInsets.symmetric(horizontal: 6.w),
-                        child: SizedBox(
-                          height: 180.h,
-                          width: double.infinity,
-                          child: Stack(
-                            alignment: Alignment.centerRight,
-                            children: [
-                              /// Background Image
-                              Positioned(
-                                right: 0,
-                                top: 0,
-                                bottom: 0,
-                                child: Image.asset(
-                                  "assets/build.png",
-                                  height: 150.h,
-                                  fit: BoxFit.contain,
-                                ),
-                              ),
-
-                              /// Text Content
-                              Positioned(
-                                left: 0,
-                                top: 15.h,
-                                child: SizedBox(
-                                  width: 180.w,
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Text(
-                                        "Find Your".tr,
-                                        style: AppTextStyles.title18.copyWith(
-                                          fontSize: 18.sp,
-                                          fontWeight: FontWeight.w500,
-                                          height: 1.15,
-                                        ),
-                                      ),
-
-                                      Text(
-                                        "Dream Property".tr,
-                                        style: AppTextStyles.title18.copyWith(
-                                          fontSize: 18.sp,
-                                          fontWeight: FontWeight.w500,
-                                          height: 1.15,
-                                        ),
-                                      ),
-
-                                      SizedBox(height: 12.h),
-
-                                      Text(
-                                        "Buy, rent and discover the best properties around you"
-                                            .tr,
-
-                                        style: AppTextStyles.body14.copyWith(
-                                          color: Colors.black87,
-                                          height: 1.5,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
+                  return false;
+                },
+                child: CustomScrollView(
+                  physics: const AlwaysScrollableScrollPhysics(),
+                  keyboardDismissBehavior:
+                      ScrollViewKeyboardDismissBehavior.onDrag,
+                  slivers: [
+                    SliverPadding(
+                      padding: EdgeInsets.fromLTRB(10.w, 12.h, 10.w, 0),
+                      sliver: SliverToBoxAdapter(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            // SizedBox(height: 16.h),
+                            // const _Hero(),
+                            SearchFilterCard(controller: controller),
+                            // SizedBox(height: 24.h),
+                            // ResultsHeader(controller: controller),
+                            SizedBox(height: 16.h),
+                          ],
                         ),
                       ),
-                      SizedBox(height: 12.h),
-                      SearchFilterCard(controller: controller),
-
-                      SizedBox(height: 24.h),
-                      PropertyCategorySection(controller: controller),
-                      SizedBox(height: 18.h),
-
-                     // FeaturedProperties(),
-                      SizedBox(height: 18.h),
-
-                      PropertiesSection(controller: controller),
-                    ],
-                  ),
+                    ),
+                    SliverPadding(
+                      padding: EdgeInsets.fromLTRB(10.w, 0, 10.w, 24.h),
+                      sliver: PropertyResultsSliver(controller: controller),
+                    ),
+                  ],
                 ),
               ),
+            );
+          },
+        ),
+      ),
+    );
+  }
+}
+
+/// Page title with the skyline sitting beside it (never behind the text).
+class _Hero extends StatelessWidget {
+  const _Hero();
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      height: 88.h,
+      child: Row(
+        children: [
+          Expanded(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  "Properties".tr,
+                  style: AppTextStyles.title14.copyWith(
+                    fontSize: 28.sp,
+                    fontWeight: FontWeight.w800,
+                    color: const Color(0xff1A1A1A),
+                  ),
+                ),
+                SizedBox(height: 4.h),
+                Text(
+                  "Find your perfect home in Qatar".tr,
+                  style: AppTextStyles.body14.copyWith(
+                    color: Colors.grey.shade600,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ],
             ),
-          );
-        },
+          ),
+          SizedBox(width: 8.w),
+          Opacity(
+            opacity: 0.6,
+            child: Image.asset(
+              "assets/build.png",
+              width: 110.w,
+              height: 88.h,
+              fit: BoxFit.contain,
+              alignment: AlignmentDirectional.centerEnd,
+            ),
+          ),
+        ],
       ),
     );
   }

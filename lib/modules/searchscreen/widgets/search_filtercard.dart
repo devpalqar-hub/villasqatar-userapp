@@ -2,20 +2,36 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:get/get_core/src/get_main.dart';
-import 'package:get/get_instance/src/extension_instance.dart';
-import 'package:get/get_state_manager/src/simple/get_state.dart';
-import 'package:get/get_utils/src/extensions/internacionalization.dart';
+import 'package:get/get.dart';
 import 'package:villas_qatar/Core/constants/app_colors.dart';
 import 'package:villas_qatar/Core/network/api_endpoints.dart';
 import 'package:villas_qatar/Core/network/api_handler.dart';
 import 'package:villas_qatar/Core/theme/app_textstyles.dart';
 import 'package:villas_qatar/Core/widgets/primary_button.dart';
+import 'package:villas_qatar/modules/home/model/ListingOptions.dart';
 import 'package:villas_qatar/modules/home/model/autocomplete_result.dart';
 import 'package:villas_qatar/modules/home/service/UtilsController.dart';
-import 'package:villas_qatar/modules/home/service/loaction_controller.dart';
-import 'package:villas_qatar/modules/propertylist/service/listproperty_controller.dart';
+import 'package:villas_qatar/modules/propertylist/model/property_filter.dart';
 import 'package:villas_qatar/modules/searchscreen/service/searchlist_screen.dart';
+
+/// A sort choice in the Sort dropdown, mapped to the API's
+/// `sortBy` / `sortOrder` query parameters.
+class _SortOption {
+  final String label;
+  final String sortBy;
+  final String sortOrder;
+
+  const _SortOption(this.label, this.sortBy, this.sortOrder);
+}
+
+const List<_SortOption> _sortOptions = [
+  _SortOption("Newest", "createdAt", "desc"),
+  _SortOption("Oldest", "createdAt", "asc"),
+  _SortOption("Price: Low to High", "price", "asc"),
+  _SortOption("Price: High to Low", "price", "desc"),
+  _SortOption("Area: Low to High", "area", "asc"),
+  _SortOption("Area: High to Low", "area", "desc"),
+];
 
 class SearchFilterCard extends StatefulWidget {
   final PropertySearchController controller;
@@ -27,8 +43,6 @@ class SearchFilterCard extends StatefulWidget {
 }
 
 class _SearchFilterCardState extends State<SearchFilterCard> {
-  final ListPropertyController controller = Get.put(ListPropertyController());
-
   final FocusNode _searchFocusNode = FocusNode();
   Timer? _autocompleteDebounce;
   bool _suggestionsLoading = false;
@@ -36,34 +50,7 @@ class _SearchFilterCardState extends State<SearchFilterCard> {
 
   final List<String> tabs = ["Buy".tr, "Rent".tr];
 
-  String selectedPropertyType = "Property Type".tr;
-  String selectedPrice = "Price Range".tr;
-
-  final List<String> propertyTypes = [
-    "Property Type".tr,
-    "VILLA".tr,
-    "APARTMENT".tr,
-    "TOWNHOUSE".tr,
-    "PENTHOUSE".tr,
-    "STUDIO".tr,
-    "COMMERCIAL".tr,
-    "LAND".tr,
-  ];
-
-  // Canonical (untranslated) keys — used for value/business-logic comparisons.
-  // Display text is derived via `.tr` at render time so it stays correct
-  // when the locale changes.
-  final List<String> sortOptions = [
-    "Sort".tr,
-    "Newest".tr,
-    "Oldest".tr,
-    "Price: Low to High".tr,
-    "Price: High to Low".tr,
-    "Area: Low to High".tr,
-    "Area: High to Low".tr,
-  ];
-
-  String selectedSort = "Sort".tr;
+  PropertyFilter get _filter => widget.controller.filter;
 
   @override
   void initState() {
@@ -117,9 +104,7 @@ class _SearchFilterCardState extends State<SearchFilterCard> {
 
       final List<AutocompleteResult> results = rawResults
           .whereType<Map>()
-          .map(
-            (e) => AutocompleteResult.fromJson(Map<String, dynamic>.from(e)),
-          )
+          .map((e) => AutocompleteResult.fromJson(Map<String, dynamic>.from(e)))
           .toList();
 
       if (!mounted) return;
@@ -144,30 +129,26 @@ class _SearchFilterCardState extends State<SearchFilterCard> {
 
     setState(() => _suggestions = const []);
 
-    widget.controller.searchTextController.value = TextEditingValue(
-      text: result.name,
-      selection: TextSelection.collapsed(offset: result.name.length),
-    );
-
-    setState(() {});
-
     await widget.controller.applyFilters(
       search: result.name,
-      type: widget.controller.filter.type,
-      purpose: widget.controller.filter.purpose,
       latitude: result.latitude,
       longitude: result.longitude,
-      furnishingId: widget.controller.filter.furnishingId,
-      nearbyTags: widget.controller.filter.nearbyTags,
-      minPrice: widget.controller.filter.minPrice,
-      maxPrice: widget.controller.filter.maxPrice,
-      minBedrooms: widget.controller.filter.minBedrooms,
-      minBathrooms: widget.controller.filter.minBathrooms,
-      minArea: widget.controller.filter.minArea,
-      maxArea: widget.controller.filter.maxArea,
     );
+  }
 
-    widget.controller.update();
+  /// Runs the search for whatever is typed in the field.
+  Future<void> _submitSearch() async {
+    FocusScope.of(context).unfocus();
+
+    _autocompleteDebounce?.cancel();
+    setState(() {
+      _suggestions = const [];
+      _suggestionsLoading = false;
+    });
+
+    await widget.controller.applyFilters(
+      search: widget.controller.searchTextController.text,
+    );
   }
 
   bool get _showSuggestions =>
@@ -176,69 +157,77 @@ class _SearchFilterCardState extends State<SearchFilterCard> {
 
   @override
   Widget build(BuildContext context) {
-    final int selectedTab = widget.controller.filter.purpose == "RENT" ? 1 : 0;
+    // No tab is highlighted until Buy or Rent is chosen — with neither set,
+    // the results include both.
+    final int selectedTab = switch (_filter.purpose) {
+      "SALE" => 0,
+      "RENT" => 1,
+      _ => -1,
+    };
+
+    int? selectedSort;
+    if (_filter.sortBy.isNotEmpty) {
+      final int index = _sortOptions.indexWhere(
+        (o) => o.sortBy == _filter.sortBy && o.sortOrder == _filter.sortOrder,
+      );
+      if (index >= 0) selectedSort = index;
+    }
+
     return Container(
       width: double.infinity,
-      padding: EdgeInsets.only(top: 5.h, left: 16.w, right: 16.w, bottom: 5.h),
+      padding: EdgeInsets.all(14.w),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(10.r),
+        borderRadius: BorderRadius.circular(16.r),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(.06),
+            color: Colors.black.withValues(alpha: .04),
             blurRadius: 20,
-            offset: const Offset(0, 10),
+            offset: const Offset(0, 8),
           ),
         ],
       ),
       child: Column(
         children: [
-          /// BUY RENT PG TABS
-          SizedBox(
-            height: 35.h,
+          /// BUY / RENT TOGGLE (tap the active tab again to clear it)
+          Container(
+            height: 42.h,
+            padding: EdgeInsets.all(4.w),
+            decoration: BoxDecoration(
+              color: const Color(0xffF5F5F5),
+              borderRadius: BorderRadius.circular(25.r),
+            ),
             child: Row(
               children: List.generate(tabs.length, (index) {
                 final selected = selectedTab == index;
                 return Expanded(
-                  child: InkWell(
-                    borderRadius: BorderRadius.circular(8.r),
+                  child: GestureDetector(
+                    behavior: HitTestBehavior.opaque,
                     onTap: () {
                       widget.controller.applyFilters(
-                        purpose: index == 0 ? "SALE" : "RENT",
-                        type: widget.controller.filter.type,
-                        search: widget.controller.filter.search,
+                        purpose: selected ? "" : (index == 0 ? "SALE" : "RENT"),
                       );
                     },
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Expanded(
-                          child: Center(
-                            child: Text(
-                              tabs[index],
-                              style: AppTextStyles.title16.copyWith(
-                                fontSize: 14.sp,
-                                fontWeight: selected
-                                    ? FontWeight.w700
-                                    : FontWeight.w600,
-                                color: selected
-                                    ? AppColors.primary
-                                    : const Color(0xff32354A),
-                              ),
-                            ),
-                          ),
+                    child: AnimatedContainer(
+                      duration: const Duration(milliseconds: 200),
+                      alignment: Alignment.center,
+                      decoration: BoxDecoration(
+                        color: selected
+                            ? AppColors.primary
+                            : Colors.transparent,
+                        borderRadius: BorderRadius.circular(20.r),
+                      ),
+                      child: Text(
+                        tabs[index],
+                        style: AppTextStyles.title14.copyWith(
+                          fontWeight: selected
+                              ? FontWeight.w700
+                              : FontWeight.w600,
+                          color: selected
+                              ? Colors.white
+                              : const Color(0xff32354A),
                         ),
-
-                        AnimatedContainer(
-                          duration: const Duration(milliseconds: 250),
-                          height: 1.5.h,
-                          width: selected ? 72.w : 0,
-                          decoration: BoxDecoration(
-                            color: AppColors.primary,
-                            borderRadius: BorderRadius.circular(50),
-                          ),
-                        ),
-                      ],
+                      ),
                     ),
                   ),
                 );
@@ -246,199 +235,66 @@ class _SearchFilterCardState extends State<SearchFilterCard> {
             ),
           ),
 
-          SizedBox(height: 2.h),
-
-          Divider(color: const Color(0xffECECEC), thickness: 1, height: 1),
-
           SizedBox(height: 12.h),
 
-          Row(
-            children: [
-              /// Search Field
-              Expanded(
-                child: Container(
-                  height: 45.h,
-                  padding: EdgeInsets.symmetric(horizontal: 16.w),
-                  decoration: BoxDecoration(
-                    color: const Color(0xffF8F9FB),
-                    borderRadius: BorderRadius.circular(5.r),
-                    border: Border.all(
-                      color: const Color(0xffE6E9EF),
-                      width: 1,
+          /// SEARCH FIELD
+          Container(
+            height: 48.h,
+            padding: EdgeInsets.symmetric(horizontal: 14.w),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(8.r),
+              border: Border.all(color: const Color(0xffE6E9EF), width: 1),
+            ),
+            child: Row(
+              children: [
+                Icon(Icons.search, size: 20.sp, color: Colors.grey.shade600),
+                SizedBox(width: 10.w),
+                Expanded(
+                  child: TextField(
+                    controller: widget.controller.searchTextController,
+                    focusNode: _searchFocusNode,
+                    textInputAction: TextInputAction.search,
+                    style: AppTextStyles.body14.copyWith(
+                      color: const Color(0xff32354A),
                     ),
-                  ),
-                  child: Row(
-                    children: [
-                      Icon(
-                        Icons.search,
-                        size: 18.sp,
-                        color: const Color(0xff8E95A4),
+                    decoration: InputDecoration(
+                      border: InputBorder.none,
+                      isDense: true,
+                      hintText: "Search by location, area or property".tr,
+                      hintStyle: AppTextStyles.body13.copyWith(
+                        color: const Color(0xffA5ADBA),
                       ),
-
-                      SizedBox(width: 12.w),
-                      Expanded(
-                        child: TextField(
-                          controller: widget.controller.searchTextController,
-                          focusNode: _searchFocusNode,
-
-                          textInputAction: TextInputAction.search,
-                          textAlignVertical: TextAlignVertical.center,
-                          style: AppTextStyles.body14.copyWith(
-                            color: const Color(0xff32354A),
-                            fontSize: 14.sp,
-                          ),
-                          onChanged: (value) {
-                            setState(() {});
-                            _onQueryChanged(value);
-                            if (value.trim().isEmpty &&
-                                widget.controller.filter.search.isNotEmpty) {
-                              widget.controller.clearSearch();
-                            }
-                          },
-
-                          onSubmitted: (value) async {
-                            final query = value.trim();
-
-                            if (query.isEmpty) {
-                              FocusScope.of(context).unfocus();
-                              return;
-                            }
-
-                            // Close keyboard first
-                            FocusScope.of(context).unfocus();
-
-                            // Search using entered text
-                            await widget.controller.applyFilters(
-                              search: query,
-                              type: widget.controller.filter.type,
-                              purpose: widget.controller.filter.purpose,
-                              furnishingId:
-                                  widget.controller.filter.furnishingId,
-                              nearbyTags: widget.controller.filter.nearbyTags,
-                              minPrice: widget.controller.filter.minPrice,
-                              maxPrice: widget.controller.filter.maxPrice,
-                              minBedrooms: widget.controller.filter.minBedrooms,
-                              minBathrooms:
-                                  widget.controller.filter.minBathrooms,
-                              minArea: widget.controller.filter.minArea,
-                              maxArea: widget.controller.filter.maxArea,
-                            );
-
-                            if (!mounted) return;
-
-                            FocusManager.instance.primaryFocus?.unfocus();
-
-                            setState(() {});
-
-                            widget.controller.update();
-                          },
-
-                          decoration: InputDecoration(
-                            border: InputBorder.none,
-                            enabledBorder: InputBorder.none,
-                            focusedBorder: InputBorder.none,
-
-                            // Remove isCollapsed
-                            isDense: true,
-
-                            // Give proper vertical padding
-                            contentPadding: EdgeInsets.symmetric(
-                              vertical: 12.h,
-                            ),
-
-                            hintText: "Search by location or property".tr,
-                            hintStyle: AppTextStyles.body13.copyWith(
-                              color: const Color(0xffA5ADBA),
-                            ),
-                            suffixIcon:
-                                widget
-                                    .controller
-                                    .searchTextController
-                                    .text
-                                    .isNotEmpty
-                                ? IconButton(
-                                    icon: const Icon(Icons.close, size: 18),
-                                    onPressed: () async {
-                                      FocusScope.of(context).unfocus();
-
-                                      setState(() => _suggestions = const []);
-                                      await widget.controller.clearSearch();
-
-                                      widget.controller.update();
-                                    },
-                                  )
-                                : null,
-                          ),
-                        ),
-                      ),
-                    ],
+                    ),
+                    onChanged: (value) {
+                      setState(() {});
+                      _onQueryChanged(value);
+                      if (value.trim().isEmpty && _filter.search.isNotEmpty) {
+                        widget.controller.clearSearch();
+                      }
+                    },
+                    onSubmitted: (_) => _submitSearch(),
                   ),
                 ),
-              ),
-
-              InkWell(
-                borderRadius: BorderRadius.circular(8.r),
-                onTap: () async {
-                  final locationController = Get.find<LocationController>();
-
-                  await locationController.detectCurrentLocation();
-
-                  if (locationController.location != null) {
-                    final locationName =
-                        locationController.location!.data.areaName.isNotEmpty
-                        ? locationController.location!.data.areaName
-                        : locationController.location!.data.formattedAddress;
-
-                    widget.controller.searchTextController.value =
-                        TextEditingValue(
-                          text: locationName,
-                          selection: TextSelection.collapsed(
-                            offset: locationName.length,
-                          ),
-                        );
-
-                    setState(() {});
-
-                    await widget.controller.applyFilters(
-                      search: locationName,
-                      type: widget.controller.filter.type,
-                      purpose: widget.controller.filter.purpose,
-                      furnishingId: widget.controller.filter.furnishingId,
-                      nearbyTags: widget.controller.filter.nearbyTags,
-                      minPrice: widget.controller.filter.minPrice,
-                      maxPrice: widget.controller.filter.maxPrice,
-                      minBedrooms: widget.controller.filter.minBedrooms,
-                      minBathrooms: widget.controller.filter.minBathrooms,
-                      minArea: widget.controller.filter.minArea,
-                      maxArea: widget.controller.filter.maxArea,
-                    );
-
-                    widget.controller.update();
-                  }
-                },
-                child: Container(
-                  width: 45.w,
-                  height: 45.h,
-                  decoration: BoxDecoration(
-                    color: const Color(0xffF8F9FB),
-                    borderRadius: BorderRadius.circular(5.r),
-                    border: Border.all(
-                      color: const Color(0xffE6E9EF),
-                      width: 1,
+                if (widget.controller.searchTextController.text.isNotEmpty)
+                  GestureDetector(
+                    behavior: HitTestBehavior.opaque,
+                    onTap: () async {
+                      FocusScope.of(context).unfocus();
+                      setState(() => _suggestions = const []);
+                      await widget.controller.clearSearch();
+                    },
+                    child: Padding(
+                      padding: EdgeInsets.only(left: 8.w),
+                      child: Icon(Icons.close, size: 18.sp, color: Colors.grey),
                     ),
                   ),
-                  child: Icon(
-                    Icons.my_location_rounded,
-                    color: Colors.black,
-                    size: 22.sp,
-                  ),
-                ),
-              ),
-            ],
+              ],
+            ),
           ),
 
           if (_showSuggestions) ...[
-            SizedBox(height: 8.h),
+            SizedBox(height: 4.h),
             _SuggestionsList(
               loading: _suggestionsLoading,
               suggestions: _suggestions,
@@ -448,253 +304,158 @@ class _SearchFilterCardState extends State<SearchFilterCard> {
 
           SizedBox(height: 12.h),
 
+          /// PROPERTY TYPE / SORT
           Row(
             children: [
-              /// Property Type
               Expanded(
-                child: Container(
-                  height: 42.h,
-                  padding: EdgeInsets.symmetric(horizontal: 10.w),
-                  decoration: BoxDecoration(
-                    color: const Color(0xffF8F9FB),
-                    borderRadius: BorderRadius.circular(5.r),
-                    border: Border.all(color: const Color(0xffE6E9EF)),
-                  ),
-                  child: DropdownButtonHideUnderline(
-                    child: DropdownButton<String>(
-                      value: selectedPropertyType,
-                      isExpanded: true,
-                      underline: const SizedBox(),
-                      items: propertyTypes
-                          .map(
-                            (e) => DropdownMenuItem(
-                              value: e,
-                              child: Text(
-                                e == "Property Type".tr
-                                    ? "Property Type".tr
-                                    : e,
-                                style: TextStyle(fontSize: 10.sp),
-                              ),
-                            ),
-                          )
-                          .toList(),
-                      onChanged: (value) {
-                        if (value == null) return;
+                child: GetBuilder<Utilscontroller>(
+                  builder: (utils) {
+                    final bool known = utils.listingTypes.any(
+                      (t) => t.id == _filter.type,
+                    );
 
-                        setState(() {
-                          selectedPropertyType = value;
-                        });
-
-                        widget.controller.filter.type =
-                            value == "Property Type".tr ? "" : value;
-
-                        widget.controller.fetchProperties();
-                      },
-                    ),
-                  ),
-                ),
-              ),
-
-              SizedBox(width: 10.w),
-
-              /// Sort
-              Expanded(
-                child: Container(
-                  height: 42.h,
-                  padding: EdgeInsets.symmetric(horizontal: 10.w),
-                  decoration: BoxDecoration(
-                    color: const Color(0xffF8F9FB),
-                    borderRadius: BorderRadius.circular(5.r),
-                    border: Border.all(color: const Color(0xffE6E9EF)),
-                  ),
-                  child: DropdownButtonHideUnderline(
-                    child: DropdownButton<String>(
-                      value: selectedSort,
-                      isExpanded: true,
-                      underline: const SizedBox(),
-                      items: sortOptions.map((e) {
-                        return DropdownMenuItem(
-                          value: e,
-                          child: Text(e.tr, style: TextStyle(fontSize: 10.sp)),
-                        );
-                      }).toList(),
-                      onChanged: (value) {
-                        if (value == null) return;
-
-                        setState(() {
-                          selectedSort = value;
-                        });
-
-                        switch (value) {
-                          case "Newest":
-                            widget.controller.filter.sortBy = "createdAt".tr;
-                            widget.controller.filter.sortOrder = "desc".tr;
-                            break;
-
-                          case "Oldest":
-                            widget.controller.filter.sortBy = "createdAt".tr;
-                            widget.controller.filter.sortOrder = "asc".tr;
-                            break;
-
-                          case "Price: Low to High":
-                            widget.controller.filter.sortBy = "price".tr;
-                            widget.controller.filter.sortOrder = "asc".tr;
-                            break;
-
-                          case "Price: High to Low":
-                            widget.controller.filter.sortBy = "price".tr;
-                            widget.controller.filter.sortOrder = "desc".tr;
-                            break;
-
-                          case "Area: Low to High":
-                            widget.controller.filter.sortBy = "area".tr;
-                            widget.controller.filter.sortOrder = "asc".tr;
-                            break;
-
-                          case "Area: High to Low":
-                            widget.controller.filter.sortBy = "area".tr;
-                            widget.controller.filter.sortOrder = "desc".tr;
-                            break;
-
-                          default:
-                            widget.controller.filter.sortBy = "";
-                            widget.controller.filter.sortOrder = "";
-                        }
-
-                        widget.controller.fetchProperties();
-                      },
-                    ),
-                  ),
-                ),
-              ),
-
-              SizedBox(width: 10.w),
-
-              /// Filters
-              Builder(
-                builder: (context) {
-                  final activeCount =
-                      widget.controller.filter.activeFilterCount;
-
-                  return InkWell(
-                    onTap: _showFilterBottomSheet,
-                    borderRadius: BorderRadius.circular(8.r),
-                    child: Container(
-                      height: 42.h,
-                      padding: EdgeInsets.symmetric(horizontal: 12.w),
-                      decoration: BoxDecoration(
-                        color: const Color(0xffF8F9FB),
-                        borderRadius: BorderRadius.circular(5.r),
-                        border: Border.all(
-                          color: activeCount > 0
-                              ? AppColors.primary
-                              : const Color(0xffE6E9EF),
+                    return _FilterDropdown<String>(
+                      icon: Icons.home_outlined,
+                      hint: "Property Type".tr,
+                      value: known ? _filter.type : null,
+                      items: [
+                        _dropdownItem("", "All Types".tr),
+                        ...utils.listingTypes.map(
+                          (t) => _dropdownItem(t.id, t.title.tr),
                         ),
-                      ),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Icon(
-                            Icons.tune_rounded,
-                            color: AppColors.primary,
-                            size: 20.sp,
-                          ),
-                          SizedBox(width: 6.w),
-                          Text(
-                            "Filters".tr,
-                            style: AppTextStyles.body13.copyWith(
-                              fontSize: 11.sp,
-                              fontWeight: FontWeight.w600,
-                              color: const Color(0xff32354A),
-                            ),
-                          ),
-                          if (activeCount > 0) ...[
-                            SizedBox(width: 6.w),
-                            Container(
-                              padding: EdgeInsets.symmetric(
-                                horizontal: 6.w,
-                                vertical: 1.h,
-                              ),
-                              constraints: BoxConstraints(minWidth: 18.w),
-                              decoration: BoxDecoration(
-                                color: AppColors.primary,
-                                borderRadius: BorderRadius.circular(20.r),
-                              ),
-                              child: Text(
-                                "$activeCount",
-                                textAlign: TextAlign.center,
-                                style: AppTextStyles.body13.copyWith(
-                                  fontSize: 10.sp,
-                                  fontWeight: FontWeight.w700,
-                                  color: Colors.white,
-                                ),
-                              ),
-                            ),
-                          ],
-                        ],
-                      ),
-                    ),
-                  );
-                },
+                      ],
+                      onChanged: (value) =>
+                          widget.controller.applyFilters(type: value ?? ""),
+                    );
+                  },
+                ),
+              ),
+              SizedBox(width: 8.w),
+              Expanded(
+                child: _FilterDropdown<int>(
+                  icon: Icons.swap_vert,
+                  hint: "Sort".tr,
+                  value: selectedSort,
+                  items: [
+                    for (int i = 0; i < _sortOptions.length; i++)
+                      _dropdownItem(i, _sortOptions[i].label.tr),
+                  ],
+                  onChanged: (index) {
+                    if (index == null) return;
+                    widget.controller.setSort(
+                      _sortOptions[index].sortBy,
+                      _sortOptions[index].sortOrder,
+                    );
+                  },
+                ),
               ),
             ],
           ),
 
-          SizedBox(height: 15.h),
+          SizedBox(height: 12.h),
 
-          SizedBox(
-            width: double.infinity,
-            height: 50.h,
-            child: ElevatedButton(
-              onPressed: () async {
-                widget.controller.applyFilters(
-                  search: widget.controller.searchTextController.text.trim(),
-                  type: widget.controller.filter.type,
-                  purpose: widget.controller.filter.purpose,
-                  furnishingId: widget.controller.filter.furnishingId,
-                  nearbyTags: widget.controller.filter.nearbyTags,
-                  minPrice: widget.controller.filter.minPrice,
-                  maxPrice: widget.controller.filter.maxPrice,
-                  minBedrooms: widget.controller.filter.minBedrooms,
-                  minBathrooms: widget.controller.filter.minBathrooms,
-                  minArea: widget.controller.filter.minArea,
-                  maxArea: widget.controller.filter.maxArea,
-                );
-
-                setState(() {
-                  selectedPropertyType = "Property Type".tr;
-                  selectedPrice = "Price Range".tr;
-                });
-              },
-              style: ElevatedButton.styleFrom(
-                elevation: 0,
-                backgroundColor: AppColors.primary,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(6.r),
-                ),
-              ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(Icons.search_rounded, color: Colors.white, size: 20.sp),
-
-                  SizedBox(width: 10.w),
-
-                  Text(
-                    "Search Properties".tr,
-                    style: AppTextStyles.title16.copyWith(
-                      color: Colors.white,
-                      fontWeight: FontWeight.w700,
-                      fontSize: 15.sp,
+          /// FILTERS + SEARCH
+          Row(
+            children: [
+              GestureDetector(
+                onTap: _showFilterBottomSheet,
+                child: Container(
+                  height: 45.h,
+                  padding: EdgeInsets.symmetric(horizontal: 14.w),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(8.r),
+                    border: Border.all(
+                      color: _filter.activeFilterCount > 0
+                          ? AppColors.primary
+                          : const Color(0xffE6E9EF),
                     ),
                   ),
-                ],
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(Icons.tune, color: AppColors.primary, size: 18.sp),
+                      SizedBox(width: 6.w),
+                      Text(
+                        "Filters".tr,
+                        maxLines: 1,
+                        style: TextStyle(
+                          fontSize: 12.sp,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                      if (_filter.activeFilterCount > 0) ...[
+                        SizedBox(width: 6.w),
+                        Container(
+                          padding: EdgeInsets.all(5.w),
+                          decoration: const BoxDecoration(
+                            color: AppColors.primary,
+                            shape: BoxShape.circle,
+                          ),
+                          child: Text(
+                            "${_filter.activeFilterCount}",
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 9.sp,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ],
+                  ),
+                ),
               ),
-            ),
+              SizedBox(width: 10.w),
+              Expanded(
+                child: SizedBox(
+                  height: 45.h,
+                  child: ElevatedButton(
+                    onPressed: _submitSearch,
+                    style: ElevatedButton.styleFrom(
+                      elevation: 0,
+                      backgroundColor: AppColors.primary,
+                      padding: EdgeInsets.symmetric(horizontal: 8.w),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8.r),
+                      ),
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(Icons.search, color: Colors.white, size: 20.sp),
+                        SizedBox(width: 8.w),
+                        Flexible(
+                          child: Text(
+                            "Search Properties".tr,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: AppTextStyles.title16.copyWith(
+                              color: Colors.white,
+                              fontWeight: FontWeight.w600,
+                              fontSize: 14.sp,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ],
           ),
-
-          SizedBox(height: 10.h),
         ],
+      ),
+    );
+  }
+
+  DropdownMenuItem<T> _dropdownItem<T>(T value, String label) {
+    return DropdownMenuItem<T>(
+      value: value,
+      child: Text(
+        label,
+        maxLines: 1,
+        overflow: TextOverflow.ellipsis,
+        style: TextStyle(fontSize: 11.sp, fontWeight: FontWeight.w500),
       ),
     );
   }
@@ -712,12 +473,73 @@ class _SearchFilterCardState extends State<SearchFilterCard> {
       },
     );
 
-    // Refresh so the Filters button count badge reflects any changes made
-    // inside the bottom sheet (Apply, Reset, or swipe-to-dismiss).
     if (mounted) setState(() {});
   }
 }
 
+/// Compact bordered dropdown used for Property Type and Sort.
+class _FilterDropdown<T> extends StatelessWidget {
+  final IconData icon;
+  final String hint;
+  final T? value;
+  final List<DropdownMenuItem<T>> items;
+  final ValueChanged<T?> onChanged;
+
+  const _FilterDropdown({
+    required this.icon,
+    required this.hint,
+    required this.value,
+    required this.items,
+    required this.onChanged,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: 40.h,
+      padding: EdgeInsets.symmetric(horizontal: 8.w),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(8.r),
+        border: Border.all(color: const Color(0xffE6E9EF)),
+      ),
+      child: Row(
+        children: [
+          Icon(icon, color: AppColors.primary, size: 16.sp),
+          SizedBox(width: 4.w),
+          Expanded(
+            child: DropdownButtonHideUnderline(
+              child: DropdownButton<T>(
+                value: value,
+                isExpanded: true,
+                hint: Text(
+                  hint,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
+                    fontSize: 11.sp,
+                    fontWeight: FontWeight.w500,
+                    color: Colors.black87,
+                  ),
+                ),
+                icon: Icon(
+                  Icons.keyboard_arrow_down,
+                  size: 16.sp,
+                  color: Colors.grey,
+                ),
+                items: items,
+                onChanged: onChanged,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// Advanced filters. Edits go to a draft copy and only reach the search when
+/// "Apply Filters" is tapped, so closing the sheet never leaves the badge and
+/// the results out of step.
 class FilterBottomSheet extends StatefulWidget {
   final PropertySearchController controller;
 
@@ -728,617 +550,434 @@ class FilterBottomSheet extends StatefulWidget {
 }
 
 class _FilterBottomSheetState extends State<FilterBottomSheet> {
-  late final ListPropertyController listingController;
+  late final PropertyFilter draft = widget.controller.filter.copy();
 
-  late final TextEditingController minPriceCtrl;
-  late final TextEditingController maxPriceCtrl;
-  late final TextEditingController bedCtrl;
-  late final TextEditingController bathCtrl;
-  late final TextEditingController areaCtrl;
-  late final TextEditingController minAreaCtrl;
-  late final TextEditingController maxAreaCtrl;
+  /// Spinner fields report 0 for "empty" — the API rejects 0 as a min/max.
+  double? _amount(int value) => value > 0 ? value.toDouble() : null;
 
-  @override
-  void initState() {
-    super.initState();
-
-    listingController = Get.find<ListPropertyController>();
-    if (listingController.nearbyTags.isEmpty) {
-      listingController.fetchListingOptions();
+  void _apply() {
+    // Keep min <= max if they were entered the wrong way round.
+    final double? minPrice = draft.minPrice;
+    final double? maxPrice = draft.maxPrice;
+    if (minPrice != null && maxPrice != null && minPrice > maxPrice) {
+      draft.minPrice = maxPrice;
+      draft.maxPrice = minPrice;
     }
-    minPriceCtrl = TextEditingController(
-      text: widget.controller.filter.minPrice?.toString() ?? "",
-    );
-    maxPriceCtrl = TextEditingController(
-      text: widget.controller.filter.maxPrice?.toString() ?? "",
-    );
-    bedCtrl = TextEditingController(
-      text: widget.controller.filter.minBedrooms?.toString() ?? "",
-    );
-    bathCtrl = TextEditingController(
-      text: widget.controller.filter.minBathrooms?.toString() ?? "",
-    );
-    areaCtrl = TextEditingController(
-      text: widget.controller.filter.minArea?.toString() ?? "",
-    );
-    minAreaCtrl = TextEditingController(
-      text: widget.controller.filter.minArea?.toString() ?? "",
-    );
-    maxAreaCtrl = TextEditingController(
-      text: widget.controller.filter.maxArea?.toString() ?? "",
-    );
-  }
 
-  @override
-  void dispose() {
-    minPriceCtrl.dispose();
-    maxPriceCtrl.dispose();
-    bedCtrl.dispose();
-    bathCtrl.dispose();
-    areaCtrl.dispose();
-    minAreaCtrl.dispose();
-    maxAreaCtrl.dispose();
-    super.dispose();
+    final double? minArea = draft.minArea;
+    final double? maxArea = draft.maxArea;
+    if (minArea != null && maxArea != null && minArea > maxArea) {
+      draft.minArea = maxArea;
+      draft.maxArea = minArea;
+    }
+
+    widget.controller.applyDraft(draft);
+
+    Navigator.pop(context);
   }
 
   @override
   Widget build(BuildContext context) {
-    return StatefulBuilder(
-      builder: (context, setState) {
-        // Push the sheet up above the keyboard instead of letting it stay
-        // pinned to the bottom of the screen — otherwise the fixed-height
-        // sheet (and the Apply/Reset row at its bottom) ends up hidden
-        // behind the keyboard whenever a price/bed/bath field is focused.
-        final keyboardInset = MediaQuery.of(context).viewInsets.bottom;
+    // Lift the sheet above the keyboard so the Apply / Reset row stays
+    // reachable while a price or area field is focused.
+    final keyboardInset = MediaQuery.of(context).viewInsets.bottom;
 
-        return Padding(
-          padding: EdgeInsets.only(bottom: keyboardInset),
-          child: SafeArea(
-            child: Container(
-              constraints: BoxConstraints(
-                maxHeight: MediaQuery.of(context).size.height * .78,
-              ),
-              decoration: BoxDecoration(
-                color: const Color(0xffF8F9FB),
-                borderRadius: BorderRadius.vertical(top: Radius.circular(24.r)),
-              ),
-              child: Column(
-                children: [
-                  Padding(
-                    padding: EdgeInsets.fromLTRB(20.w, 16.h, 20.w, 12.h),
-                    child: Column(
-                      children: [
-                        Center(
-                          child: Container(
-                            width: 44.w,
-                            height: 5.h,
-                            decoration: BoxDecoration(
-                              color: Colors.grey.shade300,
-                              borderRadius: BorderRadius.circular(20),
+    return Padding(
+      padding: EdgeInsets.only(bottom: keyboardInset),
+      child: SafeArea(
+        child: Container(
+          constraints: BoxConstraints(
+            maxHeight: MediaQuery.of(context).size.height * .78,
+          ),
+          decoration: BoxDecoration(
+            color: const Color(0xffF8F9FB),
+            borderRadius: BorderRadius.vertical(top: Radius.circular(24.r)),
+          ),
+          child: Column(
+            children: [
+              _buildHeader(),
+              Divider(height: 1, color: Colors.grey.shade200),
+              Flexible(
+                child: SingleChildScrollView(
+                  padding: EdgeInsets.symmetric(
+                    horizontal: 16.w,
+                    vertical: 10.h,
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      _sectionTitle("Location".tr),
+                      GetBuilder<Utilscontroller>(
+                        builder: (utils) => _SheetDropdown<String>(
+                          hint: "All Locations".tr,
+                          value: draft.locationId,
+                          items: [
+                            _sheetItem<String>(null, "All Locations".tr),
+                            ...utils.municipalities.map(
+                              (m) => _sheetItem<String>(m.id, m.name.tr),
                             ),
-                          ),
+                          ],
+                          onChanged: (v) =>
+                              setState(() => draft.locationId = v),
                         ),
-                        SizedBox(height: 18.h),
-                        Row(
-                          children: [
-                            Container(
-                              width: 46.w,
-                              height: 46.w,
-                              decoration: BoxDecoration(
-                                color: AppColors.primary.withOpacity(.08),
-                                shape: BoxShape.circle,
-                              ),
-                              child: Icon(
-                                Icons.tune_rounded,
-                                color: AppColors.primary,
-                                size: 22.sp,
-                              ),
-                            ),
-                            SizedBox(width: 14.w),
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    "Filter Properties".tr,
-                                    style: AppTextStyles.title16.copyWith(
-                                      fontWeight: FontWeight.w500,
-                                    ),
-                                  ),
+                      ),
 
-                                  SizedBox(height: 2.h),
-                                  Text(
-                                    "Refine your search results".tr,
-                                    style: AppTextStyles.body13.copyWith(
-                                      color: AppColors.hintGrey,
-                                    ),
-                                  ),
-                                ],
-                              ),
+                      SizedBox(height: 20.h),
+                      _sectionTitle("Price Range".tr),
+                      _rangeRow(
+                        minHint: "Min Price".tr,
+                        maxHint: "Max Price".tr,
+                        min: draft.minPrice,
+                        max: draft.maxPrice,
+                        onMin: (v) =>
+                            setState(() => draft.minPrice = _amount(v)),
+                        onMax: (v) =>
+                            setState(() => draft.maxPrice = _amount(v)),
+                      ),
+
+                      SizedBox(height: 16.h),
+                      _sectionTitle("Bedrooms".tr),
+                      SizedBox(height: 5.h),
+                      _roomChips(
+                        selected: draft.minBedrooms,
+                        onSelected: (v) =>
+                            setState(() => draft.minBedrooms = v),
+                      ),
+
+                      SizedBox(height: 16.h),
+                      _sectionTitle("Bathrooms".tr),
+                      SizedBox(height: 5.h),
+                      _roomChips(
+                        selected: draft.minBathrooms,
+                        onSelected: (v) =>
+                            setState(() => draft.minBathrooms = v),
+                      ),
+
+                      SizedBox(height: 16.h),
+                      _sectionTitle("Furnishing".tr),
+                      GetBuilder<Utilscontroller>(
+                        builder: (utils) => _SheetDropdown<String>(
+                          hint: "Any".tr,
+                          value: draft.furnishingId.isEmpty
+                              ? null
+                              : draft.furnishingId,
+                          items: [
+                            _sheetItem<String>(null, "Any".tr),
+                            ...utils.furnishingOptions.map(
+                              (item) =>
+                                  _sheetItem<String>(item.id, item.title.tr),
                             ),
-                            InkWell(
-                              borderRadius: BorderRadius.circular(30),
-                              onTap: () => Navigator.pop(context),
-                              child: Container(
-                                width: 38.w,
-                                height: 38.w,
-                                decoration: BoxDecoration(
-                                  color: Colors.white,
-                                  shape: BoxShape.circle,
-                                  border: Border.all(
-                                    color: Colors.grey.shade300,
-                                  ),
-                                ),
-                                child: Icon(Icons.close_rounded, size: 20.sp),
-                              ),
+                          ],
+                          onChanged: (v) =>
+                              setState(() => draft.furnishingId = v ?? ""),
+                        ),
+                      ),
+
+                      GetBuilder<Utilscontroller>(
+                        builder: (utils) => Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            _multiSelect(
+                              "Nearby".tr,
+                              utils.nearbyTags,
+                              draft.nearbyTags,
+                            ),
+                            _multiSelect(
+                              "Amenities".tr,
+                              utils.amenities,
+                              draft.amenities,
                             ),
                           ],
                         ),
-                      ],
-                    ),
-                  ),
-                  Divider(height: 1, color: Colors.grey.shade200),
-                  Flexible(
-                    child: SingleChildScrollView(
-                      padding: EdgeInsets.symmetric(
-                        horizontal: 16.w,
-                        vertical: 10.h,
                       ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          _sectionTitle("Location".tr),
 
-                          SizedBox(height: 8),
-
-                          GetBuilder<Utilscontroller>(
-                            builder: (utils) {
-                              return SizedBox(
-                                height: 42.h,
-                                child: DropdownButtonFormField<String>(
-                                  isDense: true,
-                                  isExpanded: true,
-                                  value: widget.controller.filter.locationId,
-                                  decoration: InputDecoration(
-                                    hintText: "All Locations".tr,
-                                    filled: true,
-                                    fillColor: Colors.white,
-                                    contentPadding: EdgeInsets.symmetric(
-                                      horizontal: 14.w,
-                                      vertical: 10.h,
-                                    ),
-                                    border: OutlineInputBorder(
-                                      borderRadius: BorderRadius.circular(10.r),
-                                    ),
-                                    enabledBorder: OutlineInputBorder(
-                                      borderRadius: BorderRadius.circular(10.r),
-                                      borderSide: BorderSide(
-                                        color: Colors.grey.shade300,
-                                      ),
-                                    ),
-                                    focusedBorder: OutlineInputBorder(
-                                      borderRadius: BorderRadius.circular(10.r),
-                                      borderSide: const BorderSide(
-                                        color: AppColors.primary,
-                                      ),
-                                    ),
-                                  ),
-                                  items: [
-                                    DropdownMenuItem<String>(
-                                      value: null,
-                                      child: Text(
-                                        "All Locations".tr,
-                                        style: TextStyle(fontSize: 13.sp),
-                                      ),
-                                    ),
-                                    ...utils.municipalities.map(
-                                      (m) => DropdownMenuItem<String>(
-                                        value: m.id,
-                                        child: Text(
-                                          m.name.tr,
-                                          style: TextStyle(fontSize: 13.sp),
-                                        ),
-                                      ),
-                                    ),
-                                  ],
-                                  onChanged: (v) {
-                                    setState(() {
-                                      widget.controller.filter.locationId = v;
-                                    });
-                                  },
-                                ),
-                              );
-                            },
-                          ),
-                          SizedBox(height: 20),
-                          _sectionTitle("Price Range".tr),
-                          _FilterCard(
-                            child: Row(
-                              children: [
-                                Expanded(
-                                  child: NumberSpinnerField(
-                                    hint: "Min Price".tr,
-                                    value:
-                                        widget.controller.filter.minPrice
-                                            ?.toInt() ??
-                                        0,
-                                    onChanged: (v) {
-                                      setState(() {
-                                        widget.controller.filter.minPrice = v
-                                            .toDouble();
-                                      });
-                                    },
-                                  ),
-                                ),
-                                SizedBox(width: 12),
-                                const Text("-", style: TextStyle(fontSize: 22)),
-                                SizedBox(width: 12),
-                                Expanded(
-                                  child: NumberSpinnerField(
-                                    hint: "Max Price".tr,
-                                    value:
-                                        widget.controller.filter.maxPrice
-                                            ?.toInt() ??
-                                        0,
-                                    onChanged: (v) {
-                                      setState(() {
-                                        widget.controller.filter.maxPrice = v
-                                            .toDouble();
-                                      });
-                                    },
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                          SizedBox(height: 12.h),
-                          _sectionTitle("Bedrooms".tr),
-                          SizedBox(height: 5.h),
-                          Wrap(
-                            spacing: 7.w,
-                            runSpacing: 12.h,
-                            children: [
-                              _NumberChip(
-                                title: "All".tr,
-                                selected:
-                                    widget.controller.filter.minBedrooms ==
-                                    null,
-                                onTap: () => setState(() {
-                                  widget.controller.filter.minBedrooms = null;
-                                }),
-                              ),
-
-                              ...List.generate(5, (i) {
-                                final value = i + 1;
-
-                                return _NumberChip(
-                                  title: "$value",
-                                  selected:
-                                      widget.controller.filter.minBedrooms ==
-                                      value,
-                                  onTap: () => setState(() {
-                                    widget.controller.filter.minBedrooms =
-                                        value;
-                                  }),
-                                );
-                              }),
-                              _NumberChip(
-                                title: "6+",
-                                selected:
-                                    widget.controller.filter.minBedrooms == 6,
-                                onTap: () => setState(() {
-                                  widget.controller.filter.minBedrooms = 6;
-                                }),
-                              ),
-                            ],
-                          ),
-                          SizedBox(height: 12.h),
-                          _sectionTitle("Bathrooms".tr),
-                          SizedBox(height: 5.h),
-                          Wrap(
-                            spacing: 6.w,
-                            runSpacing: 12.h,
-                            children: [
-                              _NumberChip(
-                                title: "All".tr,
-                                selected:
-                                    widget.controller.filter.minBathrooms ==
-                                    null,
-                                onTap: () => setState(() {
-                                  widget.controller.filter.minBathrooms = null;
-                                }),
-                              ),
-                              ...List.generate(5, (i) {
-                                final value = i + 1;
-                                return _NumberChip(
-                                  title: "$value",
-                                  selected:
-                                      widget.controller.filter.minBathrooms ==
-                                      value,
-                                  onTap: () => setState(() {
-                                    widget.controller.filter.minBathrooms =
-                                        value;
-                                  }),
-                                );
-                              }),
-                              _NumberChip(
-                                title: "6+",
-                                selected:
-                                    widget.controller.filter.minBathrooms == 5,
-                                onTap: () => setState(() {
-                                  widget.controller.filter.minBathrooms = 5;
-                                }),
-                              ),
-                            ],
-                          ),
-                          SizedBox(height: 15.h),
-                          _sectionTitle("Furnishing".tr),
-                          GetBuilder<Utilscontroller>(
-                            builder: (utils) {
-                              return SizedBox(
-                                height: 42.h,
-                                child: DropdownButtonFormField<String>(
-                                  isDense: true,
-                                  value:
-                                      widget
-                                          .controller
-                                          .filter
-                                          .furnishingId
-                                          .isEmpty
-                                      ? null
-                                      : widget.controller.filter.furnishingId,
-                                  decoration: InputDecoration(
-                                    hintText: "Any".tr,
-                                    filled: true,
-                                    fillColor: Colors.white,
-                                    isDense: true,
-                                    contentPadding: EdgeInsets.symmetric(
-                                      horizontal: 14.w,
-                                      vertical: 12.h,
-                                    ),
-                                    border: OutlineInputBorder(
-                                      borderRadius: BorderRadius.circular(10.r),
-                                    ),
-                                    enabledBorder: OutlineInputBorder(
-                                      borderRadius: BorderRadius.circular(10.r),
-                                      borderSide: BorderSide(
-                                        color: Colors.grey.shade300,
-                                      ),
-                                    ),
-                                    focusedBorder: OutlineInputBorder(
-                                      borderRadius: BorderRadius.circular(10.r),
-                                      borderSide: const BorderSide(
-                                        color: AppColors.primary,
-                                      ),
-                                    ),
-                                  ),
-                                  items: utils.furnishingOptions.map((item) {
-                                    return DropdownMenuItem<String>(
-                                      value: item.id,
-                                      child: Text(
-                                        item.title.tr,
-                                        style: TextStyle(fontSize: 13.sp),
-                                      ),
-                                    );
-                                  }).toList(),
-                                  onChanged: (v) {
-                                    setState(() {
-                                      widget.controller.filter.furnishingId =
-                                          v ?? "";
-                                    });
-                                  },
-                                ),
-                              );
-                            },
-                          ),
-                          SizedBox(height: 15.h),
-                          _sectionTitle("Nearby".tr),
-                          GetBuilder<Utilscontroller>(
-                            builder: (utils) {
-                              return Wrap(
-                                spacing: 10.w,
-                                runSpacing: 10.h,
-                                children: utils.nearbyTags.map((item) {
-                                  final selected = widget
-                                      .controller
-                                      .filter
-                                      .nearbyTags
-                                      .contains(item.id);
-
-                                  return CustomFilterChip(
-                                    title: item.title,
-                                    selected: selected,
-                                    onTap: () {
-                                      setState(() {
-                                        if (selected) {
-                                          widget.controller.filter.nearbyTags
-                                              .remove(item.id);
-                                        } else {
-                                          widget.controller.filter.nearbyTags
-                                              .add(item.id);
-                                        }
-                                      });
-                                    },
-                                  );
-                                }).toList(),
-                              );
-                            },
-                          ),
-                          SizedBox(height: 15.h),
-                          _sectionTitle("Amenities".tr),
-                          GetBuilder<Utilscontroller>(
-                            builder: (utils) {
-                              return Wrap(
-                                spacing: 10.w,
-                                runSpacing: 10.h,
-                                children: utils.amenities.map((item) {
-                                  final selected = widget
-                                      .controller
-                                      .filter
-                                      .amenities
-                                      .contains(item.id);
-
-                                  return CustomFilterChip(
-                                    title: item.title,
-                                    selected: selected,
-                                    onTap: () {
-                                      setState(() {
-                                        if (selected) {
-                                          widget.controller.filter.amenities
-                                              .remove(item.id);
-                                        } else {
-                                          widget.controller.filter.amenities
-                                              .add(item.id);
-                                        }
-                                      });
-                                    },
-                                  );
-                                }).toList(),
-                              );
-                            },
-                          ),
-                          SizedBox(height: 15.h),
-                          _sectionTitle("Area (SQM)".tr),
-                          Row(
-                            children: [
-                              Expanded(
-                                child: NumberSpinnerField(
-                                  hint: "Min Area".tr,
-                                  value:
-                                      widget.controller.filter.minArea
-                                          ?.toInt() ??
-                                      0,
-                                  onChanged: (v) {
-                                    setState(() {
-                                      widget.controller.filter.minArea = v
-                                          .toDouble();
-                                    });
-                                  },
-                                ),
-                              ),
-                              SizedBox(width: 12),
-                              Expanded(
-                                child: NumberSpinnerField(
-                                  hint: "Max Area".tr,
-                                  value:
-                                      widget.controller.filter.maxArea
-                                          ?.toInt() ??
-                                      0,
-                                  onChanged: (v) {
-                                    setState(() {
-                                      widget.controller.filter.maxArea = v
-                                          .toDouble();
-                                    });
-                                  },
-                                ),
-                              ),
-                            ],
-                          ),
-                        ],
+                      SizedBox(height: 16.h),
+                      _sectionTitle("Area (SQM)".tr),
+                      _rangeRow(
+                        minHint: "Min Area".tr,
+                        maxHint: "Max Area".tr,
+                        min: draft.minArea,
+                        max: draft.maxArea,
+                        onMin: (v) =>
+                            setState(() => draft.minArea = _amount(v)),
+                        onMax: (v) =>
+                            setState(() => draft.maxArea = _amount(v)),
                       ),
-                    ),
+                      SizedBox(height: 8.h),
+                    ],
                   ),
-                  Container(
-                    padding: EdgeInsets.fromLTRB(20.w, 16.h, 20.w, 16.h),
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      border: Border(
-                        top: BorderSide(color: Colors.grey.shade200),
-                      ),
-                    ),
-                    child: Row(
-                      children: [
-                        Expanded(
-                          child: SizedBox(
-                            height: 42.h,
-                            child: OutlinedButton(
-                              onPressed: () async {
-                                await widget.controller.clearFilters();
+                ),
+              ),
+              _buildFooter(),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
 
-                                setState(() {
-                                  minPriceCtrl.clear();
-                                  maxPriceCtrl.clear();
-                                  bedCtrl.clear();
-                                  bathCtrl.clear();
-                                  areaCtrl.clear();
-                                  maxAreaCtrl.clear();
-                                });
-                              },
-                              style: OutlinedButton.styleFrom(
-                                side: const BorderSide(
-                                  color: AppColors.primary,
-                                ),
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(10.r),
-                                ),
-                              ),
-                              child: Text(
-                                "Reset".tr,
-                                style: AppTextStyles.body14.copyWith(
-                                  color: AppColors.primary,
-                                  fontWeight: FontWeight.w700,
-                                ),
-                              ),
-                            ),
-                          ),
-                        ),
-
-                        SizedBox(width: 14.w),
-
-                        Expanded(
-                          child: SizedBox(
-                            height: 42.h,
-                            child: PrimaryButton(
-                              title: "Apply Filters".tr,
-                              onTap: () {
-                                widget.controller.applyFilters(
-                                  search: widget
-                                      .controller
-                                      .searchTextController
-                                      .text,
-                                  purpose: widget.controller.filter.purpose,
-                                  type: widget.controller.filter.type,
-                                  locationId:
-                                      widget.controller.filter.locationId,
-                                  furnishingId:
-                                      widget.controller.filter.furnishingId,
-                                  amenities: widget.controller.filter.amenities,
-                                  nearbyTags:
-                                      widget.controller.filter.nearbyTags,
-                                  minPrice: widget.controller.filter.minPrice,
-                                  maxPrice: widget.controller.filter.maxPrice,
-                                  minBedrooms:
-                                      widget.controller.filter.minBedrooms,
-                                  minBathrooms:
-                                      widget.controller.filter.minBathrooms,
-                                  minArea: widget.controller.filter.minArea,
-                                  maxArea: widget.controller.filter.maxArea,
-                                );
-
-                                minPriceCtrl.clear();
-                                maxPriceCtrl.clear();
-                                bedCtrl.clear();
-                                bathCtrl.clear();
-                                minAreaCtrl.clear();
-                                maxAreaCtrl.clear();
-
-                                Navigator.pop(context);
-                              },
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
+  Widget _buildHeader() {
+    return Padding(
+      padding: EdgeInsets.fromLTRB(20.w, 16.h, 20.w, 12.h),
+      child: Column(
+        children: [
+          Center(
+            child: Container(
+              width: 44.w,
+              height: 5.h,
+              decoration: BoxDecoration(
+                color: Colors.grey.shade300,
+                borderRadius: BorderRadius.circular(20),
               ),
             ),
           ),
-        );
-      },
+          SizedBox(height: 18.h),
+          Row(
+            children: [
+              Container(
+                width: 46.w,
+                height: 46.w,
+                decoration: BoxDecoration(
+                  color: AppColors.primary.withValues(alpha: .08),
+                  shape: BoxShape.circle,
+                ),
+                child: Icon(
+                  Icons.tune_rounded,
+                  color: AppColors.primary,
+                  size: 22.sp,
+                ),
+              ),
+              SizedBox(width: 14.w),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      "Filter Properties".tr,
+                      style: AppTextStyles.title16.copyWith(
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                    SizedBox(height: 2.h),
+                    Text(
+                      "Refine your search results".tr,
+                      style: AppTextStyles.body13.copyWith(
+                        color: AppColors.hintGrey,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              InkWell(
+                borderRadius: BorderRadius.circular(30),
+                onTap: () => Navigator.pop(context),
+                child: Container(
+                  width: 38.w,
+                  height: 38.w,
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    shape: BoxShape.circle,
+                    border: Border.all(color: Colors.grey.shade300),
+                  ),
+                  child: Icon(Icons.close_rounded, size: 20.sp),
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildFooter() {
+    return Container(
+      padding: EdgeInsets.fromLTRB(20.w, 16.h, 20.w, 16.h),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        border: Border(top: BorderSide(color: Colors.grey.shade200)),
+      ),
+      child: Row(
+        children: [
+          Expanded(
+            child: SizedBox(
+              height: 42.h,
+              child: OutlinedButton(
+                onPressed: () => setState(draft.clearAdvanced),
+                style: OutlinedButton.styleFrom(
+                  side: const BorderSide(color: AppColors.primary),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10.r),
+                  ),
+                ),
+                child: Text(
+                  "Reset".tr,
+                  style: AppTextStyles.body14.copyWith(
+                    color: AppColors.primary,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+              ),
+            ),
+          ),
+          SizedBox(width: 14.w),
+          Expanded(
+            child: SizedBox(
+              height: 42.h,
+              child: PrimaryButton(title: "Apply Filters".tr, onTap: _apply),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _rangeRow({
+    required String minHint,
+    required String maxHint,
+    required double? min,
+    required double? max,
+    required ValueChanged<int> onMin,
+    required ValueChanged<int> onMax,
+  }) {
+    return Row(
+      children: [
+        Expanded(
+          child: NumberSpinnerField(
+            hint: minHint,
+            value: min?.toInt() ?? 0,
+            onChanged: onMin,
+          ),
+        ),
+        SizedBox(width: 12.w),
+        const Text("-", style: TextStyle(fontSize: 22)),
+        SizedBox(width: 12.w),
+        Expanded(
+          child: NumberSpinnerField(
+            hint: maxHint,
+            value: max?.toInt() ?? 0,
+            onChanged: onMax,
+          ),
+        ),
+      ],
+    );
+  }
+
+  /// "All" plus 1+ … 6+ — the API treats the value as a minimum.
+  Widget _roomChips({
+    required int? selected,
+    required ValueChanged<int?> onSelected,
+  }) {
+    return Wrap(
+      spacing: 6.w,
+      runSpacing: 12.h,
+      children: [
+        _NumberChip(
+          title: "All".tr,
+          selected: selected == null,
+          onTap: () => onSelected(null),
+        ),
+        for (int value = 1; value <= 6; value++)
+          _NumberChip(
+            title: "$value+",
+            selected: selected == value,
+            onTap: () => onSelected(value),
+          ),
+      ],
+    );
+  }
+
+  /// Titled chip group; hidden until the options have loaded.
+  Widget _multiSelect(
+    String title,
+    List<OptionItem> options,
+    List<String> selectedIds,
+  ) {
+    if (options.isEmpty) return const SizedBox.shrink();
+
+    return Padding(
+      padding: EdgeInsets.only(top: 16.h),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _sectionTitle(title),
+          Wrap(
+            spacing: 10.w,
+            runSpacing: 10.h,
+            children: options.map((item) {
+              final bool selected = selectedIds.contains(item.id);
+
+              return CustomFilterChip(
+                title: item.title,
+                selected: selected,
+                onTap: () => setState(() {
+                  selected
+                      ? selectedIds.remove(item.id)
+                      : selectedIds.add(item.id);
+                }),
+              );
+            }).toList(),
+          ),
+        ],
+      ),
     );
   }
 }
+
+DropdownMenuItem<T> _sheetItem<T>(T? value, String label) {
+  return DropdownMenuItem<T>(
+    value: value,
+    child: Text(label, style: TextStyle(fontSize: 13.sp)),
+  );
+}
+
+/// Outlined dropdown used inside the filter sheet. Re-created whenever the
+/// value changes from outside (e.g. Reset) so it never shows a stale choice.
+class _SheetDropdown<T> extends StatelessWidget {
+  final String hint;
+  final T? value;
+  final List<DropdownMenuItem<T>> items;
+  final ValueChanged<T?> onChanged;
+
+  const _SheetDropdown({
+    required this.hint,
+    required this.value,
+    required this.items,
+    required this.onChanged,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    OutlineInputBorder border(Color color) => OutlineInputBorder(
+      borderRadius: BorderRadius.circular(10.r),
+      borderSide: BorderSide(color: color),
+    );
+
+    return SizedBox(
+      height: 42.h,
+      child: DropdownButtonFormField<T>(
+        key: ValueKey(value),
+        isDense: true,
+        isExpanded: true,
+        initialValue: value,
+        decoration: InputDecoration(
+          hintText: hint,
+          filled: true,
+          fillColor: Colors.white,
+          contentPadding: EdgeInsets.symmetric(
+            horizontal: 14.w,
+            vertical: 10.h,
+          ),
+          border: border(Colors.grey.shade300),
+          enabledBorder: border(Colors.grey.shade300),
+          focusedBorder: border(AppColors.primary),
+        ),
+        items: items,
+        onChanged: onChanged,
+      ),
+    );
+  }
+}
+
 //======================================================
 // SECTION TITLE
 //======================================================
@@ -1351,68 +990,6 @@ Widget _sectionTitle(String title) {
       style: AppTextStyles.title14.copyWith(fontWeight: FontWeight.w500),
     ),
   );
-}
-
-//======================================================
-// CARD
-//======================================================
-class _FilterCard extends StatelessWidget {
-  final Widget child;
-
-  const _FilterCard({required this.child});
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(children: [child]);
-  }
-}
-
-class _FilterTextField extends StatelessWidget {
-  final TextEditingController controller;
-  final String hint;
-  final IconData icon;
-  final TextInputType? keyboardType;
-
-  const _FilterTextField({
-    required this.controller,
-    required this.hint,
-    required this.icon,
-    this.keyboardType,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return TextField(
-      controller: controller,
-      keyboardType: keyboardType,
-      style: AppTextStyles.body12.copyWith(fontWeight: FontWeight.w500),
-      decoration: InputDecoration(
-        hintText: hint,
-
-        prefixIcon: Icon(icon, size: 16.sp, color: AppColors.primary),
-
-        filled: true,
-        fillColor: const Color(0xffFAFAFA),
-
-        contentPadding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 6.h),
-
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(10.r),
-          borderSide: BorderSide(color: Colors.grey.shade300),
-        ),
-
-        enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(10.r),
-          borderSide: BorderSide(color: Colors.grey.shade300),
-        ),
-
-        focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(10.r),
-          borderSide: BorderSide(color: AppColors.primary, width: 1.w),
-        ),
-      ),
-    );
-  }
 }
 
 class CustomFilterChip extends StatelessWidget {
@@ -1436,7 +1013,9 @@ class CustomFilterChip extends StatelessWidget {
         duration: const Duration(milliseconds: 200),
         padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 10.h),
         decoration: BoxDecoration(
-          color: selected ? AppColors.primary.withOpacity(.08) : Colors.white,
+          color: selected
+              ? AppColors.primary.withValues(alpha: .08)
+              : Colors.white,
           borderRadius: BorderRadius.circular(10.r),
           border: Border.all(
             color: selected ? AppColors.primary : const Color(0xffD8DCE5),
@@ -1449,75 +1028,6 @@ class CustomFilterChip extends StatelessWidget {
             fontSize: 13.sp,
             fontWeight: FontWeight.w500,
             color: selected ? AppColors.primary : const Color(0xff555555),
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-class _FilterChip extends StatelessWidget {
-  final String title;
-  final bool selected;
-  final VoidCallback onTap;
-
-  const _FilterChip({
-    required this.title,
-    required this.selected,
-    required this.onTap,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Material(
-      color: Colors.transparent,
-      child: InkWell(
-        borderRadius: BorderRadius.circular(10.r),
-        onTap: onTap,
-        child: AnimatedContainer(
-          duration: const Duration(milliseconds: 200),
-          curve: Curves.easeInOut,
-          padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 10.h),
-          decoration: BoxDecoration(
-            color: selected ? AppColors.primary.withOpacity(.08) : Colors.white,
-            borderRadius: BorderRadius.circular(10.r),
-            border: Border.all(
-              color: selected ? AppColors.primary : const Color(0xffE3E3E3),
-              width: 1,
-            ),
-          ),
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              AnimatedContainer(
-                duration: const Duration(milliseconds: 200),
-                width: 15.w,
-                height: 15.w,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: selected ? AppColors.primary : Colors.transparent,
-                  border: Border.all(
-                    color: selected ? AppColors.primary : Colors.grey.shade400,
-                  ),
-                ),
-                child: selected
-                    ? Icon(Icons.check, color: Colors.white, size: 10.sp)
-                    : null,
-              ),
-
-              SizedBox(width: 10.w),
-
-              Flexible(
-                child: Text(
-                  title,
-                  overflow: TextOverflow.ellipsis,
-                  style: AppTextStyles.body13.copyWith(
-                    fontWeight: FontWeight.w600,
-                    color: selected ? AppColors.primary : Colors.black87,
-                  ),
-                ),
-              ),
-            ],
           ),
         ),
       ),
@@ -1547,7 +1057,9 @@ class _NumberChip extends StatelessWidget {
         height: 35.h,
         alignment: Alignment.center,
         decoration: BoxDecoration(
-          color: selected ? AppColors.primary.withOpacity(.08) : Colors.white,
+          color: selected
+              ? AppColors.primary.withValues(alpha: .08)
+              : Colors.white,
           borderRadius: BorderRadius.circular(8.r),
           border: Border.all(
             color: selected ? AppColors.primary : const Color(0xffD8DCE5),
@@ -1733,9 +1245,7 @@ class _SuggestionsList extends StatelessWidget {
                     child: Row(
                       children: [
                         Icon(
-                          isPlace
-                              ? Icons.place_outlined
-                              : Icons.villa_outlined,
+                          isPlace ? Icons.place_outlined : Icons.villa_outlined,
                           size: 17.sp,
                           color: AppColors.primary,
                         ),

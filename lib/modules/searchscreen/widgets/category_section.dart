@@ -80,11 +80,8 @@ class PropertyCategorySection extends StatelessWidget {
                                 height: 22.w,
                                 fit: BoxFit.contain,
 
-                                errorBuilder: (_, __, ___) => Icon(
-                                  Icons.home_work_outlined,
-                                  size: 20.sp,
-                                  
-                                ),
+                                errorBuilder: (_, __, ___) =>
+                                    Icon(Icons.home_work_outlined, size: 20.sp),
                               ),
 
                               SizedBox(height: 6.h),

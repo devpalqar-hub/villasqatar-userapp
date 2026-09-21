@@ -1,5 +1,3 @@
-import 'dart:ui';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
@@ -11,6 +9,7 @@ import 'package:villas_qatar/Core/utils/auth_guard.dart';
 import 'package:villas_qatar/modules/offerscreen/view/make_offerscreen.dart';
 import 'package:villas_qatar/modules/visits/service/visit_controller.dart';
 import 'package:villas_qatar/modules/propertydetailscreen/widget/make_offer_Dailogue.dart';
+import 'package:villas_qatar/modules/propertydetailscreen/widget/pd_tokens.dart';
 import 'package:villas_qatar/modules/propertylist/model/myproperty_model.dart';
 
 class BottomActionCard extends StatelessWidget {
@@ -19,134 +18,164 @@ class BottomActionCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-      top: false,
-      child: ClipRRect(
-        child: BackdropFilter(
-          filter: ImageFilter.blur(sigmaX: 18, sigmaY: 18),
-          child: Container(
-            padding: EdgeInsets.fromLTRB(20.w, 18.h, 20.w, 5.h),
-            decoration: BoxDecoration(
-              color: Colors.white.withOpacity(.96),
-              borderRadius: BorderRadius.only(
-                topLeft: Radius.circular(10.r),
-                topRight: Radius.circular(10.r),
-              ),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withOpacity(.08),
-                  blurRadius: 25,
-                  offset: const Offset(0, -8),
-                ),
-              ],
-            ),
-            child: Row(
+    final bool isRent = property.purpose.toUpperCase() == 'RENT';
+
+    return PdBottomBarShell(
+      child: Row(
+        children: [
+          /// Price
+          Expanded(
+            flex: 5,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
               children: [
-                // /// Price
-                // Expanded(
-                //   flex: 4,
-                //   child: Column(
-                //     crossAxisAlignment: CrossAxisAlignment.start,
-                //     mainAxisSize: MainAxisSize.min,
-                //     children: [
-                //       Text(
-                //         "Starting From",
-                //         style: TextStyle(
-                //           fontSize: 10.sp,
-                //           color: Colors.grey.shade600,
-                //         ),
-                //       ),
-
-                //       SizedBox(height: 4.h),
-
-                //       Text(
-                //         "QAR 12.5M",
-                //         style: TextStyle(
-                //           fontSize: 14.sp,
-                //           fontWeight: FontWeight.bold,
-                //           color: AppColors.primary,
-                //         ),
-                //       ),
-                //     ],
-                //   ),
-                // ),
-
-                /// Contact
-                Expanded(
-                  flex: 6,
-                  child: SizedBox(
-                    height: 40.h,
-                    child: OutlinedButton.icon(
-                      style: OutlinedButton.styleFrom(
-                        foregroundColor: const Color(0xff8E123E),
-                        side: const BorderSide(color: Color(0xff8E123E)),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10.r),
-                        ),
-                      ),
-                      onPressed: () {
-                        if (!AuthGuard.requireLogin(
-                          message: "Login is required to make an offer.".tr,
-                        )) {
-                          return;
-                        }
-                        showMakeOfferBottomSheet(context, property);
-                      },
-                      label: Text(
-                        "Make an Offer".tr,
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        softWrap: false,
-                        style: TextStyle(
-                          fontSize: 11.sp,
-                          fontWeight: FontWeight.w800,
-                        ),
-                      ),
-                    ),
+                Text(
+                  PD.label("Asking Price".tr),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
+                    fontSize: 8.5.sp,
+                    fontWeight: FontWeight.w700,
+                    color: AppColors.inkFaint,
+                    letterSpacing: PD.tracking(1.2),
                   ),
                 ),
-
-                SizedBox(width: 10.w),
-
-                /// Schedule
-                Expanded(
-                  flex: 6,
-                  child: SizedBox(
-                    height: 40.h,
-                    child: ElevatedButton.icon(
-                      style: ElevatedButton.styleFrom(
-                        elevation: 0,
-                        backgroundColor: const Color(0xff8E123E),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10.r),
+                SizedBox(height: 3.h),
+                FittedBox(
+                  fit: BoxFit.scaleDown,
+                  alignment: AlignmentDirectional.centerStart,
+                  child: Text.rich(
+                    TextSpan(
+                      children: [
+                        TextSpan(
+                          text: "QAR ",
+                          style: TextStyle(
+                            fontSize: 11.sp,
+                            fontWeight: FontWeight.w700,
+                            color: AppColors.gold,
+                          ),
                         ),
-                      ),
-                      onPressed: () {
-                        if (!AuthGuard.requireLogin(
-                          message:
-                              "Login is required to schedule a property visit."
-                                  .tr,
-                        )) {
-                          return;
-                        }
-
-                        _showScheduleVisitSheet(context, property: property);
-                      },
-                      label: Text(
-                        "Schedule".tr,
-                        style: TextStyle(
-                          fontSize: 10.sp,
-                          color: Colors.white,
-                          fontWeight: FontWeight.w700,
+                        TextSpan(
+                          text: PD.number(property.price),
+                          style: TextStyle(
+                            fontSize: 17.sp,
+                            fontWeight: FontWeight.w700,
+                            color: AppColors.primary,
+                          ),
                         ),
-                      ),
+                        if (isRent)
+                          TextSpan(
+                            text: " / ${"per year".tr}",
+                            style: TextStyle(
+                              fontSize: 9.sp,
+                              fontWeight: FontWeight.w600,
+                              color: AppColors.inkMuted,
+                            ),
+                          ),
+                      ],
                     ),
                   ),
                 ),
               ],
             ),
           ),
-        ),
+
+          SizedBox(width: 10.w),
+
+          /// Make an offer
+          Expanded(
+            flex: 4,
+            child: SizedBox(
+              height: 46.h,
+              child: OutlinedButton(
+                style: OutlinedButton.styleFrom(
+                  foregroundColor: AppColors.primary,
+                  side: BorderSide(
+                    color: AppColors.primary.withValues(alpha: .55),
+                  ),
+                  padding: EdgeInsets.symmetric(horizontal: 6.w),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(14.r),
+                  ),
+                ),
+                onPressed: () {
+                  if (!AuthGuard.requireLogin(
+                    message: "Login is required to make an offer.".tr,
+                  )) {
+                    return;
+                  }
+                  showMakeOfferBottomSheet(context, property);
+                },
+                child: Text(
+                  "Make an Offer".tr,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  softWrap: false,
+                  style: TextStyle(
+                    fontSize: 11.5.sp,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+              ),
+            ),
+          ),
+
+          SizedBox(width: 8.w),
+
+          /// Schedule
+          Expanded(
+            flex: 4,
+            child: SizedBox(
+              height: 46.h,
+              child: DecoratedBox(
+                decoration: BoxDecoration(
+                  gradient: AppColors.ctaGradient,
+                  borderRadius: BorderRadius.circular(14.r),
+                  boxShadow: [
+                    BoxShadow(
+                      color: AppColors.primary.withValues(alpha: .30),
+                      blurRadius: 14,
+                      offset: const Offset(0, 6),
+                    ),
+                  ],
+                ),
+                child: ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    elevation: 0,
+                    backgroundColor: Colors.transparent,
+                    shadowColor: Colors.transparent,
+                    foregroundColor: Colors.white,
+                    padding: EdgeInsets.symmetric(horizontal: 6.w),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(14.r),
+                    ),
+                  ),
+                  onPressed: () {
+                    if (!AuthGuard.requireLogin(
+                      message:
+                          "Login is required to schedule a property visit.".tr,
+                    )) {
+                      return;
+                    }
+
+                    _showScheduleVisitSheet(context, property: property);
+                  },
+                  child: Text(
+                    "Schedule".tr,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(
+                      fontSize: 11.5.sp,
+                      color: Colors.white,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }

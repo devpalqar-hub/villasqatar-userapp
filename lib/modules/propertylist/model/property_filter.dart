@@ -63,6 +63,37 @@ class PropertyFilter {
     createdById = '';
   }
 
+  /// Resets only the filters edited in the Filters sheet, leaving the search
+  /// text, buy/rent, property type and sorting alone.
+  void clearAdvanced() {
+    locationId = null;
+
+    furnishingId = '';
+
+    nearbyTagId = '';
+
+    amenities.clear();
+    nearbyTags.clear();
+
+    minPrice = null;
+    maxPrice = null;
+
+    minBedrooms = null;
+    minBathrooms = null;
+
+    minArea = null;
+    maxArea = null;
+  }
+
+  /// True when anything narrows the results — search text, buy/rent,
+  /// property type, sorting or any advanced filter.
+  bool get hasCriteria =>
+      search.isNotEmpty ||
+      type.isNotEmpty ||
+      purpose.isNotEmpty ||
+      sortBy.isNotEmpty ||
+      activeFilterCount > 0;
+
   /// Number of "advanced" filters currently applied (location, furnishing,
   /// amenities, nearby tags, price/area range, bedrooms, bathrooms).
   /// Used to show a count badge on the Filters button.

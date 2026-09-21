@@ -22,15 +22,16 @@ import 'package:villas_qatar/modules/home/service/loaction_controller.dart';
 import 'package:villas_qatar/modules/home/widgets/agent_card.dart';
 import 'package:villas_qatar/modules/home/widgets/category_card.dart';
 import 'package:villas_qatar/modules/home/widgets/dealer_cta_card.dart';
+import 'package:villas_qatar/modules/home/widgets/home_app_bar.dart';
 import 'package:villas_qatar/modules/home/widgets/popular_place_card.dart';
 import 'package:villas_qatar/modules/home/widgets/property_card.dart';
 import 'package:villas_qatar/modules/home/widgets/price_estimator_card.dart';
 import 'package:villas_qatar/modules/home/widgets/hero_banner.dart';
 import 'package:villas_qatar/modules/home/widgets/location_card.dart';
 import 'package:villas_qatar/modules/home/widgets/section_header.dart';
+import 'package:villas_qatar/modules/home/widgets/social_media_card.dart';
 import 'package:villas_qatar/modules/home/widgets/sponser_banner.dart';
 import 'package:villas_qatar/modules/home/widgets/why_choose_card.dart';
-import 'package:villas_qatar/modules/mainscreen/mainscreen.dart';
 import 'package:villas_qatar/modules/onboard/views/dealer_login_screen.dart';
 import 'package:villas_qatar/modules/pricestimator/views/price_estimator_screen.dart';
 
@@ -47,11 +48,16 @@ class HomeScreen extends StatefulWidget {
   final void Function(String type) onCategorySelected;
   final void Function(String purpose) onPurposeSelected;
 
+  /// Opens the Search screen, optionally scoped to a municipality
+  /// ([locationId]) — used by "See all" and the popular places.
+  final void Function({String? locationId}) onOpenSearch;
+
   const HomeScreen({
     super.key,
     required this.onSearch,
     required this.onCategorySelected,
     required this.onPurposeSelected,
+    required this.onOpenSearch,
   });
 
   @override
@@ -95,26 +101,7 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.background,
-      appBar: AppBar(
-        backgroundColor: Colors.white,
-        surfaceTintColor: Colors.white,
-        elevation: 0,
-        scrolledUnderElevation: 0,
-
-        centerTitle: false,
-        titleSpacing: 15.w,
-
-        title: Image.asset(
-          'assets/Logo/logo.png',
-          width: 140.w,
-          fit: BoxFit.contain,
-        ),
-
-        bottom: PreferredSize(
-          preferredSize: Size.fromHeight(1.h),
-          child: Container(height: 1.h, color: AppColors.warmBorder),
-        ),
-      ),
+      appBar: const HomeAppBar(),
       body: GetBuilder<Homecontroller>(
         builder: (___) {
           return SingleChildScrollView(
@@ -205,7 +192,12 @@ class _HomeScreenState extends State<HomeScreen> {
                 /// ─── TRUST STRIP ────────────────────────────────────────────
                 Padding(padding: _gutter, child: const WhyChooseCard()),
 
-                SizedBox(height: 24.h),
+                /// ─── JOIN US ON SOCIAL MEDIA ────────────────────────────────
+                SizedBox(height: _sectionGap.h),
+                Padding(padding: _gutter, child: const SocialMediaCard()),
+
+                // No bottom bar any more, so clear the system gesture area.
+                SizedBox(height: 24.h + MediaQuery.paddingOf(context).bottom),
               ],
             ),
           );
@@ -290,12 +282,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 child: SectionHeader(
                   title: "Search by Property Type".tr,
                   subtitle: "Find the right property type for your search".tr,
-                  onSeeAllTap: () {
-                    Get.offAll(
-                      () => const MainScreen(initialIndex: 1),
-                      transition: AppTransitions.forward,
-                    );
-                  },
+                  onSeeAllTap: () => widget.onOpenSearch(),
                 ),
               ),
 
@@ -425,7 +412,7 @@ class _HomeScreenState extends State<HomeScreen> {
               SizedBox(height: _headerGap.h),
 
               SizedBox(
-                height: 80.h,
+                height: 70.h,
                 child: controller.isLoading && controller.dealers.isEmpty
                     ? AppShimmer(
                         child: ListView.separated(
@@ -436,7 +423,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           separatorBuilder: (_, __) => SizedBox(width: 12.w),
                           itemBuilder: (_, __) => ShimmerBox(
                             width: 120.w,
-                            height: 80.h,
+                            height: 50.h,
                             borderRadius: BorderRadius.circular(14.r),
                           ),
                         ),
@@ -450,15 +437,11 @@ class _HomeScreenState extends State<HomeScreen> {
                         itemBuilder: (_, index) {
                           final dealer = controller.dealers[index];
 
-                          return AgentCards(
+                          return CompactAgentCard(
                             image: dealer.dealerProfile.coverImage,
                             name: dealer.dealerProfile.dealerName.isNotEmpty
                                 ? dealer.dealerProfile.dealerName
                                 : dealer.name,
-                            designation:
-                                dealer.dealerProfile.tagline ??
-                                "Property Consultant".tr,
-                            phone: dealer.dealerProfile.contactPhone,
                             onTap: () {
                               Get.to(
                                 () => const DealerDetailsScreen(),
@@ -499,12 +482,8 @@ class _HomeScreenState extends State<HomeScreen> {
                   subtitle:
                       "Discover properties in the most sought-after locations"
                           .tr,
-                  onSeeAllTap: () {
-                    Get.offAll(
-                      () => const MainScreen(initialIndex: 1),
-                      transition: AppTransitions.forward,
-                    );
-                  },
+                  showSeeAll: false,
+                  onSeeAllTap: () => widget.onOpenSearch(),
                 ),
               ),
 
@@ -523,15 +502,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
                     return PopularPlaceCard(
                       place: place,
-                      onTap: () {
-                        Get.offAll(
-                          () => MainScreen(
-                            initialIndex: 1,
-                            initialLocationId: place.id,
-                          ),
-                          transition: AppTransitions.forward,
-                        );
-                      },
+                      onTap: () => widget.onOpenSearch(locationId: place.id),
                     );
                   },
                 ),

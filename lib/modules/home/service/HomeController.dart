@@ -31,13 +31,9 @@ class Homecontroller extends GetxController {
     featuredProperties = await featureController.fetchFeatureProperty(
       isHome: true,
     );
-
     utilsController.fetchPropertyType();
     bannerController.fetchFeaturedBanners();
     dealerController.fetchDealers();
-
-    
-
     update();
   }
 

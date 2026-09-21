@@ -1,25 +1,26 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
 
 import 'package:villas_qatar/Core/constants/app_colors.dart';
 import 'package:villas_qatar/Core/services/storage_service.dart';
-import 'package:villas_qatar/Core/theme/app_textstyles.dart';
+import 'package:villas_qatar/Core/widgets/motion/fade_slide_in.dart';
 
 import 'package:villas_qatar/modules/PlansandFeatures/model/featured_property_model.dart';
 import 'package:villas_qatar/modules/PlansandFeatures/services/FeaturedPropertiesController.dart';
 import 'package:villas_qatar/modules/home/widgets/property_card.dart';
-import 'package:villas_qatar/modules/propertydetailscreen/widget/agent_conatct_card.dart';
 import 'package:villas_qatar/modules/propertydetailscreen/widget/boost_plan_bottomsheet.dart';
 import 'package:villas_qatar/modules/propertydetailscreen/widget/bottom_actioncard.dart';
+import 'package:villas_qatar/modules/propertydetailscreen/widget/pd_content_sections.dart';
+import 'package:villas_qatar/modules/propertydetailscreen/widget/pd_header_widgets.dart';
+import 'package:villas_qatar/modules/propertydetailscreen/widget/pd_hero_gallery.dart';
+import 'package:villas_qatar/modules/propertydetailscreen/widget/pd_listed_by_card.dart';
+import 'package:villas_qatar/modules/propertydetailscreen/widget/pd_states.dart';
+import 'package:villas_qatar/modules/propertydetailscreen/widget/pd_tokens.dart';
+import 'package:villas_qatar/modules/propertydetailscreen/widget/pd_top_bar.dart';
 import 'package:villas_qatar/modules/propertydetailscreen/widget/property_insights_bottomsheet.dart';
-import 'package:villas_qatar/modules/propertydetailscreen/widget/compare_card_widget.dart';
-import 'package:villas_qatar/modules/propertydetailscreen/widget/herocard.dart';
-import 'package:villas_qatar/modules/propertydetailscreen/widget/property_details_card.dart';
-import 'package:villas_qatar/modules/propertydetailscreen/widget/property_info_card.dart';
-import 'package:villas_qatar/modules/propertydetailscreen/widget/property_location_card.dart';
-import 'package:villas_qatar/modules/propertydetailscreen/widget/overview_card.dart';
 import 'package:villas_qatar/modules/propertylist/model/myproperty_model.dart';
 import 'package:villas_qatar/modules/propertylist/service/myproperties_listcontroller.dart';
 import 'package:villas_qatar/modules/propertylist/views/add_listproperty.dart';
@@ -43,7 +44,11 @@ class _PropertyDetailsScreenState extends State<PropertyDetailsScreen> {
 
   final ScrollController featuredScrollController = ScrollController();
   late final String propertyId;
-  int selectedImageIndex = 0;
+
+  /// Page scroll position - drives the top bar's glass -> solid transition
+  /// without rebuilding the whole page on every scroll tick.
+  final ScrollController _scrollController = ScrollController();
+  final ValueNotifier<double> _scrollOffset = ValueNotifier<double>(0);
 
   @override
   void initState() {
@@ -57,12 +62,17 @@ class _PropertyDetailsScreenState extends State<PropertyDetailsScreen> {
     propertyId = widget.propertyId;
 
     debugPrint("DETAIL SCREEN PROPERTY ID: $propertyId");
-    debugPrint("DETAIL SCREEN PROPERTY ID: $propertyId");
+
+    _scrollController.addListener(() {
+      if (_scrollController.hasClients) {
+        _scrollOffset.value = _scrollController.offset;
+      }
+    });
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      final String? id = propertyId?.trim();
+      final String id = propertyId.trim();
 
-      if (id == null || id.isEmpty) {
+      if (id.isEmpty) {
         debugPrint("ERROR: Property ID is empty");
       } else {
         controller.fetchPropertyDetails(id);
@@ -78,6 +88,8 @@ class _PropertyDetailsScreenState extends State<PropertyDetailsScreen> {
   @override
   void dispose() {
     featuredScrollController.dispose();
+    _scrollController.dispose();
+    _scrollOffset.dispose();
 
     super.dispose();
   }
@@ -87,37 +99,17 @@ class _PropertyDetailsScreenState extends State<PropertyDetailsScreen> {
     return GetBuilder<PropertySearchController>(
       builder: (controller) {
         if (controller.isDetailsLoading) {
-          return const Scaffold(
-            backgroundColor: Colors.white,
-            body: Center(child: CircularProgressIndicator()),
-          );
+          return const PdLoadingSkeleton();
         }
 
         if (controller.selectedProperty == null) {
-          return Scaffold(
-            backgroundColor: Colors.white,
-
-            appBar: AppBar(
-              backgroundColor: Colors.white,
-
-              elevation: 0,
-
-              leading: IconButton(
-                icon: const Icon(Icons.arrow_back, color: Colors.black),
-
-                onPressed: () {
-                  Navigator.pop(context);
-                },
-              ),
-            ),
-
-            body: Center(child: Text("Property not found".tr)),
-          );
+          return const PdNotFoundState();
         }
 
-        final property = controller.selectedProperty!;
-        final issue =
-            (property.latestReview?.message?.trim().isNotEmpty ?? false)
+        final Property property = controller.selectedProperty!;
+
+        final String issue =
+            (property.latestReview?.message.trim().isNotEmpty ?? false)
             ? property.latestReview!.message
             : (property.rejectionReason?.trim().isNotEmpty ?? false)
             ? property.rejectionReason!
@@ -125,534 +117,118 @@ class _PropertyDetailsScreenState extends State<PropertyDetailsScreen> {
 
         final String loggedInUserId = StorageService.getUserId();
 
-        final String propertyOwnerId =
-            property.createdBy?.id?.toString().trim() ?? '';
+        final String propertyOwnerId = property.createdBy.id.toString().trim();
 
         final bool isMyProperty =
             loggedInUserId.isNotEmpty &&
             propertyOwnerId.isNotEmpty &&
             loggedInUserId == propertyOwnerId;
 
+        final double topInset = MediaQuery.paddingOf(context).top;
+        final double heroHeight = 340.h + topInset;
+        final double solidFrom = heroHeight - topInset - 56 - 40.h;
+
+        // Every section is listed here in reading order; sections with
+        // nothing to show are simply left out so spacing stays even.
+        final List<Widget> sections = [
+          if (isMyProperty && property.status.toUpperCase() == "REJECTED")
+            PdRejectionBanner(
+              issue: issue,
+              onEdit: () {
+                Get.to(
+                  () =>
+                      ListYourPropertyScreen(property: property, isEdit: true),
+                );
+              },
+            ),
+          PdHeadline(property: property),
+          PdPriceConsole(
+            property: property,
+            isMyProperty: isMyProperty,
+            onInsights: () => _onViewInsights(property),
+            onBoost: () => _onBoostProperty(property),
+          ),
+          PdStatsStrip(property: property),
+          if (property.description.trim().isNotEmpty)
+            PdOverviewSection(property: property),
+          if (property.amenities.isNotEmpty || property.nearbyTags.isNotEmpty)
+            PdFeaturesSection(property: property),
+          PdSpecsSection(property: property),
+          if (property.otherFeatures.trim().isNotEmpty)
+            PdOtherFeaturesSection(property: property),
+          PdLocationSection(property: property),
+          PdListedByCard(property: property, isMyProperty: isMyProperty),
+          PdCompareSection(property: property),
+        ];
+
         return Scaffold(
-          backgroundColor: Colors.white,
+          backgroundColor: PD.canvas,
 
           bottomNavigationBar: _buildBottomSection(
             property: property,
             isMyProperty: isMyProperty,
           ),
 
-          body: SafeArea(
+          // Light status-bar icons over the photo, dark ones once the top
+          // bar has turned solid white.
+          body: ValueListenableBuilder<double>(
+            valueListenable: _scrollOffset,
+            builder: (BuildContext context, double offset, Widget? page) {
+              final bool barIsSolid = offset > solidFrom + 35;
+
+              return AnnotatedRegion<SystemUiOverlayStyle>(
+                value:
+                    (barIsSolid
+                            ? SystemUiOverlayStyle.dark
+                            : SystemUiOverlayStyle.light)
+                        .copyWith(statusBarColor: Colors.transparent),
+                child: page!,
+              );
+            },
             child: Stack(
               children: [
                 SingleChildScrollView(
+                  controller: _scrollController,
                   physics: const BouncingScrollPhysics(),
-
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
-
                     children: [
-                      HeroImageCard(
-                        property: property,
-                        selectedImageIndex: selectedImageIndex,
-                        isMyProperty: isMyProperty,
-                        onReport: () {
-                          _showReportListingSheet(property);
-                        },
-                      ),
+                      PdHeroGallery(property: property, height: heroHeight),
 
-                      Transform.translate(
-                        offset: Offset(0, -12.h),
-                        child: Container(
-                          width: double.infinity,
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.only(
-                              topLeft: Radius.circular(12.r),
-                              topRight: Radius.circular(12.r),
-                            ),
-                          ),
-                          child: Padding(
-                            padding: EdgeInsets.fromLTRB(16.w, 10.h, 16.w, 0),
-                            child: Column(
-                              children: [
-                                if (property.photos.length > 1) ...[
-                                  SizedBox(
-                                    height: 64.h,
-                                    child: ListView.separated(
-                                      scrollDirection: Axis.horizontal,
-                                      itemCount: property.photos.length,
-                                      separatorBuilder: (_, __) =>
-                                          SizedBox(width: 8.w),
-                                      itemBuilder: (context, index) {
-                                        final photo = property.photos[index];
-                                        final isSelected =
-                                            selectedImageIndex == index;
-
-                                        return GestureDetector(
-                                          onTap: () {
-                                            setState(() {
-                                              selectedImageIndex = index;
-                                            });
-                                          },
-                                          child: AnimatedContainer(
-                                            duration: const Duration(
-                                              milliseconds: 200,
-                                            ),
-                                            width: 64.w,
-                                            height: 64.h,
-                                            decoration: BoxDecoration(
-                                              borderRadius:
-                                                  BorderRadius.circular(10.r),
-                                              border: Border.all(
-                                                color: isSelected
-                                                    ? AppColors.primary
-                                                    : Colors.grey.shade300,
-                                                width: isSelected ? 2 : 1,
-                                              ),
-                                            ),
-                                            child: ClipRRect(
-                                              borderRadius:
-                                                  BorderRadius.circular(8.r),
-                                              child: Image.network(
-                                                photo.url,
-                                                fit: BoxFit.cover,
-                                              ),
-                                            ),
-                                          ),
-                                        );
-                                      },
-                                    ),
-                                  ),
-
-                                  SizedBox(height: 12.h),
-                                ],
-                                if (isMyProperty &&
-                                    property.status.toUpperCase() == "REJECTED")
-                                  Padding(
-                                    padding: EdgeInsets.fromLTRB(
-                                      0.w,
-                                      5.h,
-                                      20.w,
-                                      8.h,
-                                    ),
-                                    child: Row(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        Icon(
-                                          Icons.error_outline_rounded,
-                                          color: Colors.red,
-                                          size: 18.sp,
-                                        ),
-
-                                        SizedBox(width: 8.w),
-
-                                        Expanded(
-                                          child: Column(
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.start,
-                                            children: [
-                                              Text(
-                                                "Listing Rejected".tr,
-                                                style: TextStyle(
-                                                  fontSize: 13.sp,
-                                                  fontWeight: FontWeight.w500,
-                                                  color: Colors.red.shade500,
-                                                ),
-                                              ),
-
-                                              SizedBox(height: 2.h),
-
-                                              RichText(
-                                                text: TextSpan(
-                                                  style: TextStyle(
-                                                    fontSize: 11.sp,
-                                                    color: Colors.black87,
-                                                    height: 1.4,
-                                                  ),
-                                                  children: [
-                                                    TextSpan(
-                                                      text: "Issue: ".tr,
-                                                      style: const TextStyle(
-                                                        fontWeight:
-                                                            FontWeight.w600,
-                                                      ),
-                                                    ),
-                                                    TextSpan(
-                                                      text: issue,
-                                                      style: TextStyle(
-                                                        color:
-                                                            Colors.red.shade700,
-                                                        fontWeight:
-                                                            FontWeight.w500,
-                                                      ),
-                                                    ),
-                                                  ],
-                                                ),
-                                              ),
-                                            ],
-                                          ),
-                                        ),
-                                        Container(
-                                          height: 28.h,
-                                          decoration: BoxDecoration(
-                                            border: Border.all(
-                                              color: AppColors.primary,
-                                            ),
-                                            borderRadius: BorderRadius.circular(
-                                              20.r,
-                                            ),
-                                          ),
-                                          child: InkWell(
-                                            borderRadius: BorderRadius.circular(
-                                              20.r,
-                                            ),
-                                            onTap: () {
-                                              Get.to(
-                                                () => ListYourPropertyScreen(
-                                                  property: property,
-                                                  isEdit: true,
-                                                ),
-                                              );
-                                            },
-                                            child: Padding(
-                                              padding: EdgeInsets.symmetric(
-                                                horizontal: 10.w,
-                                              ),
-                                              child: Row(
-                                                mainAxisSize: MainAxisSize.min,
-                                                children: [
-                                                  Icon(
-                                                    Icons.edit_outlined,
-                                                    size: 12.sp,
-                                                    color: AppColors.primary,
-                                                  ),
-                                                  SizedBox(width: 4.w),
-                                                  Text(
-                                                    "Edit and Resubmit".tr,
-                                                    style: TextStyle(
-                                                      color: AppColors.primary,
-                                                      fontSize: 10.sp,
-                                                      fontWeight:
-                                                          FontWeight.w500,
-                                                    ),
-                                                  ),
-                                                ],
-                                              ),
-                                            ),
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                PropertyInfoCard(property: property),
-
-                                SizedBox(height: 5.h),
-
-                                if (isMyProperty)
-                                  Padding(
-                                    padding: EdgeInsets.fromLTRB(
-                                      0.w,
-                                      12.h,
-                                      0.w,
-                                      4.h,
-                                    ),
-                                    child: Row(
-                                      children: [
-                                        // ==================================
-                                        // INSIGHTS
-                                        // (Instagram-style secondary action
-                                        // next to Boost)
-                                        // ==================================
-                                        Expanded(
-                                          child: SizedBox(
-                                            height: 40.h,
-                                            child: OutlinedButton(
-                                              onPressed: () {
-                                                _onViewInsights(property);
-                                              },
-                                              style: OutlinedButton.styleFrom(
-                                                foregroundColor:
-                                                    AppColors.primary,
-                                                side: BorderSide(
-                                                  color: AppColors.primary,
-                                                ),
-                                                shape: RoundedRectangleBorder(
-                                                  borderRadius:
-                                                      BorderRadius.circular(
-                                                        10.r,
-                                                      ),
-                                                ),
-                                              ),
-                                              child: Row(
-                                                mainAxisAlignment:
-                                                    MainAxisAlignment.center,
-                                                children: [
-                                                  Icon(
-                                                    Icons.insights_rounded,
-                                                    size: 18.sp,
-                                                  ),
-                                                  SizedBox(width: 6.w),
-                                                  Text(
-                                                    "Insights".tr,
-                                                    style: TextStyle(
-                                                      fontSize: 13.sp,
-                                                      fontWeight:
-                                                          FontWeight.w600,
-                                                    ),
-                                                  ),
-                                                ],
-                                              ),
-                                            ),
-                                          ),
-                                        ),
-
-                                        SizedBox(width: 10.w),
-
-                                        // ==================================
-                                        // BOOST PROPERTY
-                                        // ==================================
-                                        Expanded(
-                                          child: SizedBox(
-                                            height: 40.h,
-                                            child: ElevatedButton(
-                                              onPressed: () {
-                                                _onBoostProperty(property);
-                                              },
-                                              style: ElevatedButton.styleFrom(
-                                                backgroundColor:
-                                                    AppColors.primary,
-                                                foregroundColor: Colors.white,
-                                                elevation: 0,
-                                                shape: RoundedRectangleBorder(
-                                                  borderRadius:
-                                                      BorderRadius.circular(
-                                                        10.r,
-                                                      ),
-                                                ),
-                                              ),
-                                              child: Row(
-                                                mainAxisAlignment:
-                                                    MainAxisAlignment.center,
-                                                children: [
-                                                  Icon(
-                                                    Icons
-                                                        .rocket_launch_outlined,
-                                                    size: 18.sp,
-                                                  ),
-                                                  SizedBox(width: 6.w),
-                                                  Text(
-                                                    "Boost Property".tr,
-                                                    style: TextStyle(
-                                                      fontSize: 13.sp,
-                                                      fontWeight:
-                                                          FontWeight.w600,
-                                                    ),
-                                                  ),
-                                                ],
-                                              ),
-                                            ),
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                SizedBox(height: 12.h),
-                                OverviewCard(property: property),
-                                SizedBox(height: 12.h),
-                                PropertyLocationCard(property: property),
-                                SizedBox(height: 12.h),
-                                PropertyDetailsCard(property: property),
-                                SizedBox(height: 12.h),
-                                Container(
-                                  padding: EdgeInsets.all(16.w),
-                                  decoration: BoxDecoration(
-                                    color: Colors.white,
-                                    borderRadius: BorderRadius.circular(10.r),
-                                    border: Border.all(
-                                      color: const Color(0xffECECEC),
-                                    ),
-                                  ),
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Text(
-                                        "Amenities & Features".tr,
-                                        style: TextStyle(
-                                          fontSize: 16.sp,
-                                          fontWeight: FontWeight.w500,
-                                        ),
-                                      ),
-                                      SizedBox(height: 12.h),
-                                      GridView.builder(
-                                        shrinkWrap: true,
-                                        physics:
-                                            const NeverScrollableScrollPhysics(),
-                                        itemCount: property.amenities.length,
-                                        gridDelegate:
-                                            SliverGridDelegateWithFixedCrossAxisCount(
-                                              crossAxisCount: 3,
-                                              crossAxisSpacing: 6.w,
-                                              mainAxisSpacing: 6.h,
-                                              childAspectRatio: 2.3,
-                                            ),
-                                        itemBuilder: (context, index) {
-                                          final amenity =
-                                              property.amenities[index];
-
-                                          return Container(
-                                            padding: EdgeInsets.symmetric(
-                                              horizontal: 6.w,
-                                              vertical: 4.h,
-                                            ),
-                                            decoration: BoxDecoration(
-                                              //color: const Color(0xffF9F9FB),
-                                              borderRadius:
-                                                  BorderRadius.circular(8.r),
-                                              border: Border.all(
-                                                color: const Color(0xffE4E4E7),
-                                              ),
-                                            ),
-                                            child: Row(
-                                              children: [
-                                                (amenity.image ?? "").isNotEmpty
-                                                    ? Image.network(
-                                                        amenity.image!,
-                                                        width: 16.w,
-                                                        height: 16.w,
-                                                        fit: BoxFit.contain,
-                                                      )
-                                                    : Icon(
-                                                        Icons.check_circle,
-                                                        size: 14.sp,
-                                                        color:
-                                                            AppColors.primary,
-                                                      ),
-
-                                                SizedBox(width: 5.w),
-
-                                                Expanded(
-                                                  child: Text(
-                                                    amenity.title,
-                                                    maxLines: 2,
-                                                    overflow:
-                                                        TextOverflow.ellipsis,
-                                                    style: TextStyle(
-                                                      fontSize: 9.sp,
-                                                      fontWeight:
-                                                          FontWeight.w400,
-                                                      height: 1.2,
-                                                      color: Colors.black,
-                                                    ),
-                                                  ),
-                                                ),
-                                              ],
-                                            ),
-                                          );
-                                        },
-                                      ),
-                                    ],
-                                  ),
+                      Padding(
+                        padding: EdgeInsets.fromLTRB(16.w, 6.h, 16.w, 28.h),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            for (int i = 0; i < sections.length; i++)
+                              Padding(
+                                padding: EdgeInsets.only(
+                                  top: i == 0 ? 0 : 14.h,
                                 ),
-
-                                if (property.otherFeatures
-                                    .trim()
-                                    .isNotEmpty) ...[
-                                  SizedBox(height: 15.h),
-
-                                  Container(
-                                    width: double.infinity,
-                                    padding: EdgeInsets.all(16.w),
-                                    decoration: BoxDecoration(
-                                      color: Colors.white,
-                                      borderRadius: BorderRadius.circular(12.r),
-                                      border: Border.all(
-                                        color: const Color(0xffECECEC),
-                                      ),
-                                    ),
-                                    child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        Text(
-                                          "Other Features".tr,
-                                          style: TextStyle(
-                                            fontSize: 16.sp,
-                                            fontWeight: FontWeight.w500,
-                                          ),
-                                        ),
-
-                                        SizedBox(height: 14.h),
-
-                                        ...property.otherFeatures
-                                            .split(',')
-                                            .where((e) => e.trim().isNotEmpty)
-                                            .map(
-                                              (feature) => Padding(
-                                                padding: EdgeInsets.only(
-                                                  bottom: 12.h,
-                                                ),
-                                                child: Row(
-                                                  crossAxisAlignment:
-                                                      CrossAxisAlignment.start,
-                                                  children: [
-                                                    Container(
-                                                      margin: EdgeInsets.only(
-                                                        top: 2.h,
-                                                      ),
-                                                      width: 22.w,
-                                                      height: 22.w,
-                                                      decoration: BoxDecoration(
-                                                        color: AppColors.primary
-                                                            .withOpacity(.12),
-                                                        shape: BoxShape.circle,
-                                                      ),
-                                                      child: Icon(
-                                                        Icons.check,
-                                                        color:
-                                                            AppColors.primary,
-                                                        size: 14.sp,
-                                                      ),
-                                                    ),
-
-                                                    SizedBox(width: 10.w),
-
-                                                    Expanded(
-                                                      child: Text(
-                                                        feature.trim(),
-                                                        style: AppTextStyles
-                                                            .body14
-                                                            .copyWith(
-                                                              height: 1.45,
-                                                              color:
-                                                                  const Color(
-                                                                    0xff444444,
-                                                                  ),
-                                                            ),
-                                                      ),
-                                                    ),
-                                                  ],
-                                                ),
-                                              ),
-                                            ),
-                                      ],
-                                    ),
+                                child: FadeSlideIn(
+                                  delay: Duration(
+                                    milliseconds: 50 * (i > 6 ? 6 : i),
                                   ),
-                                ],
-                                SizedBox(height: 12.h),
-                                CompareCard(property: property),
-                                SizedBox(height: 12.h),
-                                AgentContactCard(property: property),
-                                SizedBox(height: 12.h),
-
-                                SizedBox(height: 20.h),
-                              ],
-                            ),
-                          ),
+                                  child: sections[i],
+                                ),
+                              ),
+                          ],
                         ),
                       ),
                     ],
+                  ),
+                ),
+
+                Positioned(
+                  top: 0,
+                  left: 0,
+                  right: 0,
+                  child: PdTopBar(
+                    scrollOffset: _scrollOffset,
+                    solidFrom: solidFrom,
+                    property: property,
+                    isMyProperty: isMyProperty,
+                    onReport: () => _showReportListingSheet(property),
                   ),
                 ),
               ],
@@ -664,7 +240,7 @@ class _PropertyDetailsScreenState extends State<PropertyDetailsScreen> {
   }
 
   Widget _buildBottomSection({
-    required dynamic property,
+    required Property property,
     required bool isMyProperty,
   }) {
     /// OTHER USER'S PROPERTY
@@ -673,67 +249,63 @@ class _PropertyDetailsScreenState extends State<PropertyDetailsScreen> {
     }
 
     /// Check whether property is already sold
-    final bool isSold =
-        property.status?.toString().trim().toUpperCase() == "SOLD".tr;
+    final bool isSold = property.status.trim().toUpperCase() == "SOLD";
 
-    return Material(
-      color: Colors.white,
-      elevation: 12,
-      child: SafeArea(
-        top: false,
-        child: Padding(
-          padding: EdgeInsets.fromLTRB(16.w, 12.h, 16.w, 12.h),
-          child: SizedBox(
-            width: double.infinity,
-            height: 48.h,
-            child: ElevatedButton(
-              /// Disable button after SOLD
-              onPressed: isSold
-                  ? null
-                  : () {
-                      _onMarkAsSold(property);
-                    },
+    return PdBottomBarShell(
+      child: SizedBox(
+        width: double.infinity,
+        height: 50.h,
+        child: DecoratedBox(
+          decoration: BoxDecoration(
+            /// Normal = brand gradient, Sold = red
+            gradient: isSold ? null : AppColors.ctaGradient,
+            color: isSold ? const Color(0xFFD32F2F) : null,
+            borderRadius: BorderRadius.circular(16.r),
+            boxShadow: [
+              BoxShadow(
+                color: (isSold ? const Color(0xFFD32F2F) : AppColors.primary)
+                    .withValues(alpha: .40),
+                blurRadius: 18,
+                offset: const Offset(0, 8),
+              ),
+            ],
+          ),
+          child: ElevatedButton(
+            /// Disable button after SOLD
+            onPressed: isSold ? null : () => _onMarkAsSold(property),
 
-              style: ElevatedButton.styleFrom(
-                /// Normal = primary
-                /// Sold = red
-                backgroundColor: isSold
-                    ? const Color(0xFFD32F2F)
-                    : AppColors.primary,
+            style: ElevatedButton.styleFrom(
+              /// Transparent so the DecoratedBox gradient shows through -
+              /// including when disabled (Flutter would otherwise grey it).
+              backgroundColor: Colors.transparent,
+              disabledBackgroundColor: Colors.transparent,
+              shadowColor: Colors.transparent,
+              foregroundColor: Colors.white,
+              disabledForegroundColor: Colors.white,
+              elevation: 0,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(16.r),
+              ),
+            ),
 
-                /// Required because onPressed:null
-                /// otherwise Flutter makes it grey
-                disabledBackgroundColor: const Color(0xFFD32F2F),
-
-                foregroundColor: Colors.white,
-                disabledForegroundColor: Colors.white,
-
-                elevation: 0,
-
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10.r),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(
+                  isSold ? Icons.check_circle_rounded : Icons.sell_outlined,
+                  size: 19.sp,
                 ),
-              ),
 
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(
-                    isSold ? Icons.check_circle_rounded : Icons.sell_outlined,
-                    size: 19.sp,
+                SizedBox(width: 8.w),
+
+                Text(
+                  isSold ? "Sold".tr : "Mark as Sold".tr,
+                  style: TextStyle(
+                    fontSize: 14.sp,
+                    fontWeight: FontWeight.w700,
                   ),
-
-                  SizedBox(width: 8.w),
-
-                  Text(
-                    isSold ? "Sold".tr : "Mark as Sold".tr,
-                    style: TextStyle(
-                      fontSize: 14.sp,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                ],
-              ),
+                ),
+              ],
             ),
           ),
         ),

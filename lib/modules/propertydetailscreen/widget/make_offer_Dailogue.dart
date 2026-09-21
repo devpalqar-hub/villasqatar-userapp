@@ -553,9 +553,7 @@ class _MakeOfferBottomSheetState extends State<MakeOfferBottomSheet> {
 
     Get.put(ChatController(listingId: widget.property.id!));
 
-    Get.to(
-      () => ChatStartScreen(property: widget.property, showPropertyCard: false),
-    );
+    Get.to(() => ChatStartScreen(property: widget.property));
   }
 
   // ================================================

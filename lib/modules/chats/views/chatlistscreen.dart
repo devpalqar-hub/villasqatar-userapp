@@ -37,7 +37,7 @@ class ChatListScreen extends StatelessWidget {
             color: Colors.black87,
           ),
         ),
-       
+
         actions: [
           IconButton(
             tooltip: "My Visits".tr,
@@ -84,7 +84,15 @@ class ChatListScreen extends StatelessWidget {
                     }
 
                     if (controller.filteredConversations.isEmpty) {
-                      return Center(child: Text("No Conversations".tr,style: TextStyle(fontSize: 15.sp,fontWeight: FontWeight.w500,)));
+                      return Center(
+                        child: Text(
+                          "No Conversations".tr,
+                          style: TextStyle(
+                            fontSize: 15.sp,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      );
                     }
 
                     return RefreshIndicator(
@@ -127,7 +135,9 @@ class ChatListScreen extends StatelessWidget {
                               Get.to(
                                 () => ChatStartScreen(
                                   listing: conversation.listing,
-                                  showPropertyCard: false,
+                                  otherUserId: seller.userId,
+                                  otherUserName: seller.user.name,
+                                  otherUserRole: seller.user.role,
                                 ),
                               );
                             },

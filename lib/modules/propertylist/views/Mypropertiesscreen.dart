@@ -227,7 +227,19 @@ class _MyPropertiesScreenState extends State<MyPropertiesScreen> {
       padding: const EdgeInsets.fromLTRB(12, 8, 16, 8),
       child: Row(
         children: [
-        
+          // Opened as a pushed screen (there is no bottom bar to leave by),
+          // so it needs its own way back. Keeps the title centred by taking
+          // the same width as the filter button on the other side.
+          if (Navigator.of(context).canPop())
+            IconButton(
+              icon: const BackButtonIcon(),
+              color: Colors.black87,
+              tooltip: MaterialLocalizations.of(context).backButtonTooltip,
+              onPressed: Get.back,
+            )
+          else
+            const SizedBox(width: 48),
+
           Expanded(
             child: Text(
               "My Properties".tr,

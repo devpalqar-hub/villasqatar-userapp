@@ -9,6 +9,7 @@ import 'package:villas_qatar/Core/utils/auth_guard.dart';
 import 'package:villas_qatar/modules/invoices/views/my_invoices_screen.dart';
 import 'package:villas_qatar/modules/onboard/controller/auth_controller.dart';
 import 'package:villas_qatar/modules/onboard/views/welcome_screen.dart';
+import 'package:villas_qatar/modules/propertylist/views/Mypropertiesscreen.dart';
 import 'package:villas_qatar/modules/settings/service/profile_controller.dart';
 import 'package:villas_qatar/modules/settings/widget/editprofile_bottomsheet.dart';
 
@@ -97,6 +98,19 @@ class SettingsScreen extends StatelessWidget {
           backgroundColor: Colors.transparent,
           builder: (_) => const EditProfileBottomSheet(),
         );
+      },
+    ),
+    SettingItem(
+      icon: Icons.apartment_outlined,
+      title: "My Properties".tr,
+      onTap: () {
+        if (!AuthGuard.requireLogin(
+          message: "Please login to manage your properties.".tr,
+        )) {
+          return;
+        }
+
+        Get.to(() => const MyPropertiesScreen());
       },
     ),
     SettingItem(

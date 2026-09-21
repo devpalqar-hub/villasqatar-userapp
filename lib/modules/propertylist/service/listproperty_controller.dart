@@ -150,49 +150,106 @@ class ListPropertyController extends GetxController {
   //--------------------------------------------------
   String coverImage = "";
 
-  void removeCoverImage() {
-    coverImage = "";
-    update();
-  }
-
   /// Message for whichever required field is missing on the current
   /// step, set by [validateCurrentStep]. Null once everything's filled.
   String? stepError;
 
+  /// Key of the first invalid field on the current step (see the
+  /// `errorField == '...'` checks in the view). Lets the UI outline the
+  /// field and scroll to it.
+  String? errorField;
+
+  static const String purposeSale = "SALE";
+  static const String purposeRent = "RENT";
+
+  bool get hasCover => coverImage.isNotEmpty || existingPhotos.isNotEmpty;
+
+  /// Already-uploaded photo shown in the cover slot (edit mode) while no
+  /// new cover has been picked.
+  Photo? get existingCover =>
+      coverImage.isEmpty && existingPhotos.isNotEmpty
+      ? existingPhotos.first
+      : null;
+
+  /// Already-uploaded photos that belong in the gallery grid, i.e.
+  /// everything except the one occupying the cover slot.
+  List<Photo> get existingGallery => coverImage.isEmpty
+      ? existingPhotos.skip(1).toList()
+      : List<Photo>.from(existingPhotos);
+
+  int get galleryCount => images.length + existingGallery.length;
+
+  void setCoverImage(String path) {
+    // Picking a new cover replaces the current (existing) one.
+    if (coverImage.isEmpty && existingPhotos.isNotEmpty) {
+      existingPhotos.removeAt(0);
+    }
+    coverImage = path;
+    update();
+  }
+
+  void removeCover() {
+    if (coverImage.isNotEmpty) {
+      coverImage = "";
+    } else if (existingPhotos.isNotEmpty) {
+      existingPhotos.removeAt(0);
+    }
+    update();
+  }
+
+  void removeExistingPhoto(Photo photo) {
+    existingPhotos.remove(photo);
+    update();
+  }
+
+  void setPriceNegotiable(bool value) {
+    priceNegotiable = value;
+    update();
+  }
+
+  String _plainText(String html) =>
+      html.replaceAll(RegExp(r'<[^>]*>'), ' ').replaceAll('&nbsp;', ' ').trim();
+
   /// Checks the required fields for [currentStep] (mirrors the
-  /// `required: true` markers on each step's `_fieldLabel` in the UI)
-  /// and reports the first thing that's missing. Called before
-  /// [nextStep] so the wizard can no longer be advanced past blank
-  /// required fields.
+  /// `required` markers on each step's fields in the UI) and reports the
+  /// first thing that's missing, in on-screen order. Called before
+  /// [nextStep] so the wizard can't be advanced past blank required fields.
   bool validateCurrentStep() {
     stepError = null;
+    errorField = null;
+
+    void fail(String field, String message) {
+      if (stepError != null) return;
+      errorField = field;
+      stepError = message;
+    }
 
     switch (currentStep) {
       case 0: // Basic Info
         if (fullNameController.text.trim().isEmpty) {
-          stepError = "Please enter your full name".tr;
+          fail('fullName', "Please enter your full name".tr);
         } else if (phoneController.text.trim().isEmpty) {
-          stepError = "Please enter your contact number".tr;
-        } else if (descriptionController.text.trim().isEmpty) {
-          stepError = "Please enter a property description".tr;
+          fail('phone', "Please enter your contact number".tr);
         }
         break;
 
       case 1: // Details
-        if (propertyNameController.text.trim().isEmpty) {
-          stepError = "Please enter the property name".tr;
-        } else if (propertyType.isEmpty) {
-          stepError = "Please select a property type".tr;
-        } else if (bedroomsController.text.trim().isEmpty) {
-          stepError = "Please enter the number of bedrooms".tr;
-        } else if (bathroomsController.text.trim().isEmpty) {
-          stepError = "Please enter the number of bathrooms".tr;
+        if (propertyType.isEmpty) {
+          fail('propertyType', "Please select a property type".tr);
         } else if (propertyPurpose.isEmpty) {
-          stepError = "Please select Sale or Rent".tr;
+          fail('purpose', "Please select Sale or Rent".tr);
+        } else if (propertyNameController.text.trim().isEmpty) {
+          fail('propertyName', "Please enter the property name".tr);
+        } else if (_plainText(descriptionController.text).isEmpty) {
+          fail('description', "Please enter a property description".tr);
         } else if (priceController.text.trim().isEmpty) {
-          stepError = "Please enter the price".tr;
+          fail('price', "Please enter the price".tr);
+        } else if (bedroomsController.text.trim().isEmpty) {
+          fail('bedrooms', "Please enter the number of bedrooms".tr);
+        } else if (bathroomsController.text.trim().isEmpty) {
+          fail('bathrooms', "Please enter the number of bathrooms".tr);
         } else if (areaController.text.trim().isEmpty) {
-          stepError = "Please enter the area".tr;
+          fail('area', "Please enter the area".tr);
         }
         break;
 
@@ -200,23 +257,23 @@ class ListPropertyController extends GetxController {
         break;
 
       case 3: // Location
-        if (addressController.text.trim().isEmpty) {
-          stepError = "Please enter the address".tr;
-        } else if (areaNameController.text.trim().isEmpty) {
-          stepError = "Please enter the area".tr;
-        } else if (selectedMunicipalityId.isEmpty) {
-          stepError = "Please select a municipality".tr;
-        } else if (latitudeController.text.trim().isEmpty ||
+        if (latitudeController.text.trim().isEmpty ||
             longitudeController.text.trim().isEmpty) {
-          stepError = "Please select the property location on the map".tr;
+          fail('location', "Please select the property location on the map".tr);
+        } else if (addressController.text.trim().isEmpty) {
+          fail('address', "Please enter the address".tr);
+        } else if (areaNameController.text.trim().isEmpty) {
+          fail('areaName', "Please enter the area".tr);
+        } else if (selectedMunicipalityId.isEmpty) {
+          fail('municipality', "Please select a municipality".tr);
         }
         break;
 
       case 4: // Media
-        if (coverImage.isEmpty) {
-          stepError = "Please add a cover image".tr;
-        } else if (images.isEmpty && existingPhotos.isEmpty) {
-          stepError = "Please add at least one property photo".tr;
+        if (!hasCover) {
+          fail('cover', "Please add a cover image".tr);
+        } else if (galleryCount == 0) {
+          fail('photos', "Please add at least one property photo".tr);
         }
         break;
     }
@@ -251,12 +308,23 @@ class ListPropertyController extends GetxController {
   void previousStep() {
     if (currentStep > 0) {
       currentStep--;
+      stepError = null;
+      errorField = null;
       update();
     }
   }
 
   void goToStep(int index) {
     currentStep = index;
+    stepError = null;
+    errorField = null;
+    update();
+  }
+
+  void clearError() {
+    if (errorField == null) return;
+    stepError = null;
+    errorField = null;
     update();
   }
 
@@ -375,31 +443,54 @@ class ListPropertyController extends GetxController {
   // CLEAR
   //--------------------------------------------------
 
-  void clearForm() {
-    fullNameController.clear();
-    phoneController.clear();
-    emailController.clear();
-    descriptionController.clear();
+  /// Puts the wizard back to a blank state. The controller is registered
+  /// once and outlives the screen, so this runs every time the screen is
+  /// opened — otherwise the previous listing's data (and step) would show
+  /// up again. Loaded option lists (amenities etc.) are intentionally kept.
+  void resetForm() {
+    for (final c in [
+      fullNameController,
+      phoneController,
+      emailController,
+      descriptionController,
+      propertyNameController,
+      bedroomsController,
+      bathroomsController,
+      livingRoomsController,
+      parkingSpacesController,
+      areaController,
+      priceController,
+      yearBuiltController,
+      floorNumberController,
+      totalFloorsController,
+      otherFeatureController,
+      addressController,
+      streetController,
+      cityController,
+      areaNameController,
+      buildingController,
+      landmarkController,
+      latitudeController,
+      longitudeController,
+      otpController,
+    ]) {
+      c.clear();
+    }
 
-    bedroomsController.clear();
-    bathroomsController.clear();
-    areaController.clear();
-    priceController.clear();
-
-    addressController.clear();
-    cityController.clear();
-    areaNameController.clear();
-    buildingController.clear();
-    landmarkController.clear();
+    countryCode = "+974";
+    phoneChecked = false;
+    whatsappVerified = true;
+    showOtpField = false;
 
     propertyType = "";
+    selectedTypeId = "";
     propertyPurpose = "";
     propertyCategory = "";
+    priceNegotiable = false;
+    selectedMunicipalityId = "";
 
     latitude = 0;
     longitude = 0;
-    latitudeController.clear();
-    longitudeController.clear();
 
     selectedAmenities.clear();
     selectedNearbyTags.clear();
@@ -411,8 +502,26 @@ class ListPropertyController extends GetxController {
     video = "";
 
     currentStep = 0;
+    stepError = null;
+    errorField = null;
 
     update();
+  }
+
+  /// Lets the user edit the number again after it has been checked.
+  void resetPhoneVerification() {
+    phoneChecked = false;
+    whatsappVerified = true;
+    showOtpField = false;
+    otpController.clear();
+    update();
+  }
+
+  /// Coordinates can be typed or filled by GPS/search, both of which only
+  /// touch the text controllers — read them back before submitting.
+  void _syncCoordinates() {
+    latitude = double.tryParse(latitudeController.text.trim()) ?? latitude;
+    longitude = double.tryParse(longitudeController.text.trim()) ?? longitude;
   }
 
   //--------------------------------------------------
@@ -512,6 +621,8 @@ class ListPropertyController extends GetxController {
       if (uploadedImageUrls.length != expectedImageCount) {
         throw Exception("Some images could not be uploaded.".tr);
       }
+      _syncCoordinates();
+
       final body = {
         "propertyName": propertyNameController.text.trim(),
         "description": descriptionController.text.trim(),
@@ -715,30 +826,34 @@ class ListPropertyController extends GetxController {
       error = "";
       update();
 
-      List<Map<String, dynamic>> photoList = existingPhotos
-          .map<Map<String, dynamic>>(
-            (e) => <String, dynamic>{
-              "url": e.url,
-              "sortOrder": e.sortOrder,
-              "caption": e.caption,
-            },
-          )
-          .toList();
+      // Final photo order: new cover (if one was picked), then the photos
+      // already on the listing, then newly added gallery photos. The
+      // backend treats sortOrder 0 as the cover, so renumber from 0.
+      final hasNewCover = coverImage.isNotEmpty;
 
-      // Upload newly selected images and append them
-      if (images.isNotEmpty || coverImage.isNotEmpty) {
-        final newPhotos = await uploadAllPropertyImages();
+      final List<Map<String, dynamic>> uploaded =
+          (images.isNotEmpty || hasNewCover)
+          ? await uploadAllPropertyImages()
+          : <Map<String, dynamic>>[];
 
-        int sortOrder = photoList.length;
+      final ordered = <Map<String, dynamic>>[
+        if (hasNewCover && uploaded.isNotEmpty) uploaded.first,
+        ...existingPhotos.map<Map<String, dynamic>>(
+          (e) => <String, dynamic>{"url": e.url, "caption": e.caption},
+        ),
+        ...uploaded.skip(hasNewCover ? 1 : 0),
+      ];
 
-        for (final photo in newPhotos) {
-          photoList.add(<String, dynamic>{
-            "url": photo["url"],
-            "sortOrder": sortOrder++,
-            "caption": photo["caption"] ?? "",
-          });
-        }
-      }
+      final photoList = <Map<String, dynamic>>[
+        for (int i = 0; i < ordered.length; i++)
+          <String, dynamic>{
+            "url": ordered[i]["url"],
+            "sortOrder": i,
+            "caption": ordered[i]["caption"] ?? "",
+          },
+      ];
+
+      _syncCoordinates();
 
       final body = {
         "propertyName": propertyNameController.text.trim(),
@@ -813,10 +928,26 @@ class ListPropertyController extends GetxController {
 
 
 
+  /// The API stores the number with its dial code ("+97455..."), while the
+  /// form keeps them apart and re-joins them on submit.
+  void _applyContactPhone(String full) {
+    const knownCodes = ['+974', '+971', '+91', '+44', '+1'];
+    final phone = full.trim();
+
+    for (final code in knownCodes) {
+      if (phone.startsWith(code)) {
+        countryCode = code;
+        phoneController.text = phone.substring(code.length);
+        return;
+      }
+    }
+    phoneController.text = phone;
+  }
+
   void loadProperty(Property property) {
     // Step 1
     fullNameController.text = property.createdBy.name;
-    phoneController.text = property.contactPhone;
+    _applyContactPhone(property.contactPhone);
     emailController.text = property.createdBy.email;
     descriptionController.text = property.description;
 

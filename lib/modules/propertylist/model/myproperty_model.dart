@@ -4,10 +4,7 @@ class MyPropertyModel {
   final List<Property> data;
   final Meta meta;
 
-  const MyPropertyModel({
-    required this.data,
-    required this.meta,
-  });
+  const MyPropertyModel({required this.data, required this.meta});
 
   factory MyPropertyModel.fromJson(Map<String, dynamic> json) {
     return MyPropertyModel(
@@ -173,8 +170,7 @@ class Property {
       furnishingId: json["furnishingId"] ?? "",
       furnishing: Furnishing.fromJson(json["furnishing"] ?? {}),
 
-      extraProperties:
-          Map<String, dynamic>.from(json["extraProperties"] ?? {}),
+      extraProperties: Map<String, dynamic>.from(json["extraProperties"] ?? {}),
 
       price: (json["price"] ?? 0).toDouble(),
       priceNegotiable: json["priceNegotiable"] ?? false,
@@ -242,20 +238,15 @@ class Property {
     return list;
   }
 }
+
 class ListingType {
   final String id;
   final String title;
 
-  const ListingType({
-    required this.id,
-    required this.title,
-  });
+  const ListingType({required this.id, required this.title});
 
   factory ListingType.fromJson(Map<String, dynamic> json) {
-    return ListingType(
-      id: json["id"] ?? "",
-      title: json["title"] ?? "",
-    );
+    return ListingType(id: json["id"] ?? "", title: json["title"] ?? "");
   }
 }
 
@@ -263,16 +254,10 @@ class Furnishing {
   final String id;
   final String title;
 
-  const Furnishing({
-    required this.id,
-    required this.title,
-  });
+  const Furnishing({required this.id, required this.title});
 
   factory Furnishing.fromJson(Map<String, dynamic> json) {
-    return Furnishing(
-      id: json["id"] ?? "",
-      title: json["title"] ?? "",
-    );
+    return Furnishing(id: json["id"] ?? "", title: json["title"] ?? "");
   }
 }
 
@@ -437,6 +422,7 @@ class Photo {
     );
   }
 }
+
 class Review {
   final String id;
   final String action;
@@ -460,9 +446,7 @@ class Review {
       reviewedAt: json["reviewedAt"] != null
           ? DateTime.parse(json["reviewedAt"])
           : DateTime.now(),
-      reviewedBy: ReviewedBy.fromJson(
-        json["reviewedBy"] ?? {},
-      ),
+      reviewedBy: ReviewedBy.fromJson(json["reviewedBy"] ?? {}),
     );
   }
 }
@@ -472,11 +456,7 @@ class ReviewedBy {
   final String name;
   final String role;
 
-  const ReviewedBy({
-    required this.id,
-    required this.name,
-    required this.role,
-  });
+  const ReviewedBy({required this.id, required this.name, required this.role});
 
   factory ReviewedBy.fromJson(Map<String, dynamic> json) {
     return ReviewedBy(
@@ -544,10 +524,10 @@ class PropertyInsights {
   });
 
   const PropertyInsights.empty()
-      : viewsTrend = const [],
-        allTime = const PropertyInsightsMetrics.empty(),
-        period = const PropertyInsightsMetrics.empty(),
-        previousPeriodViews = null;
+    : viewsTrend = const [],
+      allTime = const PropertyInsightsMetrics.empty(),
+      period = const PropertyInsightsMetrics.empty(),
+      previousPeriodViews = null;
 
   factory PropertyInsights.fromJson(dynamic json) {
     if (json is! Map) {
@@ -560,11 +540,7 @@ class PropertyInsights {
 
     final List<InsightPoint> points = rawList
         .whereType<Map>()
-        .map(
-          (e) => InsightPoint.fromJson(
-            Map<String, dynamic>.from(e),
-          ),
-        )
+        .map((e) => InsightPoint.fromJson(Map<String, dynamic>.from(e)))
         .toList();
 
     final int trendTotalViews = points.fold<int>(
@@ -586,11 +562,13 @@ class PropertyInsights {
       'summary',
     ]);
 
-    PropertyInsightsMetrics allTime =
-        PropertyInsightsMetrics.fromJson(allTimeJson);
+    PropertyInsightsMetrics allTime = PropertyInsightsMetrics.fromJson(
+      allTimeJson,
+    );
 
-    PropertyInsightsMetrics period =
-        PropertyInsightsMetrics.fromJson(periodJson);
+    PropertyInsightsMetrics period = PropertyInsightsMetrics.fromJson(
+      periodJson,
+    );
 
     // Neither wrapper present on the root "insights" object yet -
     // use the daily trend total as the best available view count
@@ -667,10 +645,7 @@ class PropertyInsights {
   /// backward compatibility - prefer [period].views or
   /// [allTime].views going forward.
   int get totalViews {
-    return viewsTrend.fold<int>(
-      0,
-      (sum, point) => sum + point.views,
-    );
+    return viewsTrend.fold<int>(0, (sum, point) => sum + point.views);
   }
 
   /// "11 Aug - 12 Aug" style label built from the first/last trend
@@ -699,9 +674,7 @@ class PropertyInsights {
       return period.views > 0 ? 100 : 0;
     }
 
-    return ((period.views - previousPeriodViews!) /
-            previousPeriodViews!) *
-        100;
+    return ((period.views - previousPeriodViews!) / previousPeriodViews!) * 100;
   }
 }
 
@@ -732,13 +705,13 @@ class PropertyInsightsMetrics {
   });
 
   const PropertyInsightsMetrics.empty()
-      : views = 0,
-        reach = 0,
-        impressions = 0,
-        whatsappClicks = 0,
-        messagesStarted = 0,
-        usersEngaged = 0,
-        visitRequests = 0;
+    : views = 0,
+      reach = 0,
+      impressions = 0,
+      whatsappClicks = 0,
+      messagesStarted = 0,
+      usersEngaged = 0,
+      visitRequests = 0;
 
   factory PropertyInsightsMetrics.fromJson(Map<String, dynamic>? json) {
     if (json == null) {
@@ -749,22 +722,26 @@ class PropertyInsightsMetrics {
       views: _int(json, ['views', 'totalViews', 'viewCount']),
       reach: _int(json, ['reach', 'uniqueReach', 'totalReach']),
       impressions: _int(json, ['impressions', 'totalImpressions']),
-      whatsappClicks: _int(
-        json,
-        ['whatsappClicks', 'whatsAppClicks', 'waClicks'],
-      ),
-      messagesStarted: _int(
-        json,
-        ['messagesStarted', 'chatsStarted', 'conversationsStarted'],
-      ),
-      usersEngaged: _int(
-        json,
-        ['usersEngaged', 'engagedUsers', 'uniqueUsersEngaged'],
-      ),
-      visitRequests: _int(
-        json,
-        ['visitRequests', 'visitsRequested', 'scheduledVisits'],
-      ),
+      whatsappClicks: _int(json, [
+        'whatsappClicks',
+        'whatsAppClicks',
+        'waClicks',
+      ]),
+      messagesStarted: _int(json, [
+        'messagesStarted',
+        'chatsStarted',
+        'conversationsStarted',
+      ]),
+      usersEngaged: _int(json, [
+        'usersEngaged',
+        'engagedUsers',
+        'uniqueUsersEngaged',
+      ]),
+      visitRequests: _int(json, [
+        'visitRequests',
+        'visitsRequested',
+        'scheduledVisits',
+      ]),
     );
   }
 
@@ -809,10 +786,7 @@ class InsightPoint {
   final DateTime? period;
   final int views;
 
-  const InsightPoint({
-    required this.period,
-    required this.views,
-  });
+  const InsightPoint({required this.period, required this.views});
 
   factory InsightPoint.fromJson(Map<String, dynamic> json) {
     return InsightPoint(

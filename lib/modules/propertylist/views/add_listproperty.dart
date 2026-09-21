@@ -3,16 +3,12 @@ import 'dart:io';
 import 'package:country_pickers/utils/utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:get/get_core/get_core.dart';
-import 'package:get/get_instance/src/extension_instance.dart';
-import 'package:get/get_navigation/src/extension_navigation.dart';
-import 'package:get/get_state_manager/src/simple/get_state.dart';
-import 'package:get/get_utils/src/extensions/internacionalization.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:intl/intl.dart' show NumberFormat;
 import 'package:quill_html_editor/quill_html_editor.dart';
 import 'package:villas_qatar/Core/constants/app_colors.dart';
-import 'package:villas_qatar/Core/theme/app_textstyles.dart';
 import 'package:villas_qatar/Core/widgets/primary_button.dart';
 import 'package:villas_qatar/modules/home/model/location_repsone_model.dart';
 import 'package:villas_qatar/modules/home/service/UtilsController.dart';
@@ -20,6 +16,7 @@ import 'package:villas_qatar/modules/home/service/loaction_controller.dart';
 import 'package:villas_qatar/modules/mainscreen/mainscreen.dart';
 import 'package:villas_qatar/modules/propertylist/model/myproperty_model.dart';
 import 'package:villas_qatar/modules/propertylist/service/listproperty_controller.dart';
+import 'package:villas_qatar/modules/propertylist/widgets/list_property_widgets.dart';
 
 class ListYourPropertyScreen extends StatefulWidget {
   final Property? property;
@@ -31,24 +28,13 @@ class ListYourPropertyScreen extends StatefulWidget {
 }
 
 class _ListYourPropertyScreenState extends State<ListYourPropertyScreen> {
-  @override
-  void initState() {
-    super.initState();
-
-    if (widget.isEdit && widget.property != null) {
-      controller.loadProperty(widget.property!);
-    }
-  }
-
-  @override
-  void dispose() {
-    _descriptionQuillController.dispose();
-    super.dispose();
-  }
+  static const int _maxPhotos = 20;
 
   final ListPropertyController controller = Get.put(ListPropertyController());
   final Utilscontroller utilsController = Get.put(Utilscontroller());
+  late final LocationController _location = Get.put(LocationController());
   final ImagePicker _picker = ImagePicker();
+  final ScrollController _scroll = ScrollController();
 
   // Rich-text description editor. `controller.descriptionController`
   // (a plain TextEditingController) stays the single source of truth
@@ -59,35 +45,111 @@ class _ListYourPropertyScreenState extends State<ListYourPropertyScreen> {
       QuillEditorController();
   double _descriptionEditorHeight = 160;
 
-  String currency = 'QAR';
+  /// One anchor per validatable field, so a failed "Continue" can scroll
+  /// the offending field into view.
+  final Map<String, GlobalKey> _anchors = {};
 
-  String? zoneArea;
-  String city = 'Doha';
-  String country = 'Qatar';
-  String propertyPosition = 'Residential'; // 'Residential' | 'Commercial'
-
-  final List<String> stepLabels = [
-    'Basic Info'.tr,
-    'Details'.tr,
-    'Features'.tr,
-    'Location'.tr,
-    'Media'.tr,
-    'Review'.tr,
-  ];
+  String _pickedLocationTitle = '';
+  bool _detectingLocation = false;
+  bool _showAllAmenities = false;
+  bool _showAllNearby = false;
 
   @override
+  void initState() {
+    super.initState();
+
+    // The controller outlives this screen, so always start from a clean
+    // slate — otherwise the previous listing (and its step) reappears.
+    controller.resetForm();
+
+    if (widget.isEdit && widget.property != null) {
+      controller.loadProperty(widget.property!);
+    }
+
+    if (utilsController.listingTypes.isEmpty && !utilsController.isLoading) {
+      utilsController.fetchPropertyType();
+    }
+  }
+
+  @override
+  void dispose() {
+    _descriptionQuillController.dispose();
+    _scroll.dispose();
+    super.dispose();
+  }
+
+  // ---------------------------------------------------------
+  // VALIDATION HELPERS
+  // ---------------------------------------------------------
+  GlobalKey _anchor(String name) =>
+      _anchors.putIfAbsent(name, () => GlobalKey(debugLabel: name));
+
+  Widget _anchored(String name, Widget child) =>
+      KeyedSubtree(key: _anchor(name), child: child);
+
+  bool _err(String name) => controller.errorField == name;
+
+  /// Clears the error outline once the user starts fixing that field.
+  void _fixing(String name) {
+    if (_err(name)) controller.clearError();
+  }
+
+  /// Applies a selection change and clears that field's error in one update.
+  void _select(String name, VoidCallback apply) {
+    apply();
+    if (_err(name)) {
+      controller.stepError = null;
+      controller.errorField = null;
+    }
+    controller.update();
+  }
+
+  // ---------------------------------------------------------
+  // NAVIGATION
+  // ---------------------------------------------------------
+  void _scrollToTop() {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (_scroll.hasClients) _scroll.jumpTo(0);
+    });
+  }
+
+  void _revealError() {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final ctx = _anchors[controller.errorField]?.currentContext;
+      if (ctx != null) {
+        Scrollable.ensureVisible(
+          ctx,
+          alignment: .15,
+          duration: const Duration(milliseconds: 300),
+          curve: Curves.easeOutCubic,
+        );
+      }
+    });
+  }
+
   void _goNext() {
+    FocusScope.of(context).unfocus();
     controller.nextStep();
+
+    if (controller.errorField != null) {
+      _revealError();
+    } else {
+      _scrollToTop();
+    }
   }
 
   void _goBack() {
+    FocusScope.of(context).unfocus();
     controller.previousStep();
+    _scrollToTop();
   }
 
-  // ============================================================
-  // BACK ARROW ON STEP 0
-  // ============================================================
-  //
+  void _goToStep(int index) {
+    FocusScope.of(context).unfocus();
+    controller.goToStep(index);
+    _scrollToTop();
+  }
+
   // Prefer a normal pop back to whatever screen pushed this one
   // (usually MyPropertiesScreen, still alive underneath). Using
   // Get.offAll() here unconditionally used to tear down the entire
@@ -106,748 +168,626 @@ class _ListYourPropertyScreenState extends State<ListYourPropertyScreen> {
     }
   }
 
+  bool get _hasEnteredData =>
+      [
+        controller.fullNameController,
+        controller.phoneController,
+        controller.emailController,
+        controller.propertyNameController,
+        controller.priceController,
+        controller.addressController,
+      ].any((c) => c.text.trim().isNotEmpty) ||
+      controller.images.isNotEmpty ||
+      controller.coverImage.isNotEmpty;
+
+  /// Back arrow / system back: step back through the wizard, and only
+  /// leave (after confirming, if there's something to lose) from step 1.
+  Future<void> _handleBack() async {
+    if (controller.currentStep > 0) {
+      _goBack();
+      return;
+    }
+
+    FocusScope.of(context).unfocus();
+
+    if (!widget.isEdit && _hasEnteredData) {
+      final discard = await showDialog<bool>(
+        context: context,
+        builder: (ctx) => AlertDialog(
+          backgroundColor: Colors.white,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          title: Text(
+            'Discard listing?'.tr,
+            style: const TextStyle(fontSize: 17, fontWeight: FontWeight.w700),
+          ),
+          content: Text(
+            'Your progress will be lost.'.tr,
+            style: const TextStyle(fontSize: 14, color: LpColors.muted),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(ctx, false),
+              child: Text('Keep Editing'.tr),
+            ),
+            TextButton(
+              onPressed: () => Navigator.pop(ctx, true),
+              style: TextButton.styleFrom(foregroundColor: LpColors.error),
+              child: Text('Discard'.tr),
+            ),
+          ],
+        ),
+      );
+
+      if (discard != true || !mounted) return;
+    }
+
+    _goBackOrHome();
+  }
+
+  Future<void> _submit() async {
+    FocusScope.of(context).unfocus();
+
+    final bool success = widget.isEdit
+        ? await controller.updateProperty(widget.property!.id)
+        : await controller.addProperty();
+
+    if (success) {
+      Get.back(result: true);
+    }
+  }
+
+  // ---------------------------------------------------------
+  // BUILD
+  // ---------------------------------------------------------
   @override
   Widget build(BuildContext context) {
-    return GetBuilder<ListPropertyController>(
-      builder: (controller) {
-        return Scaffold(
-          bottomNavigationBar: SafeArea(
-            top: false,
-            child: Container(
-              padding: const EdgeInsets.fromLTRB(20, 12, 20, 20),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: const BorderRadius.vertical(
-                  top: Radius.circular(20),
-                ),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(.08),
-                    blurRadius: 16,
-                    offset: const Offset(0, -4),
+    return PopScope(
+      canPop: false,
+      onPopInvokedWithResult: (didPop, _) {
+        if (!didPop) _handleBack();
+      },
+      child: AnnotatedRegion<SystemUiOverlayStyle>(
+        value: SystemUiOverlayStyle.dark,
+        child: GetBuilder<ListPropertyController>(
+          builder: (_) {
+            final total = controller.steps.length;
+            final step = controller.currentStep;
+
+            return Scaffold(
+              backgroundColor: LpColors.pageBg,
+              body: Column(
+                children: [
+                  LpTopBar(
+                    title: widget.isEdit
+                        ? 'Edit Property'.tr
+                        : 'List Your Property'.tr,
+                    stepLabel:
+                        '${'Step @current of @total'.trParams({'current': '${step + 1}', 'total': '$total'})}'
+                        ' · ${controller.steps[step].tr}',
+                    currentStep: step,
+                    totalSteps: total,
+                    onBack: _handleBack,
+                    onStepTap: _goToStep,
+                  ),
+                  Expanded(
+                    child: SingleChildScrollView(
+                      controller: _scroll,
+                      keyboardDismissBehavior:
+                          ScrollViewKeyboardDismissBehavior.onDrag,
+                      padding: const EdgeInsets.fromLTRB(16, 20, 16, 28),
+                      child: _stepContent(step),
+                    ),
                   ),
                 ],
               ),
-              child: _buildBottomButton(),
-            ),
-          ),
-          body: Stack(
-            children: [
-              /// Full screen background
-              Positioned.fill(
-                child: Image.asset("assets/bg2.png", fit: BoxFit.cover),
-              ),
-
-              /// Screen Content
-              SafeArea(
-                child: Column(
-                  children: [
-                    _buildTopBar(),
-                    _buildStepper(),
-                    Expanded(
-                      child: SingleChildScrollView(
-                        padding: EdgeInsets.fromLTRB(20, 16, 20, 100),
-                        child: Column(
-                          children: [_buildCard(), const SizedBox(height: 20)],
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-        );
-      },
+              bottomNavigationBar: LpBottomBar(child: _buildActions(step, total)),
+            );
+          },
+        ),
+      ),
     );
   }
 
-  Widget _buildTopBar() {
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(12, 8, 16, 8),
-      child: Row(
-        children: [
-          IconButton(
-            icon: const Icon(Icons.arrow_back, color: AppColors.primary),
-            onPressed: controller.currentStep > 0
-                ? _goBack
-                : _goBackOrHome,
-          ),
+  Widget _stepContent(int step) {
+    switch (step) {
+      case 0:
+        return _buildStep1();
+      case 1:
+        return _buildStep2();
+      case 2:
+        return _buildStep3();
+      case 3:
+        return _buildStep4();
+      case 4:
+        return _buildStep5();
+      case 5:
+        return _buildReviewStep();
+      default:
+        return const SizedBox.shrink();
+    }
+  }
+
+  Widget _buildActions(int step, int total) {
+    final bool isReview = step == total - 1;
+
+    return Row(
+      children: [
+        if (step > 0) ...[
           Expanded(
-            child: Text(
-              'List Your Property'.tr,
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.w700,
-                color: Colors.black87,
-              ),
+            flex: 2,
+            child: LpOutlineButton(
+              label: 'Back'.tr,
+              height: 50,
+              onTap: controller.isSubmitting ? null : _goBack,
             ),
           ),
-          // TextButton.icon(
-          //   onPressed: () {},
-          //   style: TextButton.styleFrom(
-          //     foregroundColor: AppColors.primary,
-          //     padding: EdgeInsets.zero,
-          //   ),
-          //   icon: const Icon(Icons.description_outlined, size: 18),
-          //   label: const Text(
-          //     'Save Draft',
-          //     style: TextStyle(fontWeight: FontWeight.w600, fontSize: 13),
-          //   ),
-          // ),
+          const SizedBox(width: 12),
+        ],
+        Expanded(
+          flex: 3,
+          child: PrimaryButton(
+            height: 50,
+            isLoading: controller.isSubmitting,
+            title: isReview
+                ? (widget.isEdit
+                      ? 'Update Property'.tr
+                      : 'Submit Property'.tr)
+                : 'Continue'.tr,
+            suffix: Icon(
+              isReview ? Icons.check_rounded : Icons.arrow_forward,
+              size: 18,
+              color: Colors.white,
+            ),
+            onTap: isReview ? _submit : _goNext,
+          ),
+        ),
+      ],
+    );
+  }
+
+  // ---------------------------------------------------------
+  // STEP 1 — BASIC INFO
+  // ---------------------------------------------------------
+  Widget _buildStep1() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        LpStepHeading(
+          icon: Icons.person_outline,
+          title: 'Property Owner Details'.tr,
+          subtitle: 'Enter your details to get started'.tr,
+        ),
+        const SizedBox(height: 20),
+
+        LpSectionCard(
+          icon: Icons.contact_phone_outlined,
+          title: 'Contact Details'.tr,
+          subtitle: 'Buyers will use these details to reach you'.tr,
+          children: [
+            _anchored(
+              'fullName',
+              LpLabeledField(
+                label: 'Full Name'.tr,
+                required: true,
+                child: LpTextField(
+                  controller: controller.fullNameController,
+                  hint: 'Enter your full name'.tr,
+                  prefixIcon: Icons.person_outline,
+                  textCapitalization: TextCapitalization.words,
+                  hasError: _err('fullName'),
+                  onChanged: (_) => _fixing('fullName'),
+                ),
+              ),
+            ),
+            const SizedBox(height: 16),
+
+            _anchored(
+              'phone',
+              LpLabeledField(
+                label: 'Contact Number'.tr,
+                required: true,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    IntrinsicHeight(
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          _CountryCodeDropdown(
+                            value: controller.countryCode,
+                            enabled: !controller.phoneChecked,
+                            onChanged: controller.setCountryCode,
+                          ),
+                          const SizedBox(width: 8),
+                          Expanded(
+                            child: LpTextField(
+                              controller: controller.phoneController,
+                              hint: 'Enter mobile number'.tr,
+                              keyboardType: TextInputType.phone,
+                              digitsOnly: true,
+                              enabled: !controller.phoneChecked,
+                              hasError: _err('phone'),
+                              onChanged: (_) => _fixing('phone'),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    _buildPhoneVerification(),
+                  ],
+                ),
+              ),
+            ),
+            const SizedBox(height: 16),
+
+            LpLabeledField(
+              label: 'Email Address'.tr,
+              child: LpTextField(
+                controller: controller.emailController,
+                hint: 'Enter your email'.tr,
+                keyboardType: TextInputType.emailAddress,
+                prefixIcon: Icons.email_outlined,
+              ),
+            ),
+          ],
+        ),
+      ],
+    );
+  }
+
+  Future<void> _checkPhone() async {
+    FocusScope.of(context).unfocus();
+
+    if (controller.phoneController.text.trim().isEmpty) {
+      controller.errorField = 'phone';
+      controller.update();
+      Fluttertoast.showToast(msg: 'Please enter your contact number'.tr);
+      return;
+    }
+
+    await controller.checkPhone();
+  }
+
+  Widget _changeNumberLink() {
+    return TextButton(
+      onPressed: controller.resetPhoneVerification,
+      style: TextButton.styleFrom(
+        foregroundColor: AppColors.primary,
+        minimumSize: const Size(0, 32),
+        padding: const EdgeInsets.symmetric(horizontal: 8),
+        tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+      ),
+      child: Text(
+        'Change'.tr,
+        style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w700),
+      ),
+    );
+  }
+
+  Widget _buildPhoneVerification() {
+    // Not checked yet
+    if (!controller.phoneChecked) {
+      return Padding(
+        padding: const EdgeInsets.only(top: 12),
+        child: Row(
+          children: [
+            const Icon(
+              Icons.chat_outlined,
+              size: 18,
+              color: AppColors.hintGrey,
+            ),
+            const SizedBox(width: 8),
+            Expanded(
+              child: Text(
+                'Confirm your number is verified on WhatsApp.'.tr,
+                style: const TextStyle(
+                  fontSize: 12.5,
+                  height: 1.35,
+                  color: LpColors.muted,
+                ),
+              ),
+            ),
+            const SizedBox(width: 10),
+            SizedBox(
+              width: 96,
+              child: LpOutlineButton(
+                label: 'Check'.tr,
+                loading: controller.isLoading,
+                onTap: _checkPhone,
+              ),
+            ),
+          ],
+        ),
+      );
+    }
+
+    // Verified
+    if (controller.whatsappVerified) {
+      return Padding(
+        padding: const EdgeInsets.only(top: 12),
+        child: LpBanner(
+          tone: LpBannerTone.success,
+          title: 'WhatsApp Verified'.tr,
+          message: 'Your contact number has been verified.'.tr,
+          action: _changeNumberLink(),
+        ),
+      );
+    }
+
+    // Needs OTP verification
+    return Padding(
+      padding: const EdgeInsets.only(top: 12),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          LpBanner(
+            tone: LpBannerTone.warning,
+            title: 'Verification Required'.tr,
+            message:
+                'Verify your WhatsApp number before publishing this property.'
+                    .tr,
+            action: _changeNumberLink(),
+          ),
+          const SizedBox(height: 14),
+
+          if (!controller.showOtpField)
+            PrimaryButton(
+              title: 'Send OTP'.tr,
+              height: 46,
+              isLoading: controller.isLoading,
+              onTap: controller.sendOtp,
+            )
+          else ...[
+            LpFieldLabel('Verification Code'.tr, required: true),
+            LpTextField(
+              controller: controller.otpController,
+              hint: 'Enter 6-digit OTP'.tr,
+              prefixIcon: Icons.lock_outline,
+              digitsOnly: true,
+              maxLength: 6,
+            ),
+            const SizedBox(height: 12),
+            PrimaryButton(
+              title: 'Verify Number'.tr,
+              height: 46,
+              isLoading: controller.isLoading,
+              onTap: controller.verifyOtp,
+            ),
+            Align(
+              alignment: AlignmentDirectional.centerEnd,
+              child: TextButton(
+                onPressed: controller.sendOtp,
+                child: Text('Resend OTP'.tr),
+              ),
+            ),
+          ],
         ],
       ),
     );
   }
 
   // ---------------------------------------------------------
-  // STEPPER (1 - 5) with connecting lines
-  // ---------------------------------------------------------
-  Widget _buildStepper() {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      child: Row(
-        children: List.generate(stepLabels.length * 2 - 1, (index) {
-          if (index.isOdd) {
-            final leftStep = (index ~/ 2) + 1;
-            final isCompleted = leftStep < controller.currentStep + 1;
-            return Expanded(
-              child: Container(
-                height: 2,
-                margin: const EdgeInsets.only(bottom: 20),
-                color: isCompleted ? AppColors.primary : (Color(0xFFE3E1E6)),
-              ),
-            );
-          }
-          final stepNumber = (index ~/ 2) + 1;
-          return _StepCircle(
-            number: stepNumber,
-            label: stepLabels[stepNumber - 1],
-            state: stepNumber < controller.currentStep + 1
-                ? _StepState.completed
-                : stepNumber == controller.currentStep + 1
-                ? _StepState.active
-                : _StepState.inactive,
-          );
-        }),
-      ),
-    );
-  }
-
-  Widget _buildCard() {
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: AppColors.cardBg,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: AppColors.fieldBorder),
-      ),
-      child: AnimatedSwitcher(
-        duration: const Duration(milliseconds: 250),
-        child: _stepContent(),
-      ),
-    );
-  }
-
-  Widget _stepContent() {
-    switch (controller.currentStep + 1) {
-      case 1:
-        return _buildStep1(key: const ValueKey('step1'));
-      case 2:
-        return _buildStep2(key: const ValueKey('step2'));
-      case 3:
-        return _buildStep3(key: const ValueKey('step3'));
-      case 4:
-        return _buildStep4(key: const ValueKey('step4'));
-      case 5:
-        return _buildStep5(key: const ValueKey('step5'));
-      case 6:
-        return _buildReviewStep(key: const ValueKey('review'));
-
-      default:
-        return const SizedBox.shrink();
-    }
-  }
-
-  // ---------------------------------------------------------
-  // STEP 1 — BASIC INFO
-  // ---------------------------------------------------------
- 
- Widget _buildStep1({Key? key}) {
-  return Column(
-    key: key,
-    crossAxisAlignment: CrossAxisAlignment.start,
-    children: [
-      _sectionHeader(
-        icon: Icons.person_outline,
-        title: "Property Owner Details".tr,
-        subtitle: "Enter your details to get started".tr,
-      ),
-
-      const SizedBox(height: 24),
-
-      //------------------------------------------------------------------
-      // FULL NAME
-      //------------------------------------------------------------------
-
-      _fieldLabel("Full Name".tr, required: true),
-
-      const SizedBox(height: 8),
-
-      _AppTextField(
-        controller: controller.fullNameController,
-        hint: "Enter your full name".tr,
-        prefixIcon: Icons.person_outline,
-      ),
-
-      const SizedBox(height: 24),
-
-      //------------------------------------------------------------------
-      // PHONE
-      //------------------------------------------------------------------
-         //------------------------------------------------------------------
-      // EMAIL
-      //------------------------------------------------------------------
-       
-       _fieldLabel("Contact Number".tr, required: true),
-
-const SizedBox(height: 8),
-
-Row(
-  crossAxisAlignment: CrossAxisAlignment.start,
-  children: [
-    _CountryCodeDropdown(
-      value: controller.countryCode,
-      onChanged: controller.setCountryCode,
-    ),
-
-     SizedBox(width: 5.w),
-
-    Expanded(
-      child: _AppTextField(
-        controller: controller.phoneController,
-        hint: "Enter mobile number".tr,
-        keyboardType: TextInputType.phone,
-        enabled: !controller.phoneChecked,
-      ),
-    ),
-
-    SizedBox(width: 5.w),
-
-    // BEFORE CHECK
-    if (!controller.phoneChecked)
-      SizedBox(
-        width: 90,
-        height: 48,
-        child: PrimaryButton(
-          title: "Check".tr,
-          onTap: controller.checkPhone,
-        ),
-      )
-
-    // VERIFIED
-    else if (controller.whatsappVerified)
-      Container(
-        width: 80.w,
-        height: 48,
-        padding: EdgeInsets.symmetric(horizontal: 6.w),
-        decoration: BoxDecoration(
-          color: const Color(0xFFE8F5E9),
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: Colors.green),
-        ),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(
-              Icons.verified_rounded,
-              color: Colors.green,
-              size: 12,
-            ),
-            SizedBox(width: 6),
-            Text(
-              "Verified".tr,
-              style: TextStyle(
-                fontSize: 10.sp,
-                color: Colors.green,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-          ],
-        ),
-      ),
-  ],
-),
-
-// NOT VERIFIED
-if (controller.phoneChecked && !controller.whatsappVerified) ...[
-  const SizedBox(height: 16),
-
-  _buildWhatsAppVerifiedBanner(),
-
-  const SizedBox(height: 16),
-
-  if (!controller.showOtpField)
-    SizedBox(
-      width: double.infinity,
-      child: PrimaryButton(
-        title: "Send OTP".tr,
-        onTap: controller.sendOtp,
-      ),
-    ),
-
-  if (controller.showOtpField) ...[
-    const SizedBox(height: 20),
-
-    _fieldLabel("Verification Code".tr, required: true),
-
-    const SizedBox(height: 8),
-
-    _AppTextField(
-      controller: controller.otpController,
-      hint: "Enter 6-digit OTP".tr,
-      keyboardType: TextInputType.number,
-      prefixIcon: Icons.lock_outline,
-    ),
-
-    const SizedBox(height: 12),
-
-    SizedBox(
-      width: double.infinity,
-      child: PrimaryButton(
-        title: "Verify Number".tr,
-        onTap: controller.verifyOtp,
-      ),
-    ),
-
-    Align(
-      alignment: Alignment.centerRight,
-      child: TextButton(
-        onPressed: controller.sendOtp,
-        child: Text("Resend OTP".tr),
-      ),
-    ),
-  ],
-],
-
-   SizedBox(height: 15.h),
-      _fieldLabel("Email Address".tr),
-
-      const SizedBox(height: 8),
-
-      _AppTextField(
-        controller: controller.emailController,
-        hint: "Enter your email".tr,
-        keyboardType: TextInputType.emailAddress,
-        prefixIcon: Icons.email_outlined,
-      ),
-
-      const SizedBox(height: 24),
-
-      //------------------------------------------------------------------
-      // DESCRIPTION
-      //------------------------------------------------------------------
-
-      _fieldLabel("Property Description".tr, required: true),
-
-      const SizedBox(height: 8),
-
-      _buildDescriptionEditor(),
-    ],
-  );
-}
-
-//------------------------------------------------------------------
-// DESCRIPTION EDITOR (rich text, quill_html_editor)
-//
-// Same package already used to render descriptions read-only
-// elsewhere (Mypropertiesscreen.dart's _DescriptionSheet), so the
-// HTML this produces round-trips cleanly through the rest of the
-// app.
-//------------------------------------------------------------------
-
-Widget _buildDescriptionEditor() {
-  return Container(
-    decoration: BoxDecoration(
-      color: AppColors.fieldBg,
-      borderRadius: BorderRadius.circular(12),
-      border: Border.all(color: AppColors.fieldBorder),
-    ),
-    clipBehavior: Clip.antiAlias,
-    child: Column(
-      children: [
-        ToolBar(
-          controller: _descriptionQuillController,
-          toolBarColor: AppColors.fieldBg,
-          iconColor: AppColors.hintGrey,
-          activeIconColor: AppColors.primary,
-          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 4),
-          iconSize: 18,
-          toolBarConfig: const [
-            ToolBarStyle.bold,
-            ToolBarStyle.italic,
-            ToolBarStyle.underline,
-            ToolBarStyle.listBullet,
-            ToolBarStyle.listOrdered,
-            ToolBarStyle.clean,
-          ],
-        ),
-
-        Divider(height: 1, color: AppColors.fieldBorder),
-
-        Padding(
-          padding: const EdgeInsets.all(10),
-          child: QuillHtmlEditor(
-            controller: _descriptionQuillController,
-            hintText: "Describe your property".tr,
-            minHeight: _descriptionEditorHeight,
-            isEnabled: true,
-            padding: EdgeInsets.zero,
-            hintTextPadding: EdgeInsets.zero,
-            backgroundColor: AppColors.fieldBg,
-            textStyle: const TextStyle(fontSize: 14, color: Colors.black87),
-            hintTextStyle: const TextStyle(
-              color: AppColors.hintGrey,
-              fontSize: 14,
-            ),
-            loadingBuilder: (_) => const SizedBox(
-              height: 60,
-              child: Center(
-                child: SizedBox(
-                  height: 18,
-                  width: 18,
-                  child: CircularProgressIndicator(strokeWidth: 2),
-                ),
-              ),
-            ),
-            onEditorCreated: () {
-              // Edit mode: controller.loadProperty() already put the
-              // existing HTML description into descriptionController
-              // before the editor finished loading - push it in now.
-              final existing = controller.descriptionController.text;
-
-              if (existing.isNotEmpty) {
-                _descriptionQuillController.setText(existing);
-              }
-            },
-            onTextChanged: (text) {
-              controller.descriptionController.text = text;
-            },
-            onEditorResized: (height) {
-              if (mounted && height != _descriptionEditorHeight) {
-                setState(() => _descriptionEditorHeight = height);
-              }
-            },
-          ),
-        ),
-      ],
-    ),
-  );
-}
-
-Widget _buildWhatsAppVerifiedBanner() {
-  final verified = controller.whatsappVerified;
-
-  return AnimatedContainer(
-    duration: const Duration(milliseconds: 250),
-    width: double.infinity,
-    padding: const EdgeInsets.all(14),
-    decoration: BoxDecoration(
-      color: verified
-          ? const Color(0xFFE9F8EF)
-          : const Color(0xFFFFF7E8),
-      borderRadius: BorderRadius.circular(14),
-      border: Border.all(
-        color: verified
-            ? const Color(0xFF34A853)
-            : const Color(0xFFF4B400),
-      ),
-    ),
-    child: Row(
-      children: [
-        CircleAvatar(
-          radius: 18,
-          backgroundColor: verified
-              ? const Color(0xFF34A853)
-              : const Color(0xFFF4B400),
-          child: Icon(
-            verified
-                ? Icons.check
-                : Icons.warning_amber_rounded,
-            color: Colors.white,
-            size: 18,
-          ),
-        ),
-
-        const SizedBox(width: 12),
-
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                verified
-                    ? "WhatsApp Verified".tr
-                    : "Verification Required".tr,
-                style: const TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 14,
-                ),
-              ),
-
-              const SizedBox(height: 2),
-
-              Text(
-                verified
-                    ? "Your contact number has been verified.".tr
-                    : "Verify your WhatsApp number before publishing this property."
-                        .tr,
-                style: const TextStyle(fontSize: 12),
-              ),
-            ],
-          ),
-        ),
-      ],
-    ),
-  );
-}
-
-  // ---------------------------------------------------------
   // STEP 2 — PROPERTY DETAILS
   // ---------------------------------------------------------
-  Widget _buildStep2({Key? key}) {
+  Widget _buildStep2() {
     return Column(
-      key: key,
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _sectionHeader(
+        LpStepHeading(
           icon: Icons.home_outlined,
           title: 'Property Details'.tr,
           subtitle: 'Tell us about your property'.tr,
         ),
-
         const SizedBox(height: 20),
 
-        _fieldLabel('Property Name'.tr, required: true),
-        const SizedBox(height: 8),
-
-        _AppTextField(
-          controller: controller.propertyNameController,
-          hint: 'Enter property name'.tr,
-        ),
-
-        const SizedBox(height: 18),
-
-        _fieldLabel('Property Type'.tr, required: true),
-        const SizedBox(height: 8),
-
-        GetBuilder<Utilscontroller>(
-          builder: (utils) {
-            return _AppDropdownField(
-              value: controller.propertyType.isEmpty
-                  ? null
-                  : controller.propertyType,
-              hint: 'Select property type'.tr,
-              icon: Icons.apartment_outlined,
-              items: utils.listingTypes.map((e) => e.title).toList(),
-              onChanged: (value) {
-                if (value != null) {
-                  final selected = utils.listingTypes.firstWhere(
-                    (e) => e.title == value,
-                  );
-
-                  controller.propertyType = selected.title;
-                  controller.selectedTypeId = selected.id;
-
-                  controller.update();
-                }
-              },
-            );
-          },
-        ),
-
-        const SizedBox(height: 18),
-
-        Row(
+        // ---- Property information ----
+        LpSectionCard(
+          icon: Icons.apartment_outlined,
+          title: 'Property Information'.tr,
           children: [
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  _fieldLabel("Bedrooms".tr, required: true),
-                  const SizedBox(height: 8),
+            _anchored(
+              'propertyType',
+              LpLabeledField(
+                label: 'Property Type'.tr,
+                required: true,
+                child: _buildPropertyTypeChips(),
+              ),
+            ),
+            const SizedBox(height: 16),
 
-                  _AppTextField(
+            _anchored(
+              'purpose',
+              LpLabeledField(
+                label: 'Property For'.tr,
+                required: true,
+                child: LpSegmented(
+                  hasError: _err('purpose'),
+                  selected: controller.propertyPurpose.toUpperCase(),
+                  options: [
+                    LpSegmentOption(
+                      ListPropertyController.purposeSale,
+                      'For Sale'.tr,
+                      Icons.sell_outlined,
+                    ),
+                    LpSegmentOption(
+                      ListPropertyController.purposeRent,
+                      'For Rent'.tr,
+                      Icons.key_outlined,
+                    ),
+                  ],
+                  onChanged: (v) =>
+                      _select('purpose', () => controller.propertyPurpose = v),
+                ),
+              ),
+            ),
+            const SizedBox(height: 16),
+
+            _anchored(
+              'propertyName',
+              LpLabeledField(
+                label: 'Property Name'.tr,
+                required: true,
+                child: LpTextField(
+                  controller: controller.propertyNameController,
+                  hint: 'Enter property name'.tr,
+                  prefixIcon: Icons.home_outlined,
+                  textCapitalization: TextCapitalization.sentences,
+                  hasError: _err('propertyName'),
+                  onChanged: (_) => _fixing('propertyName'),
+                ),
+              ),
+            ),
+          ],
+        ),
+
+        // ---- Description ----
+        LpSectionCard(
+          icon: Icons.notes_rounded,
+          title: 'Property Description'.tr,
+          required: true,
+          subtitle: 'Highlight what makes your property special'.tr,
+          children: [_anchored('description', _buildDescriptionEditor())],
+        ),
+
+        // ---- Pricing ----
+        LpSectionCard(
+          icon: Icons.payments_outlined,
+          title: 'Pricing'.tr,
+          children: [
+            _anchored(
+              'price',
+              LpLabeledField(
+                label: 'Price'.tr,
+                required: true,
+                child: LpTextField(
+                  controller: controller.priceController,
+                  hint: 'Enter price'.tr,
+                  digitsOnly: true,
+                  prefix: const _QarPrefix(),
+                  hasError: _err('price'),
+                  onChanged: (_) => _fixing('price'),
+                ),
+              ),
+            ),
+            const SizedBox(height: 14),
+            _buildNegotiableRow(),
+          ],
+        ),
+
+        // ---- Specifications ----
+        LpSectionCard(
+          icon: Icons.straighten_outlined,
+          title: 'Specifications'.tr,
+          children: [
+            LpFieldRow(
+              left: _anchored(
+                'bedrooms',
+                LpLabeledField(
+                  label: 'Bedrooms'.tr,
+                  required: true,
+                  child: LpTextField(
                     controller: controller.bedroomsController,
-                    hint: "e.g. 4".tr,
-                    keyboardType: TextInputType.number,
+                    hint: 'e.g. 4'.tr,
+                    digitsOnly: true,
+                    maxLength: 2,
                     prefixIcon: Icons.bed_outlined,
+                    hasError: _err('bedrooms'),
+                    onChanged: (_) => _fixing('bedrooms'),
                   ),
-                ],
+                ),
               ),
-            ),
-
-            const SizedBox(width: 12),
-
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  _fieldLabel("Bathrooms".tr, required: true),
-                  const SizedBox(height: 8),
-
-                  _AppTextField(
+              right: _anchored(
+                'bathrooms',
+                LpLabeledField(
+                  label: 'Bathrooms'.tr,
+                  required: true,
+                  child: LpTextField(
                     controller: controller.bathroomsController,
-                    hint: "e.g. 3".tr,
-                    keyboardType: TextInputType.number,
+                    hint: 'e.g. 3'.tr,
+                    digitsOnly: true,
+                    maxLength: 2,
                     prefixIcon: Icons.bathtub_outlined,
+                    hasError: _err('bathrooms'),
+                    onChanged: (_) => _fixing('bathrooms'),
                   ),
-                ],
+                ),
               ),
             ),
-          ],
-        ),
+            const SizedBox(height: 16),
 
-        const SizedBox(height: 18),
-
-        Row(
-          children: [
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  _fieldLabel("Living Rooms".tr),
-                  const SizedBox(height: 8),
-
-                  _AppTextField(
-                    controller: controller.livingRoomsController,
-                    hint: "e.g. 2".tr,
-                    keyboardType: TextInputType.number,
-                    prefixIcon: Icons.weekend_outlined,
-                  ),
-                ],
+            LpFieldRow(
+              left: LpLabeledField(
+                label: 'Living Rooms'.tr,
+                child: LpTextField(
+                  controller: controller.livingRoomsController,
+                  hint: 'e.g. 2'.tr,
+                  digitsOnly: true,
+                  maxLength: 2,
+                  prefixIcon: Icons.weekend_outlined,
+                ),
+              ),
+              right: LpLabeledField(
+                label: 'Parking Spaces'.tr,
+                child: LpTextField(
+                  controller: controller.parkingSpacesController,
+                  hint: 'e.g. 2'.tr,
+                  digitsOnly: true,
+                  maxLength: 2,
+                  prefixIcon: Icons.local_parking_outlined,
+                ),
               ),
             ),
+            const SizedBox(height: 16),
 
-            const SizedBox(width: 12),
-
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  _fieldLabel("Parking Spaces".tr),
-                  const SizedBox(height: 8),
-
-                  _AppTextField(
-                    controller: controller.parkingSpacesController,
-                    hint: "e.g. 2".tr,
-                    keyboardType: TextInputType.number,
-                    prefixIcon: Icons.local_parking_outlined,
+            LpFieldRow(
+              left: _anchored(
+                'area',
+                LpLabeledField(
+                  label: 'Area (sqm)'.tr,
+                  required: true,
+                  child: LpTextField(
+                    controller: controller.areaController,
+                    hint: 'Enter property area'.tr,
+                    decimal: true,
+                    prefixIcon: Icons.square_foot_outlined,
+                    hasError: _err('area'),
+                    onChanged: (_) => _fixing('area'),
                   ),
-                ],
+                ),
+              ),
+              right: LpLabeledField(
+                label: 'Year Built'.tr,
+                child: LpTextField(
+                  controller: controller.yearBuiltController,
+                  hint: 'e.g. 2024'.tr,
+                  digitsOnly: true,
+                  maxLength: 4,
+                  prefixIcon: Icons.calendar_today_outlined,
+                ),
               ),
             ),
-          ],
-        ),
+            const SizedBox(height: 16),
 
-        const SizedBox(height: 18),
-
-        _fieldLabel("Property For".tr, required: true),
-        const SizedBox(height: 8),
-
-        _buildSaleRentToggle(),
-
-        const SizedBox(height: 18),
-
-        _fieldLabel("Price".tr, required: true),
-        const SizedBox(height: 8),
-
-        Row(
-          children: [
-            _CurrencyDropdown(
-              value: currency,
-              onChanged: (v) {
-                setState(() {
-                  currency = v;
-                });
-              },
-            ),
-
-            const SizedBox(width: 10),
-
-            Expanded(
-              child: _AppTextField(
-                controller: controller.priceController,
-                hint: "Enter price".tr,
-                keyboardType: TextInputType.number,
+            LpFieldRow(
+              left: LpLabeledField(
+                label: 'Floor Number'.tr,
+                child: LpTextField(
+                  controller: controller.floorNumberController,
+                  hint: 'e.g. 5'.tr,
+                  digitsOnly: true,
+                  maxLength: 3,
+                  prefixIcon: Icons.layers_outlined,
+                ),
               ),
-            ),
-          ],
-        ),
-
-        const SizedBox(height: 18),
-
-        _fieldLabel("Area (sqm)".tr, required: true),
-        const SizedBox(height: 8),
-
-        _AppTextField(
-          controller: controller.areaController,
-          hint: "Enter property area".tr,
-          keyboardType: const TextInputType.numberWithOptions(decimal: true),
-          prefixIcon: Icons.square_foot_outlined,
-        ),
-
-        const SizedBox(height: 18),
-
-        _fieldLabel("Year Built".tr),
-        const SizedBox(height: 8),
-
-        _AppTextField(
-          controller: controller.yearBuiltController,
-          hint: "e.g. 2024".tr,
-          keyboardType: TextInputType.number,
-          prefixIcon: Icons.calendar_today_outlined,
-        ),
-
-        const SizedBox(height: 18),
-
-        Row(
-          children: [
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  _fieldLabel("Floor Number".tr),
-                  const SizedBox(height: 8),
-
-                  _AppTextField(
-                    controller: controller.floorNumberController,
-                    hint: "e.g. 5".tr,
-                    keyboardType: TextInputType.number,
-                    prefixIcon: Icons.layers_outlined,
-                  ),
-                ],
-              ),
-            ),
-
-            const SizedBox(width: 12),
-
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  _fieldLabel("Total Floors".tr),
-                  const SizedBox(height: 8),
-
-                  _AppTextField(
-                    controller: controller.totalFloorsController,
-                    hint: "e.g. 20".tr,
-                    keyboardType: TextInputType.number,
-                    prefixIcon: Icons.apartment_outlined,
-                  ),
-                ],
+              right: LpLabeledField(
+                label: 'Total Floors'.tr,
+                child: LpTextField(
+                  controller: controller.totalFloorsController,
+                  hint: 'e.g. 20'.tr,
+                  digitsOnly: true,
+                  maxLength: 3,
+                  prefixIcon: Icons.apartment_outlined,
+                ),
               ),
             ),
           ],
@@ -856,1498 +796,1218 @@ Widget _buildWhatsAppVerifiedBanner() {
     );
   }
 
-  Widget _buildSaleRentToggle() {
-    return Row(
-      children: [
-        Expanded(
-          child: _ToggleButton(
-            label: "Sale".tr,
-            icon: Icons.sell_outlined,
-            selected: controller.propertyPurpose == "SALE".tr,
-            onTap: () => controller.setPropertyPurpose("SALE".tr),
-            radius: const BorderRadius.only(
-              topLeft: Radius.circular(10),
-              bottomLeft: Radius.circular(10),
-            ),
-          ),
-        ),
+  Widget _buildPropertyTypeChips() {
+    return GetBuilder<Utilscontroller>(
+      builder: (utils) {
+        if (utils.listingTypes.isEmpty) {
+          return utils.isLoading
+              ? const _ChipSkeleton()
+              : _OptionsUnavailable(
+                  message: 'No property types available'.tr,
+                  onRetry: utils.fetchPropertyType,
+                );
+        }
 
-        Expanded(
-          child: _ToggleButton(
-            label: "Rent".tr,
-            icon: Icons.key_outlined,
-            selected: controller.propertyPurpose == "RENT".tr,
-            onTap: () => controller.setPropertyPurpose("RENT".tr),
-            radius: const BorderRadius.only(
-              topRight: Radius.circular(10),
-              bottomRight: Radius.circular(10),
+        return Wrap(
+          spacing: 8,
+          runSpacing: 8,
+          children: utils.listingTypes.map((type) {
+            return LpChoiceChip(
+              label: type.title,
+              selected: controller.selectedTypeId == type.id,
+              onTap: () => _select('propertyType', () {
+                controller.propertyType = type.title;
+                controller.selectedTypeId = type.id;
+              }),
+            );
+          }).toList(),
+        );
+      },
+    );
+  }
+
+  Widget _buildNegotiableRow() {
+    return Container(
+      padding: const EdgeInsetsDirectional.fromSTEB(14, 6, 8, 6),
+      decoration: BoxDecoration(
+        color: LpColors.fieldFill,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: LpColors.border),
+      ),
+      child: Row(
+        children: [
+          const Icon(
+            Icons.handshake_outlined,
+            size: 20,
+            color: AppColors.hintGrey,
+          ),
+          const SizedBox(width: 10),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Price is negotiable'.tr,
+                  style: const TextStyle(
+                    fontSize: 13.5,
+                    fontWeight: FontWeight.w600,
+                    color: LpColors.ink,
+                  ),
+                ),
+                const SizedBox(height: 1),
+                Text(
+                  'Open to offers from buyers'.tr,
+                  style: const TextStyle(fontSize: 12, color: LpColors.muted),
+                ),
+              ],
             ),
           ),
+          Switch.adaptive(
+            value: controller.priceNegotiable,
+            activeThumbColor: Colors.white,
+            activeTrackColor: AppColors.primary,
+            onChanged: controller.setPriceNegotiable,
+          ),
+        ],
+      ),
+    );
+  }
+
+  // Same package already used to render descriptions read-only
+  // elsewhere (Mypropertiesscreen.dart's _DescriptionSheet), so the
+  // HTML this produces round-trips cleanly through the rest of the
+  // app.
+  Widget _buildDescriptionEditor() {
+    final hasError = _err('description');
+
+    return Container(
+      decoration: BoxDecoration(
+        color: LpColors.fieldFill,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(
+          color: hasError ? LpColors.error : LpColors.border,
+          width: hasError ? 1.3 : 1,
         ),
-      ],
+      ),
+      clipBehavior: Clip.antiAlias,
+      child: Column(
+        children: [
+          ToolBar(
+            controller: _descriptionQuillController,
+            toolBarColor: Colors.white,
+            iconColor: AppColors.hintGrey,
+            activeIconColor: AppColors.primary,
+            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 4),
+            iconSize: 18,
+            toolBarConfig: const [
+              ToolBarStyle.bold,
+              ToolBarStyle.italic,
+              ToolBarStyle.underline,
+              ToolBarStyle.listBullet,
+              ToolBarStyle.listOrdered,
+              ToolBarStyle.clean,
+            ],
+          ),
+          const Divider(height: 1, color: LpColors.border),
+          Padding(
+            padding: const EdgeInsets.all(12),
+            child: QuillHtmlEditor(
+              controller: _descriptionQuillController,
+              hintText: 'Describe your property'.tr,
+              minHeight: _descriptionEditorHeight,
+              isEnabled: true,
+              padding: EdgeInsets.zero,
+              hintTextPadding: EdgeInsets.zero,
+              backgroundColor: LpColors.fieldFill,
+              textStyle: const TextStyle(fontSize: 14, color: LpColors.ink),
+              hintTextStyle: const TextStyle(
+                color: AppColors.hintGrey,
+                fontSize: 14,
+              ),
+              loadingBuilder: (_) => const SizedBox(
+                height: 60,
+                child: Center(
+                  child: SizedBox(
+                    height: 18,
+                    width: 18,
+                    child: CircularProgressIndicator(strokeWidth: 2),
+                  ),
+                ),
+              ),
+              onEditorCreated: () {
+                // Returning to this step (or edit mode): the existing HTML
+                // is already in descriptionController - push it in now.
+                final existing = controller.descriptionController.text;
+
+                if (existing.isNotEmpty) {
+                  _descriptionQuillController.setText(existing);
+                }
+              },
+              onTextChanged: (text) {
+                controller.descriptionController.text = text;
+                _fixing('description');
+              },
+              onEditorResized: (height) {
+                if (mounted && height != _descriptionEditorHeight) {
+                  setState(() => _descriptionEditorHeight = height);
+                }
+              },
+            ),
+          ),
+        ],
+      ),
     );
   }
 
   // ---------------------------------------------------------
   // STEP 3 — FEATURES & AMENITIES
   // ---------------------------------------------------------
-  Widget _buildStep3({Key? key}) {
+  Widget _buildStep3() {
+    final furnishing = controller.furnishingOptions;
+
     return Column(
-      key: key,
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _sectionHeader(
+        LpStepHeading(
           icon: Icons.widgets_outlined,
-          title: "Features & Amenities".tr,
-          subtitle: "Select the amenities and nearby facilities".tr,
+          title: 'Features & Amenities'.tr,
+          subtitle: 'Select the amenities and nearby facilities'.tr,
         ),
-
         const SizedBox(height: 20),
 
-        _buildFurnishingSection(),
-
-        const SizedBox(height: 22),
-
-        _buildAmenitiesSection(),
-
-        const SizedBox(height: 22),
-
-        _buildNearbyTagsSection(),
-
-        const SizedBox(height: 22),
-
-        Row(
+        LpSectionCard(
+          icon: Icons.chair_outlined,
+          title: 'Furnishing'.tr,
           children: [
-            Icon(Icons.tune_outlined, size: 18, color: AppColors.primary),
-            SizedBox(width: 8),
-            Expanded(
-              child: Text(
-                "Other Features".tr,
-                style: TextStyle(fontWeight: FontWeight.w700, fontSize: 14),
+            _optionsBody(
+              isEmpty: furnishing.isEmpty,
+              child: Wrap(
+                spacing: 8,
+                runSpacing: 8,
+                children: furnishing.map((o) {
+                  return LpChoiceChip(
+                    label: o.title,
+                    selected: controller.selectedFurnishing.contains(o.id),
+                    onTap: () => controller.toggleFurnishing(o.id),
+                  );
+                }).toList(),
               ),
             ),
           ],
         ),
 
-        const SizedBox(height: 4),
-
-        Padding(
-          padding: EdgeInsets.only(left: 26),
-          child: Text(
-            "Add any additional features not listed above".tr,
-            style: TextStyle(color: AppColors.hintGrey, fontSize: 12),
-          ),
+        LpSectionCard(
+          icon: Icons.widgets_outlined,
+          title: 'Amenities'.tr,
+          trailing: _selectedBadge(controller.selectedAmenities.length),
+          children: [
+            _optionsBody(
+              isEmpty: controller.amenities.isEmpty,
+              child: LpChipWrap(
+                expanded: _showAllAmenities,
+                onToggle: () =>
+                    setState(() => _showAllAmenities = !_showAllAmenities),
+                chips: controller.amenities.map((o) {
+                  return LpChoiceChip(
+                    label: o.title,
+                    imageUrl: o.image,
+                    selected: controller.selectedAmenities.contains(o.id),
+                    onTap: () => controller.toggleAmenity(o.id),
+                  );
+                }).toList(),
+              ),
+            ),
+          ],
         ),
 
-        const SizedBox(height: 16),
+        LpSectionCard(
+          icon: Icons.location_on_outlined,
+          title: 'Nearby Places'.tr,
+          trailing: _selectedBadge(controller.selectedNearbyTags.length),
+          children: [
+            _optionsBody(
+              isEmpty: controller.nearbyTags.isEmpty,
+              child: LpChipWrap(
+                expanded: _showAllNearby,
+                onToggle: () =>
+                    setState(() => _showAllNearby = !_showAllNearby),
+                chips: controller.nearbyTags.map((o) {
+                  return LpChoiceChip(
+                    label: o.title,
+                    imageUrl: o.image,
+                    selected: controller.selectedNearbyTags.contains(o.id),
+                    onTap: () => controller.toggleNearbyTag(o.id),
+                  );
+                }).toList(),
+              ),
+            ),
+          ],
+        ),
 
-        _fieldLabel("Other (Please specify)".tr),
-
-        const SizedBox(height: 8),
-
-        _AppTextField(
-          controller: controller.otherFeatureController,
-          hint: "Enter other features".tr,
-          prefixIcon: Icons.edit_note_outlined,
+        LpSectionCard(
+          icon: Icons.tune_outlined,
+          title: 'Other Features'.tr,
+          subtitle: 'Add any additional features not listed above'.tr,
+          children: [
+            LpTextField(
+              controller: controller.otherFeatureController,
+              hint: 'Enter other features'.tr,
+              prefixIcon: Icons.edit_note_outlined,
+              textCapitalization: TextCapitalization.sentences,
+            ),
+          ],
         ),
       ],
     );
   }
 
-  Widget _buildFurnishingSection() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Row(
-          children: [
-            const Icon(
-              Icons.chair_outlined,
-              color: AppColors.primary,
-              size: 18,
-            ),
-            const SizedBox(width: 8),
-            Expanded(
-              child: Text(
-                "Furnishing".tr,
-                style: TextStyle(fontWeight: FontWeight.w700, fontSize: 14),
-              ),
-            ),
-            _buildAddButton(_showFurnishingBottomSheet),
-          ],
-        ),
+  /// Loading skeleton / retry banner / the options themselves.
+  Widget _optionsBody({required bool isEmpty, required Widget child}) {
+    if (!isEmpty) return child;
 
-        const SizedBox(height: 6),
+    if (controller.isLoading) return const _ChipSkeleton();
 
-        _buildSelectedFurnishing(),
-      ],
+    return _OptionsUnavailable(
+      message: "Couldn't load options".tr,
+      onRetry: controller.fetchListingOptions,
     );
   }
 
-  Widget _buildAmenitiesSection() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Row(
-          children: [
-            const Icon(
-              Icons.widgets_outlined,
-              color: AppColors.primary,
-              size: 18,
-            ),
-            const SizedBox(width: 8),
-            Expanded(
-              child: Text(
-                "Amenities".tr,
-                style: TextStyle(fontWeight: FontWeight.w700, fontSize: 14),
-              ),
-            ),
-            _buildAddButton(_showAmenitiesBottomSheet),
-          ],
-        ),
+  Widget _selectedBadge(int count) {
+    if (count == 0) return const SizedBox.shrink();
 
-        const SizedBox(height: 6),
-
-        _buildSelectedAmenities(),
-      ],
-    );
-  }
-
-  Widget _buildNearbyTagsSection() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Row(
-          children: [
-            const Icon(
-              Icons.location_on_outlined,
-              color: AppColors.primary,
-              size: 18,
-            ),
-            const SizedBox(width: 8),
-            Expanded(
-              child: Text(
-                "Nearby Tags".tr,
-                style: TextStyle(fontWeight: FontWeight.w700, fontSize: 14),
-              ),
-            ),
-            _buildAddButton(_showNearbyTagsBottomSheet),
-          ],
-        ),
-
-        const SizedBox(height: 6),
-
-        _buildSelectedNearbyTags(),
-      ],
-    );
-  }
-
-  Widget _buildAddButton(VoidCallback onTap) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-        decoration: BoxDecoration(
-          border: Border.all(color: AppColors.primary),
-          borderRadius: BorderRadius.circular(8.r),
-        ),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(Icons.add, size: 16, color: AppColors.primary),
-            SizedBox(width: 4),
-            Text(
-              "Add".tr,
-              style: TextStyle(
-                color: AppColors.primary,
-                fontWeight: FontWeight.w600,
-                fontSize: 12,
-              ),
-            ),
-          ],
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+      decoration: BoxDecoration(
+        color: AppColors.pinkBg,
+        borderRadius: BorderRadius.circular(20),
+      ),
+      child: Text(
+        '$count ${'Selected'.tr}',
+        style: const TextStyle(
+          fontSize: 11.5,
+          fontWeight: FontWeight.w700,
+          color: AppColors.primary,
         ),
       ),
-    );
-  }
-
-  Widget _buildSelectedAmenities() {
-    if (controller.selectedAmenities.isEmpty) {
-      return Padding(
-        padding: EdgeInsets.only(left: 26),
-        child: Text(
-          "No amenities selected".tr,
-          style: TextStyle(color: AppColors.hintGrey, fontSize: 12),
-        ),
-      );
-    }
-
-    final selectedItems = utilsController.amenities
-        .where((item) => controller.selectedAmenities.contains(item.id))
-        .toList();
-
-    return Padding(
-      padding: const EdgeInsets.only(left: 26),
-      child: Wrap(
-        spacing: 8,
-        runSpacing: 8,
-        children: selectedItems.map((item) {
-          return Container(
-            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-            decoration: BoxDecoration(
-              color: AppColors.pinkChipBg,
-              borderRadius: BorderRadius.circular(8),
-              border: Border.all(color: AppColors.primary.withOpacity(.2)),
-            ),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                if (item.image != null && item.image!.isNotEmpty) ...[
-                  ClipRRect(
-                    borderRadius: BorderRadius.circular(4),
-                    child: Image.network(
-                      item.image!,
-                      width: 18,
-                      height: 18,
-                      fit: BoxFit.cover,
-                      errorBuilder: (_, __, ___) => const SizedBox.shrink(),
-                    ),
-                  ),
-                  const SizedBox(width: 5),
-                ],
-
-                Text(
-                  item.title.tr,
-                  style: const TextStyle(
-                    color: AppColors.primary,
-                    fontSize: 11,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-              ],
-            ),
-          );
-        }).toList(),
-      ),
-    );
-  }
-
-  Widget _chipRow(List<String> labels, Set<String> selectedSet) {
-    return Wrap(
-      spacing: 10,
-      runSpacing: 10,
-      children: labels.map((label) {
-        return _FeatureChip(
-          label: label,
-          selected: selectedSet.contains(label),
-          onTap: () {
-            setState(() {
-              if (selectedSet.contains(label)) {
-                selectedSet.remove(label);
-              } else {
-                selectedSet.add(label);
-              }
-            });
-          },
-        );
-      }).toList(),
-    );
-  }
-
-  void _showAmenitiesBottomSheet() {
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      backgroundColor: Colors.white,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
-      ),
-      builder: (_) {
-        return StatefulBuilder(
-          builder: (context, sheetState) {
-            return SafeArea(
-              child: SizedBox(
-                height: MediaQuery.of(context).size.height * .65,
-                child: Padding(
-                  padding: const EdgeInsets.fromLTRB(20, 12, 20, 20),
-                  child: Column(
-                    children: [
-                      Container(
-                        width: 42,
-                        height: 4,
-                        decoration: BoxDecoration(
-                          color: Colors.grey.shade300,
-                          borderRadius: BorderRadius.circular(20),
-                        ),
-                      ),
-
-                      const SizedBox(height: 18),
-
-                      Row(
-                        children: [
-                          Expanded(
-                            child: Text(
-                              "Select Amenities".tr,
-                              style: TextStyle(
-                                fontSize: 18,
-                                fontWeight: FontWeight.w700,
-                              ),
-                            ),
-                          ),
-                          IconButton(
-                            onPressed: () => Navigator.pop(context),
-                            icon: const Icon(Icons.close_rounded),
-                          ),
-                        ],
-                      ),
-
-                      const SizedBox(height: 4),
-
-                      Align(
-                        alignment: Alignment.centerLeft,
-                        child: Text(
-                          "Choose the amenities available in your property.".tr,
-                          style: TextStyle(
-                            color: AppColors.hintGrey,
-                            fontSize: 12,
-                          ),
-                        ),
-                      ),
-
-                      const SizedBox(height: 18),
-
-                      Expanded(
-                        child: GridView.builder(
-                          itemCount: utilsController.amenities.length,
-                          gridDelegate:
-                              const SliverGridDelegateWithFixedCrossAxisCount(
-                                crossAxisCount: 3,
-                                crossAxisSpacing: 10,
-                                mainAxisSpacing: 10,
-                                mainAxisExtent: 105,
-                              ),
-                          itemBuilder: (_, index) {
-                            final amenity = utilsController.amenities[index];
-
-                            final selected = controller.selectedAmenities
-                                .contains(amenity.id);
-
-                            return _AmenityTile(
-                              label: amenity.title,
-                              image: amenity.image,
-                              selected: selected,
-                              onTap: () {
-                                sheetState(() {
-                                  controller.toggleAmenity(amenity.id);
-                                });
-                              },
-                            );
-                          },
-                        ),
-                      ),
-
-                      const SizedBox(height: 12),
-
-                      SizedBox(
-                        width: double.infinity,
-                        height: 48,
-                        child: ElevatedButton(
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: AppColors.primary,
-                            elevation: 0,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(14),
-                            ),
-                          ),
-                          onPressed: () {
-                            controller.update();
-                            Navigator.pop(context);
-                          },
-                          child: Text(
-                            "Done".tr,
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            );
-          },
-        );
-      },
-    );
-  }
-
-  Widget _buildSelectedNearbyTags() {
-    if (controller.selectedNearbyTags.isEmpty) {
-      return Padding(
-        padding: EdgeInsets.only(left: 26),
-        child: Text(
-          "No nearby tags selected".tr,
-          style: TextStyle(color: AppColors.hintGrey, fontSize: 12),
-        ),
-      );
-    }
-
-    final selectedItems = controller.nearbyTags
-        .where((item) => controller.selectedNearbyTags.contains(item.id))
-        .toList();
-
-    return Padding(
-      padding: const EdgeInsets.only(left: 26),
-      child: Wrap(
-        spacing: 8,
-        runSpacing: 8,
-        children: selectedItems.map((item) {
-          return Container(
-            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-            decoration: BoxDecoration(
-              color: AppColors.pinkChipBg,
-              borderRadius: BorderRadius.circular(8),
-              border: Border.all(color: AppColors.primary.withOpacity(.25)),
-            ),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                if (item.image != null && item.image!.isNotEmpty) ...[
-                  ClipRRect(
-                    borderRadius: BorderRadius.circular(4),
-                    child: Image.network(
-                      item.image!,
-                      width: 18,
-                      height: 18,
-                      fit: BoxFit.cover,
-                      errorBuilder: (_, __, ___) => const SizedBox.shrink(),
-                    ),
-                  ),
-                  const SizedBox(width: 5),
-                ],
-
-                Text(
-                  item.title.tr,
-                  style: const TextStyle(
-                    color: AppColors.primary,
-                    fontSize: 11,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-              ],
-            ),
-          );
-        }).toList(),
-      ),
-    );
-  }
-
-  Widget _buildSelectedFurnishing() {
-    if (controller.selectedFurnishing.isEmpty) {
-      return Padding(
-        padding: EdgeInsets.only(left: 26),
-        child: Text(
-          "No furnishing option selected".tr,
-          style: TextStyle(color: AppColors.hintGrey, fontSize: 12),
-        ),
-      );
-    }
-
-    final selectedItems = utilsController.furnishingOptions
-        .where((item) => controller.selectedFurnishing.contains(item.id))
-        .toList();
-
-    return Padding(
-      padding: const EdgeInsets.only(left: 26),
-      child: Wrap(
-        spacing: 8,
-        runSpacing: 8,
-        children: selectedItems.map((item) {
-          return Container(
-            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-            decoration: BoxDecoration(
-              color: AppColors.pinkChipBg,
-              borderRadius: BorderRadius.circular(8),
-              border: Border.all(color: AppColors.primary.withOpacity(.25)),
-            ),
-            child: Text(
-              item.title.tr,
-              style: const TextStyle(
-                color: AppColors.primary,
-                fontWeight: FontWeight.w600,
-                fontSize: 11,
-              ),
-            ),
-          );
-        }).toList(),
-      ),
-    );
-  }
-
-  void _showFurnishingBottomSheet() {
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      backgroundColor: Colors.white,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
-      ),
-      builder: (_) {
-        return StatefulBuilder(
-          builder: (context, sheetState) {
-            return SafeArea(
-              child: Padding(
-                padding: const EdgeInsets.fromLTRB(20, 16, 20, 20),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Container(
-                      width: 42,
-                      height: 4,
-                      decoration: BoxDecoration(
-                        color: Colors.grey.shade300,
-                        borderRadius: BorderRadius.circular(20),
-                      ),
-                    ),
-
-                    const SizedBox(height: 18),
-
-                    Text(
-                      "Furnishing".tr,
-                      style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.w700,
-                      ),
-                    ),
-
-                    const SizedBox(height: 10),
-
-                    ...controller.furnishingOptions.map((item) {
-                      final selected = controller.selectedFurnishing.contains(
-                        item.id,
-                      );
-
-                      return ListTile(
-                        contentPadding: EdgeInsets.zero,
-                        leading: Icon(
-                          selected
-                              ? Icons.radio_button_checked
-                              : Icons.radio_button_off,
-                          color: AppColors.primary,
-                        ),
-                        title: Text(
-                          item.title.tr,
-                          style: const TextStyle(fontWeight: FontWeight.w500),
-                        ),
-                        onTap: () {
-                          sheetState(() {
-                            controller.toggleFurnishing(item.id);
-                          });
-                        },
-                      );
-                    }),
-
-                    const SizedBox(height: 12),
-
-                    PrimaryButton(
-                      title: "Done".tr,
-                      onTap: () {
-                        controller.update();
-                        Navigator.pop(context);
-                      },
-                    ),
-                  ],
-                ),
-              ),
-            );
-          },
-        );
-      },
-    );
-  }
-
-  void _showNearbyTagsBottomSheet() {
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      backgroundColor: Colors.white,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
-      ),
-      builder: (_) {
-        return StatefulBuilder(
-          builder: (context, sheetState) {
-            return SafeArea(
-              child: SizedBox(
-                height: MediaQuery.of(context).size.height * .65,
-                child: Padding(
-                  padding: const EdgeInsets.fromLTRB(20, 12, 20, 20),
-                  child: Column(
-                    children: [
-                      Container(
-                        width: 42,
-                        height: 4,
-                        decoration: BoxDecoration(
-                          color: Colors.grey.shade300,
-                          borderRadius: BorderRadius.circular(20),
-                        ),
-                      ),
-
-                      const SizedBox(height: 18),
-
-                      Row(
-                        children: [
-                          Expanded(
-                            child: Text(
-                              "Nearby Tags".tr,
-                              style: TextStyle(
-                                fontSize: 18,
-                                fontWeight: FontWeight.w700,
-                              ),
-                            ),
-                          ),
-                          IconButton(
-                            onPressed: () => Navigator.pop(context),
-                            icon: const Icon(Icons.close),
-                          ),
-                        ],
-                      ),
-
-                      const SizedBox(height: 15),
-
-                      Expanded(
-                        child: GridView.builder(
-                          itemCount: utilsController.nearbyTags.length,
-                          gridDelegate:
-                              const SliverGridDelegateWithFixedCrossAxisCount(
-                                crossAxisCount: 3,
-                                crossAxisSpacing: 10,
-                                mainAxisSpacing: 10,
-                                mainAxisExtent: 105,
-                              ),
-                          itemBuilder: (_, index) {
-                            final tag = utilsController.nearbyTags[index];
-
-                            final selected = controller.selectedNearbyTags
-                                .contains(tag.id);
-
-                            return _AmenityTile(
-                              label: tag.title,
-                              image: tag.image,
-                              selected: selected,
-                              onTap: () {
-                                sheetState(() {
-                                  controller.toggleNearbyTag(tag.id);
-                                });
-                              },
-                            );
-                          },
-                        ),
-                      ),
-
-                      const SizedBox(height: 12),
-
-                      SizedBox(
-                        width: double.infinity,
-                        height: 48,
-                        child: ElevatedButton(
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: AppColors.primary,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(14),
-                            ),
-                          ),
-                          onPressed: () {
-                            controller.update();
-                            Navigator.pop(context);
-                          },
-                          child: Text(
-                            "Done".tr,
-                            style: TextStyle(color: Colors.white),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            );
-          },
-        );
-      },
     );
   }
 
   // ---------------------------------------------------------
-  // STEP 4 — LOCATION DETAILS
+  // STEP 4 — LOCATION
   // ---------------------------------------------------------
   void _fillCoordinates(LocationResponse location) {
     controller.latitudeController.text = location.data.latitude.toString();
-
     controller.longitudeController.text = location.data.longitude.toString();
-
     controller.addressController.text = location.data.formattedAddress;
-
     controller.areaNameController.text = location.data.areaName;
+
+    _pickedLocationTitle = location.data.title.isNotEmpty
+        ? location.data.title
+        : location.data.formattedAddress;
+
+    if (_err('location') || _err('address') || _err('areaName')) {
+      controller.stepError = null;
+      controller.errorField = null;
+    }
 
     controller.update();
   }
 
-  Widget _buildStep4({Key? key}) {
-    final LocationController locationController = Get.put(LocationController());
+  Future<void> _useCurrentLocation() async {
+    if (_detectingLocation) return;
+
+    setState(() => _detectingLocation = true);
+
+    final before = _location.location;
+    await _location.detectCurrentLocation();
+    final after = _location.location;
+
+    if (mounted) setState(() => _detectingLocation = false);
+
+    // A failed lookup (permission denied, GPS off) leaves the previous,
+    // unrelated location in place — only accept a fresh result.
+    if (after != null && !identical(after, before)) {
+      _fillCoordinates(after);
+    }
+  }
+
+  Widget _buildStep4() {
     return Column(
-      key: key,
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _sectionHeader(
+        LpStepHeading(
           icon: Icons.location_on_outlined,
-          title: "Property Location".tr,
-          subtitle: "Tell buyers where your property is located".tr,
+          title: 'Property Location'.tr,
+          subtitle: 'Tell buyers where your property is located'.tr,
         ),
-
         const SizedBox(height: 20),
 
-        _fieldLabel("Address Line 1".tr, required: true),
-        const SizedBox(height: 8),
-
-        _AppTextField(
-          controller: controller.addressController,
-          hint: "Enter address".tr,
-          prefixIcon: Icons.location_on_outlined,
-        ),
-
-        const SizedBox(height: 18),
-
-        _fieldLabel("Address Line 2".tr),
-        const SizedBox(height: 8),
-
-        _AppTextField(
-          controller: controller.streetController,
-          hint: "Apartment / Building / Street".tr,
-          prefixIcon: Icons.home_work_outlined,
-        ),
-
-        const SizedBox(height: 18),
-
-        _fieldLabel("Area".tr, required: true),
-        const SizedBox(height: 8),
-
-        _AppTextField(
-          controller: controller.areaNameController,
-          hint: "Name of Area".tr,
-          prefixIcon: Icons.map_outlined,
-        ),
-
-        const SizedBox(height: 18),
-        _fieldLabel("Muncipality".tr, required: true),
-        const SizedBox(height: 8),
-
-        GetBuilder<Utilscontroller>(
-          builder: (utils) {
-            return _AppDropdownField(
-              value: controller.cityController.text.isEmpty
-                  ? null
-                  : controller.cityController.text,
-              hint: "Select Municipality".tr,
-              icon: Icons.location_city_outlined,
-              items: utils.municipalities.map((e) => e.name).toList(),
-              onChanged: (value) {
-                if (value != null) {
-                  final selected = utils.municipalities.firstWhere(
-                    (e) => e.name == value,
-                  );
-
-                  controller.cityController.text = selected.name;
-                  controller.selectedMunicipalityId = selected.id;
-
-                  controller.update();
-                }
-              },
-            );
-          },
-        ),
-        const SizedBox(height: 18),
-
-        Row(
+        // ---- Pin location ----
+        LpSectionCard(
+          icon: Icons.my_location_rounded,
+          title: 'Pin Location'.tr,
+          required: true,
+          subtitle:
+              'Use your current position or search for the place to fill in the address automatically.'
+                  .tr,
           children: [
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  _fieldLabel("Latitude".tr, required: true),
-                  const SizedBox(height: 8),
-                  _AppTextField(
-                    controller: controller.latitudeController,
-                    hint: "Latitude".tr,
-                    keyboardType: const TextInputType.numberWithOptions(
-                      decimal: true,
-                    ),
-                    prefixIcon: Icons.my_location,
+            Row(
+              children: [
+                Expanded(
+                  child: LpOutlineButton(
+                    icon: Icons.my_location_rounded,
+                    label: 'Use my location'.tr,
+                    loading: _detectingLocation,
+                    onTap: _useCurrentLocation,
                   ),
-                ],
-              ),
-            ),
-
-            const SizedBox(width: 12),
-
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  _fieldLabel("Longitude".tr, required: true),
-                  const SizedBox(height: 8),
-                  _AppTextField(
-                    controller: controller.longitudeController,
-                    hint: "Longitude".tr,
-                    keyboardType: const TextInputType.numberWithOptions(
-                      decimal: true,
-                    ),
-                    prefixIcon: Icons.explore_outlined,
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
-
-        SizedBox(height: 10.h),
-        Row(
-          children: [
-            Expanded(
-              child: _LocationActionButton(
-                icon: Icons.my_location_rounded,
-                title: "Use GPS".tr,
-                onTap: () async {
-                  await locationController.detectCurrentLocation();
-
-                  if (locationController.location != null) {
-                    _fillCoordinates(locationController.location!);
-                  }
-                },
-              ),
-            ),
-
-            SizedBox(width: 12.w),
-
-            Expanded(
-              child: _LocationActionButton(
-                icon: Icons.search_rounded,
-                title: "Search".tr,
-                onTap: _showLocationBottomSheet,
-              ),
-            ),
-          ],
-        ),
-        const SizedBox(height: 18),
-        _fieldLabel("Landmark".tr),
-        const SizedBox(height: 8),
-
-        _AppTextField(
-          controller: controller.landmarkController,
-          hint: "Nearby landmark".tr,
-          prefixIcon: Icons.place_outlined,
-        ),
-        const SizedBox(height: 18),
-
-        Container(
-          padding: const EdgeInsets.all(14),
-          decoration: BoxDecoration(
-            color: AppColors.fieldBg,
-            borderRadius: BorderRadius.circular(10),
-            border: Border.all(color: AppColors.fieldBorder),
-          ),
-          child: Row(
-            children: [
-              Icon(Icons.map_outlined, color: AppColors.primary),
-              SizedBox(width: 10),
-              Expanded(
-                child: Text(
-                  "Google Map integration can be added here for selecting the exact location."
-                      .tr,
-                  style: TextStyle(fontSize: 12, color: AppColors.labelGrey),
                 ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: LpOutlineButton(
+                    icon: Icons.search_rounded,
+                    label: 'Search'.tr,
+                    onTap: _showLocationSheet,
+                  ),
+                ),
+              ],
+            ),
+
+            if (_pickedLocationTitle.isNotEmpty) ...[
+              const SizedBox(height: 12),
+              LpBanner(
+                tone: LpBannerTone.success,
+                icon: Icons.place_rounded,
+                title: _pickedLocationTitle,
               ),
             ],
-          ),
+
+            const SizedBox(height: 16),
+
+            _anchored(
+              'location',
+              LpFieldRow(
+                left: LpLabeledField(
+                  label: 'Latitude'.tr,
+                  required: true,
+                  child: LpTextField(
+                    controller: controller.latitudeController,
+                    hint: 'Latitude'.tr,
+                    decimal: true,
+                    prefixIcon: Icons.my_location,
+                    hasError: _err('location'),
+                    onChanged: (_) => _fixing('location'),
+                  ),
+                ),
+                right: LpLabeledField(
+                  label: 'Longitude'.tr,
+                  required: true,
+                  child: LpTextField(
+                    controller: controller.longitudeController,
+                    hint: 'Longitude'.tr,
+                    decimal: true,
+                    prefixIcon: Icons.explore_outlined,
+                    hasError: _err('location'),
+                    onChanged: (_) => _fixing('location'),
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
+
+        // ---- Address ----
+        LpSectionCard(
+          icon: Icons.home_work_outlined,
+          title: 'Address'.tr,
+          children: [
+            _anchored(
+              'address',
+              LpLabeledField(
+                label: 'Address Line 1'.tr,
+                required: true,
+                child: LpTextField(
+                  controller: controller.addressController,
+                  hint: 'Enter address'.tr,
+                  prefixIcon: Icons.location_on_outlined,
+                  textCapitalization: TextCapitalization.sentences,
+                  hasError: _err('address'),
+                  onChanged: (_) => _fixing('address'),
+                ),
+              ),
+            ),
+            const SizedBox(height: 16),
+
+            LpLabeledField(
+              label: 'Address Line 2'.tr,
+              child: LpTextField(
+                controller: controller.streetController,
+                hint: 'Apartment / Building / Street'.tr,
+                prefixIcon: Icons.home_work_outlined,
+                textCapitalization: TextCapitalization.sentences,
+              ),
+            ),
+            const SizedBox(height: 16),
+
+            LpFieldRow(
+              left: _anchored(
+                'areaName',
+                LpLabeledField(
+                  label: 'Area'.tr,
+                  required: true,
+                  child: LpTextField(
+                    controller: controller.areaNameController,
+                    hint: 'Name of Area'.tr,
+                    prefixIcon: Icons.map_outlined,
+                    textCapitalization: TextCapitalization.words,
+                    hasError: _err('areaName'),
+                    onChanged: (_) => _fixing('areaName'),
+                  ),
+                ),
+              ),
+              right: _anchored(
+                'municipality',
+                LpLabeledField(
+                  label: 'Municipality'.tr,
+                  required: true,
+                  child: GetBuilder<Utilscontroller>(
+                    builder: (utils) {
+                      return LpDropdownField(
+                        value: controller.cityController.text.isEmpty
+                            ? null
+                            : controller.cityController.text,
+                        hint: 'Select'.tr,
+                        icon: Icons.location_city_outlined,
+                        hasError: _err('municipality'),
+                        items: utils.municipalities.map((e) => e.name).toList(),
+                        onChanged: (value) {
+                          if (value == null) return;
+
+                          final selected = utils.municipalities.firstWhere(
+                            (e) => e.name == value,
+                          );
+
+                          _select('municipality', () {
+                            controller.cityController.text = selected.name;
+                            controller.selectedMunicipalityId = selected.id;
+                          });
+                        },
+                      );
+                    },
+                  ),
+                ),
+              ),
+            ),
+            const SizedBox(height: 16),
+
+            LpLabeledField(
+              label: 'Landmark'.tr,
+              child: LpTextField(
+                controller: controller.landmarkController,
+                hint: 'Nearby landmark'.tr,
+                prefixIcon: Icons.place_outlined,
+                textCapitalization: TextCapitalization.words,
+              ),
+            ),
+          ],
         ),
       ],
     );
   }
 
-  void _showLocationBottomSheet() {
+  void _showLocationSheet() {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
-      builder: (_) {
-        return GetBuilder<LocationController>(
-          builder: (location) {
-            return SafeArea(
-              child: SizedBox(
-                height: MediaQuery.of(context).size.height * .75,
-                child: Padding(
-                  padding: const EdgeInsets.all(20),
+      backgroundColor: Colors.white,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+      ),
+      builder: (sheetContext) {
+        return Padding(
+          padding: EdgeInsets.only(
+            bottom: MediaQuery.of(sheetContext).viewInsets.bottom,
+          ),
+          child: SizedBox(
+            height: MediaQuery.of(sheetContext).size.height * .7,
+            child: GetBuilder<LocationController>(
+              builder: (location) {
+                final query = location.searchController.text.trim();
+
+                return Padding(
+                  padding: const EdgeInsets.fromLTRB(20, 12, 20, 12),
                   child: Column(
                     children: [
-                      TextField(
-                        controller: location.searchController,
-                        decoration: InputDecoration(
-                          hintText: "Search location".tr,
-                          prefixIcon: Icon(Icons.search),
+                      Container(
+                        width: 42,
+                        height: 4,
+                        decoration: BoxDecoration(
+                          color: AppColors.fieldBorder,
+                          borderRadius: BorderRadius.circular(20),
                         ),
+                      ),
+                      const SizedBox(height: 16),
+                      Row(
+                        children: [
+                          Expanded(
+                            child: Text(
+                              'Search location'.tr,
+                              style: const TextStyle(
+                                fontSize: 17,
+                                fontWeight: FontWeight.w700,
+                              ),
+                            ),
+                          ),
+                          IconButton(
+                            onPressed: () => Navigator.pop(sheetContext),
+                            icon: const Icon(Icons.close_rounded),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 8),
+                      LpTextField(
+                        controller: location.searchController,
+                        hint: 'Search location'.tr,
+                        prefixIcon: Icons.search_rounded,
                         onChanged: location.onSearchChanged,
                       ),
-
-                      SizedBox(height: 20),
-
-                      Expanded(
-                        child: ListView.builder(
-                          itemCount: location.results.length,
-                          itemBuilder: (_, index) {
-                            final item = location.results[index];
-
-                            return ListTile(
-                              leading: const Icon(Icons.location_on),
-                              title: Text(item.data.title),
-                              subtitle: Text(item.data.formattedAddress),
-                              onTap: () {
-                                location.selectLocation(item);
-                                _fillCoordinates(item);
-                                Navigator.pop(context);
-                              },
-                            );
-                          },
+                      const SizedBox(height: 8),
+                      if (location.isLoading)
+                        const LinearProgressIndicator(
+                          minHeight: 2,
+                          color: AppColors.primary,
+                          backgroundColor: AppColors.pinkBg,
                         ),
+                      Expanded(
+                        child: location.results.isEmpty
+                            ? Center(
+                                child: Text(
+                                  query.length >= 2 && !location.isLoading
+                                      ? 'No results found'.tr
+                                      : '',
+                                  style: const TextStyle(
+                                    color: LpColors.muted,
+                                    fontSize: 13,
+                                  ),
+                                ),
+                              )
+                            : ListView.separated(
+                                itemCount: location.results.length,
+                                separatorBuilder: (_, _) => const Divider(
+                                  height: 1,
+                                  color: LpColors.border,
+                                ),
+                                itemBuilder: (_, index) {
+                                  final item = location.results[index];
+
+                                  return ListTile(
+                                    contentPadding: EdgeInsets.zero,
+                                    leading: const CircleAvatar(
+                                      radius: 18,
+                                      backgroundColor: AppColors.pinkBg,
+                                      child: Icon(
+                                        Icons.location_on_rounded,
+                                        size: 18,
+                                        color: AppColors.primary,
+                                      ),
+                                    ),
+                                    title: Text(
+                                      item.data.title,
+                                      style: const TextStyle(
+                                        fontWeight: FontWeight.w600,
+                                        fontSize: 14,
+                                      ),
+                                    ),
+                                    subtitle: Text(
+                                      item.data.formattedAddress,
+                                      maxLines: 2,
+                                      overflow: TextOverflow.ellipsis,
+                                      style: const TextStyle(fontSize: 12.5),
+                                    ),
+                                    onTap: () {
+                                      location.selectLocation(item);
+                                      _fillCoordinates(item);
+                                      Navigator.pop(sheetContext);
+                                    },
+                                  );
+                                },
+                              ),
                       ),
                     ],
                   ),
-                ),
-              ),
-            );
-          },
+                );
+              },
+            ),
+          ),
         );
       },
     );
   }
 
-  Widget _buildStep5({Key? key}) {
+  // ---------------------------------------------------------
+  // STEP 5 — MEDIA
+  // ---------------------------------------------------------
+  Widget _buildStep5() {
     return Column(
-      key: key,
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _sectionHeader(
+        LpStepHeading(
           icon: Icons.camera_alt_outlined,
-          title: "Photos & Videos".tr,
-          subtitle:
-              "Add high quality photos and videos to attract more buyers".tr,
+          title: 'Photos & Media'.tr,
+          subtitle: 'Add high quality photos to attract more buyers'.tr,
         ),
-
         const SizedBox(height: 20),
 
-        _fieldLabel("Cover Image".tr, required: true),
-
-        Padding(
-          padding: const EdgeInsets.only(top: 2, bottom: 12),
-          child: Text(
-            "This image will be shown first in listings".tr,
-            style: TextStyle(color: AppColors.hintGrey, fontSize: 12),
-          ),
+        LpSectionCard(
+          icon: Icons.image_outlined,
+          title: 'Cover Photo'.tr,
+          required: true,
+          subtitle: 'This image will be shown first in listings'.tr,
+          children: [_anchored('cover', _buildCover())],
         ),
 
-        (controller.coverImage.isEmpty && controller.existingPhotos.isEmpty)
-            ? GestureDetector(
-                onTap: _pickCoverImage,
-                child: _DashedUploadBox(
-                  icon: Icons.image_outlined,
-                  title: "Upload Cover Image".tr,
-                  subtitle: "JPG, PNG up to 10MB".tr,
-                  filled: true,
-                ),
-              )
-            : Stack(
-                children: [
-                  ClipRRect(
-                    borderRadius: BorderRadius.circular(14),
-                    child: controller.coverImage.isNotEmpty
-                        ? Image.file(
-                            File(controller.coverImage),
-                            width: double.infinity,
-                            height: 190,
-                            fit: BoxFit.cover,
-                          )
-                        : Image.network(
-                            controller.existingPhotos.first.url,
-                            width: double.infinity,
-                            height: 190,
-                            fit: BoxFit.cover,
-                          ),
-                  ),
-                  Positioned(
-                    top: 10,
-                    right: 10,
-                    child: InkWell(
-                      onTap: controller.removeCoverImage,
-                      child: Container(
-                        padding: const EdgeInsets.all(6),
-                        decoration: const BoxDecoration(
-                          color: Colors.black54,
-                          shape: BoxShape.circle,
-                        ),
-                        child: const Icon(
-                          Icons.close,
-                          color: Colors.white,
-                          size: 18,
-                        ),
-                      ),
-                    ),
-                  ),
-                  Positioned(
-                    left: 10,
-                    bottom: 10,
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 10,
-                        vertical: 5,
-                      ),
-                      decoration: BoxDecoration(
-                        color: AppColors.primary,
-                        borderRadius: BorderRadius.circular(20),
-                      ),
-                      child: Text(
-                        "Cover".tr,
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-
-        const SizedBox(height: 22),
-        _fieldLabel("Property Photos".tr, required: true),
-
-        Padding(
-          padding: EdgeInsets.only(top: 2, bottom: 12),
-          child: Text(
-            "Upload clear and attractive photos (Max 20 photos)".tr,
-            style: TextStyle(color: AppColors.hintGrey, fontSize: 12),
+        LpSectionCard(
+          icon: Icons.photo_library_outlined,
+          title: 'Property Photos'.tr,
+          required: true,
+          subtitle: 'Upload clear and attractive photos (Max 20 photos)'.tr,
+          trailing: Text(
+            '${controller.galleryCount}/$_maxPhotos',
+            style: const TextStyle(
+              fontSize: 12.5,
+              fontWeight: FontWeight.w700,
+              color: LpColors.muted,
+            ),
           ),
+          children: [_anchored('photos', _buildGallery())],
         ),
 
-        SizedBox(
-          height: 82,
-          child: ListView.separated(
-            scrollDirection: Axis.horizontal,
-            separatorBuilder: (_, __) => const SizedBox(width: 8),
-            itemCount: controller.images.isNotEmpty
-                ? controller.images.length
-                : controller.existingPhotos.isNotEmpty
-                ? controller.existingPhotos.length
-                : 4,
-            itemBuilder: (_, index) {
-              // No images
-              if (controller.images.isEmpty &&
-                  controller.existingPhotos.isEmpty) {
-                const colors = [
-                  Color(0xFFEFE3D8),
-                  Color(0xFFE7DED6),
-                  Color(0xFFEDEAE4),
-                  Color(0xFFDCE4E8),
-                ];
-
-                return _PhotoThumbnail(color: colors[index]);
-              }
-
-              // Newly selected local images
-              if (controller.images.isNotEmpty) {
-                return _PhotoThumbnail(
-                  imagePath: controller.images[index],
-                  onRemove: () {
-                    controller.removeImage(index);
-                  },
-                );
-              }
-
-              // Existing images from API
-              return Stack(
-                children: [
-                  ClipRRect(
-                    borderRadius: BorderRadius.circular(10),
-                    child: Image.network(
-                      controller.existingPhotos[index].url,
-                      width: 82,
-                      height: 82,
-                      fit: BoxFit.cover,
-                    ),
-                  ),
-                  Positioned(
-                    top: 4,
-                    right: 4,
-                    child: InkWell(
-                      onTap: () {
-                        controller.existingPhotos.removeAt(index);
-                        controller.update();
-                      },
-                      child: Container(
-                        padding: const EdgeInsets.all(4),
-                        decoration: const BoxDecoration(
-                          color: Colors.black54,
-                          shape: BoxShape.circle,
-                        ),
-                        child: const Icon(
-                          Icons.close,
-                          color: Colors.white,
-                          size: 14,
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
-              );
-            },
-          ),
+        LpBanner(
+          tone: LpBannerTone.success,
+          icon: Icons.auto_awesome,
+          title: 'Tip: Properties with photos get 10x more interest!'.tr,
+          message: 'Use clear, well-lit photos of every room'.tr,
         ),
-
-        const SizedBox(height: 14),
-
-        GestureDetector(
-          onTap: _pickImages,
-          child: _DashedUploadBox(
-            icon: Icons.add_photo_alternate_outlined,
-            title: "Add Photos".tr,
-            subtitle: "JPG, PNG up to 10MB each".tr,
-            filled: true,
-          ),
-        ),
-
-        const SizedBox(height: 22),
-
-        // //=========================================================
-        // // VIDEOS
-        // //=========================================================
-        // _fieldLabel("Property Videos"),
-
-        // const Padding(
-        //   padding: EdgeInsets.only(top: 2, bottom: 4),
-        //   child: Text(
-        //     "(Optional)",
-        //     style: TextStyle(color: AppColors.hintGrey, fontSize: 11),
-        //   ),
-        // ),
-
-        // const Padding(
-        //   padding: EdgeInsets.only(bottom: 12),
-        //   child: Text(
-        //     "Upload video tour of your property (Max 3 videos)",
-        //     style: TextStyle(color: AppColors.hintGrey, fontSize: 12),
-        //   ),
-        // ),
-
-        // GestureDetector(
-        //   onTap: _pickVideo,
-        //   child: _DashedUploadBox(
-        //     icon: Icons.videocam_outlined,
-        //     title: controller.video.isEmpty ? "Add Video" : "Video Selected",
-        //     subtitle: controller.video.isEmpty
-        //         ? "MP4, MOV up to 50MB each"
-        //         : controller.video.split('/').last,
-        //   ),
-        // ),
-
-        // const SizedBox(height: 16),
-
-        // _buildVideoGuidelines(),
-
-        // const SizedBox(height: 22),
-
-        //=========================================================
-        // DOCUMENTS
-        //=========================================================
-        // _fieldLabel("Additional Documents"),
-
-        // const Padding(
-        //   padding: EdgeInsets.only(top: 2, bottom: 4),
-        //   child: Text(
-        //     "(Optional)",
-        //     style: TextStyle(color: AppColors.hintGrey, fontSize: 11),
-        //   ),
-        // ),
-
-        // const Padding(
-        //   padding: EdgeInsets.only(bottom: 12),
-        //   child: Text(
-        //     "Upload floor plans, brochures or other documents",
-        //     style: TextStyle(color: AppColors.hintGrey, fontSize: 12),
-        //   ),
-        // ),
-
-        // GestureDetector(
-        //   onTap: _pickDocument,
-        //   child: const _DashedUploadBox(
-        //     icon: Icons.upload_file_outlined,
-        //     title: "Upload Documents",
-        //     subtitle: "PDF, JPG, PNG up to 10MB each",
-        //   ),
-        // ),
-        const SizedBox(height: 18),
-
-        _buildTipBox(),
       ],
     );
   }
 
-  Widget _buildReviewStep({Key? key}) {
-    return SingleChildScrollView(
-      key: key,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+  Widget _buildCover() {
+    if (!controller.hasCover) {
+      return LpUploadBox(
+        icon: Icons.image_outlined,
+        title: 'Upload Cover Image'.tr,
+        subtitle: 'JPG, PNG up to 10MB'.tr,
+        height: 170,
+        hasError: _err('cover'),
+        onTap: _pickCoverImage,
+      );
+    }
+
+    final Widget image = controller.coverImage.isNotEmpty
+        ? Image.file(
+            File(controller.coverImage),
+            fit: BoxFit.cover,
+            cacheWidth: 1000,
+          )
+        : Image.network(
+            controller.existingCover!.url,
+            fit: BoxFit.cover,
+            errorBuilder: (_, _, _) => Container(
+              color: const Color(0xFFEDEAE4),
+              child: const Icon(
+                Icons.broken_image_outlined,
+                color: AppColors.hintGrey,
+              ),
+            ),
+          );
+
+    return AspectRatio(
+      aspectRatio: 16 / 9,
+      child: Stack(
+        fit: StackFit.expand,
         children: [
-          _sectionHeader(
-            icon: Icons.fact_check_outlined,
-            title: "Review Listing".tr,
-            subtitle: "Verify all details before submitting".tr,
+          ClipRRect(borderRadius: BorderRadius.circular(14), child: image),
+          PositionedDirectional(
+            top: 10,
+            end: 10,
+            child: Row(
+              children: [
+                LpRoundIconButton(
+                  icon: Icons.edit_outlined,
+                  tooltip: 'Change'.tr,
+                  onTap: _pickCoverImage,
+                ),
+                const SizedBox(width: 8),
+                LpRoundIconButton(
+                  icon: Icons.close_rounded,
+                  tooltip: 'Remove'.tr,
+                  onTap: controller.removeCover,
+                ),
+              ],
+            ),
           ),
-
-          const SizedBox(height: 24),
-
-          _reviewSection(
-            title: "Basic Information".tr,
-            step: 0,
-            children: [
-              _reviewTile("Full Name".tr, controller.fullNameController.text),
-              _reviewTile(
-                "Phone".tr,
-                "${controller.countryCode} ${controller.phoneController.text}",
+          PositionedDirectional(
+            start: 10,
+            bottom: 10,
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
+              decoration: BoxDecoration(
+                color: AppColors.primary,
+                borderRadius: BorderRadius.circular(20),
               ),
-              _reviewTile("Email".tr, controller.emailController.text),
-              _reviewTile(
-                "WhatsApp Verified".tr,
-                controller.whatsappVerified ? "Yes".tr : "No".tr,
-              ),
-              _reviewTile(
-                "Description".tr,
-                _plainDescriptionPreview(
-                  controller.descriptionController.text,
+              child: Text(
+                'Cover'.tr,
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 12,
+                  fontWeight: FontWeight.w700,
                 ),
               ),
-            ],
-          ),
-
-          _reviewSection(
-            title: "Property Details".tr,
-            step: 1,
-            children: [
-              _reviewTile(
-                "Property Name".tr,
-                controller.propertyNameController.text,
-              ),
-
-              _reviewTile("Property Type".tr, controller.propertyType),
-
-              _reviewTile("Purpose".tr, controller.propertyPurpose),
-
-              _reviewTile("Price".tr, "QAR ${controller.priceController.text}"),
-
-              _reviewTile("Area".tr, "${controller.areaController.text} sqm"),
-
-              _reviewTile("Bedrooms".tr, controller.bedroomsController.text),
-
-              _reviewTile("Bathrooms".tr, controller.bathroomsController.text),
-
-              _reviewTile(
-                "Living Rooms".tr,
-                controller.livingRoomsController.text,
-              ),
-
-              _reviewTile(
-                "Parking Spaces".tr,
-                controller.parkingSpacesController.text,
-              ),
-
-              _reviewTile(
-                "Floor Number".tr,
-                controller.floorNumberController.text,
-              ),
-
-              _reviewTile(
-                "Total Floors".tr,
-                controller.totalFloorsController.text,
-              ),
-
-              _reviewTile("Year Built".tr, controller.yearBuiltController.text),
-            ],
-          ),
-
-          _reviewSection(
-            title: "Features & Amenities".tr,
-            step: 2,
-            children: [
-              _reviewTile(
-                "Other Features".tr,
-                controller.otherFeatureController.text,
-              ),
-
-              const SizedBox(height: 12),
-
-              Text(
-                "Furnishing".tr,
-                style: TextStyle(fontWeight: FontWeight.bold),
-              ),
-
-              const SizedBox(height: 8),
-
-              _buildSelectedFurnishing(),
-
-              const SizedBox(height: 16),
-
-              Text(
-                "Amenities".tr,
-                style: TextStyle(fontWeight: FontWeight.bold),
-              ),
-
-              const SizedBox(height: 8),
-
-              _buildSelectedAmenities(),
-
-              const SizedBox(height: 16),
-
-              Text(
-                "Nearby Tags".tr,
-                style: TextStyle(fontWeight: FontWeight.bold),
-              ),
-
-              const SizedBox(height: 8),
-
-              _buildSelectedNearbyTags(),
-            ],
-          ),
-          _reviewSection(
-            title: "Location".tr,
-            step: 3,
-            children: [
-              _reviewTile("Address Line 1".tr, controller.addressController.text,),
-
-              _reviewTile("Address Line 2".tr, controller.streetController.text),
-
-              _reviewTile("Area".tr, controller.areaNameController.text),
-
-              _reviewTile("Municipality".tr, controller.cityController.text),
-
-              _reviewTile("Landmark".tr, controller.landmarkController.text),
-
-              _reviewTile("Latitude".tr, controller.latitudeController.text),
-
-              _reviewTile("Longitude".tr, controller.longitudeController.text),
-            ],
-          ),
-
-          _reviewSection(
-            title: "Photos & Media".tr,
-            step: 4,
-            children: [
-              if (controller.coverImage.isNotEmpty)
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      "Cover Image".tr,
-                      style: TextStyle(fontWeight: FontWeight.bold),
-                    ),
-
-                    const SizedBox(height: 10),
-
-                    ClipRRect(
-                      borderRadius: BorderRadius.circular(12),
-                      child: Image.file(
-                        File(controller.coverImage),
-                        height: 180,
-                        width: double.infinity,
-                        fit: BoxFit.cover,
-                      ),
-                    ),
-                  ],
-                ),
-
-              const SizedBox(height: 20),
-
-              Text(
-                "Gallery".tr,
-                style: TextStyle(fontWeight: FontWeight.bold),
-              ),
-
-              const SizedBox(height: 10),
-
-              Wrap(
-                spacing: 10,
-                runSpacing: 10,
-                children: controller.images.map((path) {
-                  return ClipRRect(
-                    borderRadius: BorderRadius.circular(10),
-                    child: Image.file(
-                      File(path),
-                      width: 90,
-                      height: 90,
-                      fit: BoxFit.cover,
-                    ),
-                  );
-                }).toList(),
-              ),
-
-              const SizedBox(height: 12),
-
-              _reviewTile("Total Photos".tr, controller.images.length.toString()),
-            ],
+            ),
           ),
         ],
       ),
     );
   }
 
-  Widget _reviewSection({
-    required String title,
-    required int step,
-    required List<Widget> children,
-  }) {
-    return Container(
-      margin: const EdgeInsets.only(bottom: 16),
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: Colors.grey.shade200),
+  Widget _buildGallery() {
+    final total = controller.galleryCount;
+
+    if (total == 0) {
+      return LpUploadBox(
+        icon: Icons.add_photo_alternate_outlined,
+        title: 'Add Photos'.tr,
+        subtitle: 'JPG, PNG up to 10MB each'.tr,
+        hasError: _err('photos'),
+        onTap: _pickImages,
+      );
+    }
+
+    return GridView.count(
+      crossAxisCount: 3,
+      mainAxisSpacing: 8,
+      crossAxisSpacing: 8,
+      shrinkWrap: true,
+      physics: const NeverScrollableScrollPhysics(),
+      children: [
+        for (final photo in controller.existingGallery)
+          LpPhotoTile(
+            networkUrl: photo.url,
+            onRemove: () => controller.removeExistingPhoto(photo),
+          ),
+        for (int i = 0; i < controller.images.length; i++)
+          LpPhotoTile(
+            filePath: controller.images[i],
+            onRemove: () => controller.removeImage(i),
+          ),
+        if (total < _maxPhotos) LpAddPhotoTile(onTap: _pickImages),
+      ],
+    );
+  }
+
+  Future<void> _pickCoverImage() async {
+    final XFile? image = await _picker.pickImage(source: ImageSource.gallery);
+
+    if (image == null) return;
+
+    controller.setCoverImage(image.path);
+    _fixing('cover');
+  }
+
+  Future<void> _pickImages() async {
+    final files = await _picker.pickMultiImage(imageQuality: 80);
+
+    if (files.isEmpty) return;
+
+    final remaining = _maxPhotos - controller.galleryCount;
+
+    if (files.length > remaining) {
+      Fluttertoast.showToast(msg: 'You can add up to 20 photos'.tr);
+    }
+
+    for (final image in files.take(remaining)) {
+      controller.addImage(image.path);
+    }
+
+    _fixing('photos');
+  }
+
+  // ---------------------------------------------------------
+  // STEP 6 — REVIEW
+  // ---------------------------------------------------------
+  Widget _buildReviewStep() {
+    final c = controller;
+
+    final amenities = c.amenities
+        .where((e) => c.selectedAmenities.contains(e.id))
+        .map((e) => e.title)
+        .toList();
+    final nearby = c.nearbyTags
+        .where((e) => c.selectedNearbyTags.contains(e.id))
+        .map((e) => e.title)
+        .toList();
+    final furnishing = c.furnishingOptions
+        .where((e) => c.selectedFurnishing.contains(e.id))
+        .map((e) => e.title)
+        .toList();
+
+    final description = _plainDescriptionPreview(c.descriptionController.text);
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        LpStepHeading(
+          icon: Icons.fact_check_outlined,
+          title: 'Review Listing'.tr,
+          subtitle: 'Verify all details before submitting'.tr,
+        ),
+        const SizedBox(height: 20),
+
+        _buildReviewHero(),
+        const SizedBox(height: 14),
+
+        LpReviewSection(
+          icon: Icons.contact_phone_outlined,
+          title: 'Contact Details'.tr,
+          onEdit: () => _goToStep(0),
+          children: [
+            LpReviewRow('Full Name'.tr, c.fullNameController.text),
+            LpReviewRow(
+              'Phone'.tr,
+              '${c.countryCode} ${c.phoneController.text}',
+            ),
+            _optionalRow('Email'.tr, c.emailController.text),
+            LpReviewRow(
+              'WhatsApp Verified'.tr,
+              c.whatsappVerified ? 'Yes'.tr : 'No'.tr,
+            ),
+          ],
+        ),
+
+        LpReviewSection(
+          icon: Icons.apartment_outlined,
+          title: 'Property Details'.tr,
+          onEdit: () => _goToStep(1),
+          children: [
+            LpReviewRow('Property Name'.tr, c.propertyNameController.text),
+            LpReviewRow('Property Type'.tr, c.propertyType),
+            LpReviewRow('Purpose'.tr, _purposeLabel),
+            LpReviewRow('Price'.tr, _priceLabel),
+            if (c.priceNegotiable)
+              LpReviewRow('Price is negotiable'.tr, 'Yes'.tr),
+            LpReviewRow('Area'.tr, '${c.areaController.text} sqm'),
+            LpReviewRow('Bedrooms'.tr, c.bedroomsController.text),
+            LpReviewRow('Bathrooms'.tr, c.bathroomsController.text),
+            _optionalRow('Living Rooms'.tr, c.livingRoomsController.text),
+            _optionalRow('Parking Spaces'.tr, c.parkingSpacesController.text),
+            _optionalRow('Floor Number'.tr, c.floorNumberController.text),
+            _optionalRow('Total Floors'.tr, c.totalFloorsController.text),
+            _optionalRow('Year Built'.tr, c.yearBuiltController.text),
+            if (description.isNotEmpty) ...[
+              const Divider(height: 16, color: LpColors.border),
+              Text(
+                description,
+                maxLines: 6,
+                overflow: TextOverflow.ellipsis,
+                style: const TextStyle(
+                  fontSize: 13,
+                  height: 1.45,
+                  color: LpColors.ink,
+                ),
+              ),
+              const SizedBox(height: 6),
+            ],
+          ],
+        ),
+
+        LpReviewSection(
+          icon: Icons.widgets_outlined,
+          title: 'Features & Amenities'.tr,
+          onEdit: () => _goToStep(2),
+          children: [
+            _reviewChips('Furnishing'.tr, furnishing),
+            _reviewChips('Amenities'.tr, amenities),
+            _reviewChips('Nearby Places'.tr, nearby),
+            _optionalRow('Other Features'.tr, c.otherFeatureController.text),
+            if (furnishing.isEmpty &&
+                amenities.isEmpty &&
+                nearby.isEmpty &&
+                c.otherFeatureController.text.trim().isEmpty)
+              LpReviewRow('Amenities'.tr, ''),
+          ],
+        ),
+
+        LpReviewSection(
+          icon: Icons.location_on_outlined,
+          title: 'Location'.tr,
+          onEdit: () => _goToStep(3),
+          children: [
+            LpReviewRow('Address Line 1'.tr, c.addressController.text),
+            _optionalRow('Address Line 2'.tr, c.streetController.text),
+            LpReviewRow('Area'.tr, c.areaNameController.text),
+            LpReviewRow('Municipality'.tr, c.cityController.text),
+            _optionalRow('Landmark'.tr, c.landmarkController.text),
+            LpReviewRow(
+              'Coordinates'.tr,
+              '${c.latitudeController.text}, ${c.longitudeController.text}',
+            ),
+          ],
+        ),
+
+        LpReviewSection(
+          icon: Icons.photo_library_outlined,
+          title: 'Photos & Media'.tr,
+          onEdit: () => _goToStep(4),
+          children: [
+            LpReviewRow(
+              'Total Photos'.tr,
+              '${c.galleryCount + (c.hasCover ? 1 : 0)}',
+            ),
+            const SizedBox(height: 6),
+            Wrap(
+              spacing: 8,
+              runSpacing: 8,
+              children: [
+                if (c.coverImage.isNotEmpty)
+                  _reviewThumb(filePath: c.coverImage, isCover: true)
+                else if (c.existingCover != null)
+                  _reviewThumb(networkUrl: c.existingCover!.url, isCover: true),
+                for (final p in c.existingGallery)
+                  _reviewThumb(networkUrl: p.url),
+                for (final path in c.images) _reviewThumb(filePath: path),
+              ],
+            ),
+            const SizedBox(height: 8),
+          ],
+        ),
+      ],
+    );
+  }
+
+  String get _purposeLabel {
+    switch (controller.propertyPurpose.toUpperCase()) {
+      case ListPropertyController.purposeSale:
+        return 'For Sale'.tr;
+      case ListPropertyController.purposeRent:
+        return 'For Rent'.tr;
+      default:
+        return '';
+    }
+  }
+
+  String get _priceLabel {
+    final value = num.tryParse(controller.priceController.text.trim());
+    final formatted = value == null
+        ? controller.priceController.text
+        : NumberFormat.decimalPattern().format(value);
+    return 'QAR $formatted';
+  }
+
+  Widget _buildReviewHero() {
+    final c = controller;
+
+    final Widget image = c.coverImage.isNotEmpty
+        ? Image.file(File(c.coverImage), fit: BoxFit.cover, cacheWidth: 1000)
+        : c.existingCover != null
+        ? Image.network(
+            c.existingCover!.url,
+            fit: BoxFit.cover,
+            errorBuilder: (_, _, _) => Container(color: AppColors.sand),
+          )
+        : Container(
+            color: AppColors.sand,
+            child: const Icon(
+              Icons.image_outlined,
+              size: 40,
+              color: AppColors.hintGrey,
+            ),
+          );
+
+    final place = [
+      c.areaNameController.text.trim(),
+      c.cityController.text.trim(),
+    ].where((e) => e.isNotEmpty).join(', ');
+
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(16),
+      child: SizedBox(
+        height: 200,
+        child: Stack(
+          fit: StackFit.expand,
+          children: [
+            image,
+            const DecoratedBox(
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: [Color(0x00000000), Color(0xCC000000)],
+                  stops: [.35, 1],
+                ),
+              ),
+            ),
+            Positioned.directional(
+              textDirection: Directionality.of(context),
+              start: 16,
+              end: 16,
+              bottom: 14,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  if (_purposeLabel.isNotEmpty)
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 10,
+                        vertical: 4,
+                      ),
+                      decoration: BoxDecoration(
+                        color: AppColors.primary,
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      child: Text(
+                        _purposeLabel,
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 11.5,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                    ),
+                  const SizedBox(height: 8),
+                  Text(
+                    c.propertyNameController.text.isEmpty
+                        ? '-'
+                        : c.propertyNameController.text,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 18,
+                      fontWeight: FontWeight.w800,
+                    ),
+                  ),
+                  const SizedBox(height: 2),
+                  Text(
+                    _priceLabel,
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 15,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                  if (place.isNotEmpty)
+                    Padding(
+                      padding: const EdgeInsets.only(top: 2),
+                      child: Text(
+                        place,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(
+                          color: Colors.white70,
+                          fontSize: 12.5,
+                        ),
+                      ),
+                    ),
+                ],
+              ),
+            ),
+          ],
+        ),
       ),
+    );
+  }
+
+  Widget _optionalRow(String label, String value) {
+    if (value.trim().isEmpty) return const SizedBox.shrink();
+    return LpReviewRow(label, value);
+  }
+
+  Widget _reviewChips(String label, List<String> items) {
+    if (items.isEmpty) return const SizedBox.shrink();
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 7),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(
-            children: [
-              Expanded(
-                child: Text(
-                  title,
-                  style: const TextStyle(fontWeight: FontWeight.bold),
-                ),
-              ),
-
-              InkWell(
-                onTap: () {
-                  controller.currentStep = step;
-                  controller.update();
-                },
-                child: Row(
-                  children: [
-                    const Icon(Icons.edit, size: 18),
-                    const SizedBox(width: 4),
-                    Text("Edit".tr),
-                  ],
-                ),
-              ),
-            ],
+          Text(
+            label,
+            style: const TextStyle(fontSize: 13, color: LpColors.muted),
           ),
+          const SizedBox(height: 8),
+          Wrap(
+            spacing: 6,
+            runSpacing: 6,
+            children: items
+                .map(
+                  (t) => Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 10,
+                      vertical: 5,
+                    ),
+                    decoration: BoxDecoration(
+                      color: AppColors.pinkChipBg,
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Text(
+                      t.tr,
+                      style: const TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w600,
+                        color: AppColors.primary,
+                      ),
+                    ),
+                  ),
+                )
+                .toList(),
+          ),
+        ],
+      ),
+    );
+  }
 
-          const Divider(),
+  Widget _reviewThumb({
+    String? filePath,
+    String? networkUrl,
+    bool isCover = false,
+  }) {
+    final Widget image = filePath != null
+        ? Image.file(File(filePath), fit: BoxFit.cover, cacheWidth: 240)
+        : Image.network(
+            networkUrl ?? '',
+            fit: BoxFit.cover,
+            errorBuilder: (_, _, _) => Container(color: AppColors.sand),
+          );
 
-          ...children,
+    return SizedBox(
+      width: 72,
+      height: 72,
+      child: Stack(
+        fit: StackFit.expand,
+        children: [
+          ClipRRect(borderRadius: BorderRadius.circular(10), child: image),
+          if (isCover)
+            PositionedDirectional(
+              start: 4,
+              bottom: 4,
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                decoration: BoxDecoration(
+                  color: AppColors.primary,
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Text(
+                  'Cover'.tr,
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 9.5,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+              ),
+            ),
         ],
       ),
     );
@@ -2359,573 +2019,54 @@ Widget _buildWhatsAppVerifiedBanner() {
   String _plainDescriptionPreview(String html) {
     return html
         .replaceAll(RegExp(r'<[^>]*>'), ' ')
+        .replaceAll('&nbsp;', ' ')
         .replaceAll(RegExp(r'\s+'), ' ')
         .trim();
   }
-
-  Widget _reviewTile(String title, String value) {
-  return Padding(
-    padding: const EdgeInsets.symmetric(vertical: 6),
-    child: Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Expanded(
-          flex: 2,
-          child: Text(
-            title,
-          ),
-        ),
-        const SizedBox(width: 12),
-        Expanded(
-          flex: 3,
-          child: Text(
-            value.isEmpty ? "-" : value,
-            style: const TextStyle(
-              fontWeight: FontWeight.w600,
-            ),
-            textAlign: TextAlign.right,
-            softWrap: true,
-          ),
-        ),
-      ],
-    ),
-  );
 }
 
-  Future<void> _pickCoverImage() async {
-    final ImagePicker picker = ImagePicker();
+// =================================================================
+// PRIVATE PIECES
+// =================================================================
 
-    final XFile? image = await picker.pickImage(source: ImageSource.gallery);
+/// Fixed "QAR" prefix inside the price field. Prices are always sent in
+/// QAR, so there's no currency picker to mislead the user.
+class _QarPrefix extends StatelessWidget {
+  const _QarPrefix();
 
-    if (image == null) return;
-
-    controller.coverImage = image.path;
-    controller.update();
-  }
-
-  Future<void> _pickImages() async {
-    final files = await _picker.pickMultiImage(imageQuality: 80);
-
-    if (files.isEmpty) return;
-
-    final remaining = 20 - controller.images.length;
-
-    for (final image in files.take(remaining)) {
-      controller.addImage(image.path);
-    }
-  }
-
-  Future<void> _pickVideo() async {
-    final file = await _picker.pickVideo(source: ImageSource.gallery);
-
-    if (file == null) return;
-
-    controller.setVideo(file.path);
-  }
-
-  Widget _buildVideoGuidelines() {
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(10),
-      decoration: BoxDecoration(
-        color: AppColors.pinkChipBg,
-        borderRadius: BorderRadius.circular(8),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: const [
-              Icon(Icons.info_outline, size: 16, color: AppColors.primary),
-              SizedBox(width: 8),
-              Text(
-                'Video Guidelines',
-                style: TextStyle(
-                  fontWeight: FontWeight.w700,
-                  fontSize: 12.5,
-                  color: AppColors.primary,
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 8),
-          ..._videoGuidelineItems.map(
-            (t) => Padding(
-              padding: const EdgeInsets.only(bottom: 4, left: 24),
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Icon(Icons.check, size: 14, color: AppColors.primary),
-                  const SizedBox(width: 6),
-                  Expanded(
-                    child: Text(
-                      t,
-                      style: const TextStyle(
-                        fontSize: 12,
-                        color: AppColors.labelGrey,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  static const _videoGuidelineItems = [
-    'Maximum video duration: 2 minutes',
-    'Show all major areas of the property',
-    'Ensure good lighting and clear audio',
-  ];
-
-  Widget _buildTipBox() {
-    return Container(
-      width: double.infinity,
-      padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 14.h),
-      decoration: BoxDecoration(
-        color: AppColors.greenBg,
-        borderRadius: BorderRadius.circular(8),
-      ),
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsetsDirectional.only(start: 14, end: 10),
       child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
         children: [
-          const Icon(
-            Icons.verified_user_outlined,
-            size: 18,
-            color: AppColors.greenText,
+          const Text(
+            'QAR',
+            style: TextStyle(
+              fontSize: 13.5,
+              fontWeight: FontWeight.w800,
+              color: AppColors.primary,
+            ),
           ),
           const SizedBox(width: 10),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'Tip: Properties with photos get 10x more interest!'.tr,
-                  style: TextStyle(
-                    fontWeight: FontWeight.w600,
-                    fontSize: 10.5,
-                    color: AppColors.greenText,
-                  ),
-                ),
-                SizedBox(height: 2.h),
-                Text(
-                  'Make sure to add high quality photos and videos'.tr,
-                  style: TextStyle(fontSize: 10.sp, color: Colors.black),
-                ),
-              ],
-            ),
-          ),
-          const Icon(Icons.auto_awesome, size: 16, color: AppColors.greenText),
-        ],
-      ),
-    );
-  }
-
-  // ---------------------------------------------------------
-  // SHARED PIECES
-  // ---------------------------------------------------------
-  Widget _sectionHeader({
-    required IconData icon,
-    required String title,
-    required String subtitle,
-  }) {
-    return Row(
-      children: [
-        Container(
-          width: 44,
-          height: 44,
-          decoration: const BoxDecoration(
-            color: AppColors.pinkBg,
-            shape: BoxShape.circle,
-          ),
-          child: Icon(icon, color: AppColors.primary, size: 22),
-        ),
-        const SizedBox(width: 12),
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                title,
-                style: const TextStyle(
-                  fontSize: 15,
-                  fontWeight: FontWeight.w700,
-                  color: Colors.black87,
-                ),
-              ),
-              const SizedBox(height: 2),
-              Text(
-                subtitle,
-                style: const TextStyle(
-                  fontSize: 12.5,
-                  color: AppColors.hintGrey,
-                ),
-              ),
-            ],
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _fieldLabel(String text, {bool required = false}) {
-    return RichText(
-      text: TextSpan(
-        text: text,
-        style: const TextStyle(
-          color: AppColors.labelGrey,
-          fontSize: 13.5,
-          fontWeight: FontWeight.w600,
-        ),
-        children: required
-            ? const [
-                TextSpan(
-                  text: ' *',
-                  style: TextStyle(color: AppColors.primary),
-                ),
-              ]
-            : [],
-      ),
-    );
-  }
-
-  Widget _buildBottomButton() {
-    final bool isReviewStep = controller.currentStep == 5;
-    return SizedBox(
-      width: double.infinity,
-      height: 54,
-      child: ElevatedButton(
-        // Prevent multiple submissions
-        onPressed: controller.isSubmitting
-            ? null
-            : () async {
-                if (!isReviewStep) {
-                  controller.nextStep();
-                  return;
-                }
-
-                bool success;
-                if (widget.isEdit) {
-                  success = await controller.updateProperty(
-                    widget.property!.id,
-                  );
-                } else {
-                  success = await controller.addProperty();
-                }
-
-                if (success) {
-                  Get.back(result: true);
-                }
-              },
-        style: ElevatedButton.styleFrom(
-          backgroundColor: AppColors.primary,
-          disabledBackgroundColor: AppColors.primary.withOpacity(.7),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(14),
-          ),
-          elevation: 0,
-        ),
-
-        child: controller.isSubmitting
-            ? const SizedBox(
-                width: 22,
-                height: 22,
-                child: CircularProgressIndicator(
-                  color: Colors.white,
-                  strokeWidth: 2,
-                ),
-              )
-            : Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text(
-                    isReviewStep
-                        ? (widget.isEdit
-                              ? "Update Property".tr
-                              : "Submit Property".tr)
-                        : "Save & Continue".tr,
-                    style: const TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w700,
-                      color: Colors.white,
-                    ),
-                  ),
-
-                  const SizedBox(width: 8),
-
-                  const Icon(
-                    Icons.arrow_forward,
-                    size: 18,
-                    color: Colors.white,
-                  ),
-                ],
-              ),
-      ),
-    );
-  }
-}
-
-// =================================================================
-// AMENITY DATA MODEL
-// =================================================================
-class _LocationActionButton extends StatelessWidget {
-  final IconData icon;
-  final String title;
-  final VoidCallback onTap;
-
-  const _LocationActionButton({
-    required this.icon,
-    required this.title,
-    required this.onTap,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return SizedBox(
-      height: 42.h,
-      child: OutlinedButton.icon(
-        onPressed: onTap,
-        icon: Icon(icon, size: 18.sp, color: AppColors.primary),
-        label: Text(
-          title,
-          style: AppTextStyles.body13.copyWith(
-            color: AppColors.primary,
-            fontWeight: FontWeight.w600,
-          ),
-        ),
-        style: OutlinedButton.styleFrom(
-          backgroundColor: Colors.white,
-          foregroundColor: AppColors.primary,
-          side: BorderSide(color: AppColors.primary.withOpacity(.25)),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(10.r),
-          ),
-          padding: EdgeInsets.symmetric(horizontal: 10.w),
-        ),
-      ),
-    );
-  }
-}
-
-class _AmenityData {
-  final String label;
-  final IconData icon;
-  bool selected;
-  _AmenityData(this.label, this.icon, {this.selected = false});
-}
-
-// =================================================================
-// STEP CIRCLE WIDGET
-// =================================================================
-enum _StepState { completed, active, inactive }
-
-class _StepCircle extends StatelessWidget {
-  final int number;
-  final String label;
-  final _StepState state;
-
-  const _StepCircle({
-    required this.number,
-    required this.label,
-    required this.state,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final bool isActive = state == _StepState.active;
-    final bool isCompleted = state == _StepState.completed;
-    final Color circleColor = (isActive || isCompleted)
-        ? AppColors.primary
-        : Colors.white;
-    final Color borderColor = (isActive || isCompleted)
-        ? AppColors.primary
-        : Color(0xFFE3E1E6);
-    final Color textColor = (isActive || isCompleted)
-        ? Colors.white
-        : AppColors.hintGrey;
-
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Container(
-          width: 34,
-          height: 34,
-          decoration: BoxDecoration(
-            color: circleColor,
-            shape: BoxShape.circle,
-            border: Border.all(color: borderColor, width: 1.5),
-          ),
-          alignment: Alignment.center,
-          child: isCompleted
-              ? const Icon(Icons.check, color: Colors.white, size: 18)
-              : Text(
-                  '$number',
-                  style: TextStyle(
-                    color: textColor,
-                    fontWeight: FontWeight.w700,
-                    fontSize: 14,
-                  ),
-                ),
-        ),
-        const SizedBox(height: 6),
-        Text(
-          label,
-          style: TextStyle(
-            fontSize: 10.5,
-            fontWeight: isActive ? FontWeight.w700 : FontWeight.w500,
-            color: isActive ? AppColors.primary : AppColors.hintGrey,
-          ),
-        ),
-      ],
-    );
-  }
-}
-
-// =================================================================
-// TEXT FIELD
-// =================================================================
-class _AppTextField extends StatelessWidget {
-  final TextEditingController controller;
-  final String hint;
-  final IconData? prefixIcon;
-  final TextInputType? keyboardType;
-  final int maxLines;
-  final int? maxLength;
-  final bool showCounter;
-  final bool enabled;
-  final ValueChanged<String>? onChanged;
-
-  const _AppTextField({
-    required this.controller,
-    required this.hint,
-    this.prefixIcon,
-    this.keyboardType,
-    this.maxLines = 1,
-    this.maxLength,
-    this.showCounter = false,
-    this.onChanged,
-    this.enabled = true,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        color: AppColors.fieldBg,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: AppColors.fieldBorder),
-      ),
-      padding: const EdgeInsets.symmetric(horizontal: 4),
-      child: Stack(
-        children: [
-          TextField(
-            controller: controller,
-            keyboardType: keyboardType,
-            maxLines: maxLines,
-            maxLength: maxLength,
-            onChanged: onChanged,
-            inputFormatters: keyboardType == TextInputType.number
-                ? [FilteringTextInputFormatter.digitsOnly]
-                : null,
-            style: const TextStyle(fontSize: 14, color: Colors.black87),
-            decoration: InputDecoration(
-              hintText: hint,
-              hintStyle: const TextStyle(
-                color: AppColors.hintGrey,
-                fontSize: 14,
-              ),
-              prefixIcon: prefixIcon != null
-                  ? Icon(prefixIcon, color: AppColors.hintGrey, size: 20)
-                  : null,
-              border: InputBorder.none,
-              counterText: '',
-              contentPadding: const EdgeInsets.symmetric(
-                horizontal: 12,
-                vertical: 14,
-              ),
-            ),
-          ),
-          if (showCounter)
-            Positioned(
-              right: 10,
-              bottom: 6,
-              child: Text(
-                '${controller.text.length}/${maxLength ?? 0}',
-                style: const TextStyle(fontSize: 11, color: AppColors.hintGrey),
-              ),
-            ),
+          Container(width: 1, height: 20, color: LpColors.border),
         ],
       ),
     );
   }
 }
 
-// =================================================================
-// DROPDOWN FIELD
-// =================================================================
-class _AppDropdownField extends StatelessWidget {
-  final String? value;
-  final String hint;
-  final IconData icon;
-  final List<String> items;
-  final ValueChanged<String?> onChanged;
-
-  const _AppDropdownField({
-    required this.value,
-    required this.hint,
-    required this.icon,
-    required this.items,
-    required this.onChanged,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        color: AppColors.fieldBg,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: AppColors.fieldBorder),
-      ),
-      padding: const EdgeInsets.symmetric(horizontal: 12),
-      child: DropdownButtonHideUnderline(
-        child: DropdownButton<String>(
-          isExpanded: true,
-          value: value,
-          hint: Row(
-            children: [
-              Icon(icon, color: AppColors.hintGrey, size: 20),
-              const SizedBox(width: 10),
-              Text(
-                hint,
-                style: const TextStyle(color: AppColors.hintGrey, fontSize: 14),
-              ),
-            ],
-          ),
-          icon: const Icon(
-            Icons.keyboard_arrow_down,
-            color: AppColors.hintGrey,
-          ),
-          items: items
-              .map((e) => DropdownMenuItem(value: e, child: Text(e.tr)))
-              .toList(),
-          onChanged: onChanged,
-        ),
-      ),
-    );
-  }
-}
-
-// =================================================================
-// COUNTRY CODE DROPDOWN
-// =================================================================
 class _CountryCodeDropdown extends StatelessWidget {
   final String value;
+  final bool enabled;
   final ValueChanged<String> onChanged;
 
-  const _CountryCodeDropdown({required this.value, required this.onChanged});
+  const _CountryCodeDropdown({
+    required this.value,
+    required this.onChanged,
+    this.enabled = true,
+  });
 
   // ISO code -> dial code, same set (and same flag source, via
   // country_pickers) used by the login screen's country picker.
@@ -2940,17 +2081,20 @@ class _CountryCodeDropdown extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: 48.h,
+      constraints: const BoxConstraints(minHeight: 50),
       padding: const EdgeInsets.symmetric(horizontal: 10),
       decoration: BoxDecoration(
-        color: AppColors.fieldBg,
-        borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: AppColors.fieldBorder),
+        color: enabled ? LpColors.fieldFill : const Color(0xFFF1F0F2),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: LpColors.border),
       ),
+      alignment: Alignment.center,
       child: DropdownButtonHideUnderline(
         child: DropdownButton<String>(
           value: _isoByCode.containsKey(value) ? value : _isoByCode.keys.first,
-          icon: const Icon(Icons.keyboard_arrow_down, size: 18),
+          icon: const Icon(Icons.keyboard_arrow_down_rounded, size: 18),
+          borderRadius: BorderRadius.circular(12),
+          dropdownColor: Colors.white,
           items: _isoByCode.entries
               .map(
                 (entry) => DropdownMenuItem(
@@ -2958,482 +2102,87 @@ class _CountryCodeDropdown extends StatelessWidget {
                   child: Row(
                     children: [
                       SizedBox(
-                        width: 20,
-                        height: 14,
+                        width: 22,
+                        height: 15,
                         child: CountryPickerUtils.getDefaultFlagImage(
                           CountryPickerUtils.getCountryByIsoCode(entry.value),
                         ),
                       ),
-                      const SizedBox(width: 6),
-                      Text(entry.key, style: const TextStyle(fontSize: 13)),
+                      const SizedBox(width: 8),
+                      // Dial codes are always left-to-right ("+974").
+                      Directionality(
+                        textDirection: TextDirection.ltr,
+                        child: Text(
+                          entry.key,
+                          style: const TextStyle(
+                            fontSize: 13.5,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ),
                     ],
                   ),
                 ),
               )
               .toList(),
-          onChanged: (v) => onChanged(v ?? value),
+          onChanged: enabled ? (v) => onChanged(v ?? value) : null,
         ),
       ),
     );
   }
 }
 
-// =================================================================
-// CURRENCY DROPDOWN
-// =================================================================
-
-class _CurrencyDropdown extends StatelessWidget {
-  final String value;
-  final ValueChanged<String> onChanged;
-
-  const _CurrencyDropdown({required this.value, required this.onChanged});
-
-  static const List<String> currencies = ['QAR', 'USD', 'AED', 'SAR'];
+/// Grey placeholder chips shown while option lists load.
+class _ChipSkeleton extends StatelessWidget {
+  const _ChipSkeleton();
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      height: 52,
-      padding: const EdgeInsets.symmetric(horizontal: 10),
-      decoration: BoxDecoration(
-        color: AppColors.fieldBg,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: AppColors.fieldBorder),
-      ),
-      child: DropdownButtonHideUnderline(
-        child: DropdownButton<String>(
-          value: value,
-          icon: const Icon(Icons.keyboard_arrow_down, size: 18),
-          items: currencies
-              .map(
-                (c) => DropdownMenuItem(
-                  value: c,
-                  child: Text(c, style: const TextStyle(fontSize: 13)),
-                ),
-              )
-              .toList(),
-          onChanged: (v) => onChanged(v ?? value),
-        ),
-      ),
-    );
-  }
-}
+    const widths = [84.0, 110.0, 70.0, 96.0, 78.0, 120.0];
 
-// =================================================================
-// TOGGLE BUTTON (Sale/Rent, Residential/Commercial)
-// =================================================================
-class _ToggleButton extends StatelessWidget {
-  final String label;
-  final IconData icon;
-  final bool selected;
-  final VoidCallback onTap;
-  final BorderRadius radius;
-
-  const _ToggleButton({
-    required this.label,
-    required this.icon,
-    required this.selected,
-    required this.onTap,
-    required this.radius,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        height: 50,
-        decoration: BoxDecoration(
-          color: selected ? AppColors.pinkBg : AppColors.fieldBg,
-          borderRadius: radius,
-          border: Border.all(
-            color: selected ? AppColors.primary : AppColors.fieldBorder,
-          ),
-        ),
-        alignment: Alignment.center,
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(
-              icon,
-              size: 18,
-              color: selected ? AppColors.primary : AppColors.hintGrey,
-            ),
-            const SizedBox(width: 6),
-            Flexible(
-              child: Text(
-                label,
-                overflow: TextOverflow.ellipsis,
-                style: TextStyle(
-                  fontWeight: FontWeight.w600,
-                  fontSize: 13,
-                  color: selected ? AppColors.primary : AppColors.hintGrey,
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-// =================================================================
-// AMENITY TILE (Step 3 grid item)
-// =================================================================
-class _AmenityTile extends StatelessWidget {
-  final String label;
-  final String? image;
-  final bool selected;
-  final VoidCallback onTap;
-
-  const _AmenityTile({
-    required this.label,
-    this.image,
-    required this.selected,
-    required this.onTap,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return InkWell(
-      onTap: onTap,
-      borderRadius: BorderRadius.circular(12),
-      child: Container(
-        padding: const EdgeInsets.all(8),
-        decoration: BoxDecoration(
-          color: selected ? AppColors.pinkChipBg : Colors.white,
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(
-            color: selected ? AppColors.primary : AppColors.fieldBorder,
-            width: selected ? 1.5 : 1,
-          ),
-        ),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            if (image != null && image!.trim().isNotEmpty)
-              ClipRRect(
-                borderRadius: BorderRadius.circular(8),
-                child: Image.network(
-                  image!,
-                  width: 36,
-                  height: 36,
-                  fit: BoxFit.cover,
-
-                  errorBuilder: (context, error, stackTrace) {
-                    return const Icon(
-                      Icons.home_outlined,
-                      size: 30,
-                      color: AppColors.primary,
-                    );
-                  },
-                ),
-              )
-            else
-              const Icon(
-                Icons.home_outlined,
-                size: 30,
-                color: AppColors.primary,
-              ),
-
-            const SizedBox(height: 7),
-
-            Text(
-              label.tr,
-              maxLines: 2,
-              overflow: TextOverflow.ellipsis,
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                fontSize: 11,
-                fontWeight: selected ? FontWeight.w700 : FontWeight.w500,
-                color: selected ? AppColors.primary : Colors.black87,
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-// =================================================================
-// FEATURE CHIP (Step 3 "Other Features" checkbox chip)
-// =================================================================
-class _FeatureChip extends StatelessWidget {
-  final String label;
-  final bool selected;
-  final VoidCallback onTap;
-
-  const _FeatureChip({
-    super.key,
-    required this.label,
-    required this.selected,
-    required this.onTap,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return InkWell(
-      onTap: onTap,
-      borderRadius: BorderRadius.circular(12),
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 200),
-        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-        decoration: BoxDecoration(
-          color: selected ? AppColors.primary.withOpacity(.08) : Colors.white,
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(
-            color: selected ? AppColors.primary : AppColors.fieldBorder,
-          ),
-        ),
-        child: Row(
-          mainAxisSize: MainAxisSize.min, // 👈 Width according to content
-          children: [
-            Icon(
-              selected ? Icons.check_circle : Icons.radio_button_unchecked,
-              size: 18,
-              color: selected ? AppColors.primary : AppColors.textSecondary,
-            ),
-            const SizedBox(width: 8),
-            Text(
-              label,
-              style: TextStyle(
-                fontSize: 12,
-                fontWeight: FontWeight.w600,
-                color: selected ? AppColors.primary : AppColors.textPrimary,
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-// =================================================================
-// MAP PREVIEW (Step 4)
-// =================================================================
-class _MapPreview extends StatelessWidget {
-  const _MapPreview();
-
-  @override
-  Widget build(BuildContext context) {
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(12),
-      child: Container(
-        height: 140,
-        width: double.infinity,
-        color: AppColors.mapBg,
-        child: Stack(
-          children: [
-            CustomPaint(size: Size.infinite, painter: _MapGridPainter()),
-            Positioned(top: 10, right: 12, child: _mapLabel('West Bay')),
-            Positioned(
-              bottom: 10,
-              left: 10,
-              child: _mapLabel('Doha Exhibition & Convention Center'),
-            ),
-            const Center(
-              child: Icon(
-                Icons.location_on,
-                color: AppColors.primary,
-                size: 34,
-              ),
-            ),
-            Positioned(
-              bottom: 10,
-              right: 10,
-              child: Container(
-                width: 30,
-                height: 30,
-                decoration: const BoxDecoration(
-                  color: Colors.white,
-                  shape: BoxShape.circle,
-                  boxShadow: [BoxShadow(color: Colors.black26, blurRadius: 3)],
-                ),
-                child: const Icon(
-                  Icons.my_location,
-                  size: 16,
-                  color: AppColors.primary,
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _mapLabel(String text) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(6),
-        boxShadow: const [BoxShadow(color: Colors.black12, blurRadius: 2)],
-      ),
-      child: Text(
-        text,
-        style: const TextStyle(fontSize: 9.5, color: Colors.black87),
-      ),
-    );
-  }
-}
-
-class _MapGridPainter extends CustomPainter {
-  @override
-  void paint(Canvas canvas, Size size) {
-    final paint = Paint()
-      ..color = Colors.white.withOpacity(0.5)
-      ..strokeWidth = 1;
-    for (double x = 0; x < size.width; x += 24) {
-      canvas.drawLine(Offset(x, 0), Offset(x, size.height), paint);
-    }
-    for (double y = 0; y < size.height; y += 24) {
-      canvas.drawLine(Offset(0, y), Offset(size.width, y), paint);
-    }
-  }
-
-  @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
-}
-
-// =================================================================
-// PHOTO THUMBNAIL (Step 5)
-// =================================================================
-
-// =================================================================
-// DASHED UPLOAD BOX (Step 5 — photos / video / documents)
-// =================================================================
-
-class _PhotoThumbnail extends StatelessWidget {
-  final Color color;
-  final String? imagePath;
-  final String? overlayLabel;
-  final bool isLast;
-  final VoidCallback? onRemove;
-
-  const _PhotoThumbnail({
-    this.color = Colors.grey,
-    this.imagePath,
-    this.overlayLabel,
-    this.isLast = false,
-    this.onRemove,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: 78,
-      height: 78,
-      margin: const EdgeInsets.only(right: 8),
-      child: Stack(
-        children: [
-          ClipRRect(
-            borderRadius: BorderRadius.circular(10),
-            child: imagePath != null
-                ? Image.file(
-                    File(imagePath!),
-                    width: 78,
-                    height: 78,
-                    fit: BoxFit.cover,
-                  )
-                : Container(width: 78, height: 78, color: color),
-          ),
-
-          if (overlayLabel != null)
-            Container(
-              width: 78,
-              height: 78,
+    return Wrap(
+      spacing: 8,
+      runSpacing: 8,
+      children: widths
+          .map(
+            (w) => Container(
+              width: w,
+              height: 38,
               decoration: BoxDecoration(
-                color: Colors.black45,
+                color: const Color(0xFFF1F0F2),
                 borderRadius: BorderRadius.circular(10),
               ),
-              child: Center(
-                child: Text(
-                  overlayLabel!,
-                  textAlign: TextAlign.center,
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ),
             ),
-
-          if (imagePath != null)
-            Positioned(
-              top: 3,
-              right: 3,
-              child: GestureDetector(
-                onTap: onRemove,
-                child: Container(
-                  padding: const EdgeInsets.all(3),
-                  decoration: const BoxDecoration(
-                    color: Colors.red,
-                    shape: BoxShape.circle,
-                  ),
-                  child: const Icon(Icons.close, color: Colors.white, size: 12),
-                ),
-              ),
-            ),
-        ],
-      ),
+          )
+          .toList(),
     );
   }
 }
 
-class _DashedUploadBox extends StatelessWidget {
-  final IconData icon;
-  final String title;
-  final String subtitle;
-  final bool filled;
+class _OptionsUnavailable extends StatelessWidget {
+  final String message;
+  final VoidCallback onRetry;
 
-  const _DashedUploadBox({
-    required this.icon,
-    required this.title,
-    required this.subtitle,
-    this.filled = false,
-  });
+  const _OptionsUnavailable({required this.message, required this.onRetry});
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
-      decoration: BoxDecoration(
-        color: filled ? AppColors.pinkChipBg : Colors.white,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(
-          color: AppColors.primary.withOpacity(.4),
-          width: 1.2,
+    return LpBanner(
+      tone: LpBannerTone.warning,
+      title: message,
+      action: TextButton(
+        onPressed: onRetry,
+        style: TextButton.styleFrom(
+          foregroundColor: AppColors.primary,
+          minimumSize: const Size(0, 32),
+          padding: const EdgeInsets.symmetric(horizontal: 8),
+          tapTargetSize: MaterialTapTargetSize.shrinkWrap,
         ),
-      ),
-      child: Column(
-        children: [
-          Icon(icon, color: AppColors.primary, size: 32),
-
-          const SizedBox(height: 10),
-
-          Text(
-            title,
-            style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 14),
-          ),
-
-          const SizedBox(height: 4),
-
-          Text(
-            subtitle,
-            textAlign: TextAlign.center,
-            style: const TextStyle(color: AppColors.hintGrey, fontSize: 12),
-          ),
-        ],
+        child: Text(
+          'Retry'.tr,
+          style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w700),
+        ),
       ),
     );
   }
 }
-
-// =================================================================
-// ENTRY POINT (for quick preview / testing)
-// =================================================================

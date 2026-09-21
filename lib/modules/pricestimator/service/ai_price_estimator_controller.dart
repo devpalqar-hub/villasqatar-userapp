@@ -28,12 +28,12 @@ class AiPriceEstimatorController extends GetxController {
     required String areaName,
     required double areaSqft,
     required String propertyType,
-    required int bhk,
-    required int bathrooms,
-    required String furnishingStatus,
-    required int floorAbove,
-    required int totalFloors,
-    required bool parkingAvailable,
+    int? bhk,
+    int? bathrooms,
+    String? furnishingStatus,
+    int? floorAbove,
+    int? totalFloors,
+    bool? parkingAvailable,
     String highlights = "",
   }) async {
     if (isLoading) {

@@ -71,7 +71,7 @@ class _DealerListScreenState extends State<DealerListScreen> {
         elevation: 0,
         backgroundColor: Colors.white,
         centerTitle: true,
-        title: Text("Featured Dealers".tr, style: AppTextStyles.title18),
+        title: Text("Dealers".tr, style: AppTextStyles.title18),
       ),
       // IMPORTANT: AppBar + search bar live OUTSIDE GetBuilder now.
       // Only the list/body below reacts to controller.update(), so the
@@ -92,36 +92,36 @@ class _DealerListScreenState extends State<DealerListScreen> {
                   child: c.isLoading && allDealers.isEmpty
                       ? const Center(child: CircularProgressIndicator())
                       : allDealers.isEmpty
-                          ? (c.error.isNotEmpty
-                              ? _ErrorState(
-                                  message: c.error.replaceFirst(
-                                    "Exception: ",
-                                    "",
-                                  ),
-                                  onRetry: () => c.fetchDealers(),
-                                )
-                              : const _EmptyState())
-                          : dealers.isEmpty
-                              ? const _NoSearchResultsState()
-                              : ListView.separated(
-                                  controller: _scrollCtrl,
-                                  padding: EdgeInsets.symmetric(
-                                    horizontal: 16.w,
-                                    vertical: 8.h,
-                                  ),
-                                  itemCount: dealers.length +
-                                      (c.hasMore && _query.isEmpty ? 1 : 0),
-                                  separatorBuilder: (_, __) =>
-                                      SizedBox(height: 12.h),
-                                  itemBuilder: (_, i) => i == dealers.length
-                                      ? const Padding(
-                                          padding: EdgeInsets.all(20),
-                                          child: Center(
-                                            child: CircularProgressIndicator(),
-                                          ),
-                                        )
-                                      : DealerCard(dealer: dealers[i]),
+                      ? (c.error.isNotEmpty
+                            ? _ErrorState(
+                                message: c.error.replaceFirst(
+                                  "Exception: ",
+                                  "",
                                 ),
+                                onRetry: () => c.fetchDealers(),
+                              )
+                            : const _EmptyState())
+                      : dealers.isEmpty
+                      ? const _NoSearchResultsState()
+                      : ListView.separated(
+                          controller: _scrollCtrl,
+                          padding: EdgeInsets.symmetric(
+                            horizontal: 16.w,
+                            vertical: 8.h,
+                          ),
+                          itemCount:
+                              dealers.length +
+                              (c.hasMore && _query.isEmpty ? 1 : 0),
+                          separatorBuilder: (_, __) => SizedBox(height: 12.h),
+                          itemBuilder: (_, i) => i == dealers.length
+                              ? const Padding(
+                                  padding: EdgeInsets.all(20),
+                                  child: Center(
+                                    child: CircularProgressIndicator(),
+                                  ),
+                                )
+                              : DealerCard(dealer: dealers[i]),
+                        ),
                 );
               },
             ),
@@ -268,10 +268,7 @@ class DealerCard extends StatelessWidget {
     return InkWell(
       borderRadius: BorderRadius.circular(12.r),
       onTap: () {
-        Get.to(
-          () => const DealerDetailsScreen(),
-          arguments: dealer.id,
-        );
+        Get.to(() => const DealerDetailsScreen(), arguments: dealer.id);
       },
       child: Container(
         decoration: BoxDecoration(
@@ -329,47 +326,47 @@ class DealerCard extends StatelessWidget {
                         ],
                       ),
                       SizedBox(height: 6.h),
-                      Row(
-                        children: [
-                          Icon(
-                            Icons.email_outlined,
-                            color: AppColors.textSecondary,
-                            size: 14.sp,
-                          ),
-                          SizedBox(width: 4.w),
-                          Expanded(
-                            child: Text(
-                              dealer.email,
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                              style: AppTextStyles.body12.copyWith(
-                                color: AppColors.textSecondary,
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                      SizedBox(height: 6.h),
-                      Row(
-                        children: [
-                          Icon(
-                            Icons.call_outlined,
-                            color: AppColors.textSecondary,
-                            size: 14.sp,
-                          ),
-                          SizedBox(width: 4.w),
-                          Expanded(
-                            child: Text(
-                              dealer.phone,
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                              style: AppTextStyles.body12.copyWith(
-                                color: AppColors.textSecondary,
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
+                      // Row(
+                      //   children: [
+                      //     Icon(
+                      //       Icons.email_outlined,
+                      //       color: AppColors.textSecondary,
+                      //       size: 14.sp,
+                      //     ),
+                      //     SizedBox(width: 4.w),
+                      //     Expanded(
+                      //       child: Text(
+                      //         dealer.email,
+                      //         maxLines: 1,
+                      //         overflow: TextOverflow.ellipsis,
+                      //         style: AppTextStyles.body12.copyWith(
+                      //           color: AppColors.textSecondary,
+                      //         ),
+                      //       ),
+                      //     ),
+                      //   ],
+                      // ),
+                      // SizedBox(height: 6.h),
+                      // Row(
+                      //   children: [
+                      //     Icon(
+                      //       Icons.call_outlined,
+                      //       color: AppColors.textSecondary,
+                      //       size: 14.sp,
+                      //     ),
+                      //     SizedBox(width: 4.w),
+                      //     Expanded(
+                      //       child: Text(
+                      //         dealer.phone,
+                      //         maxLines: 1,
+                      //         overflow: TextOverflow.ellipsis,
+                      //         style: AppTextStyles.body12.copyWith(
+                      //           color: AppColors.textSecondary,
+                      //         ),
+                      //       ),
+                      //     ),
+                      //   ],
+                      // ),
                     ],
                   ),
                 ),
@@ -423,7 +420,6 @@ class _DealerActions extends StatelessWidget {
             onTap: () => launchWebsite(profile.website),
           ),
         ),
-      
       ],
     );
   }

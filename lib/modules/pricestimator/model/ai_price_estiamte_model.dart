@@ -2,25 +2,28 @@ class AiPriceEstimatorRequest {
   final String areaName;
   final double areaSqft;
   final String propertyType;
-  final int bhk;
-  final int bathrooms;
-  final String furnishingStatus;
-  final int floorAbove;
-  final int totalFloors;
-  final bool parkingAvailable;
+
+  /// Optional specifications — left null when the user did not choose them,
+  /// so the backend does not treat a default as a real answer.
+  final int? bhk;
+  final int? bathrooms;
+  final String? furnishingStatus;
+  final int? floorAbove;
+  final int? totalFloors;
+  final bool? parkingAvailable;
   final String highlights;
 
   const AiPriceEstimatorRequest({
     required this.areaName,
     required this.areaSqft,
     required this.propertyType,
-    required this.bhk,
-    required this.bathrooms,
-    required this.furnishingStatus,
-    required this.floorAbove,
-    required this.totalFloors,
-    required this.parkingAvailable,
-    required this.highlights,
+    this.bhk,
+    this.bathrooms,
+    this.furnishingStatus,
+    this.floorAbove,
+    this.totalFloors,
+    this.parkingAvailable,
+    this.highlights = "",
   });
 
   Map<String, dynamic> toJson() {
@@ -28,14 +31,14 @@ class AiPriceEstimatorRequest {
       "areaName": areaName.trim(),
       "areaSqft": areaSqft,
       "propertyType": propertyType.trim(),
-      "bhk": bhk,
-      "bathrooms": bathrooms,
-      "furnishingStatus":
-          furnishingStatus.trim(),
-      "floorAbove": floorAbove,
-      "totalFloors": totalFloors,
-      "parkingAvailable": parkingAvailable,
-      "highlights": highlights.trim(),
+      if (bhk != null) "bhk": bhk,
+      if (bathrooms != null) "bathrooms": bathrooms,
+      if (furnishingStatus != null && furnishingStatus!.trim().isNotEmpty)
+        "furnishingStatus": furnishingStatus!.trim(),
+      if (floorAbove != null) "floorAbove": floorAbove,
+      if (totalFloors != null) "totalFloors": totalFloors,
+      if (parkingAvailable != null) "parkingAvailable": parkingAvailable,
+      if (highlights.trim().isNotEmpty) "highlights": highlights.trim(),
     };
   }
 }
