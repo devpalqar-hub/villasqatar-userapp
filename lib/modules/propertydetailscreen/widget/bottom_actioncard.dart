@@ -66,7 +66,7 @@ class BottomActionCard extends StatelessWidget {
                         ),
                         if (isRent)
                           TextSpan(
-                            text: " / ${"per year".tr}",
+                            text: ' / month'.tr,
                             style: TextStyle(
                               fontSize: 9.sp,
                               fontWeight: FontWeight.w600,

@@ -3,6 +3,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:villas_qatar/Core/constants/app_colors.dart';
 import 'package:villas_qatar/Core/theme/app_textstyles.dart';
+import 'package:villas_qatar/Core/widgets/app_logo.dart';
 import 'package:villas_qatar/modules/searchscreen/service/searchlist_screen.dart';
 import 'package:villas_qatar/modules/searchscreen/widgets/properties_section.dart';
 import 'package:villas_qatar/modules/searchscreen/widgets/search_filtercard.dart';
@@ -29,11 +30,7 @@ class SearchScreen extends StatelessWidget {
         scrolledUnderElevation: 0,
         centerTitle: false,
         titleSpacing: 15.w,
-        title: Image.asset(
-          'assets/Logo/logo.png',
-          width: 140.w,
-          fit: BoxFit.contain,
-        ),
+        title: Image.asset(AppLogo.path, width: 140.w, fit: BoxFit.contain),
         bottom: PreferredSize(
           preferredSize: Size.fromHeight(1.h),
           child: Container(height: 1.h, color: AppColors.warmBorder),

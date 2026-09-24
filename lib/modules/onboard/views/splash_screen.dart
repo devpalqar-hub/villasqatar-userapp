@@ -6,6 +6,7 @@ import 'package:get/get.dart';
 import 'package:villas_qatar/Core/constants/app_colors.dart';
 import 'package:villas_qatar/Core/services/storage_service.dart';
 import 'package:villas_qatar/Core/theme/app_textstyles.dart';
+import 'package:villas_qatar/Core/widgets/app_logo.dart';
 import 'package:villas_qatar/modules/dealer_dashboard/views/dealer_analytics_screen.dart';
 import 'package:villas_qatar/modules/mainscreen/mainscreen.dart';
 
@@ -36,7 +37,9 @@ class _SplashScreenState extends State<SplashScreen> {
       // session must land back on the dealer dashboard, not the
       // buyer/renter MainScreen, or a refreshed app silently drops
       // dealers into the wrong home screen every time.
-      final role = StorageService.getProfile()?['role']?.toString().toUpperCase();
+      final role = StorageService.getProfile()?['role']
+          ?.toString()
+          .toUpperCase();
 
       if (role == "DEALER") {
         Get.offAll(() => const DealerAnalyticsScreen());
@@ -63,10 +66,9 @@ class _SplashScreenState extends State<SplashScreen> {
               children: [
                 /// Logo
                 ///
-           
                 Center(
                   child: Image.asset(
-                    'assets/Logo/homeLogo.png',
+                    AppLogo.heroPath,
                     width: 150.w,
                     fit: BoxFit.contain,
                   ),

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get_utils/src/extensions/internacionalization.dart';
 import 'package:villas_qatar/Core/theme/app_textstyles.dart';
+import 'package:villas_qatar/Core/widgets/app_logo.dart';
 
 import '../../../Core/constants/app_colors.dart';
 
@@ -17,11 +18,7 @@ class HomeHeader extends StatelessWidget {
           // Icon(Icons.menu, color: AppColors.primary, size: 24.sp),
           SizedBox(width: 10.w),
 
-          Image.asset(
-            'assets/Logo/logo.png',
-            width: 120.w,
-            fit: BoxFit.contain,
-          ),
+          Image.asset(AppLogo.path, width: 120.w, fit: BoxFit.contain),
           Spacer(),
 
           SizedBox(width: 8.w),

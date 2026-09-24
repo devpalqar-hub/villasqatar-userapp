@@ -364,6 +364,7 @@ class LpTextField extends StatelessWidget {
   final String hint;
   final IconData? prefixIcon;
   final Widget? prefix;
+  final String? suffixText;
   final TextInputType? keyboardType;
   final bool digitsOnly;
   final bool decimal;
@@ -380,6 +381,7 @@ class LpTextField extends StatelessWidget {
     required this.hint,
     this.prefixIcon,
     this.prefix,
+    this.suffixText,
     this.keyboardType,
     this.digitsOnly = false,
     this.decimal = false,
@@ -422,6 +424,8 @@ class LpTextField extends StatelessWidget {
       decoration: InputDecoration(
         hintText: hint,
         hintStyle: const TextStyle(color: AppColors.hintGrey, fontSize: 14),
+        suffixText: suffixText,
+        suffixStyle: const TextStyle(color: AppColors.hintGrey, fontSize: 14),
         counterText: '',
         filled: true,
         fillColor: enabled ? LpColors.fieldFill : const Color(0xFFF1F0F2),
@@ -430,7 +434,8 @@ class LpTextField extends StatelessWidget {
           horizontal: 14,
           vertical: 15,
         ),
-        prefixIcon: prefix ??
+        prefixIcon:
+            prefix ??
             (prefixIcon != null
                 ? Icon(prefixIcon, color: AppColors.hintGrey, size: 20)
                 : null),

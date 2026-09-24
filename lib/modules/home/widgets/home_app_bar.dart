@@ -5,6 +5,7 @@ import 'package:get/get.dart';
 import 'package:villas_qatar/Core/constants/app_colors.dart';
 import 'package:villas_qatar/Core/services/storage_service.dart';
 import 'package:villas_qatar/Core/utils/auth_guard.dart';
+import 'package:villas_qatar/Core/widgets/app_logo.dart';
 import 'package:villas_qatar/modules/chats/views/chatlistscreen.dart';
 import 'package:villas_qatar/modules/settings/view/setting_screen.dart';
 
@@ -43,7 +44,7 @@ class HomeAppBar extends StatelessWidget implements PreferredSizeWidget {
       centerTitle: false,
       titleSpacing: 15.w,
       title: Image.asset(
-        'assets/Logo/logo.png',
+        AppLogo.path,
         width: 130.w,
         fit: BoxFit.contain,
         alignment: AlignmentDirectional.centerStart,

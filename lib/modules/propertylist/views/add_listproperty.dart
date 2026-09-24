@@ -195,7 +195,9 @@ class _ListYourPropertyScreenState extends State<ListYourPropertyScreen> {
         context: context,
         builder: (ctx) => AlertDialog(
           backgroundColor: Colors.white,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+          ),
           title: Text(
             'Discard listing?'.tr,
             style: const TextStyle(fontSize: 17, fontWeight: FontWeight.w700),
@@ -280,7 +282,9 @@ class _ListYourPropertyScreenState extends State<ListYourPropertyScreen> {
                   ),
                 ],
               ),
-              bottomNavigationBar: LpBottomBar(child: _buildActions(step, total)),
+              bottomNavigationBar: LpBottomBar(
+                child: _buildActions(step, total),
+              ),
             );
           },
         ),
@@ -329,9 +333,7 @@ class _ListYourPropertyScreenState extends State<ListYourPropertyScreen> {
             height: 50,
             isLoading: controller.isSubmitting,
             title: isReview
-                ? (widget.isEdit
-                      ? 'Update Property'.tr
-                      : 'Submit Property'.tr)
+                ? (widget.isEdit ? 'Update Property'.tr : 'Submit Property'.tr)
                 : 'Continue'.tr,
             suffix: Icon(
               isReview ? Icons.check_rounded : Icons.arrow_forward,
@@ -664,6 +666,11 @@ class _ListYourPropertyScreenState extends State<ListYourPropertyScreen> {
                   hint: 'Enter price'.tr,
                   digitsOnly: true,
                   prefix: const _QarPrefix(),
+                  suffixText:
+                      controller.propertyPurpose.toUpperCase() ==
+                          ListPropertyController.purposeRent
+                      ? ' / month'.tr
+                      : null,
                   hasError: _err('price'),
                   onChanged: (_) => _fixing('price'),
                 ),
@@ -1801,7 +1808,12 @@ class _ListYourPropertyScreenState extends State<ListYourPropertyScreen> {
     final formatted = value == null
         ? controller.priceController.text
         : NumberFormat.decimalPattern().format(value);
-    return 'QAR $formatted';
+
+    final bool isRent =
+        controller.propertyPurpose.toUpperCase() ==
+        ListPropertyController.purposeRent;
+
+    return 'QAR $formatted${isRent ? ' / month'.tr : ''}';
   }
 
   Widget _buildReviewHero() {

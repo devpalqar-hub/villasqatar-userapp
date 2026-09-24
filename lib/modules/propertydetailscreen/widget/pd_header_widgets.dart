@@ -305,7 +305,7 @@ class PdPriceConsole extends StatelessWidget {
                         if (isRent) ...[
                           SizedBox(width: 8.w),
                           Text(
-                            '/ ${'per year'.tr}',
+                            ' / month'.tr,
                             style: TextStyle(
                               fontSize: 12.sp,
                               fontWeight: FontWeight.w600,

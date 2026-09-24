@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 import 'package:villas_qatar/Core/constants/app_colors.dart';
 import 'package:villas_qatar/Core/theme/app_textstyles.dart';
 import 'package:villas_qatar/Core/widgets/auth_background.dart';
+import 'package:villas_qatar/Core/widgets/app_logo.dart';
 import 'package:villas_qatar/Core/widgets/primary_button.dart';
 import 'package:villas_qatar/modules/dealer_dashboard/views/dealer_analytics_screen.dart';
 import 'package:villas_qatar/modules/onboard/controller/auth_controller.dart';
@@ -45,7 +46,7 @@ class _DealerLoginScreenState extends State<DealerLoginScreen> {
                       ),
                     ),
 
-                    Image.asset("assets/Logo/homeLogo.png", width: 120.w),
+                    Image.asset(AppLogo.heroPath, width: 120.w),
 
                     SizedBox(height: 20.h),
 
@@ -185,7 +186,6 @@ class _DealerLoginScreenState extends State<DealerLoginScreen> {
                           ),
                         ),
                       ),
-
 
                     SizedBox(height: 25.h),
 
