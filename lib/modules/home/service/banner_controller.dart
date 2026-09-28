@@ -11,7 +11,7 @@ class BannerController extends GetxController {
   bool isLoading = false;
   String errorMessage = '';
 
-  Future<void> fetchFeaturedBanners() async {
+  Future<void> fetchBanners() async {
     if (isLoading) return;
 
     try {
@@ -21,11 +21,11 @@ class BannerController extends GetxController {
       update();
 
       debugPrint(
-        'Fetching banners: ${ApiEndpoints.featuredBanners()}',
+        'Fetching banners: ${ApiEndpoints.banners}',
       );
 
       final dynamic response = await ApiHandler.get(
-        ApiEndpoints.featuredBanners(),
+        ApiEndpoints.banners,
       );
 
       debugPrint(
@@ -83,6 +83,6 @@ class BannerController extends GetxController {
   }
 
   Future<void> refreshBanners() async {
-    await fetchFeaturedBanners();
+    await fetchBanners();
   }
 }

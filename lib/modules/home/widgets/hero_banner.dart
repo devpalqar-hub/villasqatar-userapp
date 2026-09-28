@@ -707,7 +707,6 @@ class _SearchTypeToggle extends StatelessWidget {
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          
           _buildOption(context, "Buy".tr, PropertySearchType.sale),
           _buildOption(context, "Rent".tr, PropertySearchType.rent),
         ],

@@ -25,6 +25,18 @@ class BannerModel {
     this.updatedAt,
   });
 
+  /// The API serves both photos and videos through [imageUrl]; a video is
+  /// recognised by its file extension (query strings are ignored).
+  bool get isVideo {
+    final String path = (Uri.tryParse(imageUrl.trim())?.path ?? '')
+        .toLowerCase();
+
+    return path.endsWith('.mp4') ||
+        path.endsWith('.mov') ||
+        path.endsWith('.m4v') ||
+        path.endsWith('.webm');
+  }
+
   factory BannerModel.fromJson(Map<String, dynamic> json) {
     return BannerModel(
       id: json['id']?.toString() ?? '',
@@ -34,36 +46,25 @@ class BannerModel {
 
       position: json['position'] is int
           ? json['position']
-          : int.tryParse(
-                json['position']?.toString() ?? '',
-              ) ??
-              0,
+          : int.tryParse(json['position']?.toString() ?? '') ?? 0,
 
       isFeatured: json['isFeatured'] == true,
       isActive: json['isActive'] == true,
 
       startDate: json['startDate'] != null
-          ? DateTime.tryParse(
-              json['startDate'].toString(),
-            )
+          ? DateTime.tryParse(json['startDate'].toString())
           : null,
 
       endDate: json['endDate'] != null
-          ? DateTime.tryParse(
-              json['endDate'].toString(),
-            )
+          ? DateTime.tryParse(json['endDate'].toString())
           : null,
 
       createdAt: json['createdAt'] != null
-          ? DateTime.tryParse(
-              json['createdAt'].toString(),
-            )
+          ? DateTime.tryParse(json['createdAt'].toString())
           : null,
 
       updatedAt: json['updatedAt'] != null
-          ? DateTime.tryParse(
-              json['updatedAt'].toString(),
-            )
+          ? DateTime.tryParse(json['updatedAt'].toString())
           : null,
     );
   }

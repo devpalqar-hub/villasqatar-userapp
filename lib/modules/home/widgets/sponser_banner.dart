@@ -3,6 +3,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get_utils/src/extensions/internacionalization.dart';
 
 import 'package:villas_qatar/modules/home/model/banner_model.dart';
+import 'package:villas_qatar/modules/home/widgets/banner_video.dart';
 
 class InvestmentBanner extends StatelessWidget {
   final BannerModel banner;
@@ -47,24 +48,28 @@ class InvestmentBanner extends StatelessWidget {
 
               /// ==========================================
               /// OVERLAY
-              /// Makes text readable over bright images.
+              /// Makes text readable over bright images. Skipped for a
+              /// video with no text on it, so it plays untinted.
               /// ==========================================
-              Container(
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    begin: AlignmentDirectional.centerStart,
-                    end: AlignmentDirectional.centerEnd,
-                    colors: [
-                      const Color(0xff5E0D27).withOpacity(.88),
+              if (!banner.isVideo ||
+                  banner.title.trim().isNotEmpty ||
+                  banner.linkUrl.isNotEmpty)
+                Container(
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      begin: AlignmentDirectional.centerStart,
+                      end: AlignmentDirectional.centerEnd,
+                      colors: [
+                        const Color(0xff5E0D27).withOpacity(.88),
 
-                      const Color(0xff8C1437).withOpacity(.45),
+                        const Color(0xff8C1437).withOpacity(.45),
 
-                      Colors.black.withOpacity(.05),
-                    ],
-                    stops: const [0.0, 0.55, 1.0],
+                        Colors.black.withOpacity(.05),
+                      ],
+                      stops: const [0.0, 0.55, 1.0],
+                    ),
                   ),
                 ),
-              ),
 
               /// ==========================================
               /// FEATURED BADGE
@@ -213,6 +218,10 @@ class InvestmentBanner extends StatelessWidget {
   Widget _buildBannerImage() {
     if (banner.imageUrl.trim().isEmpty) {
       return _fallbackImage();
+    }
+
+    if (banner.isVideo) {
+      return BannerVideo(url: banner.imageUrl, fallback: _fallbackImage());
     }
 
     return Image.network(

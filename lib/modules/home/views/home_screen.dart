@@ -20,6 +20,7 @@ import 'package:villas_qatar/modules/home/service/UtilsController.dart';
 import 'package:villas_qatar/modules/home/service/banner_controller.dart';
 import 'package:villas_qatar/modules/home/service/loaction_controller.dart';
 import 'package:villas_qatar/modules/home/widgets/agent_card.dart';
+import 'package:villas_qatar/modules/home/widgets/banner_carousel.dart';
 import 'package:villas_qatar/modules/home/widgets/category_card.dart';
 import 'package:villas_qatar/modules/home/widgets/dealer_cta_card.dart';
 import 'package:villas_qatar/modules/home/widgets/featured_properties_carousel.dart';
@@ -588,29 +589,14 @@ Widget _buildBannersSection() {
         );
       }
 
-      /// MULTIPLE BANNERS
+      /// MULTIPLE BANNERS — auto-advancing carousel with page dots.
+      /// (Horizontal inset is 4.w smaller than the single banner's because
+      /// each page carries its own 4.w gutter.)
       return Padding(
-        padding: _bannerInsets,
-        child: SizedBox(
-          height: 150.h,
-          child: PageView.builder(
-            itemCount: banners.length,
-            itemBuilder: (context, index) {
-              final banner = banners[index];
-
-              return Padding(
-                padding: EdgeInsetsDirectional.only(
-                  end: index == banners.length - 1 ? 0 : 8.w,
-                ),
-                child: InvestmentBanner(
-                  banner: banner,
-                  onTap: () {
-                    _handleBannerTap(banner.linkUrl);
-                  },
-                ),
-              );
-            },
-          ),
+        padding: EdgeInsets.fromLTRB(12.w, 0, 12.w, 12.h),
+        child: BannerCarousel(
+          banners: banners,
+          onTap: (banner) => _handleBannerTap(banner.linkUrl),
         ),
       );
     },

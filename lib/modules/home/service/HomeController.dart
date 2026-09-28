@@ -31,7 +31,7 @@ class Homecontroller extends GetxController {
       isHome: true,
     );
     utilsController.fetchPropertyType();
-    bannerController.fetchFeaturedBanners();
+    bannerController.fetchBanners();
     dealerController.fetchDealers();
     update();
   }

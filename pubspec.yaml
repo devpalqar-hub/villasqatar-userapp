@@ -49,6 +49,7 @@ dependencies:
 
   cupertino_icons: ^1.0.8
   shimmer: ^3.0.0
+  video_player: ^2.11.1
 
 
 
