@@ -1,3 +1,4 @@
+import 'package:get/get.dart';
 class FeaturedPropertiesResponse {
   final String location;
   final int total;
@@ -138,7 +139,7 @@ class FeaturedListing {
 
       slug: json['slug']?.toString() ?? '',
 
-      propertyName: json['propertyName']?.toString() ?? 'Property',
+      propertyName: json['propertyName']?.toString() ?? 'Property'.tr,
 
       description: json['description']?.toString() ?? '',
 
@@ -230,10 +231,10 @@ class FeaturedListing {
 
   String get formattedPrice {
     if (price == price.roundToDouble()) {
-      return 'QAR ${price.toInt()}';
+      return '${'QAR'.tr} ${price.toInt()}';
     }
 
-    return 'QAR $price';
+    return '${'QAR'.tr} $price';
   }
 
   String get formattedLocation {

@@ -7,6 +7,7 @@ import 'package:villas_qatar/Core/network/api_handler.dart';
 import 'package:villas_qatar/Core/utils/app_location.dart';
 import 'package:villas_qatar/modules/home/model/location_repsone_model.dart';
 import 'package:villas_qatar/modules/home/model/nearBypropertyResponse.dart';
+import 'package:villas_qatar/Core/utils/app_toast.dart';
 
 class LocationController extends GetxController {
   static LocationController get to => Get.find();
@@ -128,7 +129,7 @@ class LocationController extends GetxController {
 
       bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
       if (!serviceEnabled) {
-        Fluttertoast.showToast(msg: "Please enable location services.".tr);
+        AppToast.show(msg: "Please enable location services.".tr);
         return;
       }
 
@@ -140,7 +141,7 @@ class LocationController extends GetxController {
 
       if (permission == LocationPermission.denied ||
           permission == LocationPermission.deniedForever) {
-        Fluttertoast.showToast(msg: "Location permission denied.".tr);
+        AppToast.show(msg: "Location permission denied.".tr);
         return;
       }
 
@@ -201,7 +202,7 @@ class LocationController extends GetxController {
       debugPrint(e.toString());
       debugPrint(stackTrace.toString());
 
-      Fluttertoast.showToast(msg: "Unable to detect current location.".tr);
+      AppToast.show(msg: "Unable to detect current location.".tr);
     } finally {
       isLoading = false;
       update();

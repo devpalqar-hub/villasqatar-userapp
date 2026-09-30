@@ -23,6 +23,13 @@ class HeroBannerModel {
   final String webImageUrl;
   final String title;
   final String subtitle;
+
+  /// Arabic counterparts the backend sends alongside the English copy.
+  /// Either can be null/empty if the dealer hasn't translated that banner
+  /// yet, in which case the English text is shown instead.
+  final String? arabicTitle;
+  final String? arabicHeroText;
+
   final String? actionUrl;
   final String? actionButtonName;
 
@@ -32,6 +39,8 @@ class HeroBannerModel {
     required this.webImageUrl,
     required this.title,
     required this.subtitle,
+    this.arabicTitle,
+    this.arabicHeroText,
     this.actionUrl,
     this.actionButtonName,
   });
@@ -43,9 +52,27 @@ class HeroBannerModel {
       webImageUrl: json['webImageUrl'] as String? ?? '',
       title: json['title'] as String? ?? '',
       subtitle: json['subtitle'] as String? ?? '',
+      arabicTitle: json['arabicTitle'] as String?,
+      arabicHeroText: json['arabicHeroText'] as String?,
       actionUrl: json['actionUrl'] as String?,
       actionButtonName: json['actionButtonName'] as String?,
     );
+  }
+
+  bool get _isArabic => (Get.locale?.languageCode ?? 'en') == 'ar';
+
+  /// [arabicTitle] when the app is in Arabic and the backend provided one,
+  /// otherwise the English [title].
+  String get displayTitle {
+    final String? ar = arabicTitle?.trim();
+    return _isArabic && ar != null && ar.isNotEmpty ? ar : title;
+  }
+
+  /// [arabicHeroText] when the app is in Arabic and the backend provided
+  /// one, otherwise the English [subtitle].
+  String get displaySubtitle {
+    final String? ar = arabicHeroText?.trim();
+    return _isArabic && ar != null && ar.isNotEmpty ? ar : subtitle;
   }
 }
 
@@ -262,13 +289,14 @@ class _HomeBannerState extends State<HomeBanner> {
   @override
   Widget build(BuildContext context) {
     // Fallback content if the API returns nothing / fails.
-    final HeroBannerModel fallback = const HeroBannerModel(
+    final HeroBannerModel fallback = HeroBannerModel(
       id: 'fallback',
       mobileImageUrl: '',
       webImageUrl: '',
-      title: 'A Better Way to Live in Qatar',
+      title: 'A Better Way to Live in Qatar'.tr,
       subtitle:
-          'Discover exceptional homes in Qatar — buy, rent or invest with confidence.',
+          'Discover exceptional homes in Qatar — buy, rent or invest with confidence.'
+              .tr,
     );
 
     final List<HeroBannerModel> slides = _slides.isNotEmpty
@@ -348,16 +376,16 @@ class _HomeBannerState extends State<HomeBanner> {
 
                         SizedBox(height: 14.h),
 
-                        /// Headline from the API's `title`, last word
-                        /// picked out in gold.
-                        _HeroTitle(title: slides[activeIndex].title),
+                        /// Headline from the API's `title` (or its Arabic
+                        /// counterpart), last word picked out in gold.
+                        _HeroTitle(title: slides[activeIndex].displayTitle),
 
                         SizedBox(height: 10.h),
 
                         SizedBox(
                           width: 250.w,
                           child: Text(
-                            slides[activeIndex].subtitle,
+                            slides[activeIndex].displaySubtitle,
                             style: TextStyle(
                               fontFamily: AppFonts.currentFont,
                               fontSize: 11.5.sp,

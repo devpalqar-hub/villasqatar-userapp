@@ -1,3 +1,4 @@
+import 'package:get/get.dart';
 class ChatListModel {
   final String id;
   final DateTime createdAt;
@@ -49,7 +50,7 @@ class ChatListModel {
 }
 
 String get otherParticipantName {
-  return otherParticipant?.user.name ?? "Seller";
+  return otherParticipant?.user.name ?? "Seller".tr;
 }
 }
 class Listing {

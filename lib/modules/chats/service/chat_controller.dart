@@ -19,6 +19,7 @@ import '../models/conversation_model.dart';
 import '../models/message_model.dart';
 import '../models/message_page_model.dart';
 
+import 'package:villas_qatar/Core/utils/app_toast.dart';
 class ChatController extends GetxController {
   ChatController({required this.listingId, this.initialConversationId});
 
@@ -354,7 +355,7 @@ class ChatController extends GetxController {
     debugPrint(data.toString());
     debugPrint("═══════════════════════════════════");
 
-    Fluttertoast.showToast(
+    AppToast.show(
       msg: data["message"] ?? "Something went wrong".tr,
     );
   }
@@ -568,7 +569,7 @@ class ChatController extends GetxController {
     } catch (e) {
       debugPrint("UPLOAD IMAGE ERROR : $e");
 
-      Fluttertoast.showToast(msg: e.toString());
+      AppToast.show(msg: e.toString());
 
       return null;
     }
@@ -629,7 +630,7 @@ class ChatController extends GetxController {
   Future<void> sendLocation() async {
     try {
       if (!isConnected) {
-        Fluttertoast.showToast(
+        AppToast.show(
           msg: "Please wait for chat to connect.".tr,
         );
         return;
@@ -640,7 +641,7 @@ class ChatController extends GetxController {
       bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
 
       if (!serviceEnabled) {
-        Fluttertoast.showToast(
+        AppToast.show(
           msg: "Please enable location services.".tr,
         );
         return;
@@ -653,14 +654,14 @@ class ChatController extends GetxController {
       }
 
       if (permission == LocationPermission.denied) {
-        Fluttertoast.showToast(
+        AppToast.show(
           msg: "Location permission is required.".tr,
         );
         return;
       }
 
       if (permission == LocationPermission.deniedForever) {
-        Fluttertoast.showToast(
+        AppToast.show(
           msg: "Enable location permission from settings.".tr,
         );
         return;
@@ -681,7 +682,7 @@ class ChatController extends GetxController {
     } catch (e) {
       debugPrint("Send Location Error: $e");
 
-      Fluttertoast.showToast(msg: e.toString());
+      AppToast.show(msg: e.toString());
     }
   }
 

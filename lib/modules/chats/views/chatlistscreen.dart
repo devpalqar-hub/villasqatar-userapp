@@ -435,7 +435,7 @@ class _ConversationTile extends StatelessWidget {
         .split(" ")
         .where((word) => word.isNotEmpty)
         .map((word) => "${word[0].toUpperCase()}${word.substring(1)}")
-        .join(" ");
+        .join(" ").tr;
   }
 
   String _formatTime(DateTime date) {

@@ -18,6 +18,7 @@ import 'package:villas_qatar/Core/theme/app_textstyles.dart';
 import 'package:villas_qatar/modules/invoices/model/invoice_model.dart';
 import 'package:villas_qatar/modules/invoices/service/invoice_controller.dart';
 
+import 'package:villas_qatar/Core/utils/app_toast.dart';
 // ============================================================
 // INVOICE DETAIL SCREEN
 //
@@ -157,7 +158,7 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailScreen> {
 
   void _showSnack(String message) {
     if (!mounted) return;
-    Fluttertoast.showToast(msg: message);
+    AppToast.show(msg: message);
   }
 
   @override
@@ -384,7 +385,7 @@ class _TopSummaryCard extends StatelessWidget {
                 SizedBox(height: 3.h),
 
                 Text(
-                  "${invoice.currency} ${formatter.format(invoice.totalAmount)}",
+                  "${invoice.currency.tr} ${formatter.format(invoice.totalAmount)}",
                   style: AppTextStyles.title14.copyWith(
                     color: AppColors.primary,
                   ),
@@ -603,7 +604,7 @@ class _LineItemsCard extends StatelessWidget {
                         Expanded(
                           flex: 2,
                           child: Text(
-                            "${invoice.currency} ${formatter.format(item.unitPrice)}",
+                            "${invoice.currency.tr} ${formatter.format(item.unitPrice)}",
                             style: AppTextStyles.body13,
                             textAlign: TextAlign.right,
                           ),
@@ -618,7 +619,7 @@ class _LineItemsCard extends StatelessWidget {
                         Expanded(
                           flex: 2,
                           child: Text(
-                            "${invoice.currency} ${formatter.format(item.amount)}",
+                            "${invoice.currency.tr} ${formatter.format(item.amount)}",
                             style: AppTextStyles.body13,
                             textAlign: TextAlign.right,
                           ),
@@ -661,14 +662,14 @@ class _TotalsCard extends StatelessWidget {
         children: [
           _totalsRow(
             "Subtotal".tr,
-            "${invoice.currency} ${formatter.format(invoice.subtotal)}",
+            "${invoice.currency.tr} ${formatter.format(invoice.subtotal)}",
           ),
           SizedBox(height: 10.h),
           _totalsRow(
             "VAT (@rate%)".trParams({
               "rate": invoice.vatRate.toStringAsFixed(0),
             }),
-            "${invoice.currency} ${formatter.format(invoice.vatAmount)}",
+            "${invoice.currency.tr} ${formatter.format(invoice.vatAmount)}",
           ),
           Padding(
             padding: EdgeInsets.symmetric(vertical: 10.h),
@@ -676,7 +677,7 @@ class _TotalsCard extends StatelessWidget {
           ),
           _totalsRow(
             "Total Amount".tr,
-            "${invoice.currency} ${formatter.format(invoice.totalAmount)}",
+            "${invoice.currency.tr} ${formatter.format(invoice.totalAmount)}",
             emphasize: true,
           ),
         ],
@@ -990,7 +991,7 @@ class _CopyableValue extends StatelessWidget {
               InkWell(
                 onTap: () {
                   Clipboard.setData(ClipboardData(text: value!));
-                  Fluttertoast.showToast(msg: "Copied to clipboard".tr);
+                  AppToast.show(msg: "Copied to clipboard".tr);
                 },
                 child: Padding(
                   padding: EdgeInsets.only(left: 6.w),
@@ -1023,10 +1024,10 @@ class _StatusChip extends StatelessWidget {
         : AppColors.warning.withOpacity(.12);
 
     final String label = paid
-        ? "Paid"
+        ? "Paid".tr
         : status.isEmpty
-        ? "Unknown"
-        : status[0].toUpperCase() + status.substring(1).toLowerCase();
+        ? "Unknown".tr
+        : (status[0].toUpperCase() + status.substring(1).toLowerCase()).tr;
 
     return Container(
       padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 2.h),

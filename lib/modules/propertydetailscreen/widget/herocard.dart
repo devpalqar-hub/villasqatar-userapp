@@ -8,6 +8,7 @@ import 'package:villas_qatar/Core/utils/auth_guard.dart';
 import 'package:villas_qatar/modules/propertylist/model/myproperty_model.dart';
 import 'package:villas_qatar/modules/wishlist/service/wishlist_controller.dart';
 
+import 'package:villas_qatar/Core/utils/app_toast.dart';
 class HeroImageCard extends StatefulWidget {
   final Property property;
   final bool isMyProperty;
@@ -400,7 +401,7 @@ class _HeroImageCardState extends State<HeroImageCard> {
     final String? slug = widget.property.slug;
 
     if (slug == null || slug.trim().isEmpty) {
-      Fluttertoast.showToast(msg: "Property link is not available".tr);
+      AppToast.show(msg: "Property link is not available".tr);
       return;
     }
 
@@ -409,7 +410,7 @@ class _HeroImageCardState extends State<HeroImageCard> {
         "${Uri.encodeComponent(slug)}";
 
     final String message =
-        "Check out ${widget.property.propertyName}\n\n"
+        "${"Check out @name".trParams({'name': widget.property.propertyName})}\n\n"
         "$propertyLink";
 
     Get.bottomSheet(
@@ -470,7 +471,7 @@ class _HeroImageCardState extends State<HeroImageCard> {
                       mode: LaunchMode.externalApplication,
                     );
                   } catch (e) {
-                    Fluttertoast.showToast(msg: "Could not open WhatsApp".tr);
+                    AppToast.show(msg: "Could not open WhatsApp".tr);
                   }
                 },
               ),
@@ -500,7 +501,7 @@ class _HeroImageCardState extends State<HeroImageCard> {
 
                   Get.back();
 
-                  Fluttertoast.showToast(
+                  AppToast.show(
                     msg: "Property link copied to clipboard".tr,
                   );
                 },

@@ -156,7 +156,7 @@ class WishlistPropertyCard extends StatelessWidget {
                           Expanded(
                             child: _smallFeature(
                               Icons.square_foot_outlined,
-                              "${_formatArea(property.area)} sqm",
+                              "${_formatArea(property.area)} ${"sqm".tr}",
                             ),
                           ),
                         ],
@@ -169,7 +169,7 @@ class WishlistPropertyCard extends StatelessWidget {
                         children: [
                           Expanded(
                             child: Text(
-                              "QAR ${_formatPrice(property.price)}",
+                              "${"QAR".tr} ${_formatPrice(property.price)}",
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
                               style: TextStyle(

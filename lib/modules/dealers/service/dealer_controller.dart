@@ -8,6 +8,7 @@ import 'package:villas_qatar/modules/dealers/model/dealer_details_model.dart';
 import 'package:villas_qatar/modules/dealers/model/dealer_list_model.dart';
 
 
+import 'package:villas_qatar/Core/utils/app_toast.dart';
 class DealerController extends GetxController {
   bool isLoading = false;
   bool isLoadingMore = false;
@@ -122,7 +123,7 @@ class DealerController extends GetxController {
         response,
       );
     } catch (e) {
-      Fluttertoast.showToast(
+      AppToast.show(
         msg: e.toString().replaceFirst(
           "Exception: ",
           "",

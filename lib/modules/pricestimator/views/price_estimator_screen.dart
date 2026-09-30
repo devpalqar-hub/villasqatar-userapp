@@ -11,6 +11,7 @@ import 'package:villas_qatar/modules/pricestimator/service/ai_price_estimator_co
 import 'package:villas_qatar/modules/propertylist/model/listing_options_model.dart';
 import '../../propertylist/service/listproperty_controller.dart';
 
+import 'package:villas_qatar/Core/utils/app_toast.dart';
 class PriceEstimatorScreen extends StatefulWidget {
   const PriceEstimatorScreen({super.key});
 
@@ -720,7 +721,7 @@ class _PriceEstimatorScreenState extends State<PriceEstimatorScreen> {
             .toList();
         return InkWell(
           onTap: () => controller.amenities.isEmpty
-              ? Fluttertoast.showToast(msg: "Amenities not available.".tr)
+              ? AppToast.show(msg: "Amenities not available.".tr)
               : _showAmenitiesSheet(controller.amenities),
           borderRadius: BorderRadius.circular(8.r),
           child: Container(
@@ -827,10 +828,10 @@ class _PriceEstimatorScreenState extends State<PriceEstimatorScreen> {
       Get.find<Utilscontroller>().listingTypes,
     );
 
-    if (selectedType == null) return _toast("Please select property type.");
-    if (areaName.isEmpty) return _toast("Please enter location.");
+    if (selectedType == null) return _toast("Please select property type.".tr);
+    if (areaName.isEmpty) return _toast("Please enter location.".tr);
     if (areaSqft == null || areaSqft <= 0)
-      return _toast("Please enter valid area.");
+      return _toast("Please enter valid area.".tr);
 
     final bool allowed = await GuestLimiter.canUseEstimator();
     if (!allowed) {
@@ -857,7 +858,7 @@ class _PriceEstimatorScreenState extends State<PriceEstimatorScreen> {
       _toast(
         controller.error.isNotEmpty
             ? controller.error
-            : "Unable to estimate price.",
+            : "Unable to estimate price.".tr,
       );
   }
 
@@ -881,7 +882,7 @@ class _PriceEstimatorScreenState extends State<PriceEstimatorScreen> {
   }
 
   void _toast(String msg) =>
-      Fluttertoast.showToast(msg: msg.tr, gravity: ToastGravity.BOTTOM);
+      AppToast.show(msg: msg.tr, gravity: ToastGravity.BOTTOM);
 
   void _showEstimateResult(AiPriceEstimatorController controller) {
     final result = controller.estimation;
@@ -994,7 +995,7 @@ class _PriceEstimatorScreenState extends State<PriceEstimatorScreen> {
   }
 
   String _formatQar(double value) =>
-      "QAR ${value.round().toString().replaceAllMapped(RegExp(r'\B(?=(\d{3})+(?!\d))'), (m) => ',')}";
+      "${"QAR".tr} ${value.round().toString().replaceAllMapped(RegExp(r'\B(?=(\d{3})+(?!\d))'), (m) => ',')}";
 
   /// Warning shown with every estimate: the figure is indicative only.
   Widget _buildEstimateDisclaimer() {

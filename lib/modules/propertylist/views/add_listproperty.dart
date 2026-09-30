@@ -18,6 +18,7 @@ import 'package:villas_qatar/modules/propertylist/model/myproperty_model.dart';
 import 'package:villas_qatar/modules/propertylist/service/listproperty_controller.dart';
 import 'package:villas_qatar/modules/propertylist/widgets/list_property_widgets.dart';
 
+import 'package:villas_qatar/Core/utils/app_toast.dart';
 class ListYourPropertyScreen extends StatefulWidget {
   final Property? property;
   final bool isEdit;
@@ -443,7 +444,7 @@ class _ListYourPropertyScreenState extends State<ListYourPropertyScreen> {
     if (controller.phoneController.text.trim().isEmpty) {
       controller.errorField = 'phone';
       controller.update();
-      Fluttertoast.showToast(msg: 'Please enter your contact number'.tr);
+      AppToast.show(msg: 'Please enter your contact number'.tr);
       return;
     }
 
@@ -1630,7 +1631,7 @@ class _ListYourPropertyScreenState extends State<ListYourPropertyScreen> {
     final remaining = _maxPhotos - controller.galleryCount;
 
     if (files.length > remaining) {
-      Fluttertoast.showToast(msg: 'You can add up to 20 photos'.tr);
+      AppToast.show(msg: 'You can add up to 20 photos'.tr);
     }
 
     for (final image in files.take(remaining)) {
@@ -1813,7 +1814,7 @@ class _ListYourPropertyScreenState extends State<ListYourPropertyScreen> {
         controller.propertyPurpose.toUpperCase() ==
         ListPropertyController.purposeRent;
 
-    return 'QAR $formatted${isRent ? ' / month'.tr : ''}';
+    return '${"QAR".tr} $formatted${isRent ? ' / month'.tr : ''}';
   }
 
   Widget _buildReviewHero() {
@@ -2053,8 +2054,8 @@ class _QarPrefix extends StatelessWidget {
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          const Text(
-            'QAR',
+          Text(
+            'QAR'.tr,
             style: TextStyle(
               fontSize: 13.5,
               fontWeight: FontWeight.w800,

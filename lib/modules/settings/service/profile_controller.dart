@@ -9,6 +9,7 @@ import 'package:villas_qatar/Core/network/api_endpoints.dart';
 import 'package:villas_qatar/Core/network/api_handler.dart';
 import 'package:villas_qatar/Core/services/storage_service.dart';
 import 'package:villas_qatar/modules/settings/model/profile_model.dart';
+import 'package:villas_qatar/Core/utils/app_toast.dart';
 
 class ProfileController extends GetxController {
   final nameController = TextEditingController();
@@ -104,7 +105,7 @@ Future<bool> updateProfile() async {
   } catch (e) {
     debugPrint("UPDATE PROFILE ERROR: $e");
 
-    Fluttertoast.showToast(
+    AppToast.show(
       msg: _extractErrorMessage(e, "Failed to update profile".tr),
     );
 

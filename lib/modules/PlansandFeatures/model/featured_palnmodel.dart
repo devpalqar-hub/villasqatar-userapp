@@ -1,3 +1,4 @@
+import 'package:get/get.dart';
 class FeaturedPlanModel {
   final String id;
   final String name;
@@ -64,18 +65,18 @@ class FeaturedPlanModel {
 
   String get formattedPrice {
     if (price % 1 == 0) {
-      return 'QAR ${price.toInt()}';
+      return '${'QAR'.tr} ${price.toInt()}';
     }
 
-    return 'QAR ${price.toStringAsFixed(2)}';
+    return '${'QAR'.tr} ${price.toStringAsFixed(2)}';
   }
 
   String get formattedDuration {
     if (durationDays == 1) {
-      return '1 Day';
+      return '1 Day'.tr;
     }
 
-    return '$durationDays Days';
+    return '$durationDays ${'Days'.tr}';
   }
 
   bool get isHomePage {

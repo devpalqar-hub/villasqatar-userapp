@@ -10,6 +10,7 @@ import 'package:villas_qatar/Core/services/storage_service.dart';
 import 'package:villas_qatar/modules/support/views/my_tickets_screen.dart';
 import 'package:villas_qatar/modules/support/service/support_ticket_controller.dart';
 
+import 'package:villas_qatar/Core/utils/app_toast.dart';
 class SupportScreen extends StatefulWidget {
   const SupportScreen({super.key});
 
@@ -528,7 +529,7 @@ class _SupportScreenState extends State<SupportScreen> {
     // ============================================================
 
     if (subject.isEmpty) {
-      Fluttertoast.showToast(
+      AppToast.show(
         msg: "Please enter a subject for your request.".tr,
         toastLength: Toast.LENGTH_SHORT,
         gravity: ToastGravity.BOTTOM,
@@ -541,7 +542,7 @@ class _SupportScreenState extends State<SupportScreen> {
     // ============================================================
 
     if (message.isEmpty) {
-      Fluttertoast.showToast(
+      AppToast.show(
         msg: "Please describe the issue.".tr,
         toastLength: Toast.LENGTH_SHORT,
         gravity: ToastGravity.BOTTOM,
@@ -566,7 +567,7 @@ class _SupportScreenState extends State<SupportScreen> {
     // ============================================================
 
     if (currentUserId.isEmpty) {
-      Fluttertoast.showToast(
+      AppToast.show(
         msg: "Unable to identify the logged-in user.".tr,
         toastLength: Toast.LENGTH_SHORT,
         gravity: ToastGravity.BOTTOM,
@@ -599,7 +600,7 @@ class _SupportScreenState extends State<SupportScreen> {
         selectedCategory = SupportCategory.general;
       });
 
-      Fluttertoast.showToast(
+      AppToast.show(
         msg: "Your support request has been submitted successfully.".tr,
         toastLength: Toast.LENGTH_SHORT,
         gravity: ToastGravity.BOTTOM,
@@ -609,7 +610,7 @@ class _SupportScreenState extends State<SupportScreen> {
     // ERROR
     // ============================================================
     else {
-      Fluttertoast.showToast(
+      AppToast.show(
         msg: supportController.createError.isNotEmpty
             ? supportController.createError
             : "Unable to submit. Please try again.".tr,

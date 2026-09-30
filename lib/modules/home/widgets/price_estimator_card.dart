@@ -151,7 +151,7 @@ class _EstimateBadge extends StatelessWidget {
             mainAxisSize: MainAxisSize.min,
             children: [
               Text(
-                "QAR 2.4M",
+                "QAR 2.4M".tr,
                 style: AppTextStyles.bold12.copyWith(
                   fontSize: 10.5.sp,
                   fontWeight: FontWeight.w700,

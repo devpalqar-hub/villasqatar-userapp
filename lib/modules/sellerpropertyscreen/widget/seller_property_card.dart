@@ -78,7 +78,7 @@ class SellerPropertyCard extends StatelessWidget {
                           borderRadius: BorderRadius.circular(10.r),
                         ),
                         child: Text(
-                          property.purpose,
+                          property.purpose.tr,
                           style: TextStyle(
                             color: Colors.white,
                             fontSize: 10.sp,
@@ -167,7 +167,7 @@ class SellerPropertyCard extends StatelessWidget {
                       SizedBox(height: 8.h),
 
                       Text(
-                        "QAR ${property.price.toStringAsFixed(0)}",
+                        "${"QAR".tr} ${property.price.toStringAsFixed(0)}",
                         style: AppTextStyles.title16.copyWith(
                           color: AppColors.primary,
                           fontWeight: FontWeight.bold,

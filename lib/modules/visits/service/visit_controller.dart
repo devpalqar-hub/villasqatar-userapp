@@ -5,6 +5,7 @@ import 'package:villas_qatar/Core/network/api_endpoints.dart';
 import 'package:villas_qatar/Core/network/api_handler.dart';
 import 'package:villas_qatar/modules/visits/model/visit_model.dart';
 
+import 'package:villas_qatar/Core/utils/app_toast.dart';
 class VisitController extends GetxController {
   bool isScheduling = false;
   bool isAccepting = false;
@@ -53,7 +54,7 @@ class VisitController extends GetxController {
       // Refresh visitor list after booking
       await fetchVisitorVisits(showLoading: false);
 
-      Fluttertoast.showToast(
+      AppToast.show(
         msg: "Visit scheduled successfully".tr,
       );
 
@@ -61,7 +62,7 @@ class VisitController extends GetxController {
     } catch (e) {
       debugPrint("Schedule Visit Error: $e");
 
-      Fluttertoast.showToast(
+      AppToast.show(
         msg: e.toString().replaceFirst("Exception: ", ""),
       );
 
@@ -82,7 +83,7 @@ class VisitController extends GetxController {
       );
       await fetchOwnerVisits(showLoading: false);
 
-      Fluttertoast.showToast(
+      AppToast.show(
         msg: "Visit scheduled successfully".tr,
         toastLength: Toast.LENGTH_SHORT,
         gravity: ToastGravity.BOTTOM,
@@ -93,7 +94,7 @@ class VisitController extends GetxController {
     } catch (e) {
       debugPrint("Accept Visit Error: $e");
 
-      Fluttertoast.showToast(
+      AppToast.show(
         msg: e.toString().replaceFirst("Exception: ", ""),
       );
 
@@ -176,7 +177,7 @@ class VisitController extends GetxController {
     if (id.isEmpty) {
       debugPrint("Reject Visit: Visit ID is empty");
 
-      Fluttertoast.showToast(
+      AppToast.show(
         msg: "Visit ID is missing".tr,
         backgroundColor: Colors.red,
         textColor: Colors.white,
@@ -209,7 +210,7 @@ class VisitController extends GetxController {
       await fetchOwnerVisits(showLoading: false);
       return true;
     } catch (e) {
-      Fluttertoast.showToast(
+      AppToast.show(
         msg: e.toString().replaceFirst("Exception: ", ""),
         backgroundColor: Colors.red.shade700,
         textColor: Colors.white,

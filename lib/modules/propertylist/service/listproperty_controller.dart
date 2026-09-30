@@ -13,6 +13,7 @@ import 'package:villas_qatar/modules/propertylist/model/myproperty_model.dart';
 import 'package:villas_qatar/modules/propertylist/model/upload_property_model.dart';
 import 'package:villas_qatar/modules/propertylist/service/myproperties_listcontroller.dart';
 
+import 'package:villas_qatar/Core/utils/app_toast.dart';
 class ListPropertyController extends GetxController {
   //--------------------------------------------------
   // STEP
@@ -279,7 +280,7 @@ class ListPropertyController extends GetxController {
     }
 
     if (stepError != null) {
-      Fluttertoast.showToast(msg: stepError!);
+      AppToast.show(msg: stepError!);
       update();
       return false;
     }
@@ -399,7 +400,7 @@ class ListPropertyController extends GetxController {
   //--------------------------------------------------
 
   void saveDraft() {
-    Fluttertoast.showToast(
+    AppToast.show(
       msg: "Draft saved successfully".tr,
     );
   }
@@ -704,7 +705,7 @@ class ListPropertyController extends GetxController {
 
       debugPrint("======================================");
 
-      Fluttertoast.showToast(
+      AppToast.show(
         msg: "Property listed successfully.".tr,
         toastLength: Toast.LENGTH_SHORT,
         gravity: ToastGravity.BOTTOM,
@@ -726,7 +727,7 @@ class ListPropertyController extends GetxController {
 
       error = e.toString().replaceFirst("Exception: ", "");
 
-      Fluttertoast.showToast(
+      AppToast.show(
         msg: error,
         toastLength: Toast.LENGTH_LONG,
         gravity: ToastGravity.BOTTOM,
@@ -916,7 +917,7 @@ class ListPropertyController extends GetxController {
     } catch (e) {
       error = e.toString();
 
-      Fluttertoast.showToast(msg: error);
+      AppToast.show(msg: error);
 
       return false;
     } finally {
@@ -1029,7 +1030,7 @@ Future<bool> checkPhone() async {
     update();
     return true;
   } catch (e) {
-    Fluttertoast.showToast(
+    AppToast.show(
       msg: e.toString().replaceFirst("Exception: ", ""),
     );
     return false;
@@ -1053,14 +1054,14 @@ Future<bool> sendOtp() async {
 
     showOtpField = true;
 
-    Fluttertoast.showToast(
+    AppToast.show(
       msg: response["message"] ?? "OTP sent successfully".tr,
     );
 
     update();
     return true;
   } catch (e) {
-    Fluttertoast.showToast(
+    AppToast.show(
       msg: e.toString().replaceFirst("Exception: ", ""),
     );
     return false;
@@ -1090,14 +1091,14 @@ Future<bool> verifyOtp() async {
     showOtpField = false;
     otpController.clear();
 
-    Fluttertoast.showToast(
+    AppToast.show(
       msg: response["message"] ?? "Phone verified successfully".tr,
     );
 
     update();
     return true;
   } catch (e) {
-    Fluttertoast.showToast(
+    AppToast.show(
       msg: e.toString().replaceFirst("Exception: ", ""),
     );
     return false;

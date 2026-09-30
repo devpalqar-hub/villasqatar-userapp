@@ -1,3 +1,4 @@
+import 'package:get/get.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:intl/intl.dart';
@@ -94,7 +95,7 @@ class PropertySummaryCard extends StatelessWidget {
 
                 /// Price
                 Text(
-                  "QAR ${NumberFormat('#,##0').format(property.price)}",
+                  "${"QAR".tr} ${NumberFormat('#,##0').format(property.price)}",
                   style: AppTextStyles.title16.copyWith(
                     color: AppColors.primary,
                     fontWeight: FontWeight.w700,
@@ -118,7 +119,7 @@ class PropertySummaryCard extends StatelessWidget {
 
                     _feature(
                       Icons.square_foot_outlined,
-                      "${property.area.toStringAsFixed(0)} sqm",
+                      "${property.area.toStringAsFixed(0)} ${"sqm".tr}",
                     ),
                   ],
                 ),

@@ -15,6 +15,7 @@ import 'package:villas_qatar/modules/propertydetailscreen/propertydetailscreen.d
 import 'package:villas_qatar/modules/wishlist/service/wishlist_controller.dart';
 
 import '../../PlansandFeatures/model/myfeatured_property.dart';
+import 'package:villas_qatar/Core/utils/app_toast.dart';
 
 // Adjust this import to wherever FeaturedListing actually lives in your
 // project (the model you shared — id, slug, propertyName, purpose,
@@ -252,7 +253,7 @@ class _PropertyCardState extends State<PropertyCard> {
     final String id = listing.id ?? '';
 
     if (id.isEmpty) {
-      Fluttertoast.showToast(msg: "Property ID is not available".tr);
+      AppToast.show(msg: "Property ID is not available".tr);
       return;
     }
 
@@ -388,7 +389,7 @@ class _PropertyCardState extends State<PropertyCard> {
                                     ? null
                                     : () async {
                                         if (id.isEmpty) {
-                                          Fluttertoast.showToast(
+                                          AppToast.show(
                                             msg: "Property ID is not available"
                                                 .tr,
                                           );
@@ -471,7 +472,7 @@ class _PropertyCardState extends State<PropertyCard> {
                     children: [
                       /// TITLE
                       Text(
-                        listing.propertyName ?? "No Name",
+                        listing.propertyName ?? "No Name".tr,
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,
                         style: AppTextStyles.title16.copyWith(
@@ -600,12 +601,12 @@ class _PropertyCardState extends State<PropertyCard> {
     }
 
     final String formattedInt = buffer.toString();
-    return 'QAR $formattedInt${parts.length > 1 ? '.${parts[1]}' : ''}';
+    return '${'QAR'.tr} $formattedInt${parts.length > 1 ? '.${parts[1]}' : ''}';
   }
 
   /// "/ month" for rentals, nothing for sale listings.
   String? _priceSuffix() {
-    return listing.purpose == 'RENT' ? '/ month' : null;
+    return listing.purpose == 'RENT' ? '/ month'.tr : null;
   }
 
   // =============================================================
@@ -614,7 +615,7 @@ class _PropertyCardState extends State<PropertyCard> {
 
   String _areaText() {
     if (listing.area != null && listing.area! > 0) {
-      return "${listing.area!.toStringAsFixed(0)} m²";
+      return "${listing.area!.toStringAsFixed(0)} ${"m²".tr}";
     }
     return "0 m²";
   }

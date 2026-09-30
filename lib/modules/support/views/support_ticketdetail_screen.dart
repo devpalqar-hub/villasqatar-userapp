@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
+import 'package:intl/intl.dart';
 
 import 'package:villas_qatar/Core/constants/app_colors.dart';
 import 'package:villas_qatar/modules/support/model/support_ticket_details.dart';
@@ -627,7 +628,7 @@ String _categoryLabel(String category) {
                 ? word
                 : "${word[0].toUpperCase()}${word.substring(1)}",
           )
-          .join(" ");
+          .join(" ").tr;
   }
 }
 
@@ -778,35 +779,7 @@ String _formatDateTime(DateTime? date) {
 
   final local = date.toLocal();
 
-  const months = [
-    "Jan",
-    "Feb",
-    "Mar",
-    "Apr",
-    "May",
-    "Jun",
-    "Jul",
-    "Aug",
-    "Sep",
-    "Oct",
-    "Nov",
-    "Dec",
-  ];
-
-  final int hour = local.hour == 0
-      ? 12
-      : local.hour > 12
-      ? local.hour - 12
-      : local.hour;
-
-  final String minute = local.minute.toString().padLeft(2, "0");
-
-  final String period = local.hour >= 12 ? "PM" : "AM";
-
-  return "${local.day.toString().padLeft(2, '0')} "
-      "${months[local.month - 1]} "
-      "${local.year} • "
-      "$hour:$minute $period";
+  return DateFormat('dd MMM yyyy • hh:mm a').format(local);
 }
 
 Widget _assignedToCard(SupportTicketDetails ticket) {

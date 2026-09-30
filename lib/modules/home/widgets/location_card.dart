@@ -77,7 +77,7 @@ class LocationCard extends StatelessWidget {
                         ),
                         SizedBox(width: 4.w),
                         Text(
-                          "${property.distanceMetres} m",
+                          "${property.distanceMetres} ${"m".tr}",
                           style: TextStyle(
                             color: Colors.white,
                             fontWeight: FontWeight.w500,

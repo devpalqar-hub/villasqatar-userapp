@@ -8,6 +8,7 @@ import 'package:villas_qatar/Core/theme/app_textstyles.dart';
 import 'package:villas_qatar/Core/widgets/motion/pressable_scale.dart';
 
 import '../../../Core/constants/app_colors.dart';
+import 'package:villas_qatar/Core/utils/app_toast.dart';
 
 /// "Join us on social media" panel that closes the home page - a cream panel
 /// with a warm border (same material as the trust strip above it) holding one
@@ -63,7 +64,7 @@ class SocialMediaCard extends StatelessWidget {
             children: [
               Expanded(
                 child: _SocialTile(
-                  label: 'Facebook',
+                  label: 'Facebook'.tr,
                   icon: FontAwesomeIcons.facebookF,
                   color: const Color(0xFF1877F2),
                   url: facebookUrl,
@@ -72,7 +73,7 @@ class SocialMediaCard extends StatelessWidget {
               SizedBox(width: 10.w),
               Expanded(
                 child: _SocialTile(
-                  label: 'Instagram',
+                  label: 'Instagram'.tr,
                   icon: FontAwesomeIcons.instagram,
                   gradient: const LinearGradient(
                     begin: Alignment.bottomLeft,
@@ -89,7 +90,7 @@ class SocialMediaCard extends StatelessWidget {
               SizedBox(width: 10.w),
               Expanded(
                 child: _SocialTile(
-                  label: 'X',
+                  label: 'X'.tr,
                   icon: FontAwesomeIcons.xTwitter,
                   color: AppColors.ink,
                   url: xUrl,
@@ -132,7 +133,7 @@ class _SocialTile extends StatelessWidget {
       debugPrint('Social link error: $e');
     }
 
-    Fluttertoast.showToast(msg: 'Could not open the link'.tr);
+    AppToast.show(msg: 'Could not open the link'.tr);
   }
 
   @override

@@ -846,8 +846,8 @@ class _PropertyCard extends StatelessWidget {
                   SizedBox(height: 8.h),
 
                   Text(
-                    "QAR ${listing.price.toStringAsFixed(0)}"
-                    "${forSale ? '' : '/month'}",
+                    "${"QAR".tr} ${listing.price.toStringAsFixed(0)}"
+                    "${forSale ? '' : '/month'.tr}",
                     style: AppTextStyles.bold16.copyWith(
                       color: AppColors.primary,
                       fontSize: 13.sp,

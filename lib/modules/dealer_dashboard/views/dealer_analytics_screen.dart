@@ -688,7 +688,7 @@ class _DealerAnalyticsScreenState extends State<DealerAnalyticsScreen> {
         value: o.listings.total,
         label: "Total Listings".tr,
         foot:
-            "${o.listings.open} Open · ${o.listings.sold} Sold · ${o.listings.rejected} Rejected",
+            "${o.listings.open} ${"Open".tr} · ${o.listings.sold} ${"Sold".tr} · ${o.listings.rejected} ${"Rejected".tr}",
       ),
       _statCard(
         icon: Icons.remove_red_eye_rounded,
@@ -724,7 +724,7 @@ class _DealerAnalyticsScreenState extends State<DealerAnalyticsScreen> {
         label: "Units Sold".tr,
         foot: o.sales.soldCount == 0
             ? "No sales this period".tr
-            : "QAR ${_currency.format(o.sales.soldValue)} total",
+            : "${"QAR".tr} ${_currency.format(o.sales.soldValue)} ${"total".tr}",
       ),
       _statCard(
         icon: Icons.event_available_rounded,
@@ -1156,7 +1156,7 @@ class _DealerAnalyticsScreenState extends State<DealerAnalyticsScreen> {
                               borderRadius: BorderRadius.circular(12.r),
                             ),
                             child: Text(
-                              l.status,
+                              l.status.tr,
                               style: TextStyle(
                                 fontSize: 8.sp,
                                 fontWeight: FontWeight.w700,
@@ -1192,7 +1192,7 @@ class _DealerAnalyticsScreenState extends State<DealerAnalyticsScreen> {
                           borderRadius: BorderRadius.circular(12.r),
                         ),
                         child: Text(
-                          l.purpose,
+                          l.purpose.tr,
                           style: TextStyle(
                             fontSize: 8.5.sp,
                             fontWeight: FontWeight.w700,
@@ -1204,7 +1204,7 @@ class _DealerAnalyticsScreenState extends State<DealerAnalyticsScreen> {
                       const Spacer(),
 
                       Text(
-                        "QAR ${_currency.format(l.price)}",
+                        "${"QAR".tr} ${_currency.format(l.price)}",
                         style: AppTextStyles.title16.copyWith(
                           fontSize: 13.sp,
                           color: AppColors.primary,

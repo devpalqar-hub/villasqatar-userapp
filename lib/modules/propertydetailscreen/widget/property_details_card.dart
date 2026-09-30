@@ -15,7 +15,7 @@ class PropertyDetailsCard extends StatelessWidget {
       {
         "icon": Icons.square_foot_outlined,
         "title": "Built-up Area".tr,
-        "value": "${property.area} sqm",
+        "value": "${property.area} ${"sqm".tr}",
       },
       {
         "icon": Icons.crop_square_outlined,
@@ -45,12 +45,12 @@ class PropertyDetailsCard extends StatelessWidget {
      {
   "icon": Icons.chair_outlined,
   "title": "Furnishing".tr,
-  "value": property.furnishing.title,
+  "value": property.furnishing.title.tr,
 },
     {
   "icon": Icons.home_work_outlined,
   "title": "Property Type".tr,
-  "value": property.type.title,
+  "value": property.type.title.tr,
 },
       {
         "icon": Icons.sell_outlined,

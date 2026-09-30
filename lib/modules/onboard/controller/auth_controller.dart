@@ -20,6 +20,7 @@ import 'package:villas_qatar/modules/dealer_dashboard/views/dealer_analytics_scr
 import 'package:villas_qatar/modules/mainscreen/mainscreen.dart';
 import 'package:villas_qatar/modules/onboard/views/welcome_screen.dart';
 
+import 'package:villas_qatar/Core/utils/app_toast.dart';
 class AuthController extends GetxController {
   final phoneController = TextEditingController();
   final otpController = TextEditingController();
@@ -150,7 +151,7 @@ selectedCountryCode = "+974";
 
     phoneError = _extractErrorMessage(e, "Failed to send OTP".tr);
 
-    Fluttertoast.showToast(msg: phoneError!);
+    AppToast.show(msg: phoneError!);
 
     update();
 
@@ -184,7 +185,7 @@ selectedCountryCode = "+974";
 
     otpError = _extractErrorMessage(e, "Invalid OTP. Please try again.".tr);
 
-    Fluttertoast.showToast(msg: otpError!);
+    AppToast.show(msg: otpError!);
 
     update();
 
@@ -208,7 +209,7 @@ selectedCountryCode = "+974";
     }
 
     if (dealerIdentifierError != null || dealerPasswordError != null) {
-      Fluttertoast.showToast(
+      AppToast.show(
         msg: dealerIdentifierError ?? dealerPasswordError!,
       );
       update();
@@ -243,7 +244,7 @@ selectedCountryCode = "+974";
         "Invalid email/phone or password.".tr,
       );
 
-      Fluttertoast.showToast(msg: dealerPasswordError!);
+      AppToast.show(msg: dealerPasswordError!);
 
       update();
 
@@ -300,7 +301,7 @@ selectedCountryCode = "+974";
     } catch (e) {
       debugPrint("Google Sign-In Error: $e");
 
-      Fluttertoast.showToast(
+      AppToast.show(
         msg: "Google sign-in failed".tr,
       );
 
@@ -390,7 +391,7 @@ selectedCountryCode = "+974";
     } catch (e) {
       debugPrint("Apple Sign-In Error: $e");
 
-      Fluttertoast.showToast(
+      AppToast.show(
         msg: "Apple sign-in failed".tr,
       );
 
@@ -437,7 +438,7 @@ selectedCountryCode = "+974";
     }
 
     if (nameError != null || emailError != null) {
-      Fluttertoast.showToast(msg: nameError ?? emailError!);
+      AppToast.show(msg: nameError ?? emailError!);
       update();
       return false;
     }
@@ -496,7 +497,7 @@ selectedCountryCode = "+974";
 
       emailError = message.toLowerCase().contains("email") ? message : null;
 
-      Fluttertoast.showToast(msg: message);
+      AppToast.show(msg: message);
 
       update();
 
@@ -621,14 +622,14 @@ bool validatePhone() {
 
   if (phone.isEmpty) {
     phoneError = "Please enter your WhatsApp number".tr;
-    Fluttertoast.showToast(msg: phoneError!);
+    AppToast.show(msg: phoneError!);
     update();
     return false;
   }
 
   if (!RegExp(r'^[0-9]{6,15}$').hasMatch(phone)) {
     phoneError = "Please enter a valid phone number".tr;
-    Fluttertoast.showToast(msg: phoneError!);
+    AppToast.show(msg: phoneError!);
     update();
     return false;
   }
@@ -645,14 +646,14 @@ bool validateOtp() {
 
   if (otp.isEmpty) {
     otpError = "Please enter the OTP".tr;
-    Fluttertoast.showToast(msg: otpError!);
+    AppToast.show(msg: otpError!);
     update();
     return false;
   }
 
   if (otp.length != 6) {
     otpError = "OTP must be 6 digits".tr;
-    Fluttertoast.showToast(msg: otpError!);
+    AppToast.show(msg: otpError!);
     update();
     return false;
   }

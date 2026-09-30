@@ -9,6 +9,7 @@ import 'package:villas_qatar/modules/PlansandFeatures/services/FeaturedPropertie
 import 'package:villas_qatar/modules/PlansandFeatures/services/plan_controller.dart';
 import 'package:villas_qatar/modules/propertylist/service/myproperties_listcontroller.dart';
 
+import 'package:villas_qatar/Core/utils/app_toast.dart';
 class BoostPlanBottomSheet extends StatefulWidget {
   final String propertyId;
 
@@ -866,7 +867,7 @@ class _BoostPlanBottomSheetState extends State<BoostPlanBottomSheet> {
     final String listingId = widget.propertyId.trim();
 
     if (listingId.isEmpty) {
-      Fluttertoast.showToast(msg: "Property ID is missing.".tr);
+      AppToast.show(msg: "Property ID is missing.".tr);
 
       return;
     }
@@ -906,7 +907,7 @@ class _BoostPlanBottomSheetState extends State<BoostPlanBottomSheet> {
           // the pop instead of the bottom sheet's route.
           Get.back();
 
-          Fluttertoast.showToast(
+          AppToast.show(
             msg: "${plan.name} has been activated for your property.".tr,
           );
 
@@ -921,12 +922,12 @@ class _BoostPlanBottomSheetState extends State<BoostPlanBottomSheet> {
           break;
 
         case StripePaymentOutcome.cancelled:
-          Fluttertoast.showToast(msg: "You can try again anytime.".tr);
+          AppToast.show(msg: "You can try again anytime.".tr);
 
           break;
       }
     } catch (e) {
-      Fluttertoast.showToast(msg: e.toString().replaceFirst("Exception: ", ""));
+      AppToast.show(msg: e.toString().replaceFirst("Exception: ", ""));
     } finally {
       // The sheet may already be closed/disposed by now on the
       // success path (Get.back() above) - only touch state if it's

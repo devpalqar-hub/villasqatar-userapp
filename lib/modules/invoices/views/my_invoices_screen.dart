@@ -200,7 +200,7 @@ class _InvoiceSummaryCard extends StatelessWidget {
               SizedBox(height: 8.h),
 
               Text(
-                "$currency ${formatter.format(amount)}",
+                "${currency.tr} ${formatter.format(amount)}",
                 style: AppTextStyles.title18.copyWith(
                   color: Colors.white,
                   fontSize: 26.sp,
@@ -422,7 +422,7 @@ class _InvoiceCard extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.end,
               children: [
                 Text(
-                  "${invoice.currency} ${formatter.format(invoice.totalAmount)}",
+                  "${invoice.currency.tr} ${formatter.format(invoice.totalAmount)}",
                   style: AppTextStyles.title14,
                 ),
                 SizedBox(height: 8.h),
@@ -451,10 +451,10 @@ class _StatusChip extends StatelessWidget {
         : AppColors.warning.withOpacity(.12);
 
     final String label = paid
-        ? "Paid"
+        ? "Paid".tr
         : status.isEmpty
-        ? "Unknown"
-        : status[0].toUpperCase() + status.substring(1).toLowerCase();
+        ? "Unknown".tr
+        : (status[0].toUpperCase() + status.substring(1).toLowerCase()).tr;
 
     return Container(
       padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 4.h),

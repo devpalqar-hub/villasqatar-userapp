@@ -122,6 +122,6 @@ class PopularPlaceCard extends StatelessWidget {
       buffer.write(whole[i]);
     }
 
-    return "QAR $buffer";
+    return "${"QAR".tr} $buffer";
   }
 }

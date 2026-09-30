@@ -1,3 +1,4 @@
+import 'package:get/get.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:villas_qatar/Core/constants/app_colors.dart';
@@ -74,7 +75,7 @@ class CompactAgentCard extends StatelessWidget {
   /// Centered text fallback when the logo is unavailable
   Widget _namePlaceholder() {
     return Text(
-      name.isNotEmpty ? name : "Partner",
+      name.isNotEmpty ? name : "Partner".tr,
       maxLines: 2,
       overflow: TextOverflow.ellipsis,
       textAlign: TextAlign.center,

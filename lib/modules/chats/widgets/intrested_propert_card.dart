@@ -106,7 +106,7 @@ class InterestedPropertyCard extends StatelessWidget {
                          SizedBox(height: 5.h),
 
                     Text(
-                      "QAR ${listing.price}",
+                      "${"QAR".tr} ${listing.price}",
                       style: TextStyle(
                         color: AppColors.primary,
                         fontWeight: FontWeight.bold,
@@ -141,7 +141,7 @@ class InterestedPropertyCard extends StatelessWidget {
                             ),
                             TextSpan(
                               text:
-                                  "QAR ${offerAmount ?? listing.price}",
+                                  "${"QAR".tr} ${offerAmount ?? listing.price}",
                               style: TextStyle(
                                 color: AppColors.primary,
                                 fontWeight: FontWeight.bold,

@@ -12,6 +12,7 @@ import 'package:villas_qatar/modules/propertydetailscreen/widget/pd_tokens.dart'
 import 'package:villas_qatar/modules/propertylist/model/myproperty_model.dart';
 import 'package:villas_qatar/modules/wishlist/service/wishlist_controller.dart';
 
+import 'package:villas_qatar/Core/utils/app_toast.dart';
 /// Fixed top bar that floats over the gallery as white round controls and
 /// crossfades into a solid white bar (with the property name) once the page
 /// has scrolled past the gallery.
@@ -208,13 +209,13 @@ class _PdTopBarState extends State<PdTopBar> {
     final String slug = widget.property.slug.trim();
 
     if (slug.isEmpty) {
-      Fluttertoast.showToast(msg: 'Property link is not available'.tr);
+      AppToast.show(msg: 'Property link is not available'.tr);
       return;
     }
 
     final String link =
         'https://villas.palqar.cloud/property/${Uri.encodeComponent(slug)}';
-    final String message = 'Check out ${widget.property.propertyName}\n\n$link';
+    final String message = '${'Check out @name'.trParams({'name': widget.property.propertyName})}\n\n$link';
 
     Get.bottomSheet(
       Container(
@@ -279,7 +280,7 @@ class _PdTopBarState extends State<PdTopBar> {
                           mode: LaunchMode.externalApplication,
                         );
                       } catch (_) {
-                        Fluttertoast.showToast(
+                        AppToast.show(
                           msg: 'Could not open WhatsApp'.tr,
                         );
                       }
@@ -297,7 +298,7 @@ class _PdTopBarState extends State<PdTopBar> {
 
                       Get.back();
 
-                      Fluttertoast.showToast(
+                      AppToast.show(
                         msg: 'Property link copied to clipboard'.tr,
                       );
                     },

@@ -58,9 +58,8 @@ class GuestLimiter {
           ],
         ),
         content: Text(
-          "You've used all $maxGuestEstimates free AI price estimates. "
-                  "Sign in to keep estimating."
-              .tr,
+          "You've used all @count free AI price estimates. Sign in to keep estimating."
+              .trParams({'count': '$maxGuestEstimates'}),
         ),
         actions: [
           Row(

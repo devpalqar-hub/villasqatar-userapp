@@ -9,6 +9,7 @@ import 'package:villas_qatar/Core/theme/app_textstyles.dart';
 import 'package:villas_qatar/modules/propertylist/model/myproperty_model.dart';
 import 'package:villas_qatar/modules/searchscreen/service/searchlist_screen.dart';
 
+import 'package:villas_qatar/Core/utils/app_toast.dart';
 enum CompareStep { selection, comparison }
 
 class CompareBottomSheet extends StatefulWidget {
@@ -51,7 +52,7 @@ class _CompareBottomSheetState extends State<CompareBottomSheet> {
     }
 
     if (selectedProperties.length >= 2) {
-      Fluttertoast.showToast(
+      AppToast.show(
         msg: "You can compare only two properties.".tr,
       );
       return;
@@ -338,7 +339,7 @@ class ComparePropertyTile extends StatelessWidget {
                       SizedBox(height: 4.h),
 
                       Text(
-                        "QAR ${property.price.toStringAsFixed(0)}",
+                        "${"QAR".tr} ${property.price.toStringAsFixed(0)}",
                         style: AppTextStyles.body12.copyWith(
                           fontSize: 10.sp,
                           color: AppColors.primary,
@@ -504,12 +505,12 @@ class ComparisonView extends StatelessWidget {
                   _row(
                     "Price".tr,
                     properties,
-                    (e) => "QAR ${e.price.toStringAsFixed(0)}",
+                    (e) => "${"QAR".tr} ${e.price.toStringAsFixed(0)}",
                   ),
 
-                  _row("Purpose".tr, properties, (e) => e.purpose),
+                  _row("Purpose".tr, properties, (e) => e.purpose.tr),
 
-                  _row("Property Type".tr, properties, (e) => e.type.title),
+                  _row("Property Type".tr, properties, (e) => e.type.title.tr),
 
                   _row(
                     "Location".tr,
@@ -521,9 +522,9 @@ class ComparisonView extends StatelessWidget {
 
                   _row("Bathrooms".tr, properties, (e) => "${e.bathrooms}"),
 
-                  _row("Area".tr, properties, (e) => "${e.area} sqft"),
+                  _row("Area".tr, properties, (e) => "${e.area} ${"sqft".tr}"),
 
-                  _row("Furnishing".tr, properties, (e) => e.furnishing.title),
+                  _row("Furnishing".tr, properties, (e) => e.furnishing.title.tr),
 
                   _row(
                     "Price Negotiable".tr,

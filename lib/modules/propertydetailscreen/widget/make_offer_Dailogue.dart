@@ -9,6 +9,7 @@ import '../../chats/service/chat_controller.dart';
 import '../../chats/views/chat_startscreen.dart';
 import '../../propertylist/model/myproperty_model.dart';
 
+import 'package:villas_qatar/Core/utils/app_toast.dart';
 class MakeOfferBottomSheet extends StatefulWidget {
   final Property property;
 
@@ -277,7 +278,7 @@ class _MakeOfferBottomSheetState extends State<MakeOfferBottomSheet> {
                 SizedBox(height: 4.h),
 
                 Text(
-                  "QAR ${_formatPrice(widget.property.price)}",
+                  "${"QAR".tr} ${_formatPrice(widget.property.price)}",
                   style: TextStyle(
                     fontSize: 16.sp,
                     fontWeight: FontWeight.w800,
@@ -382,10 +383,10 @@ class _MakeOfferBottomSheetState extends State<MakeOfferBottomSheet> {
                       fontWeight: FontWeight.w700,
                       color: AppColors.primary,
                     ),
-                    items: const [
-                      DropdownMenuItem(value: "QAR", child: Text("QAR")),
-                      DropdownMenuItem(value: "USD", child: Text("USD")),
-                      DropdownMenuItem(value: "AED", child: Text("AED")),
+                    items: [
+                      DropdownMenuItem(value: "QAR", child: Text("QAR".tr)),
+                      DropdownMenuItem(value: "USD", child: Text("USD".tr)),
+                      DropdownMenuItem(value: "AED", child: Text("AED".tr)),
                     ],
                     onChanged: (value) {
                       if (value == null) {
@@ -564,7 +565,7 @@ class _MakeOfferBottomSheetState extends State<MakeOfferBottomSheet> {
     final String offer = offerController.text.trim();
 
     if (offer.isEmpty) {
-      Fluttertoast.showToast(msg: "Please enter your offer amount.".tr);
+      AppToast.show(msg: "Please enter your offer amount.".tr);
 
       return;
     }
@@ -572,7 +573,7 @@ class _MakeOfferBottomSheetState extends State<MakeOfferBottomSheet> {
     final double? amount = double.tryParse(offer);
 
     if (amount == null || amount <= 0) {
-      Fluttertoast.showToast(msg: "Please enter a valid offer amount.".tr);
+      AppToast.show(msg: "Please enter a valid offer amount.".tr);
 
       return;
     }

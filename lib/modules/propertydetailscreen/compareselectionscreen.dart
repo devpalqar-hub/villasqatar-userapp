@@ -40,7 +40,7 @@
 //   }
 
 //   String formatPrice(double price) {
-//     return "QAR ${price.toStringAsFixed(0)}";
+//     return "${"QAR".tr} ${price.toStringAsFixed(0)}";
 //   }
 
 //   @override

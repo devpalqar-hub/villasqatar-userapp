@@ -210,18 +210,18 @@ class _MakeOfferScreenState extends State<MakeOfferScreen> {
                                     fontWeight: FontWeight.w700,
                                     color: Colors.black87,
                                   ),
-                                  items: const [
+                                  items: [
                                     DropdownMenuItem(
                                       value: "QAR",
-                                      child: Text("QAR"),
+                                      child: Text("QAR".tr),
                                     ),
                                     DropdownMenuItem(
                                       value: "USD",
-                                      child: Text("USD"),
+                                      child: Text("USD".tr),
                                     ),
                                     DropdownMenuItem(
                                       value: "AED",
-                                      child: Text("AED"),
+                                      child: Text("AED".tr),
                                     ),
                                   ],
                                   onChanged: (value) {
@@ -304,7 +304,10 @@ class _MakeOfferScreenState extends State<MakeOfferScreen> {
                                 () => ChatStartScreen(
                                   property: widget.property,
                                   initialMessage:
-                                      "I'm ready to buy this property for QAR ${offerController.text}",
+                                      "I'm ready to buy this property for QAR @amount"
+                                          .trParams({
+                                            'amount': offerController.text,
+                                          }),
                                 ),
                               );
                             },

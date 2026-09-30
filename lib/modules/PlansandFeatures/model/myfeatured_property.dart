@@ -1,3 +1,4 @@
+import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 
 class MyFeaturedProperty {
@@ -209,10 +210,10 @@ class MyFeaturedProperty {
 
     if (paidAmount ==
         paidAmount!.roundToDouble()) {
-      return 'QAR ${paidAmount!.toInt()}';
+      return '${'QAR'.tr} ${paidAmount!.toInt()}';
     }
 
-    return 'QAR ${paidAmount!.toStringAsFixed(2)}';
+    return '${'QAR'.tr} ${paidAmount!.toStringAsFixed(2)}';
   }
 }
 
@@ -307,10 +308,10 @@ class FeaturedPlan {
 
   String get formattedPrice {
     if (price == price.roundToDouble()) {
-      return 'QAR ${price.toInt()}';
+      return '${'QAR'.tr} ${price.toInt()}';
     }
 
-    return 'QAR ${price.toStringAsFixed(2)}';
+    return '${'QAR'.tr} ${price.toStringAsFixed(2)}';
   }
 }
 
@@ -348,7 +349,7 @@ class FeaturedListing {
 
       propertyName:
           json['propertyName']?.toString() ??
-              'Property',
+              'Property'.tr,
 
       slug: json['slug']?.toString(),
 
@@ -456,5 +457,5 @@ String _formatEnum(String value) {
             '${word[0].toUpperCase()}'
             '${word.substring(1)}',
       )
-      .join(' ');
+      .join(' ').tr;
 }

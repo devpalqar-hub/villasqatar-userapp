@@ -19,6 +19,7 @@ import 'package:villas_qatar/modules/searchscreen/service/searchlist_screen.dart
 
 import 'add_listproperty.dart';
 
+import 'package:villas_qatar/Core/utils/app_toast.dart';
 class MyPropertiesScreen extends StatefulWidget {
   const MyPropertiesScreen({super.key});
 
@@ -308,7 +309,7 @@ class _MyPropertiesScreenState extends State<MyPropertiesScreen> {
       );
 
       if (result.activated) {
-        Fluttertoast.showToast(
+        AppToast.show(
           msg: "${listing.propertyName} is now live.".tr,
         );
         return;
@@ -320,20 +321,20 @@ class _MyPropertiesScreenState extends State<MyPropertiesScreen> {
 
       switch (outcome) {
         case StripePaymentOutcome.success:
-          Fluttertoast.showToast(
+          AppToast.show(
             msg: "${listing.propertyName} has been activated.".tr,
           );
           await controller.fetchProperties(showLoader: false);
           break;
 
         case StripePaymentOutcome.cancelled:
-          Fluttertoast.showToast(
+          AppToast.show(
             msg: "You can try again anytime.".tr,
           );
           break;
       }
     } catch (e) {
-      Fluttertoast.showToast(
+      AppToast.show(
         msg: e.toString().replaceFirst("Exception: ", ""),
       );
     }
@@ -547,7 +548,7 @@ class _PropertyCard extends StatelessWidget {
         const SizedBox(height: 8),
 
         Text(
-          "QAR ${_formatPrice(listing.price)}"
+          "${"QAR".tr} ${_formatPrice(listing.price)}"
           "${listing.purpose == "RENT" ? " / month".tr : ""}",
           style: const TextStyle(
             fontWeight: FontWeight.w600,

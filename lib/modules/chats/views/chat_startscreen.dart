@@ -13,6 +13,7 @@ import 'package:villas_qatar/modules/chats/widgets/quick_replay_Section.dart';
 import 'package:villas_qatar/modules/propertylist/model/myproperty_model.dart';
 import 'package:villas_qatar/modules/support/service/support_ticket_controller.dart';
 
+import 'package:villas_qatar/Core/utils/app_toast.dart';
 class ChatStartScreen extends StatelessWidget {
   final Listing? listing;
   final Property? property;
@@ -582,7 +583,7 @@ class ChatStartScreen extends StatelessWidget {
     debugPrint("FINAL REPORTED USER ID: $reportedUserId");
 
     if (reportedUserId.isEmpty) {
-      Fluttertoast.showToast(
+      AppToast.show(
         msg: "Unable to identify the user".tr,
         toastLength: Toast.LENGTH_SHORT,
         gravity: ToastGravity.BOTTOM,
@@ -657,7 +658,7 @@ class _ReportUserBottomSheetState extends State<ReportUserBottomSheet> {
 
   Future<void> _submitReport() async {
     if (_selectedReason == null) {
-      Fluttertoast.showToast(
+      AppToast.show(
         msg: "Please select a reason".tr,
         toastLength: Toast.LENGTH_SHORT,
         gravity: ToastGravity.BOTTOM,
@@ -703,7 +704,7 @@ class _ReportUserBottomSheetState extends State<ReportUserBottomSheet> {
 
       /// Show toast after this frame.
       WidgetsBinding.instance.addPostFrameCallback((_) {
-        Fluttertoast.showToast(
+        AppToast.show(
           msg: "Report submitted successfully".tr,
           toastLength: Toast.LENGTH_SHORT,
           gravity: ToastGravity.BOTTOM,
@@ -717,7 +718,7 @@ class _ReportUserBottomSheetState extends State<ReportUserBottomSheet> {
       _isSubmitting = false;
     });
 
-    Fluttertoast.showToast(
+    AppToast.show(
       msg: support.createError.isNotEmpty
           ? support.createError
           : "Unable to submit report".tr,

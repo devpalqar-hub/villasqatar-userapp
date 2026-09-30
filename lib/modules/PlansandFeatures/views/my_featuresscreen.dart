@@ -13,6 +13,7 @@ import 'package:villas_qatar/modules/PlansandFeatures/model/myfeatured_property.
 import 'package:villas_qatar/modules/PlansandFeatures/services/FeaturedPropertiesController.dart';
 import 'package:villas_qatar/modules/PlansandFeatures/services/receipt_pdf_service.dart';
 import 'package:villas_qatar/modules/propertydetailscreen/propertydetailscreen.dart';
+import 'package:villas_qatar/Core/utils/app_toast.dart';
 
 class MyFeaturedPropertiesScreen extends StatefulWidget {
   const MyFeaturedPropertiesScreen({
@@ -628,7 +629,7 @@ class _FeaturedEntryCardState extends State<_FeaturedEntryCard> {
       );
     } catch (_) {
       if (mounted) {
-        Fluttertoast.showToast(
+        AppToast.show(
           msg: 'Unable to generate receipt. Please try again'.tr,
         );
       }
@@ -781,7 +782,7 @@ class _FeaturedEntryCardState extends State<_FeaturedEntryCard> {
                 alignment: Alignment.centerRight,
                 child: Text(
                   entry.remainingDays > 0
-                      ? '${entry.remainingDays} days left'
+                      ? '@count days left'.trParams({'count': '${entry.remainingDays}'})
                       : 'Ends today'.tr,
                   style: TextStyle(
                     fontSize: 9.5.sp,
@@ -894,21 +895,21 @@ class _FeaturedEntryCardState extends State<_FeaturedEntryCard> {
     Color color;
 
     if (entry.isExpired) {
-      text = 'Expired';
+      text = 'Expired'.tr;
       color = Colors.grey;
     } else if (entry.isCurrentlyActive) {
-      text = 'Active';
+      text = 'Active'.tr;
       color = const Color(0xFF258A57);
     } else if (entry.isFailed) {
-      text = 'Failed';
+      text = 'Failed'.tr;
       color = Colors.red;
     } else if (entry.isPaid) {
-      text = 'Paid';
+      text = 'Paid'.tr;
       color = const Color(0xFF258A57);
     } else {
       text = entry.paymentStatusLabel.isNotEmpty
           ? entry.paymentStatusLabel
-          : 'Pending';
+          : 'Pending'.tr;
 
       color = Colors.orange;
     }

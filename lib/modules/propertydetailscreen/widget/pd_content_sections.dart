@@ -379,7 +379,7 @@ class PdSpecsSection extends StatelessWidget {
         '${PD.number(property.area)} ${'sqm'.tr}',
       ),
       if (furnishing.isNotEmpty)
-        (Icons.chair_outlined, 'Furnishing'.tr, furnishing),
+        (Icons.chair_outlined, 'Furnishing'.tr, furnishing.tr),
       if (property.livingRooms > 0)
         (Icons.weekend_outlined, 'Living Rooms'.tr, '${property.livingRooms}'),
       if (property.parkingSpaces > 0)

@@ -305,7 +305,7 @@ class PropertyCard extends StatelessWidget {
           "${property.bathrooms} ${(property.bathrooms == 1 ? "Bath" : "Baths").tr}",
         ),
       if (property.area > 0)
-        _Spec(Icons.square_foot_outlined, "${_formatArea(property.area)} m²"),
+        _Spec(Icons.square_foot_outlined, "${_formatArea(property.area)} ${"m²".tr}"),
     ];
 
     return PressableScale(
@@ -449,7 +449,7 @@ class PropertyCard extends StatelessWidget {
                                 child: RichText(
                                   text: TextSpan(
                                     text:
-                                        "QAR ${_priceFormat.format(property.price.round())}",
+                                        "${"QAR".tr} ${_priceFormat.format(property.price.round())}",
                                     style: AppTextStyles.title16.copyWith(
                                       color: AppColors.primary,
                                       fontWeight: FontWeight.bold,

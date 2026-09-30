@@ -7,6 +7,7 @@ import 'package:get/get.dart';
 import 'package:villas_qatar/modules/propertydetailscreen/propertydetailscreen.dart';
 import 'package:villas_qatar/modules/propertydetailscreen/service/deeplink_controller.dart';
 import 'package:villas_qatar/modules/searchscreen/service/searchlist_screen.dart';
+import 'package:villas_qatar/Core/utils/app_toast.dart';
 
 class DeepLinkService {
   DeepLinkService._();
@@ -228,7 +229,7 @@ class DeepLinkService {
       if (property == null) {
         _lastHandledLink = null;
 
-        Fluttertoast.showToast(
+        AppToast.show(
           msg: deepLinkController.error.isNotEmpty
               ? deepLinkController.error
               : "Unable to open this property".tr,
@@ -288,7 +289,7 @@ Get.to(
         "Open App Link Property Error: $e",
       );
 
-      Fluttertoast.showToast(
+      AppToast.show(
         msg: "Unable to open this property".tr,
       );
     }

@@ -9,6 +9,7 @@ import 'package:villas_qatar/modules/PlansandFeatures/services/plan_controller.d
 import 'package:villas_qatar/modules/propertylist/model/myproperty_model.dart';
 import 'package:villas_qatar/modules/propertylist/service/myproperties_listcontroller.dart';
 import 'package:villas_qatar/modules/searchscreen/service/searchlist_screen.dart';
+import 'package:villas_qatar/Core/utils/app_toast.dart';
 
 class BoostPropertyScreen extends StatefulWidget {
   const BoostPropertyScreen({super.key});
@@ -625,7 +626,7 @@ class _BoostPropertyScreenState extends State<BoostPropertyScreen> {
       final dynamic value = property.price;
 
       if (value != null) {
-        return "QAR $value";
+        return "${"QAR".tr} $value";
       }
     } catch (_) {}
 
@@ -1171,7 +1172,7 @@ class _BoostPropertyScreenState extends State<BoostPropertyScreen> {
 
   Future<void> _continueToPayment(FeaturedPlanModel plan) async {
     if (selectedProperty == null) {
-      Fluttertoast.showToast(
+      AppToast.show(
         msg: "Please select a property to boost".tr,
       );
 
@@ -1217,7 +1218,7 @@ class _BoostPropertyScreenState extends State<BoostPropertyScreen> {
 
       switch (outcome) {
         case StripePaymentOutcome.success:
-          Fluttertoast.showToast(
+          AppToast.show(
             msg: "${plan.name} has been activated for your property.".tr,
           );
 
@@ -1226,14 +1227,14 @@ class _BoostPropertyScreenState extends State<BoostPropertyScreen> {
           break;
 
         case StripePaymentOutcome.cancelled:
-          Fluttertoast.showToast(
+          AppToast.show(
             msg: "You can try again anytime.".tr,
           );
 
           break;
       }
     } catch (e) {
-      Fluttertoast.showToast(
+      AppToast.show(
         msg: e.toString().replaceFirst("Exception: ", ""),
       );
     }

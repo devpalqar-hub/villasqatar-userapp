@@ -49,7 +49,7 @@ class BottomActionCard extends StatelessWidget {
                     TextSpan(
                       children: [
                         TextSpan(
-                          text: "QAR ",
+                          text: "${"QAR".tr} ",
                           style: TextStyle(
                             fontSize: 11.sp,
                             fontWeight: FontWeight.w700,

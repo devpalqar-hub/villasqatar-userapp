@@ -339,7 +339,7 @@ class _MyTicketScreenState extends State<MyTicketScreen> {
               ? word
               : "${word[0].toUpperCase()}${word.substring(1)}",
         )
-        .join(" ");
+        .join(" ").tr;
   }
 
   String _categoryLabel(String category) {

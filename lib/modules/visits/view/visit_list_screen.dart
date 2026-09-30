@@ -952,7 +952,7 @@ class _VisitListScreenState extends State<VisitListScreen> {
               ? ""
               : "${word[0].toUpperCase()}${word.substring(1)}",
         )
-        .join(" ");
+        .join(" ").tr;
   }
 
   // ============================================================

@@ -8,6 +8,8 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_stripe/flutter_stripe.dart';
 import 'package:get/get.dart';
+import 'package:intl/date_symbol_data_local.dart';
+import 'package:intl/intl.dart' show Intl;
 
 import 'package:villas_qatar/Core/constants/stripe_config.dart';
 import 'package:villas_qatar/Core/services/deep_link_service.dart';
@@ -34,6 +36,9 @@ Future<void> main() async {
   // Storage
   // ------------------------------------------------------------
   await StorageService.init();
+
+  // Locale data so DateFormat can render Arabic month/day names.
+  await initializeDateFormatting();
 
   // ------------------------------------------------------------
   // Firebase
@@ -176,7 +181,7 @@ class _VillasQatarAppState extends State<VillasQatarApp> {
               // ----------------------------------------------------
               debugShowCheckedModeBanner: false,
 
-              title: 'Villas Qatar',
+              onGenerateTitle: (_) => 'Villas Qatar'.tr,
 
               useInheritedMediaQuery: true,
 
@@ -211,6 +216,9 @@ class _VillasQatarAppState extends State<VillasQatarApp> {
                     Get.locale ??
                     DevicePreview.locale(context) ??
                     const Locale('en', 'US');
+
+                // Keep DateFormat/NumberFormat in step with the app language.
+                Intl.defaultLocale = locale.languageCode;
 
                 return Directionality(
                   textDirection: locale.languageCode == 'ar'

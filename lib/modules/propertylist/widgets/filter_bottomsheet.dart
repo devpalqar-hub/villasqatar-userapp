@@ -4,9 +4,11 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get_core/src/get_main.dart';
 import 'package:get/get_instance/src/extension_instance.dart';
 import 'package:get/get_navigation/src/extension_navigation.dart';
+import 'package:get/get_state_manager/src/simple/get_state.dart';
 import 'package:get/get_utils/src/extensions/internacionalization.dart';
 import 'package:villas_qatar/Core/theme/app_textstyles.dart';
 import 'package:villas_qatar/core/constants/app_colors.dart';
+import 'package:villas_qatar/modules/home/service/UtilsController.dart';
 import 'package:villas_qatar/modules/propertylist/service/myproperties_listcontroller.dart';
 
 void showFilterBottomSheet(BuildContext context) {
@@ -165,27 +167,30 @@ void showFilterBottomSheet(BuildContext context) {
                           sectionTitle("Furnishing".tr),
 
                           card(
-                            child: Wrap(
-                              spacing: 10.w,
-                              runSpacing: 10.h,
-                              children:
-                                  [
-                                    "Furnished",
-                                    "Semi-Furnished",
-                                    "Unfurnished",
-                                  ].map((e) {
-                                    return chip(
-                                      title: e.tr,
-                                      selected: furnishing == e,
-                                      onTap: () {
-                                        setState(() {
-                                          furnishing = furnishing == e
-                                              ? null
-                                              : e;
-                                        });
-                                      },
-                                    );
-                                  }).toList(),
+                            // Furnishing options come from the same
+                            // /api/listings/options list the Search screen
+                            // uses — no hardcoded status names here.
+                            child: GetBuilder<Utilscontroller>(
+                              init: Get.isRegistered<Utilscontroller>()
+                                  ? Get.find<Utilscontroller>()
+                                  : Get.put(Utilscontroller(), permanent: true),
+                              builder: (utils) => Wrap(
+                                spacing: 10.w,
+                                runSpacing: 10.h,
+                                children: utils.furnishingOptions.map((option) {
+                                  return chip(
+                                    title: option.title.tr,
+                                    selected: furnishing == option.title,
+                                    onTap: () {
+                                      setState(() {
+                                        furnishing = furnishing == option.title
+                                            ? null
+                                            : option.title;
+                                      });
+                                    },
+                                  );
+                                }).toList(),
+                              ),
                             ),
                           ),
 

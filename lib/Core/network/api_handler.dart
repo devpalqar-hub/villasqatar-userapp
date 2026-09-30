@@ -6,6 +6,7 @@ import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
 
 import 'package:villas_qatar/Core/services/storage_service.dart';
+import 'package:villas_qatar/Core/utils/message_localizer.dart';
 import 'package:villas_qatar/modules/onboard/controller/auth_controller.dart';
 import 'package:villas_qatar/modules/onboard/views/welcome_screen.dart';
 
@@ -307,22 +308,22 @@ class ApiHandler {
       final dynamic message = data["message"];
 
       if (message is String && message.isNotEmpty) {
-        return message;
+        return message.trMsg;
       }
 
       if (message is List) {
-        return message.join(", ");
+        return message.map((e) => e.toString().trMsg).join(", ");
       }
 
       final dynamic error = data["error"];
 
       if (error is String && error.isNotEmpty) {
-        return error;
+        return error.trMsg;
       }
     }
 
     if (data is String && data.isNotEmpty) {
-      return data;
+      return data.trMsg;
     }
 
     return fallback;

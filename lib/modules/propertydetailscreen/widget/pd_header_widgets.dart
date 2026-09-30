@@ -285,7 +285,7 @@ class PdPriceConsole extends StatelessWidget {
                       textBaseline: TextBaseline.alphabetic,
                       children: [
                         Text(
-                          'QAR',
+                          'QAR'.tr,
                           style: TextStyle(
                             fontSize: 15.sp,
                             fontWeight: FontWeight.w700,

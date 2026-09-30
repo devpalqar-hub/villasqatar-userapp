@@ -28,6 +28,7 @@ import 'package:villas_qatar/modules/propertylist/views/add_listproperty.dart';
 import 'package:villas_qatar/modules/searchscreen/service/searchlist_screen.dart';
 import 'package:villas_qatar/modules/support/service/support_ticket_controller.dart';
 
+import 'package:villas_qatar/Core/utils/app_toast.dart';
 class PropertyDetailsScreen extends StatefulWidget {
   final String propertyId;
 
@@ -317,7 +318,7 @@ class _PropertyDetailsScreenState extends State<PropertyDetailsScreen> {
     final String propertyId = property.id?.toString().trim() ?? "";
 
     if (propertyId.isEmpty) {
-      Fluttertoast.showToast(msg: "Property ID is missing..".tr);
+      AppToast.show(msg: "Property ID is missing..".tr);
       return;
     }
 
@@ -477,7 +478,7 @@ class _PropertyDetailsScreenState extends State<PropertyDetailsScreen> {
                           if (success) {
                             await controller.fetchPropertyDetails(propertyId);
 
-                            Fluttertoast.showToast(
+                            AppToast.show(
                               msg: "Property marked as sold successfully".tr,
                               toastLength: Toast.LENGTH_SHORT,
                               gravity: ToastGravity.BOTTOM,
@@ -486,7 +487,7 @@ class _PropertyDetailsScreenState extends State<PropertyDetailsScreen> {
                               fontSize: 14.sp,
                             );
                           } else {
-                            Fluttertoast.showToast(
+                            AppToast.show(
                               msg:
                                   myPropertyController
                                       .markAsSoldError
@@ -542,7 +543,7 @@ class _PropertyDetailsScreenState extends State<PropertyDetailsScreen> {
   void _onBoostProperty(dynamic property) {
     final String id = property.id?.toString().trim() ?? '';
     if (id.isEmpty) {
-      Fluttertoast.showToast(msg: "Property ID is missing.".tr);
+      AppToast.show(msg: "Property ID is missing.".tr);
       return;
     }
 
@@ -580,12 +581,12 @@ class _PropertyDetailsScreenState extends State<PropertyDetailsScreen> {
     debugPrint("REPORTED USER ID: $reportedUserId");
 
     if (listingId.isEmpty) {
-      Fluttertoast.showToast(msg: "Property information is not available.".tr);
+      AppToast.show(msg: "Property information is not available.".tr);
       return;
     }
 
     if (reportedUserId.isEmpty) {
-      Fluttertoast.showToast(
+      AppToast.show(
         msg: "Logged-in user information is not available.".tr,
       );
       return;
@@ -1122,13 +1123,13 @@ class _PropertyDetailsScreenState extends State<PropertyDetailsScreen> {
     }
 
     if (reportSubmitted) {
-      Fluttertoast.showToast(
+      AppToast.show(
         msg: "Thank you. Our support team will review this listing.".tr,
         backgroundColor: Colors.green.shade700,
         textColor: Colors.white,
       );
     } else if (submitError != null && submitError!.isNotEmpty) {
-      Fluttertoast.showToast(
+      AppToast.show(
         msg: submitError!,
         backgroundColor: Colors.red.shade700,
         textColor: Colors.white,
