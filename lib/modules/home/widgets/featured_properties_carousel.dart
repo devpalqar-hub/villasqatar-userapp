@@ -133,7 +133,7 @@ class _FeaturedPropertiesCarouselState
           // the left edge keep painting over it (clipBehavior.none below).
           padding: EdgeInsetsDirectional.only(start: 20.w),
           child: SizedBox(
-            height: 220.h,
+            height: 235.h,
             child: NotificationListener<ScrollNotification>(
               onNotification: (notification) {
                 if (notification.depth != 0) {

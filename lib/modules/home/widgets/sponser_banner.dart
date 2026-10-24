@@ -34,9 +34,9 @@ class InvestmentBanner extends StatelessWidget {
       child: Container(
         width: double.infinity,
         height: 150.h,
-        decoration: BoxDecoration(borderRadius: BorderRadius.circular(18.r)),
+        decoration: BoxDecoration(borderRadius: BorderRadius.circular(8.r)),
         child: ClipRRect(
-          borderRadius: BorderRadius.circular(18.r),
+          borderRadius: BorderRadius.circular(8.r),
           child: Stack(
             fit: StackFit.expand,
             children: [

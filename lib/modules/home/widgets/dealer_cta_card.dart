@@ -147,13 +147,13 @@ class DealerCtaCard extends StatelessWidget {
 
                 PressableScale(
                   child: InkWell(
-                    borderRadius: BorderRadius.circular(12.r),
+                    borderRadius: BorderRadius.circular(8.r),
                     onTap: onBecomeDealer,
                     child: Container(
                       height: 48.h,
                       decoration: BoxDecoration(
                         gradient: AppColors.ctaGradient,
-                        borderRadius: BorderRadius.circular(12.r),
+                        borderRadius: BorderRadius.circular(8.r),
                         boxShadow: [
                           BoxShadow(
                             color: AppColors.primary.withOpacity(.22),
@@ -217,7 +217,7 @@ class _Feature extends StatelessWidget {
           height: 42.w,
           decoration: BoxDecoration(
             color: AppColors.maroonTint,
-            borderRadius: BorderRadius.circular(13.r),
+            borderRadius: BorderRadius.circular(8.r),
           ),
           child: Icon(icon, size: 19.sp, color: AppColors.primary),
         ),

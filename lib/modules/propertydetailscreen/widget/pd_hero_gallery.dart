@@ -223,7 +223,7 @@ class _PdHeroGalleryState extends State<PdHeroGallery> {
               height: _thumbSize.w,
               padding: const EdgeInsets.all(1.5),
               decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(13.r),
+                borderRadius: BorderRadius.circular(8.r),
                 border: Border.all(
                   color: active
                       ? AppColors.gold
@@ -240,7 +240,7 @@ class _PdHeroGalleryState extends State<PdHeroGallery> {
                     : null,
               ),
               child: ClipRRect(
-                borderRadius: BorderRadius.circular(10.r),
+                borderRadius: BorderRadius.circular(8.r),
                 child: Opacity(
                   opacity: active ? 1 : .72,
                   child: Image.network(
@@ -479,7 +479,7 @@ class _PdPhotoViewerState extends State<PdPhotoViewer> {
                         children: [
                           if (caption.isNotEmpty) ...[
                             PdGlass(
-                              borderRadius: BorderRadius.circular(16.r),
+                              borderRadius: BorderRadius.circular(8.r),
                               padding: EdgeInsets.symmetric(
                                 horizontal: 14.w,
                                 vertical: 10.h,
@@ -535,7 +535,7 @@ class _PdPhotoViewerState extends State<PdPhotoViewer> {
                 height: _thumbSize.w,
                 padding: const EdgeInsets.all(1.5),
                 decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(13.r),
+                  borderRadius: BorderRadius.circular(8.r),
                   border: Border.all(
                     color: active
                         ? AppColors.gold
@@ -552,7 +552,7 @@ class _PdPhotoViewerState extends State<PdPhotoViewer> {
                       : null,
                 ),
                 child: ClipRRect(
-                  borderRadius: BorderRadius.circular(10.r),
+                  borderRadius: BorderRadius.circular(8.r),
                   child: Opacity(
                     opacity: active ? 1 : .68,
                     child: Image.network(

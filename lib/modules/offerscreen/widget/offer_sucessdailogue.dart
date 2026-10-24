@@ -60,7 +60,7 @@ class OfferSuccessDialog extends StatelessWidget {
                   backgroundColor: AppColors.primary,
                   elevation: 0,
                   shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(14.r),
+                    borderRadius: BorderRadius.circular(8.r),
                   ),
                 ),
                 onPressed: () {

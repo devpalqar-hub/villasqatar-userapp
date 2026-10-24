@@ -396,12 +396,12 @@ class _PropertyCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return InkWell(
-      borderRadius: BorderRadius.circular(10.r),
+      borderRadius: BorderRadius.circular(8.r),
       onTap: onTap,
       child: Container(
         decoration: BoxDecoration(
           color: AppColors.cardBg,
-          borderRadius: BorderRadius.circular(10.r),
+          borderRadius: BorderRadius.circular(8.r),
           border: Border.all(color: AppColors.fieldBorder),
         ),
         padding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 8.h),
@@ -1055,7 +1055,7 @@ class _DescriptionSheetState extends State<_DescriptionSheet> {
                 height: 4.h,
                 decoration: BoxDecoration(
                   color: Colors.grey.shade300,
-                  borderRadius: BorderRadius.circular(10.r),
+                  borderRadius: BorderRadius.circular(8.r),
                 ),
               ),
             ),

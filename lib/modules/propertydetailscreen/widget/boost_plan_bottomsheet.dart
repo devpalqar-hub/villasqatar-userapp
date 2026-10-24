@@ -11,9 +11,9 @@ import 'package:villas_qatar/modules/propertylist/service/myproperties_listcontr
 
 import 'package:villas_qatar/Core/utils/app_toast.dart';
 class BoostPlanBottomSheet extends StatefulWidget {
-  final String propertyId;
+  final String carId;
 
-  const BoostPlanBottomSheet({super.key, required this.propertyId});
+  const BoostPlanBottomSheet({super.key, required this.carId});
 
   @override
   State<BoostPlanBottomSheet> createState() => _BoostPlanBottomSheetState();
@@ -241,7 +241,7 @@ class _BoostPlanBottomSheetState extends State<BoostPlanBottomSheet> {
       height: 46.h,
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(12.r),
+        borderRadius: BorderRadius.circular(8.r),
         border: Border.all(color: const Color(0xffE8E8E8)),
         boxShadow: [
           BoxShadow(
@@ -434,14 +434,14 @@ class _BoostPlanBottomSheetState extends State<BoostPlanBottomSheet> {
         onTap: () {
           controller.selectPlan(plan);
         },
-        borderRadius: BorderRadius.circular(14.r),
+        borderRadius: BorderRadius.circular(8.r),
         child: AnimatedContainer(
           duration: const Duration(milliseconds: 180),
           width: double.infinity,
           padding: EdgeInsets.all(12.w),
           decoration: BoxDecoration(
             color: Colors.white,
-            borderRadius: BorderRadius.circular(14.r),
+            borderRadius: BorderRadius.circular(8.r),
             border: Border.all(
               color: selected ? primaryColor : const Color(0xffEAEAEA),
               width: selected ? 1.4 : 1,
@@ -454,7 +454,7 @@ class _BoostPlanBottomSheetState extends State<BoostPlanBottomSheet> {
                 height: 42.w,
                 decoration: BoxDecoration(
                   color: primaryColor.withOpacity(.07),
-                  borderRadius: BorderRadius.circular(11.r),
+                  borderRadius: BorderRadius.circular(8.r),
                 ),
                 child: Icon(
                   _getPlanIcon(plan),
@@ -696,7 +696,7 @@ class _BoostPlanBottomSheetState extends State<BoostPlanBottomSheet> {
                       disabledBackgroundColor: primaryColor.withOpacity(.6),
                       elevation: 0,
                       shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12.r),
+                        borderRadius: BorderRadius.circular(8.r),
                       ),
                     ),
                     child: _isProcessingPayment
@@ -744,7 +744,7 @@ class _BoostPlanBottomSheetState extends State<BoostPlanBottomSheet> {
       padding: EdgeInsets.symmetric(vertical: 28.h),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(14.r),
+        borderRadius: BorderRadius.circular(8.r),
         border: Border.all(color: const Color(0xffEAEAEA)),
       ),
       child: Column(
@@ -779,7 +779,7 @@ class _BoostPlanBottomSheetState extends State<BoostPlanBottomSheet> {
       padding: EdgeInsets.all(16.w),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(12.r),
+        borderRadius: BorderRadius.circular(8.r),
         border: Border.all(color: Colors.grey.shade200),
       ),
       child: Column(
@@ -824,7 +824,7 @@ class _BoostPlanBottomSheetState extends State<BoostPlanBottomSheet> {
       padding: EdgeInsets.symmetric(vertical: 25.h, horizontal: 16.w),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(12.r),
+        borderRadius: BorderRadius.circular(8.r),
         border: Border.all(color: Colors.grey.shade200),
       ),
       child: Column(
@@ -864,7 +864,7 @@ class _BoostPlanBottomSheetState extends State<BoostPlanBottomSheet> {
       return;
     }
 
-    final String listingId = widget.propertyId.trim();
+    final String listingId = widget.carId.trim();
 
     if (listingId.isEmpty) {
       AppToast.show(msg: "Property ID is missing.".tr);

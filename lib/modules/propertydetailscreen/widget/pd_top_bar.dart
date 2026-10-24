@@ -161,7 +161,7 @@ class _PdTopBarState extends State<PdTopBar> {
       color: Colors.white,
       elevation: 6,
       surfaceTintColor: Colors.white,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14.r)),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8.r)),
       onSelected: (String value) {
         if (value != 'report') return;
 
@@ -200,6 +200,8 @@ class _PdTopBarState extends State<PdTopBar> {
       child: const PdCircleButton(icon: Icons.more_vert_rounded),
     );
   }
+
+  
 
   // ===============================================================
   // SHARE

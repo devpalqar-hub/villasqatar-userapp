@@ -223,7 +223,7 @@ class _PriceEstimatorScreenState extends State<PriceEstimatorScreen> {
                 foregroundColor: Colors.white,
                 elevation: 0,
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12.r),
+                  borderRadius: BorderRadius.circular(8.r),
                 ),
               ),
               child: loading
@@ -270,7 +270,7 @@ class _PriceEstimatorScreenState extends State<PriceEstimatorScreen> {
       padding: EdgeInsets.all(14.w),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(12.r),
+        borderRadius: BorderRadius.circular(8.r),
         border: Border.all(color: AppColors.border),
       ),
       child: Column(
@@ -904,7 +904,7 @@ class _PriceEstimatorScreenState extends State<PriceEstimatorScreen> {
                 height: 4.h,
                 decoration: BoxDecoration(
                   color: const Color(0xFFDADADA),
-                  borderRadius: BorderRadius.circular(10.r),
+                  borderRadius: BorderRadius.circular(8.r),
                 ),
               ),
               SizedBox(height: 20.h),
@@ -929,7 +929,7 @@ class _PriceEstimatorScreenState extends State<PriceEstimatorScreen> {
                 padding: EdgeInsets.symmetric(vertical: 16.h),
                 decoration: BoxDecoration(
                   color: const Color(0xFFFAFAFB),
-                  borderRadius: BorderRadius.circular(12.r),
+                  borderRadius: BorderRadius.circular(8.r),
                   border: Border.all(color: AppColors.border),
                 ),
                 child: Row(
@@ -973,7 +973,7 @@ class _PriceEstimatorScreenState extends State<PriceEstimatorScreen> {
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppColors.primary,
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10.r),
+                      borderRadius: BorderRadius.circular(8.r),
                     ),
                   ),
                   child: Text(
@@ -1004,7 +1004,7 @@ class _PriceEstimatorScreenState extends State<PriceEstimatorScreen> {
       padding: EdgeInsets.all(12.w),
       decoration: BoxDecoration(
         color: const Color(0xFFFFF8E6),
-        borderRadius: BorderRadius.circular(12.r),
+        borderRadius: BorderRadius.circular(8.r),
         border: Border.all(color: AppColors.warning.withOpacity(.45)),
       ),
       child: Row(

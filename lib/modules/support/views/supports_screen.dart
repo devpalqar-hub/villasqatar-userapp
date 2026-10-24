@@ -132,7 +132,7 @@ class _SupportScreenState extends State<SupportScreen> {
                   padding: EdgeInsets.all(16.w),
                   decoration: BoxDecoration(
                     color: Colors.white,
-                    borderRadius: BorderRadius.circular(14.r),
+                    borderRadius: BorderRadius.circular(8.r),
                     border: Border.all(
                       color: AppColors.fieldBorder.withOpacity(.8),
                     ),
@@ -215,7 +215,7 @@ class _SupportScreenState extends State<SupportScreen> {
                   padding: EdgeInsets.all(13.w),
                   decoration: BoxDecoration(
                     color: AppColors.primary.withOpacity(.05),
-                    borderRadius: BorderRadius.circular(12.r),
+                    borderRadius: BorderRadius.circular(8.r),
                     border: Border.all(
                       color: AppColors.primary.withOpacity(.08),
                     ),
@@ -265,7 +265,7 @@ class _SupportScreenState extends State<SupportScreen> {
                       foregroundColor: Colors.white,
                       elevation: 0,
                       shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(11.r),
+                        borderRadius: BorderRadius.circular(8.r),
                       ),
                     ),
                     child: supportController.isCreating
@@ -311,7 +311,7 @@ class _SupportScreenState extends State<SupportScreen> {
       padding: EdgeInsets.all(18.w),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(16.r),
+        borderRadius: BorderRadius.circular(8.r),
         border: Border.all(color: AppColors.fieldBorder.withOpacity(.8)),
         boxShadow: [
           BoxShadow(
@@ -328,7 +328,7 @@ class _SupportScreenState extends State<SupportScreen> {
             height: 52.w,
             decoration: BoxDecoration(
               color: AppColors.primary.withOpacity(.08),
-              borderRadius: BorderRadius.circular(14.r),
+              borderRadius: BorderRadius.circular(8.r),
             ),
             child: Icon(
               Icons.support_agent_rounded,
@@ -385,7 +385,7 @@ class _SupportScreenState extends State<SupportScreen> {
     return Material(
       color: Colors.transparent,
       child: InkWell(
-        borderRadius: BorderRadius.circular(13.r),
+        borderRadius: BorderRadius.circular(8.r),
         onTap: () {
           setState(() {
             selectedCategory = category;
@@ -399,7 +399,7 @@ class _SupportScreenState extends State<SupportScreen> {
             color: selected
                 ? AppColors.primary.withOpacity(.055)
                 : Colors.white,
-            borderRadius: BorderRadius.circular(13.r),
+            borderRadius: BorderRadius.circular(8.r),
             border: Border.all(
               color: selected ? AppColors.primary : AppColors.fieldBorder,
               width: selected ? 1.2 : 1,
@@ -412,7 +412,7 @@ class _SupportScreenState extends State<SupportScreen> {
                 height: 42.w,
                 decoration: BoxDecoration(
                   color: AppColors.primary.withOpacity(.08),
-                  borderRadius: BorderRadius.circular(11.r),
+                  borderRadius: BorderRadius.circular(8.r),
                 ),
                 child: Icon(icon, color: AppColors.primary, size: 21.sp),
               ),
@@ -481,17 +481,17 @@ class _SupportScreenState extends State<SupportScreen> {
       contentPadding: EdgeInsets.symmetric(horizontal: 13.w, vertical: 13.h),
 
       border: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(10.r),
+        borderRadius: BorderRadius.circular(8.r),
         borderSide: const BorderSide(color: Color(0xFFEAEAEA)),
       ),
 
       enabledBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(10.r),
+        borderRadius: BorderRadius.circular(8.r),
         borderSide: const BorderSide(color: Color(0xFFEAEAEA)),
       ),
 
       focusedBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(10.r),
+        borderRadius: BorderRadius.circular(8.r),
         borderSide: BorderSide(color: AppColors.primary, width: 1.2),
       ),
     );

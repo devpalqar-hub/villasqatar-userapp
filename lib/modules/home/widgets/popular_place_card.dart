@@ -19,14 +19,14 @@ class PopularPlaceCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return PressableScale(
       child: InkWell(
-        borderRadius: BorderRadius.circular(16.r),
+        borderRadius: BorderRadius.circular(8.r),
         onTap: onTap,
         child: Container(
           width: 210.w,
           padding: EdgeInsets.fromLTRB(14.w, 14.h, 12.w, 14.h),
           decoration: BoxDecoration(
             color: AppColors.white,
-            borderRadius: BorderRadius.circular(16.r),
+            borderRadius: BorderRadius.circular(8.r),
             border: Border.all(color: AppColors.coolBorder),
           ),
           child: Row(
@@ -37,7 +37,7 @@ class PopularPlaceCard extends StatelessWidget {
                 height: 40.w,
                 decoration: BoxDecoration(
                   color: AppColors.maroonTint,
-                  borderRadius: BorderRadius.circular(12.r),
+                  borderRadius: BorderRadius.circular(8.r),
                 ),
                 child: Icon(
                   Icons.location_on_outlined,

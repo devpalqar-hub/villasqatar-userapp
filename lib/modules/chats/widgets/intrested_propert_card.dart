@@ -40,7 +40,7 @@ class InterestedPropertyCard extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               ClipRRect(
-                borderRadius: BorderRadius.circular(10.r),
+                borderRadius: BorderRadius.circular(8.r),
                 child: Image.network(
                   listing.photos.isNotEmpty
                       ? listing.photos.first.url
@@ -54,7 +54,7 @@ class InterestedPropertyCard extends StatelessWidget {
                       height: 72.w,
                       decoration: BoxDecoration(
                         color: Colors.grey.shade200,
-                        borderRadius: BorderRadius.circular(10.r),
+                        borderRadius: BorderRadius.circular(8.r),
                       ),
                       child: const Icon(
                         Icons.home,

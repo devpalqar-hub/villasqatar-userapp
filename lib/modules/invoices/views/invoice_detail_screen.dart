@@ -291,7 +291,7 @@ class _TopSummaryCard extends StatelessWidget {
                   height: 40.w,
                   decoration: BoxDecoration(
                     color: AppColors.primarySoft,
-                    borderRadius: BorderRadius.circular(12.r),
+                    borderRadius: BorderRadius.circular(8.r),
                   ),
                   child: Icon(
                     Icons.description_outlined,
@@ -851,7 +851,7 @@ class _CardShell extends StatelessWidget {
       padding: padding,
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(14.r),
+        borderRadius: BorderRadius.circular(8.r),
         border: Border.all(color: AppColors.fieldBorder),
       ),
       child: child,
@@ -1033,7 +1033,7 @@ class _StatusChip extends StatelessWidget {
       padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 2.h),
       decoration: BoxDecoration(
         color: bg,
-        borderRadius: BorderRadius.circular(18.r),
+        borderRadius: BorderRadius.circular(8.r),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,

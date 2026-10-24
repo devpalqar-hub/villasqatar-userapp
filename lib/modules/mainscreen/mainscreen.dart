@@ -1,30 +1,23 @@
+
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
+
+import 'package:villas_qatar/Core/constants/app_colors.dart';
 import 'package:villas_qatar/Core/utils/auth_guard.dart';
-import 'package:villas_qatar/modules/chats/views/chatlistscreen.dart';
 import 'package:villas_qatar/modules/home/views/home_screen.dart';
+import 'package:villas_qatar/modules/pricestimator/views/price_estimator_screen.dart';
 import 'package:villas_qatar/modules/propertylist/views/Mypropertiesscreen.dart';
 import 'package:villas_qatar/modules/searchscreen/service/searchlist_screen.dart';
 import 'package:villas_qatar/modules/searchscreen/view/search_screen.dart';
 import 'package:villas_qatar/modules/settings/view/setting_screen.dart';
 
-/// App shell. Home is the only screen that lives here — there is no bottom
-/// navigation bar. Every other destination (Search, My Properties, Chats,
-/// Profile) opens as a regular pushed screen on top of Home, so the back
-/// button always returns to Home.
 class MainScreen extends StatefulWidget {
-  /// Screen to open on top of Home right after it appears:
-  /// 0 = none (just Home), 1 = Search, 2 = My Properties, 3 = Chats,
-  /// 4 = Profile.
   final int initialIndex;
-
   final String? initialSearch;
   final String? initialType;
   final String? initialPurpose;
   final String? initialCategory;
-
-  /// Municipality to pre-filter the search by — used when a popular place
-  /// is tapped on Home. Maps to the API's `municipalityId` query parameter.
   final String? initialLocationId;
 
   const MainScreen({
@@ -42,103 +35,283 @@ class MainScreen extends StatefulWidget {
 }
 
 class _MainScreenState extends State<MainScreen> {
+
+  static const Color _inactiveColor = Color(0xFF667085);
+
+  late int _selectedTab;
+
   PropertySearchController get _searchController =>
       Get.isRegistered<PropertySearchController>()
-      ? Get.find<PropertySearchController>()
-      : Get.put(PropertySearchController(), permanent: true);
+          ? Get.find<PropertySearchController>()
+          : Get.put(PropertySearchController(), permanent: true);
 
   @override
   void initState() {
     super.initState();
 
-    /// Get or create ONE search controller
+    _selectedTab = widget.initialIndex.clamp(0, 4);
+
     final controller = _searchController;
 
-    /// Apply initial SEARCH if provided
-    if (widget.initialSearch != null &&
-        widget.initialSearch!.trim().isNotEmpty) {
+    if (widget.initialSearch?.trim().isNotEmpty ?? false) {
       controller.filter.search = widget.initialSearch!.trim();
-
       controller.searchTextController.text = widget.initialSearch!.trim();
     }
 
-    /// Apply initial PROPERTY TYPE if provided
-    if (widget.initialType != null && widget.initialType!.trim().isNotEmpty) {
+    if (widget.initialType?.trim().isNotEmpty ?? false) {
       controller.filter.type = widget.initialType!.trim();
     }
 
-    /// Apply initial BUY / RENT
-    if (widget.initialPurpose != null &&
-        widget.initialPurpose!.trim().isNotEmpty) {
-      controller.filter.purpose = widget.initialPurpose!.trim().toUpperCase();
+    if (widget.initialPurpose?.trim().isNotEmpty ?? false) {
+      controller.filter.purpose =
+          widget.initialPurpose!.trim().toUpperCase();
     }
 
-    /// Apply initial category if needed
-    if (widget.initialCategory != null &&
-        widget.initialCategory!.trim().isNotEmpty) {
+    if (widget.initialCategory?.trim().isNotEmpty ?? false) {
       controller.filter.type = widget.initialCategory!.trim();
     }
 
-    /// Apply initial MUNICIPALITY if provided
-    if (widget.initialLocationId != null &&
-        widget.initialLocationId!.trim().isNotEmpty) {
+    if (widget.initialLocationId?.trim().isNotEmpty ?? false) {
       controller.filter.locationId = widget.initialLocationId!.trim();
     }
 
-    /// Opened straight onto another screen (e.g. after listing a property):
-    /// show Home first so there is something to go back to, then push it.
-    if (widget.initialIndex != 0) {
+    if (_selectedTab == 1) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) {
+          _searchController.fetchProperties();
+        }
+      });
+    }
+
+    // Validate protected initial tabs after the first frame.
+    if (_selectedTab == 2 || _selectedTab == 3) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if (!mounted) return;
 
-        if (widget.initialIndex == 1) {
-          controller.fetchProperties();
-        }
+        final message = _selectedTab == 2
+            ? 'Please login to manage your properties.'.tr
+            : 'Please login to access AI Price.'.tr;
 
-        _openScreen(widget.initialIndex);
+        if (!AuthGuard.requireLogin(message: message)) {
+          setState(() => _selectedTab = 0);
+        }
       });
     }
   }
 
   void _openScreen(int index) {
-    switch (index) {
-      case 1:
-        Get.to(() => SearchScreen());
-        break;
-      case 2:
-        if (!AuthGuard.requireLogin(
-          message: "Please login to manage your properties.".tr,
-        )) {
-          return;
-        }
-        Get.to(() => const MyPropertiesScreen());
-        break;
-      case 3:
-        if (!AuthGuard.requireLogin(
-          message: "Please login to access your chats.".tr,
-        )) {
-          return;
-        }
-        Get.to(() => ChatListScreen());
-        break;
-      case 4:
-        Get.to(() => SettingsScreen());
-        break;
+    if (index < 0 || index > 4) return;
+
+    if (index == 2) {
+      if (!AuthGuard.requireLogin(
+        message: 'Please login to manage your properties.'.tr,
+      )) {
+        return;
+      }
     }
+
+    if (index == 3) {
+      if (!AuthGuard.requireLogin(
+        message: 'Please login to access AI Price.'.tr,
+      )) {
+        return;
+      }
+    }
+
+    if (index == 1) {
+      _searchController.fetchProperties();
+    }
+
+    setState(() {
+      _selectedTab = index;
+    });
   }
+
+  void _goHome() => _openScreen(0);
+
+  void _handleSellTap() => _openScreen(2);
+
+  void _handleAiPriceTap() => _openScreen(3);
 
   @override
   Widget build(BuildContext context) {
-    return HomeScreen(
-      onSearch: _handleHomeSearch,
-      onCategorySelected: _handleCategorySearch,
-      onPurposeSelected: _handlePurposeSearch,
-      onOpenSearch: _handleOpenSearch,
+    return Scaffold(
+      body: IndexedStack(
+        index: _selectedTab,
+        children: [
+          HomeScreen(
+            onSearch: _handleHomeSearch,
+            onCategorySelected: _handleCategorySearch,
+            onPurposeSelected: _handlePurposeSearch,
+            onOpenSearch: _handleOpenSearch,
+          ),
+          SearchScreen(),
+          const MyPropertiesScreen(),
+          PriceEstimatorScreen(),
+          SettingsScreen(),
+        ],
+      ),
+      bottomNavigationBar: _buildBottomNavigationBar(),
     );
   }
 
-  /// "See all" / popular place: open Search, optionally scoped to a
-  /// municipality.
+  Widget _buildBottomNavigationBar() {
+    return SafeArea(
+      top: false,
+      child: Container(
+        height: 82.h,
+        padding: EdgeInsets.fromLTRB(5.w, 5.h, 5.w, 5.h),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.07),
+              blurRadius: 14.r,
+              offset: Offset(0, -3.h),
+            ),
+          ],
+        ),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            _buildNavigationItem(
+              icon: Icons.home_outlined,
+              label: 'Home'.tr,
+              index: 0,
+              onTap: _goHome,
+            ),
+            _buildNavigationItem(
+              icon: Icons.search_rounded,
+              label: 'Explore'.tr,
+              index: 1,
+              onTap: () => _openScreen(1),
+            ),
+            Expanded(child: _buildSellItem()),
+            _buildNavigationItem(
+              icon: Icons.auto_awesome_outlined,
+              label: 'AI Price'.tr,
+              index: 3,
+              onTap: _handleAiPriceTap,
+            ),
+            _buildNavigationItem(
+              icon: Icons.person_outline_rounded,
+              label: 'Profile'.tr,
+              index: 4,
+              onTap: () => _openScreen(4),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildSellItem() {
+    final bool isSelected = _selectedTab == 2;
+
+    return Transform.translate(
+      offset: Offset(0, -5.h),
+      child: InkWell(
+        onTap: _handleSellTap,
+        borderRadius: BorderRadius.circular(30.r),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Container(
+              width: 48.w,
+              height: 48.w,
+              decoration: BoxDecoration(
+                color: AppColors.primary,
+                shape: BoxShape.circle,
+                boxShadow: [
+                  BoxShadow(
+                    color: AppColors.primary.withOpacity(0.28),
+                    blurRadius: 10.r,
+                    offset: Offset(0, 3.h),
+                  ),
+                ],
+              ),
+              child: Icon(
+                Icons.add_rounded,
+                color: Colors.white,
+                size: 32.sp,
+              ),
+            ),
+            SizedBox(height: 3.h),
+            Text(
+              'Sell'.tr,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(
+                fontSize: 10.sp,
+                fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
+                color: isSelected ? AppColors.primary : _inactiveColor,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildNavigationItem({
+    required IconData icon,
+    required String label,
+    required int index,
+    required VoidCallback onTap,
+  }) {
+    final bool isSelected = _selectedTab == index;
+
+    return Expanded(
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(16.r),
+        child: Padding(
+          padding: EdgeInsets.symmetric(
+            horizontal: 2.w,
+            vertical: 3.h,
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              AnimatedContainer(
+                duration: const Duration(milliseconds: 200),
+                width: 42.w,
+                height: 35.h,
+                alignment: Alignment.center,
+                decoration: BoxDecoration(
+                  color: isSelected
+                      ? AppColors.primaryLight
+                      : Colors.transparent,
+                  borderRadius: BorderRadius.circular(12.r),
+                ),
+                child: Icon(
+                  icon,
+                  size: 24.sp,
+                  color: isSelected ? AppColors.primary : _inactiveColor,
+                ),
+              ),
+              SizedBox(height: 3.h),
+              Text(
+                label,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: 10.sp,
+                  fontWeight:
+                      isSelected ? FontWeight.w700 : FontWeight.w500,
+                  color: isSelected ? AppColors.primary : _inactiveColor,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
   void _handleOpenSearch({String? locationId}) {
     final controller = _searchController;
 
@@ -147,23 +320,17 @@ class _MainScreenState extends State<MainScreen> {
     }
 
     controller.fetchProperties();
-
     _openScreen(1);
   }
 
   void _handleCategorySearch(String type) {
     final controller = _searchController;
 
-    // Clear previous property-name search
-    controller.filter.search = "";
+    controller.filter.search = '';
     controller.searchTextController.clear();
-
-    // Set selected category/type
     controller.filter.type = type;
 
     controller.update();
-
-    // Fetch filtered properties
     controller.fetchProperties();
 
     _openScreen(1);
@@ -175,16 +342,10 @@ class _MainScreenState extends State<MainScreen> {
     double? latitude,
     double? longitude,
   }) {
-    debugPrint("MAIN RECEIVED SEARCH: $propertyName ($purpose)");
-
     final controller = _searchController;
 
     controller.searchTextController.text = propertyName;
 
-    // Apply the query and the Rent/Sale toggle together in one fetch,
-    // so the Search screen (and its filter chips) opens already matching
-    // what was picked on the home banner. Coordinates carry over when the
-    // query came from picking a place out of the search autocomplete.
     controller.applyFilters(
       search: propertyName,
       purpose: purpose,
@@ -196,26 +357,14 @@ class _MainScreenState extends State<MainScreen> {
   }
 
   void _handlePurposeSearch(String purpose) {
-    debugPrint("PURPOSE CLICKED: $purpose");
-
     final controller = _searchController;
 
-    /// Clear previous property-name search
-    controller.filter.search = "";
+    controller.filter.search = '';
     controller.searchTextController.clear();
-
-    /// Clear previous category
-    controller.filter.type = "";
-
-    /// Set BUY or RENT
-    /// BUY  = SALE
-    /// RENT = RENT
+    controller.filter.type = '';
     controller.filter.purpose = purpose;
 
-    /// Rebuild SearchFilterCard
     controller.update();
-
-    /// Fetch filtered properties
     controller.fetchProperties();
 
     _openScreen(1);

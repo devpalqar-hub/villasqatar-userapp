@@ -252,7 +252,7 @@ class _HeroImageCardState extends State<HeroImageCard> {
                     elevation: 6,
                     surfaceTintColor: Colors.white,
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12.r),
+                      borderRadius: BorderRadius.circular(8.r),
                     ),
                     onSelected: (value) {
                       if (value == 'report') {
@@ -429,7 +429,7 @@ class _HeroImageCardState extends State<HeroImageCard> {
                 height: 4.h,
                 decoration: BoxDecoration(
                   color: Colors.grey.shade300,
-                  borderRadius: BorderRadius.circular(10.r),
+                  borderRadius: BorderRadius.circular(8.r),
                 ),
               ),
 

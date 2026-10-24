@@ -104,7 +104,7 @@ class EditProfileBottomSheet extends StatelessWidget {
                             foregroundColor: const Color(0xFF444444),
                             side: const BorderSide(color: Color(0xFFE2E2E2)),
                             shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(10.r),
+                              borderRadius: BorderRadius.circular(8.r),
                             ),
                             elevation: 0,
                           ),
@@ -143,7 +143,7 @@ class EditProfileBottomSheet extends StatelessWidget {
                             disabledForegroundColor: Colors.white,
                             elevation: 0,
                             shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(10.r),
+                              borderRadius: BorderRadius.circular(8.r),
                             ),
                           ),
                           child: controller.isSaving

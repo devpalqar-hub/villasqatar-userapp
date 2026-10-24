@@ -267,7 +267,7 @@ class SettingsSection extends StatelessWidget {
           elevation: 0,
           color: Colors.white,
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(16.r),
+            borderRadius: BorderRadius.circular(8.r),
             side: BorderSide(color: Colors.grey.shade200),
           ),
           child: ListView.separated(
@@ -296,7 +296,7 @@ class SettingTile extends StatelessWidget {
   Widget build(BuildContext context) {
     return InkWell(
       onTap: item.onTap,
-      borderRadius: BorderRadius.circular(16.r),
+      borderRadius: BorderRadius.circular(8.r),
       child: Padding(
         padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 14.h),
         child: Row(
@@ -306,7 +306,7 @@ class SettingTile extends StatelessWidget {
               height: 42.w,
               decoration: BoxDecoration(
                 color: AppColors.primary.withOpacity(.08),
-                borderRadius: BorderRadius.circular(12.r),
+                borderRadius: BorderRadius.circular(8.r),
               ),
               child: Icon(item.icon, color: AppColors.primary, size: 20.sp),
             ),
@@ -364,7 +364,7 @@ class ProfileHeader extends StatelessWidget {
             height: 95.h,
             decoration: BoxDecoration(
               color: AppColors.primary,
-              borderRadius: BorderRadius.circular(18.r),
+              borderRadius: BorderRadius.circular(8.r),
             ),
             child: const Center(
               child: CircularProgressIndicator(color: Colors.white),
@@ -382,7 +382,7 @@ class ProfileHeader extends StatelessWidget {
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
             ),
-            borderRadius: BorderRadius.circular(18.r),
+            borderRadius: BorderRadius.circular(8.r),
             boxShadow: [
               BoxShadow(
                 color: AppColors.primary.withOpacity(.12),
@@ -480,14 +480,14 @@ class QuickActionCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Material(
       color: Colors.white,
-      borderRadius: BorderRadius.circular(16.r),
+      borderRadius: BorderRadius.circular(8.r),
       child: InkWell(
         onTap: onTap,
-        borderRadius: BorderRadius.circular(16.r),
+        borderRadius: BorderRadius.circular(8.r),
         child: Ink(
           padding: EdgeInsets.symmetric(vertical: 10.h, horizontal: 5.w),
           decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(16.r),
+            borderRadius: BorderRadius.circular(8.r),
             border: Border.all(color: Colors.grey.shade200),
             boxShadow: [
               BoxShadow(
@@ -505,7 +505,7 @@ class QuickActionCard extends StatelessWidget {
                 height: 38.w,
                 decoration: BoxDecoration(
                   color: AppColors.primary.withOpacity(.08),
-                  borderRadius: BorderRadius.circular(10.r),
+                  borderRadius: BorderRadius.circular(8.r),
                 ),
                 child: Icon(icon, color: AppColors.primary, size: 22.sp),
               ),
@@ -558,7 +558,7 @@ class LogoutButton extends StatelessWidget {
           backgroundColor: Colors.white,
           side: BorderSide(color: Colors.red.shade100),
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(16.r),
+            borderRadius: BorderRadius.circular(8.r),
           ),
         ),
       ),
@@ -620,7 +620,7 @@ class LogoutButton extends StatelessWidget {
                       style: OutlinedButton.styleFrom(
                         minimumSize: Size.fromHeight(48.h),
                         shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(14.r),
+                          borderRadius: BorderRadius.circular(8.r),
                         ),
                       ),
                       child: Text(
@@ -653,7 +653,7 @@ class LogoutButton extends StatelessWidget {
                         minimumSize: Size.fromHeight(48.h),
                         elevation: 0,
                         shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(14.r),
+                          borderRadius: BorderRadius.circular(8.r),
                         ),
                       ),
                       child: Text(

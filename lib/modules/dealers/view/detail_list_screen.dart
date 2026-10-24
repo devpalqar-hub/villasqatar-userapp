@@ -154,15 +154,15 @@ class _SearchBar extends StatelessWidget {
           fillColor: Colors.white,
           contentPadding: EdgeInsets.symmetric(vertical: 13.h),
           border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(14.r),
+            borderRadius: BorderRadius.circular(8.r),
             borderSide: BorderSide.none,
           ),
           enabledBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(14.r),
+            borderRadius: BorderRadius.circular(8.r),
             borderSide: BorderSide(color: AppColors.border),
           ),
           focusedBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(14.r),
+            borderRadius: BorderRadius.circular(8.r),
             borderSide: BorderSide(color: AppColors.primary),
           ),
         ),
@@ -266,14 +266,14 @@ class DealerCard extends StatelessWidget {
     final profile = dealer.dealerProfile;
 
     return InkWell(
-      borderRadius: BorderRadius.circular(12.r),
+      borderRadius: BorderRadius.circular(8.r),
       onTap: () {
         Get.to(() => const DealerDetailsScreen(), arguments: dealer.id);
       },
       child: Container(
         decoration: BoxDecoration(
           color: AppColors.cardBg,
-          borderRadius: BorderRadius.circular(12.r),
+          borderRadius: BorderRadius.circular(8.r),
           border: Border.all(color: AppColors.fieldBorder),
         ),
         padding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 10.h),
@@ -471,11 +471,11 @@ class _Avatar extends StatelessWidget {
       width: size,
       height: size,
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(12.r),
+        borderRadius: BorderRadius.circular(8.r),
         border: Border.all(color: AppColors.fieldBorder),
       ),
       child: ClipRRect(
-        borderRadius: BorderRadius.circular(12.r),
+        borderRadius: BorderRadius.circular(8.r),
         child: logo.isNotEmpty
             ? Image.network(
                 logo,

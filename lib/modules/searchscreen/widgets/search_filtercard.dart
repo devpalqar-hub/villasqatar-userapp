@@ -178,7 +178,7 @@ class _SearchFilterCardState extends State<SearchFilterCard> {
       padding: EdgeInsets.all(14.w),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(16.r),
+        borderRadius: BorderRadius.circular(8.r),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withValues(alpha: .04),
@@ -806,7 +806,7 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
                 style: OutlinedButton.styleFrom(
                   side: const BorderSide(color: AppColors.primary),
                   shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10.r),
+                    borderRadius: BorderRadius.circular(8.r),
                   ),
                 ),
                 child: Text(
@@ -948,7 +948,7 @@ class _SheetDropdown<T> extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     OutlineInputBorder border(Color color) => OutlineInputBorder(
-      borderRadius: BorderRadius.circular(10.r),
+      borderRadius: BorderRadius.circular(8.r),
       borderSide: BorderSide(color: color),
     );
 
@@ -1007,7 +1007,7 @@ class CustomFilterChip extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return InkWell(
-      borderRadius: BorderRadius.circular(10.r),
+      borderRadius: BorderRadius.circular(8.r),
       onTap: onTap,
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 200),
@@ -1016,7 +1016,7 @@ class CustomFilterChip extends StatelessWidget {
           color: selected
               ? AppColors.primary.withValues(alpha: .08)
               : Colors.white,
-          borderRadius: BorderRadius.circular(10.r),
+          borderRadius: BorderRadius.circular(8.r),
           border: Border.all(
             color: selected ? AppColors.primary : const Color(0xffD8DCE5),
             width: 1.4,
@@ -1121,7 +1121,7 @@ class _NumberSpinnerFieldState extends State<NumberSpinnerField> {
       height: 42.h,
       decoration: BoxDecoration(
         border: Border.all(color: Colors.grey.shade200),
-        borderRadius: BorderRadius.circular(10.r),
+        borderRadius: BorderRadius.circular(8.r),
         color: Colors.white,
       ),
       child: Row(

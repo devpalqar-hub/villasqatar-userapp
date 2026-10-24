@@ -301,13 +301,13 @@ class _RoundIcon extends StatelessWidget {
   Widget build(BuildContext context) {
     return InkWell(
       onTap: onTap,
-      borderRadius: BorderRadius.circular(12.r),
+      borderRadius: BorderRadius.circular(8.r),
       child: Container(
         width: 30.w,
         height: 30.w,
         decoration: BoxDecoration(
           color: Colors.white,
-          borderRadius: BorderRadius.circular(12.r),
+          borderRadius: BorderRadius.circular(8.r),
           boxShadow: [
             BoxShadow(color: Colors.black.withOpacity(.08), blurRadius: 8),
           ],
@@ -488,7 +488,7 @@ class _ContactTile extends StatelessWidget {
           padding: EdgeInsets.all(8.w),
           decoration: BoxDecoration(
             color: AppColors.primarySoft,
-            borderRadius: BorderRadius.circular(10.r),
+            borderRadius: BorderRadius.circular(8.r),
           ),
           child: Icon(icon, size: 16.sp, color: AppColors.primary),
         ),
@@ -539,7 +539,7 @@ class _StatTile extends StatelessWidget {
               padding: EdgeInsets.all(8.w),
               decoration: BoxDecoration(
                 color: color.withOpacity(.12),
-                borderRadius: BorderRadius.circular(10.r),
+                borderRadius: BorderRadius.circular(8.r),
               ),
               child: Icon(icon, size: 16.sp, color: color),
             ),
@@ -662,7 +662,7 @@ class _PropertiesRow extends StatelessWidget {
           padding: EdgeInsets.symmetric(vertical: 10.h, horizontal: 20.w),
           decoration: BoxDecoration(
             color: Colors.white,
-            borderRadius: BorderRadius.circular(12.r),
+            borderRadius: BorderRadius.circular(8.r),
             border: Border.all(color: AppColors.border),
           ),
           child: Column(
@@ -744,7 +744,7 @@ class _PropertyCard extends StatelessWidget {
         width: 180.w,
         decoration: BoxDecoration(
           color: Colors.white,
-          borderRadius: BorderRadius.circular(12.r),
+          borderRadius: BorderRadius.circular(8.r),
           boxShadow: [
             BoxShadow(
               color: Colors.black.withOpacity(.05),
@@ -876,7 +876,7 @@ class _Card extends StatelessWidget {
       padding: EdgeInsets.all(16.w),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(16.r),
+        borderRadius: BorderRadius.circular(8.r),
         border: Border.all(color: AppColors.border),
       ),
       child: Column(
@@ -989,7 +989,7 @@ class _BottomActions extends StatelessWidget {
                 elevation: 0,
                 backgroundColor: AppColors.primary,
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10.r),
+                  borderRadius: BorderRadius.circular(8.r),
                 ),
               ),
             )
@@ -1008,7 +1008,7 @@ class _BottomActions extends StatelessWidget {
               style: OutlinedButton.styleFrom(
                 side: BorderSide(color: AppColors.primary),
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10.r),
+                  borderRadius: BorderRadius.circular(8.r),
                 ),
               ),
             ),

@@ -17,13 +17,13 @@ class WhyChooseCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return PressableScale(
       child: InkWell(
-        borderRadius: BorderRadius.circular(18.r),
+        borderRadius: BorderRadius.circular(8.r),
         onTap: onTap,
         child: Container(
           padding: EdgeInsets.all(14.w),
           decoration: BoxDecoration(
             color: AppColors.cream,
-            borderRadius: BorderRadius.circular(18.r),
+            borderRadius: BorderRadius.circular(8.r),
             border: Border.all(color: AppColors.warmBorder),
           ),
           child: Row(

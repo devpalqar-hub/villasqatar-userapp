@@ -19,7 +19,7 @@ class AgentContactCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return InkWell(
-       borderRadius: BorderRadius.circular(16.r),
+       borderRadius: BorderRadius.circular(8.r),
   onTap: () {
     final bool isDealer =
         property.createdBy.role.toUpperCase() == "DEALER";
@@ -45,7 +45,7 @@ class AgentContactCard extends StatelessWidget {
         padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 14.h),
        decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(16.r),
+        borderRadius: BorderRadius.circular(8.r),
          border: Border.all(color: const Color(0xffECECEC)),
         
         boxShadow: [

@@ -46,7 +46,7 @@ class QuickReplySection extends StatelessWidget {
                   width: 1,
                 ),
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10.r),
+                  borderRadius: BorderRadius.circular(8.r),
                 ),
                 padding: EdgeInsets.symmetric(
                   horizontal: 16.w,

@@ -8,36 +8,68 @@ import 'package:villas_qatar/modules/home/service/banner_controller.dart';
 import 'package:villas_qatar/modules/home/service/loaction_controller.dart';
 
 class Homecontroller extends GetxController {
-  FeaturedPropertiesController featureController = Get.put(
-    FeaturedPropertiesController(),
-  );
-  Utilscontroller utilsController = Get.isRegistered<Utilscontroller>()
-      ? Get.find<Utilscontroller>()
-      : Get.put(Utilscontroller(), permanent: true);
-  BannerController bannerController = Get.isRegistered<BannerController>()
-      ? Get.find<BannerController>()
-      : Get.put(BannerController(), permanent: true);
-  LocationController locationController = Get.isRegistered<LocationController>()
-      ? Get.find<LocationController>()
-      : Get.put(LocationController(), permanent: true);
-  DealerController dealerController = Get.isRegistered<DealerController>()
-      ? Get.find<DealerController>()
-      : Get.put(DealerController(), permanent: true);
+  late final FeaturedPropertiesController featureController;
+
+  late final Utilscontroller utilsController;
+  late final BannerController bannerController;
+  late final LocationController locationController;
+  late final DealerController dealerController;
 
   List<PropertyModel> featuredProperties = [];
 
+  @override
+  void onInit() {
+    super.onInit();
+
+    featureController = Get.isRegistered<FeaturedPropertiesController>()
+        ? Get.find<FeaturedPropertiesController>()
+        : Get.put(
+            FeaturedPropertiesController(),
+            permanent: true,
+          );
+
+    utilsController = Get.isRegistered<Utilscontroller>()
+        ? Get.find<Utilscontroller>()
+        : Get.put(Utilscontroller(), permanent: true);
+
+    bannerController = Get.isRegistered<BannerController>()
+        ? Get.find<BannerController>()
+        : Get.put(BannerController(), permanent: true);
+
+    locationController = Get.isRegistered<LocationController>()
+        ? Get.find<LocationController>()
+        : Get.put(LocationController(), permanent: true);
+
+    dealerController = Get.isRegistered<DealerController>()
+        ? Get.find<DealerController>()
+        : Get.put(DealerController(), permanent: true);
+
+    loadHomeScreenData();
+  }
+
   Future<void> loadHomeScreenData() async {
-    featuredProperties = await featureController.fetchFeatureProperty(
-      isHome: true,
-    );
+    try {
+      final properties = await featureController.fetchFeatureProperty(
+        isHome: true,
+      );
+
+      featuredProperties = properties;
+
+      print(
+        'HOME FEATURED PROPERTIES COUNT: ${featuredProperties.length}',
+      );
+
+      update();
+    } catch (e, stackTrace) {
+      print('HOME FEATURED PROPERTY ERROR: $e');
+      print(stackTrace);
+    }
+
     utilsController.fetchPropertyType();
     bannerController.fetchBanners();
     dealerController.fetchDealers();
-    update();
   }
 
-  /// Pull-to-refresh: reloads every home section and resolves once they have
-  /// all finished, so the refresh spinner stays up for the whole reload.
   Future<void> refreshHomeScreenData() async {
     await Future.wait([
       _refreshFeaturedProperties(),
@@ -50,16 +82,21 @@ class Homecontroller extends GetxController {
   }
 
   Future<void> _refreshFeaturedProperties() async {
-    featuredProperties = await featureController.fetchFeatureProperty(
-      isHome: true,
-    );
-    update();
-  }
+    try {
+      final properties = await featureController.fetchFeatureProperty(
+        isHome: true,
+      );
 
-  @override
-  void onInit() {
-    super.onInit();
+      featuredProperties = properties;
 
-    loadHomeScreenData();
+      print(
+        'REFRESH FEATURED COUNT: ${featuredProperties.length}',
+      );
+
+      update();
+    } catch (e, stackTrace) {
+      print('REFRESH FEATURED ERROR: $e');
+      print(stackTrace);
+    }
   }
 }

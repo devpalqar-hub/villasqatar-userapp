@@ -137,7 +137,7 @@ class PdListedByCard extends StatelessWidget {
               Expanded(
                 child: InkWell(
                   onTap: _openLister,
-                  borderRadius: BorderRadius.circular(10.r),
+                  borderRadius: BorderRadius.circular(8.r),
                   child: Padding(
                     padding: EdgeInsets.symmetric(vertical: 6.h),
                     child: Row(
@@ -328,16 +328,16 @@ class _IconAction extends StatelessWidget {
       message: tooltip,
       child: Material(
         color: background,
-        borderRadius: BorderRadius.circular(12.r),
+        borderRadius: BorderRadius.circular(8.r),
         child: InkWell(
           onTap: onTap,
-          borderRadius: BorderRadius.circular(12.r),
+          borderRadius: BorderRadius.circular(8.r),
           child: Container(
             width: 36.w,
             height: 36.w,
             alignment: Alignment.center,
             decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(12.r),
+              borderRadius: BorderRadius.circular(8.r),
               border: Border.all(color: border),
             ),
             child: icon,

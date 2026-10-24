@@ -80,7 +80,7 @@ class PropertyInsightsBottomSheet extends StatelessWidget {
                       alignment: Alignment.center,
                       decoration: BoxDecoration(
                         color: primaryColor.withOpacity(.08),
-                        borderRadius: BorderRadius.circular(12.r),
+                        borderRadius: BorderRadius.circular(8.r),
                       ),
                       child: Icon(
                         Icons.insights_rounded,
@@ -148,7 +148,7 @@ class PropertyInsightsBottomSheet extends StatelessWidget {
                     ),
                     decoration: BoxDecoration(
                       color: primaryColor.withOpacity(.05),
-                      borderRadius: BorderRadius.circular(14.r),
+                      borderRadius: BorderRadius.circular(8.r),
                     ),
                     child: Row(
                       children: [
@@ -270,7 +270,7 @@ class PropertyInsightsBottomSheet extends StatelessWidget {
       padding: EdgeInsets.all(16.w),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(18.r),
+        borderRadius: BorderRadius.circular(8.r),
         boxShadow: _cardShadow,
       ),
       child: Column(
@@ -411,7 +411,7 @@ class PropertyInsightsBottomSheet extends StatelessWidget {
         color: highlighted
             ? primaryColor.withOpacity(.05)
             : const Color(0xffFAFAFB),
-        borderRadius: BorderRadius.circular(14.r),
+        borderRadius: BorderRadius.circular(8.r),
         border: highlighted
             ? Border.all(color: primaryColor.withOpacity(.18))
             : null,
@@ -424,7 +424,7 @@ class PropertyInsightsBottomSheet extends StatelessWidget {
             alignment: Alignment.center,
             decoration: BoxDecoration(
               color: bgColor,
-              borderRadius: BorderRadius.circular(10.r),
+              borderRadius: BorderRadius.circular(8.r),
             ),
             child: glyph,
           ),
@@ -484,7 +484,7 @@ class PropertyInsightsBottomSheet extends StatelessWidget {
       padding: EdgeInsets.all(12.w),
       decoration: BoxDecoration(
         color: changeColor.withOpacity(.06),
-        borderRadius: BorderRadius.circular(14.r),
+        borderRadius: BorderRadius.circular(8.r),
       ),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -566,7 +566,7 @@ class PropertyInsightsBottomSheet extends StatelessWidget {
       padding: EdgeInsets.fromLTRB(12.w, 16.h, 18.w, 12.h),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(18.r),
+        borderRadius: BorderRadius.circular(8.r),
         boxShadow: _cardShadow,
       ),
       child: Column(
@@ -754,7 +754,7 @@ class PropertyInsightsBottomSheet extends StatelessWidget {
       padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 28.h),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(18.r),
+        borderRadius: BorderRadius.circular(8.r),
         boxShadow: _cardShadow,
       ),
       child: Column(

@@ -200,7 +200,7 @@ class ChatListingCard extends StatelessWidget {
     );
 
     return ClipRRect(
-      borderRadius: BorderRadius.circular(14.r),
+      borderRadius: BorderRadius.circular(8.r),
       child: (summary.photoUrl ?? '').isEmpty
           ? placeholder
           : Image.network(

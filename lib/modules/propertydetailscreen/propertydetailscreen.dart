@@ -261,7 +261,7 @@ class _PropertyDetailsScreenState extends State<PropertyDetailsScreen> {
             /// Normal = brand gradient, Sold = red
             gradient: isSold ? null : AppColors.ctaGradient,
             color: isSold ? const Color(0xFFD32F2F) : null,
-            borderRadius: BorderRadius.circular(16.r),
+            borderRadius: BorderRadius.circular(8.r),
             boxShadow: [
               BoxShadow(
                 color: (isSold ? const Color(0xFFD32F2F) : AppColors.primary)
@@ -285,7 +285,7 @@ class _PropertyDetailsScreenState extends State<PropertyDetailsScreen> {
               disabledForegroundColor: Colors.white,
               elevation: 0,
               shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(16.r),
+                borderRadius: BorderRadius.circular(8.r),
               ),
             ),
 
@@ -396,7 +396,7 @@ class _PropertyDetailsScreenState extends State<PropertyDetailsScreen> {
                 padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 10.h),
                 decoration: BoxDecoration(
                   color: const Color(0xFFF8F8F8),
-                  borderRadius: BorderRadius.circular(10.r),
+                  borderRadius: BorderRadius.circular(8.r),
                 ),
                 child: Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -442,7 +442,7 @@ class _PropertyDetailsScreenState extends State<PropertyDetailsScreen> {
                           side: const BorderSide(color: Color(0xFFE2E2E2)),
                           elevation: 0,
                           shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(10.r),
+                            borderRadius: BorderRadius.circular(8.r),
                           ),
                         ),
                         child: Text(
@@ -507,7 +507,7 @@ class _PropertyDetailsScreenState extends State<PropertyDetailsScreen> {
                           foregroundColor: Colors.white,
                           elevation: 0,
                           shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(10.r),
+                            borderRadius: BorderRadius.circular(8.r),
                           ),
                         ),
                         child: Row(
@@ -540,15 +540,15 @@ class _PropertyDetailsScreenState extends State<PropertyDetailsScreen> {
     );
   }
 
-  void _onBoostProperty(dynamic property) {
-    final String id = property.id?.toString().trim() ?? '';
+  void _onBoostProperty(dynamic car) {
+    final String id = car.id?.toString().trim() ?? '';
     if (id.isEmpty) {
       AppToast.show(msg: "Property ID is missing.".tr);
       return;
     }
 
     Get.bottomSheet(
-      BoostPlanBottomSheet(propertyId: id),
+      BoostPlanBottomSheet(carId: id),
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
       barrierColor: Colors.black.withOpacity(.45),
@@ -673,7 +673,7 @@ class _PropertyDetailsScreenState extends State<PropertyDetailsScreen> {
                             height: 38.w,
                             decoration: BoxDecoration(
                               color: const Color(0xFFFFF1F1),
-                              borderRadius: BorderRadius.circular(10.r),
+                              borderRadius: BorderRadius.circular(8.r),
                             ),
                             child: Icon(
                               Icons.flag_outlined,
@@ -782,7 +782,7 @@ class _PropertyDetailsScreenState extends State<PropertyDetailsScreen> {
                                             selectedReason = reason;
                                           });
                                         },
-                                  borderRadius: BorderRadius.circular(10.r),
+                                  borderRadius: BorderRadius.circular(8.r),
                                   child: AnimatedContainer(
                                     duration: const Duration(milliseconds: 150),
                                     width: double.infinity,
@@ -794,7 +794,7 @@ class _PropertyDetailsScreenState extends State<PropertyDetailsScreen> {
                                       color: isSelected
                                           ? AppColors.primary.withOpacity(.05)
                                           : Colors.white,
-                                      borderRadius: BorderRadius.circular(10.r),
+                                      borderRadius: BorderRadius.circular(8.r),
                                       border: Border.all(
                                         color: isSelected
                                             ? AppColors.primary
@@ -908,14 +908,14 @@ class _PropertyDetailsScreenState extends State<PropertyDetailsScreen> {
                                 contentPadding: EdgeInsets.all(13.w),
 
                                 enabledBorder: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(10.r),
+                                  borderRadius: BorderRadius.circular(8.r),
                                   borderSide: const BorderSide(
                                     color: Color(0xFFE5E5E5),
                                   ),
                                 ),
 
                                 focusedBorder: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(10.r),
+                                  borderRadius: BorderRadius.circular(8.r),
                                   borderSide: BorderSide(
                                     color: AppColors.primary,
                                     width: 1.2,
@@ -923,7 +923,7 @@ class _PropertyDetailsScreenState extends State<PropertyDetailsScreen> {
                                 ),
 
                                 disabledBorder: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(10.r),
+                                  borderRadius: BorderRadius.circular(8.r),
                                   borderSide: const BorderSide(
                                     color: Color(0xFFE5E5E5),
                                   ),
@@ -1071,7 +1071,7 @@ class _PropertyDetailsScreenState extends State<PropertyDetailsScreen> {
                             elevation: 0,
 
                             shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(10.r),
+                              borderRadius: BorderRadius.circular(8.r),
                             ),
                           ),
 
@@ -1156,7 +1156,7 @@ class _PropertyDetailsScreenState extends State<PropertyDetailsScreen> {
       color: Colors.transparent,
       child: InkWell(
         onTap: enabled ? onTap : null,
-        borderRadius: BorderRadius.circular(10.r),
+        borderRadius: BorderRadius.circular(8.r),
         child: AnimatedContainer(
           duration: const Duration(milliseconds: 150),
           width: double.infinity,
@@ -1165,7 +1165,7 @@ class _PropertyDetailsScreenState extends State<PropertyDetailsScreen> {
             color: selected
                 ? AppColors.primary.withOpacity(0.05)
                 : Colors.white,
-            borderRadius: BorderRadius.circular(10.r),
+            borderRadius: BorderRadius.circular(8.r),
             border: Border.all(
               color: selected ? AppColors.primary : const Color(0xFFE5E5E5),
               width: selected ? 1.2 : 1,

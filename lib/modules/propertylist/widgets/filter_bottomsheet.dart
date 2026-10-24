@@ -293,7 +293,7 @@ void showFilterBottomSheet(BuildContext context) {
                               style: OutlinedButton.styleFrom(
                                 side: BorderSide(color: AppColors.primary),
                                 shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(12.r),
+                                  borderRadius: BorderRadius.circular(8.r),
                                 ),
                               ),
                               onPressed: () {
@@ -338,7 +338,7 @@ void showFilterBottomSheet(BuildContext context) {
                                 backgroundColor: AppColors.primary,
                                 elevation: 0,
                                 shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(12.r),
+                                  borderRadius: BorderRadius.circular(8.r),
                                 ),
                               ),
                               onPressed: () {
@@ -413,16 +413,16 @@ Widget field(String hint, IconData icon, TextEditingController controller) {
         contentPadding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 12.h),
 
         enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12.r),
+          borderRadius: BorderRadius.circular(8.r),
           borderSide: BorderSide(color: AppColors.fieldBorder),
         ),
 
         focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12.r),
+          borderRadius: BorderRadius.circular(8.r),
           borderSide: BorderSide(color: AppColors.primary),
         ),
 
-        border: OutlineInputBorder(borderRadius: BorderRadius.circular(12.r)),
+        border: OutlineInputBorder(borderRadius: BorderRadius.circular(8.r)),
       ),
     ),
   );
@@ -455,7 +455,7 @@ Widget chip({
   return Material(
     color: Colors.transparent,
     child: InkWell(
-      borderRadius: BorderRadius.circular(12.r),
+      borderRadius: BorderRadius.circular(8.r),
       onTap: onTap,
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 220),
@@ -465,7 +465,7 @@ Widget chip({
         decoration: BoxDecoration(
           color: selected ? AppColors.primary.withOpacity(.08) : Colors.white,
 
-          borderRadius: BorderRadius.circular(12.r),
+          borderRadius: BorderRadius.circular(8.r),
 
           border: Border.all(
             color: selected ? AppColors.primary : AppColors.fieldBorder,

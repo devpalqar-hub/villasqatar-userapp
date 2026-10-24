@@ -35,13 +35,13 @@ class CategoryCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return PressableScale(
       child: InkWell(
-        borderRadius: BorderRadius.circular(18.r),
+        borderRadius: BorderRadius.circular(8.r),
         onTap: onTap,
         child: Container(
           width: 138.w,
           decoration: BoxDecoration(
             gradient: AppColors.creamCardGradient,
-            borderRadius: BorderRadius.circular(18.r),
+            borderRadius: BorderRadius.circular(8.r),
             border: Border.all(color: AppColors.warmBorder),
           ),
           clipBehavior: Clip.antiAlias,
@@ -64,7 +64,7 @@ class CategoryCard extends StatelessWidget {
                       height: 46.w,
                       decoration: BoxDecoration(
                         gradient: AppColors.categoryIconGradient,
-                        borderRadius: BorderRadius.circular(13.r),
+                        borderRadius: BorderRadius.circular(8.r),
                       ),
                       alignment: Alignment.center,
                       child: _buildIcon(),

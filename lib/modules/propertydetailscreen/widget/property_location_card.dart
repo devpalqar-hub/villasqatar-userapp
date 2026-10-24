@@ -68,7 +68,7 @@ iframe {
       padding: EdgeInsets.fromLTRB(14.w, 15.h, 14.w, 13.h),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(12.r),
+        borderRadius: BorderRadius.circular(8.r),
         border: Border.all(color: const Color(0xFFE7E7E7), width: 1),
       ),
       child: Column(
@@ -142,7 +142,7 @@ iframe {
                 foregroundColor: Colors.white,
                 elevation: 0,
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12.r),
+                  borderRadius: BorderRadius.circular(8.r),
                 ),
               ),
             ),
@@ -194,7 +194,7 @@ iframe {
         padding: EdgeInsets.all(4.w),
         decoration: BoxDecoration(
           color: Colors.white,
-          borderRadius: BorderRadius.circular(10.r),
+          borderRadius: BorderRadius.circular(8.r),
           border: Border.all(color: const Color(0xffECECEC)),
           boxShadow: [
             BoxShadow(

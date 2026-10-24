@@ -65,7 +65,7 @@ class EmptyConversationWidget extends StatelessWidget {
               ),
               decoration: BoxDecoration(
                 color: Colors.white,
-                borderRadius: BorderRadius.circular(16.r),
+                borderRadius: BorderRadius.circular(8.r),
                 border: Border.all(
                   color: AppColors.fieldBorder,
                 ),

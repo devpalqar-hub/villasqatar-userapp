@@ -79,7 +79,7 @@ class _QuickAction extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return InkWell(
-      borderRadius: BorderRadius.circular(16.r),
+      borderRadius: BorderRadius.circular(8.r),
       onTap: onTap,
       child: Padding(
         padding: EdgeInsets.symmetric(vertical: 6.h),
@@ -91,7 +91,7 @@ class _QuickAction extends StatelessWidget {
               height: 52.w,
               decoration: BoxDecoration(
                 color: background,
-                borderRadius: BorderRadius.circular(16.r),
+                borderRadius: BorderRadius.circular(8.r),
               ),
               child: Icon(icon, color: iconColor, size: 22.sp),
             ),

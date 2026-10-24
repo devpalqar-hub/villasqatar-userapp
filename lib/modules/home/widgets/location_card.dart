@@ -29,7 +29,7 @@ class LocationCard extends StatelessWidget {
         height: 120.h,
         margin: EdgeInsetsDirectional.only(end: 2.w),
         decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(16.r),
+          borderRadius: BorderRadius.circular(8.r),
           image: DecorationImage(
             image: image.isNotEmpty
                 ? NetworkImage(image)
@@ -40,7 +40,7 @@ class LocationCard extends StatelessWidget {
         ),
         child: Container(
           decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(16.r),
+            borderRadius: BorderRadius.circular(8.r),
             gradient: LinearGradient(
               begin: Alignment.topCenter,
               end: Alignment.bottomCenter,

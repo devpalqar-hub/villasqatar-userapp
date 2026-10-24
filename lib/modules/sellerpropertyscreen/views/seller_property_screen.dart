@@ -215,7 +215,7 @@ class _NoMoreProperties extends StatelessWidget {
       padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 18.h),
       decoration: BoxDecoration(
         color: AppColors.primarySoft.withOpacity(.4),
-        borderRadius: BorderRadius.circular(12.r),
+        borderRadius: BorderRadius.circular(8.r),
       ),
       child: Row(
         children: [
@@ -275,7 +275,7 @@ class _SellerHeader extends StatelessWidget {
       margin: EdgeInsets.fromLTRB(16.w, 12.h, 16.w, 20.h),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(10.r),
+        borderRadius: BorderRadius.circular(8.r),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withOpacity(.05),
@@ -511,7 +511,7 @@ class SellerFilterBar extends StatelessWidget {
           //   width: 40.h,
           //   decoration: BoxDecoration(
           //     color: Colors.white,
-          //     borderRadius: BorderRadius.circular(10.r),
+          //     borderRadius: BorderRadius.circular(8.r),
           //     border: Border.all(color: AppColors.fieldBorder),
           //   ),
           //   child: Icon(
@@ -529,14 +529,14 @@ class SellerFilterBar extends StatelessWidget {
     final selectedChip = selected == title;
 
     return InkWell(
-      borderRadius: BorderRadius.circular(10.r),
+      borderRadius: BorderRadius.circular(8.r),
       onTap: () => onChanged(title),
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 250),
         padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
         decoration: BoxDecoration(
           color: selectedChip ? AppColors.primary : Colors.white,
-          borderRadius: BorderRadius.circular(14.r),
+          borderRadius: BorderRadius.circular(8.r),
           border: Border.all(
             color: selectedChip ? AppColors.primary : AppColors.fieldBorder,
           ),

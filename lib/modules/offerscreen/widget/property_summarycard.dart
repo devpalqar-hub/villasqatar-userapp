@@ -19,7 +19,7 @@ class PropertySummaryCard extends StatelessWidget {
       padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 10.h),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(18.r),
+        borderRadius: BorderRadius.circular(8.r),
         border: Border.all(color: const Color(0xffECECEC)),
       ),
       child: Row(
@@ -27,7 +27,7 @@ class PropertySummaryCard extends StatelessWidget {
         children: [
           /// Property Image
           ClipRRect(
-            borderRadius: BorderRadius.circular(14.r),
+            borderRadius: BorderRadius.circular(8.r),
             child: image.isNotEmpty
                 ? Image.network(
                     image,

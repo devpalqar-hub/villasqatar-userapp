@@ -137,7 +137,7 @@ class _MakeOfferScreenState extends State<MakeOfferScreen> {
                           decoration: BoxDecoration(
                             color: Colors.white,
                             border: Border.all(color: const Color(0xffE8E8E8)),
-                            borderRadius: BorderRadius.circular(10.r),
+                            borderRadius: BorderRadius.circular(8.r),
                           ),
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
@@ -183,7 +183,7 @@ class _MakeOfferScreenState extends State<MakeOfferScreen> {
                           decoration: BoxDecoration(
                             color: Colors.white,
                             border: Border.all(color: const Color(0xffE8E8E8)),
-                            borderRadius: BorderRadius.circular(10.r),
+                            borderRadius: BorderRadius.circular(8.r),
                           ),
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
@@ -279,7 +279,7 @@ class _MakeOfferScreenState extends State<MakeOfferScreen> {
                               foregroundColor: AppColors.primary,
                               side: const BorderSide(color: AppColors.primary),
                               shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(12.r),
+                                borderRadius: BorderRadius.circular(8.r),
                               ),
                             ),
                           ),
@@ -323,7 +323,7 @@ class _MakeOfferScreenState extends State<MakeOfferScreen> {
                               backgroundColor: AppColors.primary,
                               elevation: 0,
                               shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(12.r),
+                                borderRadius: BorderRadius.circular(8.r),
                               ),
                             ),
                           ),
@@ -343,7 +343,7 @@ class _MakeOfferScreenState extends State<MakeOfferScreen> {
                         backgroundColor: AppColors.primary,
                         elevation: 0,
                         shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(14.r),
+                          borderRadius: BorderRadius.circular(8.r),
                         ),
                       ),
                       onPressed: () {

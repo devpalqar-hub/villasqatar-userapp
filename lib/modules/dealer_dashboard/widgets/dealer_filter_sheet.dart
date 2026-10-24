@@ -142,7 +142,7 @@ Widget build(BuildContext context) {
             height: 4.h,
             decoration: BoxDecoration(
               color: const Color(0xFFD8D1D3),
-              borderRadius: BorderRadius.circular(10.r),
+              borderRadius: BorderRadius.circular(8.r),
             ),
           ),
 
@@ -529,7 +529,7 @@ Widget build(BuildContext context) {
                         ),
                         shape: RoundedRectangleBorder(
                           borderRadius:
-                              BorderRadius.circular(10.r),
+                              BorderRadius.circular(8.r),
                         ),
                       ),
                       child: Text(
@@ -591,7 +591,7 @@ Widget build(BuildContext context) {
                         elevation: 0,
                         shape: RoundedRectangleBorder(
                           borderRadius:
-                              BorderRadius.circular(10.r),
+                              BorderRadius.circular(8.r),
                         ),
                       ),
                       child: Text(
@@ -620,13 +620,13 @@ Widget build(BuildContext context) {
   Widget _dateField({required String label, required VoidCallback onTap}) {
     return InkWell(
       onTap: onTap,
-      borderRadius: BorderRadius.circular(10.r),
+      borderRadius: BorderRadius.circular(8.r),
       child: Container(
         padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 12.h),
         decoration: BoxDecoration(
           color: Colors.white,
           border: Border.all(color: AppColors.border),
-          borderRadius: BorderRadius.circular(10.r),
+          borderRadius: BorderRadius.circular(8.r),
         ),
         child: Row(
           children: [
@@ -656,7 +656,7 @@ Widget build(BuildContext context) {
   }) {
     return InkWell(
       onTap: onTap,
-      borderRadius: BorderRadius.circular(10.r),
+      borderRadius: BorderRadius.circular(8.r),
       child: Container(
         padding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 8.h),
         decoration: BoxDecoration(
@@ -688,7 +688,7 @@ Widget build(BuildContext context) {
       decoration: BoxDecoration(
         color: Colors.white,
         border: Border.all(color: AppColors.border),
-        borderRadius: BorderRadius.circular(10.r),
+        borderRadius: BorderRadius.circular(8.r),
       ),
       child: DropdownButtonHideUnderline(
         child: DropdownButton<T>(
@@ -713,11 +713,11 @@ Widget build(BuildContext context) {
         fillColor: Colors.white,
         contentPadding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 12.h),
         enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(10.r),
+          borderRadius: BorderRadius.circular(8.r),
           borderSide: const BorderSide(color: AppColors.border),
         ),
         focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(10.r),
+          borderRadius: BorderRadius.circular(8.r),
           borderSide: const BorderSide(color: AppColors.primary),
         ),
       ),

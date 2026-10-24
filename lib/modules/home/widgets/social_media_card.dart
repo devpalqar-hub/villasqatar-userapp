@@ -30,7 +30,7 @@ class SocialMediaCard extends StatelessWidget {
       padding: EdgeInsets.all(16.w),
       decoration: BoxDecoration(
         color: AppColors.cream,
-        borderRadius: BorderRadius.circular(18.r),
+        borderRadius: BorderRadius.circular(8.r),
         border: Border.all(color: AppColors.warmBorder),
       ),
       child: Column(
@@ -141,14 +141,14 @@ class _SocialTile extends StatelessWidget {
     return PressableScale(
       child: Material(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(16.r),
+        borderRadius: BorderRadius.circular(8.r),
         child: InkWell(
           onTap: _open,
-          borderRadius: BorderRadius.circular(16.r),
+          borderRadius: BorderRadius.circular(8.r),
           child: Container(
             padding: EdgeInsets.symmetric(vertical: 14.h, horizontal: 6.w),
             decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(16.r),
+              borderRadius: BorderRadius.circular(8.r),
               border: Border.all(color: AppColors.warmBorder),
             ),
             child: Column(

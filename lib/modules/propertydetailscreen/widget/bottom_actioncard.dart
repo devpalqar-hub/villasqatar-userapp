@@ -96,7 +96,7 @@ class BottomActionCard extends StatelessWidget {
                   ),
                   padding: EdgeInsets.symmetric(horizontal: 6.w),
                   shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(14.r),
+                    borderRadius: BorderRadius.circular(8.r),
                   ),
                 ),
                 onPressed: () {
@@ -131,7 +131,7 @@ class BottomActionCard extends StatelessWidget {
               child: DecoratedBox(
                 decoration: BoxDecoration(
                   gradient: AppColors.ctaGradient,
-                  borderRadius: BorderRadius.circular(14.r),
+                  borderRadius: BorderRadius.circular(8.r),
                   boxShadow: [
                     BoxShadow(
                       color: AppColors.primary.withValues(alpha: .30),
@@ -148,7 +148,7 @@ class BottomActionCard extends StatelessWidget {
                     foregroundColor: Colors.white,
                     padding: EdgeInsets.symmetric(horizontal: 6.w),
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(14.r),
+                      borderRadius: BorderRadius.circular(8.r),
                     ),
                   ),
                   onPressed: () {
@@ -266,7 +266,7 @@ void _showScheduleVisitSheet(
 
                     /// DATE PICKER
                     InkWell(
-                      borderRadius: BorderRadius.circular(12.r),
+                      borderRadius: BorderRadius.circular(8.r),
                       onTap: isLoading
                           ? null
                           : () async {
@@ -312,7 +312,7 @@ void _showScheduleVisitSheet(
                         ),
                         decoration: BoxDecoration(
                           color: Colors.white,
-                          borderRadius: BorderRadius.circular(12.r),
+                          borderRadius: BorderRadius.circular(8.r),
                           border: Border.all(color: AppColors.fieldBorder),
                         ),
                         child: Row(
@@ -383,7 +383,7 @@ void _showScheduleVisitSheet(
                               color: selected
                                   ? AppColors.primary.withOpacity(.08)
                                   : Colors.white,
-                              borderRadius: BorderRadius.circular(12.r),
+                              borderRadius: BorderRadius.circular(8.r),
                               border: Border.all(
                                 color: selected
                                     ? AppColors.primary
@@ -416,7 +416,7 @@ void _showScheduleVisitSheet(
                       decoration: InputDecoration(
                         hintText: "Add a note (Optional)".tr,
                         border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12.r),
+                          borderRadius: BorderRadius.circular(8.r),
                         ),
                       ),
                     ),
@@ -433,7 +433,7 @@ void _showScheduleVisitSheet(
                           disabledBackgroundColor: AppColors.primary
                               .withOpacity(.6),
                           shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12.r),
+                            borderRadius: BorderRadius.circular(8.r),
                           ),
                         ),
                         onPressed: isLoading

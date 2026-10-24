@@ -65,7 +65,7 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  late final FeaturedPropertiesController featuredController;
+
   late final BannerController bannerController;
   late final DealerController dealerController;
   final ScrollController featuredScrollController = ScrollController();
@@ -75,9 +75,7 @@ class _HomeScreenState extends State<HomeScreen> {
   void initState() {
     super.initState();
 
-    featuredController = Get.isRegistered<FeaturedPropertiesController>()
-        ? Get.find<FeaturedPropertiesController>()
-        : Get.put(FeaturedPropertiesController(), permanent: true);
+   
 
     bannerController = Get.isRegistered<BannerController>()
         ? Get.find<BannerController>()
@@ -103,7 +101,7 @@ class _HomeScreenState extends State<HomeScreen> {
       backgroundColor: AppColors.background,
       appBar: const HomeAppBar(),
       body: GetBuilder<Homecontroller>(
-        builder: (___) {
+        builder: (controller) {
           return RefreshIndicator(
             color: AppColors.primary,
             onRefresh: hctrl.refreshHomeScreenData,
@@ -138,7 +136,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                   SizedBox(height: 12.h),
                   FeaturedPropertiesCarousel(
-                    properties: hctrl.featuredProperties,
+                    properties: controller.featuredProperties,
                   ),
 
                   /// ─── FEATURED PROPERTIES ────────────────────────────────────
@@ -256,7 +254,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       itemBuilder: (_, __) => ShimmerBox(
                         width: 110.w,
                         height: 110.h,
-                        borderRadius: BorderRadius.circular(14.r),
+                        borderRadius: BorderRadius.circular(8.r),
                       ),
                     ),
                   ),
@@ -357,7 +355,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           itemBuilder: (_, __) => ShimmerBox(
                             width: 180.w,
                             height: 120.h,
-                            borderRadius: BorderRadius.circular(16.r),
+                            borderRadius: BorderRadius.circular(8.r),
                           ),
                         ),
                       )
@@ -421,7 +419,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           itemBuilder: (_, __) => ShimmerBox(
                             width: 120.w,
                             height: 50.h,
-                            borderRadius: BorderRadius.circular(14.r),
+                            borderRadius: BorderRadius.circular(8.r),
                           ),
                         ),
                       )
@@ -524,7 +522,7 @@ Widget _buildBannersSection() {
             height: 150.h,
             decoration: BoxDecoration(
               color: AppColors.cream,
-              borderRadius: BorderRadius.circular(18.r),
+              borderRadius: BorderRadius.circular(8.r),
               border: Border.all(color: AppColors.warmBorder),
             ),
             alignment: Alignment.center,
@@ -729,7 +727,7 @@ class LocationBottomSheet extends StatelessWidget {
                   Padding(
                     padding: EdgeInsets.symmetric(horizontal: 16.w),
                     child: InkWell(
-                      borderRadius: BorderRadius.circular(10.r),
+                      borderRadius: BorderRadius.circular(8.r),
                       onTap: () async {
                         await controller.detectCurrentLocation();
                         Get.back();
@@ -740,7 +738,7 @@ class LocationBottomSheet extends StatelessWidget {
                           vertical: 10.h,
                         ),
                         decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(10.r),
+                          borderRadius: BorderRadius.circular(8.r),
                           color: AppColors.primary.withOpacity(.05),
                           border: Border.all(
                             color: AppColors.primary.withOpacity(.12),
@@ -760,7 +758,7 @@ class LocationBottomSheet extends StatelessWidget {
                               width: 35.w,
                               decoration: BoxDecoration(
                                 color: AppColors.primary,
-                                borderRadius: BorderRadius.circular(10.r),
+                                borderRadius: BorderRadius.circular(8.r),
                               ),
                               child: Icon(
                                 Icons.my_location_rounded,
@@ -844,17 +842,17 @@ class LocationBottomSheet extends StatelessWidget {
                         contentPadding: EdgeInsets.symmetric(vertical: 16.h),
 
                         border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(10.r),
+                          borderRadius: BorderRadius.circular(8.r),
                           borderSide: BorderSide.none,
                         ),
 
                         enabledBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(10.r),
+                          borderRadius: BorderRadius.circular(8.r),
                           borderSide: BorderSide.none,
                         ),
 
                         focusedBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(10.r),
+                          borderRadius: BorderRadius.circular(8.r),
                           borderSide: BorderSide(
                             color: AppColors.primary,
                             width: 1.2,
@@ -938,11 +936,11 @@ class LocationBottomSheet extends StatelessWidget {
 
                                 return Material(
                                   color: Colors.white,
-                                  borderRadius: BorderRadius.circular(18.r),
+                                  borderRadius: BorderRadius.circular(8.r),
                                   elevation: .5,
                                   shadowColor: Colors.black12,
                                   child: InkWell(
-                                    borderRadius: BorderRadius.circular(18.r),
+                                    borderRadius: BorderRadius.circular(8.r),
                                     onTap: () {
                                       controller.selectLocation(item);
                                       Get.back();
@@ -958,7 +956,7 @@ class LocationBottomSheet extends StatelessWidget {
                                               color: AppColors.primary
                                                   .withOpacity(.08),
                                               borderRadius:
-                                                  BorderRadius.circular(15.r),
+                                                  BorderRadius.circular(8.r),
                                             ),
                                             child: Icon(
                                               Icons.location_on_rounded,

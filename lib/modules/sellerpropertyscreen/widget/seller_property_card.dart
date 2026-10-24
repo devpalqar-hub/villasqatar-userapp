@@ -21,12 +21,12 @@ class SellerPropertyCard extends StatelessWidget {
 
     return PressableScale(
       child: InkWell(
-        borderRadius: BorderRadius.circular(10.r),
+        borderRadius: BorderRadius.circular(8.r),
         onTap: onTap,
         child: Container(
           decoration: BoxDecoration(
             color: Colors.white,
-            borderRadius: BorderRadius.circular(10.r),
+            borderRadius: BorderRadius.circular(8.r),
             boxShadow: [
               BoxShadow(
                 color: Colors.black.withOpacity(.04),
@@ -75,7 +75,7 @@ class SellerPropertyCard extends StatelessWidget {
                         ),
                         decoration: BoxDecoration(
                           color: AppColors.primary,
-                          borderRadius: BorderRadius.circular(10.r),
+                          borderRadius: BorderRadius.circular(8.r),
                         ),
                         child: Text(
                           property.purpose.tr,

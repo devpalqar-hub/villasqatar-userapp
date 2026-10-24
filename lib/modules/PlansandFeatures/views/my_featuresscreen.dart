@@ -462,7 +462,7 @@ class _MyFeaturedPropertiesScreenState
                 ),
                 shape: RoundedRectangleBorder(
                   borderRadius:
-                      BorderRadius.circular(10.r),
+                      BorderRadius.circular(8.r),
                 ),
               ),
               child: Text(
@@ -649,7 +649,7 @@ class _FeaturedEntryCardState extends State<_FeaturedEntryCard> {
     return Container(
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(12.r),
+        borderRadius: BorderRadius.circular(8.r),
         border: Border.all(
           color: const Color(0xFFEBEBEF),
         ),

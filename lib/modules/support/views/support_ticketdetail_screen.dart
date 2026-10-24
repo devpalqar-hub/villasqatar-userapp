@@ -195,7 +195,7 @@ class _SupportTicketDetailsScreenState
       decoration: BoxDecoration(
         color: Colors.white,
 
-        borderRadius: BorderRadius.circular(15.r),
+        borderRadius: BorderRadius.circular(8.r),
 
         border: Border.all(color: AppColors.fieldBorder.withOpacity(.8)),
       ),
@@ -213,7 +213,7 @@ class _SupportTicketDetailsScreenState
                 decoration: BoxDecoration(
                   color: AppColors.primary.withOpacity(.07),
 
-                  borderRadius: BorderRadius.circular(11.r),
+                  borderRadius: BorderRadius.circular(8.r),
                 ),
 
                 child: Icon(
@@ -276,7 +276,7 @@ class _SupportTicketDetailsScreenState
       decoration: BoxDecoration(
         color: Colors.white,
 
-        borderRadius: BorderRadius.circular(13.r),
+        borderRadius: BorderRadius.circular(8.r),
 
         border: Border.all(color: AppColors.fieldBorder.withOpacity(.8)),
       ),
@@ -316,7 +316,7 @@ class _SupportTicketDetailsScreenState
         color: reply.isAdmin
             ? AppColors.primary.withOpacity(.035)
             : Colors.white,
-        borderRadius: BorderRadius.circular(14.r),
+        borderRadius: BorderRadius.circular(8.r),
         border: Border.all(
           color: reply.isAdmin
               ? AppColors.primary.withOpacity(.13)
@@ -370,7 +370,7 @@ class _SupportTicketDetailsScreenState
                             ),
                             decoration: BoxDecoration(
                               color: AppColors.primary.withOpacity(.09),
-                              borderRadius: BorderRadius.circular(10.r),
+                              borderRadius: BorderRadius.circular(8.r),
                             ),
                             child: Text(
                               "Support".tr,
@@ -455,7 +455,7 @@ class _SupportTicketDetailsScreenState
       decoration: BoxDecoration(
         color: Colors.white,
 
-        borderRadius: BorderRadius.circular(13.r),
+        borderRadius: BorderRadius.circular(8.r),
 
         border: Border.all(color: AppColors.fieldBorder),
       ),
@@ -638,7 +638,7 @@ Widget _ticketInformationCard(SupportTicketDetails ticket) {
     padding: EdgeInsets.all(16.w),
     decoration: BoxDecoration(
       color: Colors.white,
-      borderRadius: BorderRadius.circular(14.r),
+      borderRadius: BorderRadius.circular(8.r),
       border: Border.all(color: AppColors.fieldBorder.withOpacity(.8)),
     ),
     child: Column(
@@ -798,7 +798,7 @@ Widget _assignedToCard(SupportTicketDetails ticket) {
     padding: EdgeInsets.all(15.w),
     decoration: BoxDecoration(
       color: Colors.white,
-      borderRadius: BorderRadius.circular(14.r),
+      borderRadius: BorderRadius.circular(8.r),
       border: Border.all(color: AppColors.fieldBorder.withOpacity(.8)),
     ),
     child: Row(
@@ -869,7 +869,7 @@ Widget _submitterCard(SupportTicketDetails ticket) {
     padding: EdgeInsets.all(15.w),
     decoration: BoxDecoration(
       color: Colors.white,
-      borderRadius: BorderRadius.circular(14.r),
+      borderRadius: BorderRadius.circular(8.r),
       border: Border.all(color: AppColors.fieldBorder.withOpacity(.8)),
     ),
     child: Column(
@@ -961,7 +961,7 @@ Widget _emptyInfoCard(String text) {
     padding: EdgeInsets.all(15.w),
     decoration: BoxDecoration(
       color: Colors.white,
-      borderRadius: BorderRadius.circular(13.r),
+      borderRadius: BorderRadius.circular(8.r),
       border: Border.all(color: AppColors.fieldBorder),
     ),
     child: Text(

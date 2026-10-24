@@ -148,7 +148,7 @@ class _WishlistScreenState extends State<WishlistScreen> {
       height: 45.h,
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(10.r),
+        borderRadius: BorderRadius.circular(8.r),
         border: Border.all(color: const Color(0xffEEEEEE)),
         boxShadow: [
           BoxShadow(

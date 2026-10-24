@@ -124,7 +124,7 @@ class _VisitListScreenState extends State<VisitListScreen> {
         padding: EdgeInsets.all(4.w),
         decoration: BoxDecoration(
           color: const Color(0xffF1F1F1),
-          borderRadius: BorderRadius.circular(12.r),
+          borderRadius: BorderRadius.circular(8.r),
         ),
         child: Row(
           children: [
@@ -294,7 +294,7 @@ class _VisitListScreenState extends State<VisitListScreen> {
       padding: EdgeInsets.all(10.w),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(12.r),
+        borderRadius: BorderRadius.circular(8.r),
         border: Border.all(color: const Color(0xffEEEEEE)),
         boxShadow: [
           BoxShadow(
@@ -600,7 +600,7 @@ class _VisitListScreenState extends State<VisitListScreen> {
       padding: EdgeInsets.all(10.w),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(12.r),
+        borderRadius: BorderRadius.circular(8.r),
         border: Border.all(color: const Color(0xffEEEEEE)),
         boxShadow: [
           BoxShadow(
@@ -928,7 +928,7 @@ class _VisitListScreenState extends State<VisitListScreen> {
       padding: EdgeInsets.symmetric(horizontal: 6.w, vertical: 3.h),
       decoration: BoxDecoration(
         color: background,
-        borderRadius: BorderRadius.circular(12.r),
+        borderRadius: BorderRadius.circular(8.r),
       ),
       child: Text(
         _formatStatus(status),
@@ -993,7 +993,7 @@ class _VisitListScreenState extends State<VisitListScreen> {
           padding: EdgeInsets.fromLTRB(20.w, 16.h, 20.w, 20.h),
           decoration: BoxDecoration(
             color: Colors.white,
-            borderRadius: BorderRadius.circular(18.r),
+            borderRadius: BorderRadius.circular(8.r),
             boxShadow: [
               BoxShadow(
                 color: Colors.black.withOpacity(0.08),
@@ -1105,7 +1105,7 @@ class _VisitListScreenState extends State<VisitListScreen> {
                           side: const BorderSide(color: Color(0xFFD32F2F)),
                           elevation: 0,
                           shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(10.r),
+                            borderRadius: BorderRadius.circular(8.r),
                           ),
                         ),
                         child: Text(
@@ -1144,7 +1144,7 @@ class _VisitListScreenState extends State<VisitListScreen> {
                           backgroundColor: AppColors.primary,
                           foregroundColor: Colors.white,
                           shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(10.r),
+                            borderRadius: BorderRadius.circular(8.r),
                           ),
                         ),
                         child: Text(

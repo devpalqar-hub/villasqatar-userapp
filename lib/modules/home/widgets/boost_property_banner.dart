@@ -13,7 +13,7 @@ class BoostPropertyBanner extends StatelessWidget {
     return Padding(
       padding: EdgeInsets.symmetric(horizontal: 0.w, vertical: 5.h),
       child: InkWell(
-        borderRadius: BorderRadius.circular(18.r),
+        borderRadius: BorderRadius.circular(8.r),
         onTap: () {
           Get.to(() => const BoostPropertyScreen());
         },
@@ -21,7 +21,7 @@ class BoostPropertyBanner extends StatelessWidget {
           padding: EdgeInsets.all(18.w),
           decoration: BoxDecoration(
             color: AppColors.primary,
-            borderRadius: BorderRadius.circular(18.r),
+            borderRadius: BorderRadius.circular(8.r),
             boxShadow: [
               BoxShadow(
                 color: Colors.black.withOpacity(.08),

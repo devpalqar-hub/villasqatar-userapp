@@ -50,14 +50,14 @@ class WishlistPropertyCard extends StatelessWidget {
         color: Colors.white,
         child: InkWell(
           onTap: _openDetails,
-          borderRadius: BorderRadius.circular(12.r),
+          borderRadius: BorderRadius.circular(8.r),
           child: Container(
             height: 112.h,
             margin: EdgeInsets.only(bottom: 10.h),
             padding: EdgeInsets.all(8.w),
             decoration: BoxDecoration(
               color: Colors.white,
-              borderRadius: BorderRadius.circular(12.r),
+              borderRadius: BorderRadius.circular(8.r),
               border: Border.all(color: const Color(0xffEEEEEE), width: .8),
             ),
             child: Row(

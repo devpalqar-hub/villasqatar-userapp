@@ -26,7 +26,7 @@ class CompactAgentCard extends StatelessWidget {
         width: 100.w,
         height: 70.h, // Compact height
         decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(12.r),
+          borderRadius: BorderRadius.circular(8.r),
           border: Border.all(color: Colors.grey.withOpacity(0.15)),
           boxShadow: [
             BoxShadow(
@@ -38,7 +38,7 @@ class CompactAgentCard extends StatelessWidget {
         ),
         child: Material(
           color: AppColors.white,
-          borderRadius: BorderRadius.circular(12.r),
+          borderRadius: BorderRadius.circular(8.r),
           clipBehavior:
               Clip.antiAlias, // Keeps ripple effect inside the borders
           child: InkWell(

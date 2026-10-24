@@ -482,14 +482,14 @@ class _ConsoleButton extends StatelessWidget {
         decoration: BoxDecoration(
           gradient: highlighted ? AppColors.ctaGradient : null,
           color: highlighted ? null : Colors.white,
-          borderRadius: BorderRadius.circular(14.r),
+          borderRadius: BorderRadius.circular(8.r),
           border: highlighted
               ? null
               : Border.all(color: AppColors.primary.withValues(alpha: .45)),
         ),
         child: InkWell(
           onTap: onTap,
-          borderRadius: BorderRadius.circular(14.r),
+          borderRadius: BorderRadius.circular(8.r),
           child: SizedBox(
             height: 44.h,
             child: Row(
@@ -655,7 +655,7 @@ class _StatTile extends StatelessWidget {
             height: 34.w,
             decoration: BoxDecoration(
               gradient: AppColors.categoryIconGradient,
-              borderRadius: BorderRadius.circular(12.r),
+              borderRadius: BorderRadius.circular(8.r),
             ),
             child: Icon(icon, size: 18.sp, color: AppColors.primary),
           ),
@@ -741,7 +741,7 @@ class PdRejectionBanner extends StatelessWidget {
                 height: 36.w,
                 decoration: BoxDecoration(
                   color: _red.withValues(alpha: .12),
-                  borderRadius: BorderRadius.circular(12.r),
+                  borderRadius: BorderRadius.circular(8.r),
                 ),
                 child: Icon(
                   Icons.error_outline_rounded,
@@ -797,7 +797,7 @@ class PdRejectionBanner extends StatelessWidget {
             child: DecoratedBox(
               decoration: BoxDecoration(
                 gradient: AppColors.ctaGradient,
-                borderRadius: BorderRadius.circular(14.r),
+                borderRadius: BorderRadius.circular(8.r),
               ),
               child: ElevatedButton.icon(
                 onPressed: onEdit,
@@ -815,7 +815,7 @@ class PdRejectionBanner extends StatelessWidget {
                   foregroundColor: Colors.white,
                   elevation: 0,
                   shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(14.r),
+                    borderRadius: BorderRadius.circular(8.r),
                   ),
                 ),
               ),

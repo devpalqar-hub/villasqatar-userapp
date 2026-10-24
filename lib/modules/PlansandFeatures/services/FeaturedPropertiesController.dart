@@ -17,10 +17,10 @@ class FeaturedPropertiesController extends GetxController {
   }) async {
     List<PropertyModel> propertyList = [];
     String loc = (isHome)
-        ? "PROPERTY_DETAIL_PAGE"
+        ? "HOME_PAGE"
         : (isListing)
         ? "LISTING_PAGE"
-        : "HOME_PAGE";
+        :  "PROPERTY_DETAIL_PAGE";
     final response = await ApiHandler.get(
       "/api/featured?location=${loc}&page=1&limit=10",
     );

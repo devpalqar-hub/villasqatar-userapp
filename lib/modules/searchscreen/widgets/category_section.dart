@@ -42,7 +42,7 @@ class PropertyCategorySection extends StatelessWidget {
                       final bool selected = controller.filter.type == item.id;
 
                       return InkWell(
-                        borderRadius: BorderRadius.circular(10.r),
+                        borderRadius: BorderRadius.circular(8.r),
                         onTap: () {
                           controller.applyFilters(type: item.id);
                         },
@@ -56,7 +56,7 @@ class PropertyCategorySection extends StatelessWidget {
                           ),
                           decoration: BoxDecoration(
                             color: Colors.white,
-                            borderRadius: BorderRadius.circular(10.r),
+                            borderRadius: BorderRadius.circular(8.r),
                             border: Border.all(
                               color: selected
                                   ? AppColors.primary

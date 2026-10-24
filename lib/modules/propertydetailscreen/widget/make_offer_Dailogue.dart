@@ -235,7 +235,7 @@ class _MakeOfferBottomSheetState extends State<MakeOfferBottomSheet> {
       padding: EdgeInsets.all(14.w),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(14.r),
+        borderRadius: BorderRadius.circular(8.r),
         border: Border.all(color: const Color(0xffEAEAEA)),
         boxShadow: [
           BoxShadow(
@@ -252,7 +252,7 @@ class _MakeOfferBottomSheetState extends State<MakeOfferBottomSheet> {
             height: 44.w,
             decoration: BoxDecoration(
               color: AppColors.primary.withOpacity(.07),
-              borderRadius: BorderRadius.circular(11.r),
+              borderRadius: BorderRadius.circular(8.r),
             ),
             child: Icon(
               Icons.home_work_outlined,
@@ -332,7 +332,7 @@ class _MakeOfferBottomSheetState extends State<MakeOfferBottomSheet> {
           height: 52.h,
           decoration: BoxDecoration(
             color: Colors.white,
-            borderRadius: BorderRadius.circular(12.r),
+            borderRadius: BorderRadius.circular(8.r),
             border: Border.all(color: const Color(0xffE5E5E5)),
           ),
           child: Row(
@@ -372,7 +372,7 @@ class _MakeOfferBottomSheetState extends State<MakeOfferBottomSheet> {
                 child: DropdownButtonHideUnderline(
                   child: DropdownButton<String>(
                     value: currency,
-                    borderRadius: BorderRadius.circular(12.r),
+                    borderRadius: BorderRadius.circular(8.r),
                     icon: Icon(
                       Icons.keyboard_arrow_down_rounded,
                       size: 18.sp,
@@ -417,7 +417,7 @@ class _MakeOfferBottomSheetState extends State<MakeOfferBottomSheet> {
       padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 11.h),
       decoration: BoxDecoration(
         color: AppColors.primary.withOpacity(.045),
-        borderRadius: BorderRadius.circular(10.r),
+        borderRadius: BorderRadius.circular(8.r),
         border: Border.all(color: AppColors.primary.withOpacity(.10)),
       ),
       child: Row(
@@ -475,7 +475,7 @@ class _MakeOfferBottomSheetState extends State<MakeOfferBottomSheet> {
                     side: const BorderSide(color: AppColors.primary),
                     elevation: 0,
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12.r),
+                      borderRadius: BorderRadius.circular(8.r),
                     ),
                   ),
                   child: Row(
@@ -513,7 +513,7 @@ class _MakeOfferBottomSheetState extends State<MakeOfferBottomSheet> {
                     foregroundColor: Colors.white,
                     elevation: 0,
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12.r),
+                      borderRadius: BorderRadius.circular(8.r),
                     ),
                   ),
                   child: Row(

@@ -149,7 +149,7 @@ class _MyTicketScreenState extends State<MyTicketScreen> {
       color: Colors.transparent,
 
       child: InkWell(
-        borderRadius: BorderRadius.circular(14.r),
+        borderRadius: BorderRadius.circular(8.r),
 
         onTap: () {
           Get.to(() => SupportTicketDetailsScreen(ticketId: ticket.id));
@@ -163,7 +163,7 @@ class _MyTicketScreenState extends State<MyTicketScreen> {
           decoration: BoxDecoration(
             color: Colors.white,
 
-            borderRadius: BorderRadius.circular(14.r),
+            borderRadius: BorderRadius.circular(8.r),
 
             border: Border.all(color: AppColors.fieldBorder.withOpacity(.8)),
 
@@ -190,7 +190,7 @@ class _MyTicketScreenState extends State<MyTicketScreen> {
                 decoration: BoxDecoration(
                   color: AppColors.primary.withOpacity(.07),
 
-                  borderRadius: BorderRadius.circular(11.r),
+                  borderRadius: BorderRadius.circular(8.r),
                 ),
 
                 child: Icon(

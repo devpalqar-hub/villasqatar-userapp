@@ -297,7 +297,7 @@ class TextBubble extends StatelessWidget {
     switch (message.type.toUpperCase()) {
       case "IMAGE":
         return ClipRRect(
-          borderRadius: BorderRadius.circular(12.r),
+          borderRadius: BorderRadius.circular(8.r),
           child: GestureDetector(
             onTap: () {
               if (message.mediaUrl == null) return;
@@ -539,7 +539,7 @@ class _AttachmentItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return InkWell(
-      borderRadius: BorderRadius.circular(16.r),
+      borderRadius: BorderRadius.circular(8.r),
       onTap: onTap,
       child: SizedBox(
         width: 90.w,
@@ -550,7 +550,7 @@ class _AttachmentItem extends StatelessWidget {
               height: 58.w,
               decoration: BoxDecoration(
                 color: AppColors.primary.withOpacity(.08),
-                borderRadius: BorderRadius.circular(16.r),
+                borderRadius: BorderRadius.circular(8.r),
               ),
               child: Icon(
                 icon,

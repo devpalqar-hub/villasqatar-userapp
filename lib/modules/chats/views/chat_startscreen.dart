@@ -297,7 +297,7 @@ class ChatStartScreen extends StatelessWidget {
 
       case "IMAGE":
         return ClipRRect(
-          borderRadius: BorderRadius.circular(10.r),
+          borderRadius: BorderRadius.circular(8.r),
           child: Image.network(
             message.mediaUrl ?? "",
             width: 220.w,
@@ -316,7 +316,7 @@ class ChatStartScreen extends StatelessWidget {
         final lng = message.longitude;
 
         return InkWell(
-          borderRadius: BorderRadius.circular(10.r),
+          borderRadius: BorderRadius.circular(8.r),
           onTap: () async {
             final url =
                 "https://www.google.com/maps/search/?api=1&query=$lat,$lng";
@@ -332,7 +332,7 @@ class ChatStartScreen extends StatelessWidget {
             width: 230.w,
             decoration: BoxDecoration(
               color: Colors.white,
-              borderRadius: BorderRadius.circular(10.r),
+              borderRadius: BorderRadius.circular(8.r),
               boxShadow: [
                 BoxShadow(
                   color: Colors.black.withOpacity(.08),
@@ -342,7 +342,7 @@ class ChatStartScreen extends StatelessWidget {
               ],
             ),
             child: ClipRRect(
-              borderRadius: BorderRadius.circular(10.r),
+              borderRadius: BorderRadius.circular(8.r),
               child: Column(
                 // mainAxisSize: MainAxisSize.min,
                 children: [
@@ -380,7 +380,7 @@ class ChatStartScreen extends StatelessWidget {
                           ),
                           decoration: BoxDecoration(
                             color: Colors.white,
-                            borderRadius: BorderRadius.circular(10.r),
+                            borderRadius: BorderRadius.circular(8.r),
                           ),
                           child: Row(
                             mainAxisSize: MainAxisSize.min,
@@ -973,17 +973,17 @@ class _ReportUserBottomSheetState extends State<ReportUserBottomSheet> {
                   ),
 
                   border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12.r),
+                    borderRadius: BorderRadius.circular(8.r),
                     borderSide: BorderSide(color: AppColors.fieldBorder),
                   ),
 
                   enabledBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12.r),
+                    borderRadius: BorderRadius.circular(8.r),
                     borderSide: BorderSide(color: AppColors.fieldBorder),
                   ),
 
                   focusedBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12.r),
+                    borderRadius: BorderRadius.circular(8.r),
                     borderSide: const BorderSide(color: AppColors.primary),
                   ),
                 ),
@@ -999,7 +999,7 @@ class _ReportUserBottomSheetState extends State<ReportUserBottomSheet> {
                 padding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 12.h),
                 decoration: BoxDecoration(
                   color: AppColors.primary.withOpacity(.05),
-                  borderRadius: BorderRadius.circular(12.r),
+                  borderRadius: BorderRadius.circular(8.r),
                   border: Border.all(color: AppColors.primary.withOpacity(.12)),
                 ),
                 child: Row(
@@ -1049,7 +1049,7 @@ class _ReportUserBottomSheetState extends State<ReportUserBottomSheet> {
                     foregroundColor: Colors.white,
 
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12.r),
+                      borderRadius: BorderRadius.circular(8.r),
                     ),
                   ),
 

@@ -66,7 +66,7 @@ class ShimmerListingCard extends StatelessWidget {
       padding: EdgeInsets.all(10.w),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(14.r),
+        borderRadius: BorderRadius.circular(8.r),
         border: Border.all(color: const Color(0xffEEEEEE)),
       ),
       child: Column(
@@ -75,7 +75,7 @@ class ShimmerListingCard extends StatelessWidget {
           ShimmerBox(
             width: double.infinity,
             height: 120.h,
-            borderRadius: BorderRadius.circular(12.r),
+            borderRadius: BorderRadius.circular(8.r),
           ),
 
           SizedBox(height: 10.h),
@@ -110,7 +110,7 @@ class ShimmerListTile extends StatelessWidget {
           ShimmerBox(
             width: 42.w,
             height: 42.w,
-            borderRadius: BorderRadius.circular(10.r),
+            borderRadius: BorderRadius.circular(8.r),
           ),
 
           SizedBox(width: 12.w),

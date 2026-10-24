@@ -32,7 +32,7 @@ class _OverviewCardState extends State<OverviewCard> {
       ),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(12.r),
+        borderRadius: BorderRadius.circular(8.r),
         border: Border.all(
           color: const Color(0xFFE7E7E7),
           width: 1,

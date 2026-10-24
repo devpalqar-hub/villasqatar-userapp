@@ -172,7 +172,7 @@ class _AttachmentItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return InkWell(
-      borderRadius: BorderRadius.circular(14.r),
+      borderRadius: BorderRadius.circular(8.r),
       onTap: onTap,
       child: SizedBox(
         width: 90.w,
@@ -183,7 +183,7 @@ class _AttachmentItem extends StatelessWidget {
               height: 58.w,
               decoration: BoxDecoration(
                 color: AppColors.primary.withOpacity(.08),
-                borderRadius: BorderRadius.circular(16.r),
+                borderRadius: BorderRadius.circular(8.r),
               ),
               child: Icon(icon, color: AppColors.primary, size: 28.sp),
             ),

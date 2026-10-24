@@ -185,7 +185,7 @@ class _BoostPropertyScreenState extends State<BoostPropertyScreen> {
 
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(16.r),
+        borderRadius: BorderRadius.circular(8.r),
         border: Border.all(color: const Color(0xffECECEC)),
       ),
 
@@ -197,7 +197,7 @@ class _BoostPropertyScreenState extends State<BoostPropertyScreen> {
 
             decoration: BoxDecoration(
               color: primaryColor.withOpacity(.08),
-              borderRadius: BorderRadius.circular(12.r),
+              borderRadius: BorderRadius.circular(8.r),
             ),
 
             child: Icon(
@@ -377,7 +377,7 @@ class _BoostPropertyScreenState extends State<BoostPropertyScreen> {
                     side: BorderSide(color: primaryColor.withOpacity(.3)),
 
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(11.r),
+                      borderRadius: BorderRadius.circular(8.r),
                     ),
                   ),
 
@@ -424,7 +424,7 @@ class _BoostPropertyScreenState extends State<BoostPropertyScreen> {
 
       child: InkWell(
         onTap: onTap,
-        borderRadius: BorderRadius.circular(14.r),
+        borderRadius: BorderRadius.circular(8.r),
 
         child: AnimatedContainer(
           duration: const Duration(milliseconds: 180),
@@ -436,7 +436,7 @@ class _BoostPropertyScreenState extends State<BoostPropertyScreen> {
           decoration: BoxDecoration(
             color: Colors.white,
 
-            borderRadius: BorderRadius.circular(14.r),
+            borderRadius: BorderRadius.circular(8.r),
 
             border: Border.all(
               color: selected ? primaryColor : const Color(0xffEAEAEA),
@@ -447,7 +447,7 @@ class _BoostPropertyScreenState extends State<BoostPropertyScreen> {
           child: Row(
             children: [
               ClipRRect(
-                borderRadius: BorderRadius.circular(10.r),
+                borderRadius: BorderRadius.circular(8.r),
 
                 child: imageUrl.isNotEmpty
                     ? Image.network(
@@ -650,7 +650,7 @@ class _BoostPropertyScreenState extends State<BoostPropertyScreen> {
           controller.selectPlan(plan);
         },
 
-        borderRadius: BorderRadius.circular(14.r),
+        borderRadius: BorderRadius.circular(8.r),
 
         child: AnimatedContainer(
           duration: const Duration(milliseconds: 180),
@@ -662,7 +662,7 @@ class _BoostPropertyScreenState extends State<BoostPropertyScreen> {
           decoration: BoxDecoration(
             color: Colors.white,
 
-            borderRadius: BorderRadius.circular(14.r),
+            borderRadius: BorderRadius.circular(8.r),
 
             border: Border.all(
               color: selected ? primaryColor : const Color(0xffEAEAEA),
@@ -679,7 +679,7 @@ class _BoostPropertyScreenState extends State<BoostPropertyScreen> {
                 decoration: BoxDecoration(
                   color: primaryColor.withOpacity(.07),
 
-                  borderRadius: BorderRadius.circular(11.r),
+                  borderRadius: BorderRadius.circular(8.r),
                 ),
 
                 child: Icon(
@@ -843,7 +843,7 @@ class _BoostPropertyScreenState extends State<BoostPropertyScreen> {
       decoration: BoxDecoration(
         color: Colors.white,
 
-        borderRadius: BorderRadius.circular(12.r),
+        borderRadius: BorderRadius.circular(8.r),
 
         border: Border.all(color: Colors.grey.shade200),
       ),
@@ -894,7 +894,7 @@ class _BoostPropertyScreenState extends State<BoostPropertyScreen> {
       decoration: BoxDecoration(
         color: Colors.white,
 
-        borderRadius: BorderRadius.circular(12.r),
+        borderRadius: BorderRadius.circular(8.r),
 
         border: Border.all(color: Colors.grey.shade200),
       ),
@@ -1033,7 +1033,7 @@ class _BoostPropertyScreenState extends State<BoostPropertyScreen> {
                       elevation: 0,
 
                       shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12.r),
+                        borderRadius: BorderRadius.circular(8.r),
                       ),
                     ),
 
@@ -1082,7 +1082,7 @@ class _BoostPropertyScreenState extends State<BoostPropertyScreen> {
 
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(14.r),
+        borderRadius: BorderRadius.circular(8.r),
         border: Border.all(color: const Color(0xffEAEAEA)),
       ),
 
@@ -1122,7 +1122,7 @@ class _BoostPropertyScreenState extends State<BoostPropertyScreen> {
 
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(14.r),
+        borderRadius: BorderRadius.circular(8.r),
         border: Border.all(color: const Color(0xffEAEAEA)),
       ),
 

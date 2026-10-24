@@ -797,7 +797,7 @@ class _SearchField extends StatelessWidget {
       height: 48.h,
       decoration: BoxDecoration(
         color: AppColors.cream,
-        borderRadius: BorderRadius.circular(14.r),
+        borderRadius: BorderRadius.circular(8.r),
         border: Border.all(
           color: isFocused ? AppColors.primary : AppColors.warmBorder,
           width: isFocused ? 1.4 : 1,
@@ -846,7 +846,7 @@ class _SearchField extends StatelessWidget {
                 height: 36.h,
                 decoration: BoxDecoration(
                   gradient: AppColors.ctaGradient,
-                  borderRadius: BorderRadius.circular(11.r),
+                  borderRadius: BorderRadius.circular(8.r),
                 ),
                 child: Icon(
                   Icons.search_rounded,
@@ -881,7 +881,7 @@ class _SuggestionsList extends StatelessWidget {
       constraints: BoxConstraints(maxHeight: 240.h),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(14.r),
+        borderRadius: BorderRadius.circular(8.r),
         border: Border.all(color: AppColors.warmBorder),
       ),
       child: loading

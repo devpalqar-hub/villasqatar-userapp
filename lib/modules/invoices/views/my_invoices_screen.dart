@@ -166,7 +166,7 @@ class _InvoiceSummaryCard extends StatelessWidget {
       padding: EdgeInsets.all(20.w),
       decoration: BoxDecoration(
         gradient: AppColors.heroGradient,
-        borderRadius: BorderRadius.circular(14.r),
+        borderRadius: BorderRadius.circular(8.r),
         boxShadow: [
           BoxShadow(
             color: AppColors.primary.withOpacity(.25),
@@ -243,7 +243,7 @@ class _SearchField extends StatelessWidget {
       padding: EdgeInsets.symmetric(horizontal: 14.w),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(12.r),
+        borderRadius: BorderRadius.circular(8.r),
         border: Border.all(color: AppColors.fieldBorder),
       ),
       child: Row(
@@ -314,14 +314,14 @@ class _StatusTabs extends StatelessWidget {
     final bool isSelected = selected == value;
 
     return InkWell(
-      borderRadius: BorderRadius.circular(10.r),
+      borderRadius: BorderRadius.circular(8.r),
       onTap: () => onChanged(value),
       child: Container(
         padding: EdgeInsets.symmetric(vertical: 10.h),
         alignment: Alignment.center,
         decoration: BoxDecoration(
           color: isSelected ? AppColors.primary : Colors.white,
-          borderRadius: BorderRadius.circular(10.r),
+          borderRadius: BorderRadius.circular(8.r),
           border: Border.all(
             color: isSelected ? AppColors.primary : AppColors.fieldBorder,
           ),
@@ -356,13 +356,13 @@ class _InvoiceCard extends StatelessWidget {
         : "";
 
     return InkWell(
-      borderRadius: BorderRadius.circular(12.r),
+      borderRadius: BorderRadius.circular(8.r),
       onTap: () => Get.to(() => InvoiceDetailScreen(invoiceId: invoice.id)),
       child: Container(
         padding: EdgeInsets.all(14.w),
         decoration: BoxDecoration(
           color: Colors.white,
-          borderRadius: BorderRadius.circular(12.r),
+          borderRadius: BorderRadius.circular(8.r),
           border: Border.all(color: AppColors.fieldBorder),
         ),
         child: Row(
@@ -373,7 +373,7 @@ class _InvoiceCard extends StatelessWidget {
               height: 44.w,
               decoration: BoxDecoration(
                 color: AppColors.primarySoft,
-                borderRadius: BorderRadius.circular(10.r),
+                borderRadius: BorderRadius.circular(8.r),
               ),
               child: Icon(
                 Icons.description_outlined,

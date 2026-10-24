@@ -212,7 +212,7 @@ class _PropertyCardState extends State<PropertyCard> {
           padding: EdgeInsets.symmetric(horizontal: 7.w, vertical: 2.h),
           decoration: BoxDecoration(
             color: Colors.black.withOpacity(.55),
-            borderRadius: BorderRadius.circular(10.r),
+            borderRadius: BorderRadius.circular(8.r),
           ),
           child: Text(
             '${active + 1}/$count',

@@ -141,7 +141,7 @@ class PropertyInfoCard extends StatelessWidget {
           width: double.infinity,
           decoration: BoxDecoration(
             color: Colors.white,
-            borderRadius: BorderRadius.circular(12.r),
+            borderRadius: BorderRadius.circular(8.r),
             border: Border.all(color: borderColor, width: 1),
           ),
           child: Column(

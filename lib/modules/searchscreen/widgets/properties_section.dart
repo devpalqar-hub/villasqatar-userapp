@@ -162,14 +162,14 @@ class _ResultsSkeleton extends StatelessWidget {
               padding: EdgeInsets.all(8.w),
               decoration: BoxDecoration(
                 color: Colors.white,
-                borderRadius: BorderRadius.circular(16.r),
+                borderRadius: BorderRadius.circular(8.r),
               ),
               child: Row(
                 children: [
                   ShimmerBox(
                     width: _PropertyCardMetrics.imageWidth,
                     height: _PropertyCardMetrics.minHeight,
-                    borderRadius: BorderRadius.circular(12.r),
+                    borderRadius: BorderRadius.circular(8.r),
                   ),
                   SizedBox(width: 12.w),
                   Expanded(
@@ -247,7 +247,7 @@ class _MessageState extends StatelessWidget {
                 side: const BorderSide(color: AppColors.primary),
                 padding: EdgeInsets.symmetric(horizontal: 22.w, vertical: 10.h),
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10.r),
+                  borderRadius: BorderRadius.circular(8.r),
                 ),
               ),
               child: Text(
@@ -312,7 +312,7 @@ class PropertyCard extends StatelessWidget {
       child: Container(
         decoration: BoxDecoration(
           color: Colors.white,
-          borderRadius: BorderRadius.circular(16.r),
+          borderRadius: BorderRadius.circular(8.r),
           boxShadow: [
             BoxShadow(
               color: Colors.black.withValues(alpha: 0.04),
@@ -324,7 +324,7 @@ class PropertyCard extends StatelessWidget {
         child: Material(
           type: MaterialType.transparency,
           child: InkWell(
-            borderRadius: BorderRadius.circular(16.r),
+            borderRadius: BorderRadius.circular(8.r),
             onTap: () =>
                 Get.to(() => PropertyDetailsScreen(propertyId: property.id)),
             child: Padding(
@@ -343,7 +343,7 @@ class PropertyCard extends StatelessWidget {
                       SizedBox(
                         width: _PropertyCardMetrics.imageWidth,
                         child: ClipRRect(
-                          borderRadius: BorderRadius.circular(12.r),
+                          borderRadius: BorderRadius.circular(8.r),
                           child: Stack(
                             children: [
                               Positioned.fill(

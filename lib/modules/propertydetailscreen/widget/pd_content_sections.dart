@@ -159,7 +159,7 @@ class _CountBadge extends StatelessWidget {
       padding: EdgeInsets.symmetric(horizontal: 9.w, vertical: 3.h),
       decoration: BoxDecoration(
         color: AppColors.maroonTint,
-        borderRadius: BorderRadius.circular(12.r),
+        borderRadius: BorderRadius.circular(8.r),
       ),
       child: Text(
         '$count',
@@ -288,7 +288,7 @@ class _ImageTile extends StatelessWidget {
         padding: EdgeInsets.all(size * .12),
         decoration: BoxDecoration(
           color: PD.cell,
-          borderRadius: BorderRadius.circular(16.r),
+          borderRadius: BorderRadius.circular(8.r),
           border: Border.all(color: AppColors.warmBorder),
         ),
         child: image.isEmpty
@@ -316,16 +316,16 @@ class _ToggleTile extends StatelessWidget {
   Widget build(BuildContext context) {
     return Material(
       color: AppColors.maroonTint,
-      borderRadius: BorderRadius.circular(16.r),
+      borderRadius: BorderRadius.circular(8.r),
       child: InkWell(
         onTap: onTap,
-        borderRadius: BorderRadius.circular(16.r),
+        borderRadius: BorderRadius.circular(8.r),
         child: Container(
           width: size,
           height: size,
           alignment: Alignment.center,
           decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(16.r),
+            borderRadius: BorderRadius.circular(8.r),
             border: Border.all(color: AppColors.primary.withValues(alpha: .18)),
           ),
           child: label != null
@@ -451,7 +451,7 @@ class _SpecCell extends StatelessWidget {
       padding: EdgeInsets.all(12.w),
       decoration: BoxDecoration(
         color: PD.cell,
-        borderRadius: BorderRadius.circular(16.r),
+        borderRadius: BorderRadius.circular(8.r),
         border: Border.all(color: AppColors.warmBorder),
       ),
       child: Row(
@@ -528,7 +528,7 @@ class PdOtherFeaturesSection extends StatelessWidget {
                   ),
                   decoration: BoxDecoration(
                     color: AppColors.maroonTint,
-                    borderRadius: BorderRadius.circular(14.r),
+                    borderRadius: BorderRadius.circular(8.r),
                     border: Border.all(
                       color: AppColors.primary.withValues(alpha: .14),
                     ),
@@ -637,7 +637,7 @@ iframe { border: 0; width: 100%; height: 100%; }
           SizedBox(height: 14.h),
 
           ClipRRect(
-            borderRadius: BorderRadius.circular(18.r),
+            borderRadius: BorderRadius.circular(8.r),
             child: SizedBox(
               height: 190.h,
               width: double.infinity,
@@ -707,7 +707,7 @@ iframe { border: 0; width: 100%; height: 100%; }
                 height: 36.w,
                 decoration: BoxDecoration(
                   color: AppColors.maroonTint,
-                  borderRadius: BorderRadius.circular(12.r),
+                  borderRadius: BorderRadius.circular(8.r),
                 ),
                 child: Icon(
                   Icons.location_on_rounded,
@@ -781,7 +781,7 @@ class _Coordinate extends StatelessWidget {
       padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 10.h),
       decoration: BoxDecoration(
         color: PD.cell,
-        borderRadius: BorderRadius.circular(14.r),
+        borderRadius: BorderRadius.circular(8.r),
         border: Border.all(color: AppColors.warmBorder),
       ),
       child: Column(
@@ -850,7 +850,7 @@ class PdCompareSection extends StatelessWidget {
                 height: 42.w,
                 decoration: BoxDecoration(
                   color: AppColors.maroonTint,
-                  borderRadius: BorderRadius.circular(14.r),
+                  borderRadius: BorderRadius.circular(8.r),
                 ),
                 child: Icon(
                   Icons.compare_arrows_rounded,

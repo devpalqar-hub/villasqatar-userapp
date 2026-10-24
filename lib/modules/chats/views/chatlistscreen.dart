@@ -60,7 +60,7 @@ class ChatListScreen extends StatelessWidget {
                 height: 38.h,
                 decoration: BoxDecoration(
                   color: AppColors.fieldBg,
-                  borderRadius: BorderRadius.circular(10.r),
+                  borderRadius: BorderRadius.circular(8.r),
                   border: Border.all(color: AppColors.fieldBorder),
                 ),
                 child: TextField(
@@ -190,14 +190,14 @@ class _ConversationTile extends StatelessWidget {
       padding: EdgeInsets.symmetric(horizontal: 4.w, vertical: 5.h),
       child: Material(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(14.r),
+        borderRadius: BorderRadius.circular(8.r),
         child: InkWell(
           onTap: onTap,
-          borderRadius: BorderRadius.circular(14.r),
+          borderRadius: BorderRadius.circular(8.r),
           child: Container(
             padding: EdgeInsets.all(11.w),
             decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(14.r),
+              borderRadius: BorderRadius.circular(8.r),
               border: Border.all(color: const Color(0xffECECEC)),
               boxShadow: [
                 BoxShadow(
@@ -214,7 +214,7 @@ class _ConversationTile extends StatelessWidget {
                 // PROPERTY IMAGE
                 // ============================================
                 ClipRRect(
-                  borderRadius: BorderRadius.circular(11.r),
+                  borderRadius: BorderRadius.circular(8.r),
                   child: SizedBox(
                     width: 72.w,
                     height: 76.h,

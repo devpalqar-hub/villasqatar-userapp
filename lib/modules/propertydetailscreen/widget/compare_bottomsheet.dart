@@ -176,15 +176,15 @@ class _CompareBottomSheetState extends State<CompareBottomSheet> {
                       vertical: 0,
                     ),
                     border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(10.r),
+                      borderRadius: BorderRadius.circular(8.r),
                       borderSide: BorderSide.none,
                     ),
                     enabledBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(10.r),
+                      borderRadius: BorderRadius.circular(8.r),
                       borderSide: BorderSide.none,
                     ),
                     focusedBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(10.r),
+                      borderRadius: BorderRadius.circular(8.r),
                       borderSide: BorderSide(
                         color: AppColors.primary,
                         width: 1,
@@ -237,7 +237,7 @@ class _CompareBottomSheetState extends State<CompareBottomSheet> {
                     style: ElevatedButton.styleFrom(
                       backgroundColor: AppColors.primary,
                       shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10.r),
+                        borderRadius: BorderRadius.circular(8.r),
                       ),
                     ),
                     child: Text(
@@ -580,7 +580,7 @@ class ComparisonView extends StatelessWidget {
                 style: OutlinedButton.styleFrom(
                   side: BorderSide(color: AppColors.primary),
                   shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(14.r),
+                    borderRadius: BorderRadius.circular(8.r),
                   ),
                 ),
                 child: Text(
@@ -611,7 +611,7 @@ Widget _titleColumn() {
       child: Column(
         children: [
           ClipRRect(
-            borderRadius: BorderRadius.circular(12.r),
+            borderRadius: BorderRadius.circular(8.r),
             child: image.isEmpty
                 ? Container(height: 100.h, color: Colors.grey.shade200)
                 : Image.network(

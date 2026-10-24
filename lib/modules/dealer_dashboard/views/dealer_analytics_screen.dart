@@ -122,14 +122,14 @@ class _DealerAnalyticsScreenState extends State<DealerAnalyticsScreen> {
             childAspectRatio: 1.40,
             children: List.generate(
               4,
-              (_) => ShimmerBox(borderRadius: BorderRadius.circular(16.r)),
+              (_) => ShimmerBox(borderRadius: BorderRadius.circular(8.r)),
             ),
           ),
           SizedBox(height: 18.h),
           ShimmerBox(
             width: double.infinity,
             height: 170.h,
-            borderRadius: BorderRadius.circular(18.r),
+            borderRadius: BorderRadius.circular(8.r),
           ),
         ],
       ),
@@ -306,7 +306,7 @@ class _DealerAnalyticsScreenState extends State<DealerAnalyticsScreen> {
                 height: 4.h,
                 decoration: BoxDecoration(
                   color: const Color(0xFFD9D9D9),
-                  borderRadius: BorderRadius.circular(10.r),
+                  borderRadius: BorderRadius.circular(8.r),
                 ),
               ),
 
@@ -372,7 +372,7 @@ class _DealerAnalyticsScreenState extends State<DealerAnalyticsScreen> {
 
               /// Logout
               InkWell(
-                borderRadius: BorderRadius.circular(12.r),
+                borderRadius: BorderRadius.circular(8.r),
                 onTap: () async {
                   Navigator.pop(context);
 
@@ -392,7 +392,7 @@ class _DealerAnalyticsScreenState extends State<DealerAnalyticsScreen> {
                         height: 36.w,
                         decoration: BoxDecoration(
                           color: const Color(0xFFFFF1F1),
-                          borderRadius: BorderRadius.circular(10.r),
+                          borderRadius: BorderRadius.circular(8.r),
                         ),
                         alignment: Alignment.center,
                         child: Icon(
@@ -468,14 +468,14 @@ class _DealerAnalyticsScreenState extends State<DealerAnalyticsScreen> {
       children: [
         Expanded(
           child: InkWell(
-            borderRadius: BorderRadius.circular(14.r),
+            borderRadius: BorderRadius.circular(8.r),
             onTap: () => showDealerFilterSheet(context, controller),
             child: Container(
               padding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 10.h),
               decoration: BoxDecoration(
                 color: Colors.white,
                 border: Border.all(color: _line),
-                borderRadius: BorderRadius.circular(14.r),
+                borderRadius: BorderRadius.circular(8.r),
               ),
               child: Row(
                 children: [
@@ -508,14 +508,14 @@ class _DealerAnalyticsScreenState extends State<DealerAnalyticsScreen> {
         SizedBox(width: 8.w),
         PressableScale(
           child: InkWell(
-            borderRadius: BorderRadius.circular(14.r),
+            borderRadius: BorderRadius.circular(8.r),
             onTap: () => showDealerFilterSheet(context, controller),
             child: Container(
               width: 40.w,
               height: 40.w,
               decoration: BoxDecoration(
                 color: AppColors.primary,
-                borderRadius: BorderRadius.circular(14.r),
+                borderRadius: BorderRadius.circular(8.r),
               ),
               alignment: Alignment.center,
               child: Icon(Icons.tune_rounded, color: Colors.white, size: 16.sp),
@@ -762,7 +762,7 @@ class _DealerAnalyticsScreenState extends State<DealerAnalyticsScreen> {
       padding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 12.h),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(16.r),
+        borderRadius: BorderRadius.circular(8.r),
         border: Border.all(color: _line),
       ),
       child: Column(
@@ -834,7 +834,7 @@ class _DealerAnalyticsScreenState extends State<DealerAnalyticsScreen> {
         decoration: BoxDecoration(
           color: Colors.white,
           border: Border.all(color: _line),
-          borderRadius: BorderRadius.circular(18.r),
+          borderRadius: BorderRadius.circular(8.r),
         ),
         child: Center(
           child: Text(
@@ -858,7 +858,7 @@ class _DealerAnalyticsScreenState extends State<DealerAnalyticsScreen> {
       decoration: BoxDecoration(
         color: Colors.white,
         border: Border.all(color: _line),
-        borderRadius: BorderRadius.circular(18.r),
+        borderRadius: BorderRadius.circular(8.r),
       ),
       child: Column(
         children: [
@@ -954,7 +954,7 @@ class _DealerAnalyticsScreenState extends State<DealerAnalyticsScreen> {
             decoration: BoxDecoration(
               color: Colors.white,
               border: Border.all(color: _line),
-              borderRadius: BorderRadius.circular(16.r),
+              borderRadius: BorderRadius.circular(8.r),
             ),
             child: Column(
               children: [
@@ -1043,12 +1043,12 @@ class _DealerAnalyticsScreenState extends State<DealerAnalyticsScreen> {
         margin: EdgeInsets.only(bottom: 10.h),
         decoration: BoxDecoration(
           color: Colors.white,
-          borderRadius: BorderRadius.circular(14.r),
+          borderRadius: BorderRadius.circular(8.r),
           border: Border.all(color: _line, width: 0.8),
         ),
         child: Material(
           color: Colors.transparent,
-          borderRadius: BorderRadius.circular(14.r),
+          borderRadius: BorderRadius.circular(8.r),
           clipBehavior: Clip.antiAlias,
           child: InkWell(
             onTap: () => Get.to(() => PropertyDetailsScreen(propertyId: l.id)),
@@ -1066,7 +1066,7 @@ class _DealerAnalyticsScreenState extends State<DealerAnalyticsScreen> {
                         height: 42.w,
                         decoration: BoxDecoration(
                           color: AppColors.primarySoft,
-                          borderRadius: BorderRadius.circular(11.r),
+                          borderRadius: BorderRadius.circular(8.r),
                         ),
                         child: Icon(
                           _typeIcon(l.type?.title),
@@ -1153,7 +1153,7 @@ class _DealerAnalyticsScreenState extends State<DealerAnalyticsScreen> {
                             ),
                             decoration: BoxDecoration(
                               color: statusBg,
-                              borderRadius: BorderRadius.circular(12.r),
+                              borderRadius: BorderRadius.circular(8.r),
                             ),
                             child: Text(
                               l.status.tr,
@@ -1189,7 +1189,7 @@ class _DealerAnalyticsScreenState extends State<DealerAnalyticsScreen> {
                         ),
                         decoration: BoxDecoration(
                           color: isSale ? _goldLight : _blueSoft,
-                          borderRadius: BorderRadius.circular(12.r),
+                          borderRadius: BorderRadius.circular(8.r),
                         ),
                         child: Text(
                           l.purpose.tr,
